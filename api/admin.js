@@ -1,14 +1,36 @@
 // api/admin.js
-// Painel admin com suporte a alunos (Hotmart) + controle manual de licenças
-
-import { createClient } from '@supabase/supabase-js';
+const { createClient } = require('@supabase/supabase-js');
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_KEY
 );
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '@Benicio23';
+// ── MÚLTIPLOS ADMINS ─────────────────────────────────────────
+// Para adicionar/remover admins, edite esta lista.
+// Cada admin tem: nome, login e senha.
+const ADMINS = [
+  { name: 'Rafael',   login: 'rafael',   password: process.env.ADMIN_PASSWORD  || '@Benicio23' },
+  { name: 'Admin 2',  login: 'admin2',   password: process.env.ADMIN2_PASSWORD || 'troque-esta-senha' },
+  { name: 'Admin 3',  login: 'admin3',   password: process.env.ADMIN3_PASSWORD || 'troque-esta-senha-3' },
+];
+
+function findAdmin(login, password) {
+  return ADMINS.find(a => a.login === login && a.password === password);
+}
+
+function isValidToken(token) {
+  try {
+    const decoded = Buffer.from(token, 'base64').toString('utf8');
+    const [login, ...rest] = decoded.split(':');
+    const password = rest.join(':');
+    return !!findAdmin(login, password);
+  } catch { return false; }
+}
+
+function makeToken(login, password) {
+  return Buffer.from(`${login}:${password}`).toString('base64');
+}
 
 function generateKey() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -26,113 +48,94 @@ async function generateUniqueKey() {
   return key;
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  // Auth simples por header
-  const auth = req.headers['authorization'] || '';
-  const token = auth.replace('Bearer ', '');
-  if (token !== ADMIN_PASSWORD && req.body?.password !== ADMIN_PASSWORD) {
-    // Permite login via body também
-    if (req.method === 'POST' && req.body?.action === 'login') {
-      if (req.body?.password === ADMIN_PASSWORD) {
-        return res.status(200).json({ ok: true, token: ADMIN_PASSWORD });
-      }
-      return res.status(401).json({ error: 'Senha incorreta' });
+  const body = req.body || {};
+  const action = body.action || req.query?.action;
+
+  // LOGIN
+  if (action === 'login') {
+    const admin = findAdmin(body.login || '', body.password || '');
+    if (admin) {
+      const token = makeToken(admin.login, admin.password);
+      return res.status(200).json({ ok: true, token, name: admin.name });
     }
+    return res.status(401).json({ error: 'Login ou senha incorretos' });
+  }
+
+  // AUTH
+  const authHeader = req.headers['authorization'] || '';
+  const token = authHeader.replace('Bearer ', '');
+  const legacyOk = ADMINS.some(a => a.password === token || a.password === body.password);
+  const tokenOk  = isValidToken(token);
+  if (!legacyOk && !tokenOk) {
     return res.status(401).json({ error: 'Não autorizado' });
   }
 
-  const action = req.body?.action || req.query?.action;
-
-  // ─── LICENÇAS ───────────────────────────────────────────────────────────────
-
-  if (action === 'list' || req.method === 'GET' && !action) {
-    const { data, error } = await supabase
-      .from('licenses')
-      .select('*')
-      .order('created_at', { ascending: false });
+  // LIST
+  if (action === 'list' || (req.method === 'GET' && !action)) {
+    const { data, error } = await supabase.from('licenses').select('*').order('created_at', { ascending: false });
     if (error) return res.status(500).json({ error: error.message });
     return res.status(200).json({ licenses: data });
   }
 
+  // CREATE
   if (action === 'create') {
-    const { email, name, phone, notes } = req.body;
     const key = await generateUniqueKey();
     const { data, error } = await supabase.from('licenses').insert({
-      key,
-      email: email || null,
-      name: name || null,
-      phone: phone || null,
-      notes: notes || null,
-      status: 'active',
-      source: 'manual',
-      created_at: new Date().toISOString()
+      key, email: body.email||null, name: body.name||null, phone: body.phone||null,
+      notes: body.notes||null, status: 'active', source: 'manual', created_at: new Date().toISOString()
     }).select().single();
     if (error) return res.status(500).json({ error: error.message });
     return res.status(200).json({ ok: true, license: data });
   }
 
+  // TOGGLE
   if (action === 'toggle') {
-    const { key } = req.body;
-    const { data: current } = await supabase.from('licenses').select('status').eq('key', key).single();
-    const newStatus = current?.status === 'active' ? 'inactive' : 'active';
-    const { error } = await supabase.from('licenses').update({ status: newStatus }).eq('key', key);
-    if (error) return res.status(500).json({ error: error.message });
+    const { data: cur } = await supabase.from('licenses').select('status').eq('key', body.key).single();
+    const newStatus = cur?.status === 'active' ? 'inactive' : 'active';
+    await supabase.from('licenses').update({ status: newStatus }).eq('key', body.key);
     return res.status(200).json({ ok: true, status: newStatus });
   }
 
-  if (action === 'revoke') {
-    const { key } = req.body;
-    const { error } = await supabase.from('licenses').update({ status: 'inactive' }).eq('key', key);
-    if (error) return res.status(500).json({ error: error.message });
-    return res.status(200).json({ ok: true });
-  }
-
+  // REGEN KEY
   if (action === 'regenkey') {
-    // Gera uma nova chave para o registro (mantém email/nome)
-    const { key: oldKey } = req.body;
     const newKey = await generateUniqueKey();
-    const { error } = await supabase.from('licenses').update({ key: newKey }).eq('key', oldKey);
-    if (error) return res.status(500).json({ error: error.message });
+    await supabase.from('licenses').update({ key: newKey }).eq('key', body.key);
     return res.status(200).json({ ok: true, newKey });
   }
 
+  // DELETE
   if (action === 'delete') {
-    const { key } = req.body;
-    const { error } = await supabase.from('licenses').delete().eq('key', key);
-    if (error) return res.status(500).json({ error: error.message });
+    await supabase.from('licenses').delete().eq('key', body.key);
     return res.status(200).json({ ok: true });
   }
 
+  // UPDATE
   if (action === 'update') {
-    // Atualiza nome, email, phone, notes de uma licença
-    const { key, name, email, phone, notes } = req.body;
     const updates = {};
-    if (name  !== undefined) updates.name  = name;
-    if (email !== undefined) updates.email = email;
-    if (phone !== undefined) updates.phone = phone;
-    if (notes !== undefined) updates.notes = notes;
-    const { error } = await supabase.from('licenses').update(updates).eq('key', key);
-    if (error) return res.status(500).json({ error: error.message });
+    if (body.name  !== undefined) updates.name  = body.name;
+    if (body.email !== undefined) updates.email = body.email;
+    if (body.phone !== undefined) updates.phone = body.phone;
+    if (body.notes !== undefined) updates.notes = body.notes;
+    await supabase.from('licenses').update(updates).eq('key', body.key);
     return res.status(200).json({ ok: true });
   }
 
-  // ─── STATS ──────────────────────────────────────────────────────────────────
-
+  // STATS
   if (action === 'stats') {
-    const { data, error } = await supabase.from('licenses').select('status, source');
-    if (error) return res.status(500).json({ error: error.message });
-    const total    = data.length;
-    const active   = data.filter(l => l.status === 'active').length;
-    const inactive = data.filter(l => l.status !== 'active').length;
-    const hotmart  = data.filter(l => l.source === 'hotmart').length;
-    const manual   = data.filter(l => l.source === 'manual').length;
+    const { data } = await supabase.from('licenses').select('status, source');
+    const total    = (data||[]).length;
+    const active   = (data||[]).filter(l => l.status === 'active').length;
+    const inactive = (data||[]).filter(l => l.status !== 'active').length;
+    const hotmart  = (data||[]).filter(l => l.source === 'hotmart').length;
+    const manual   = (data||[]).filter(l => l.source === 'manual').length;
     return res.status(200).json({ total, active, inactive, hotmart, manual });
   }
 
   return res.status(400).json({ error: 'Ação desconhecida' });
-}
+};
