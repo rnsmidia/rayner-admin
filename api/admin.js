@@ -10,9 +10,9 @@ const supabase = createClient(
 // Para adicionar/remover admins, edite esta lista.
 // Cada admin tem: nome, login e senha.
 const ADMINS = [
-  { name: 'Rafael',   login: 'rafael',   password: process.env.ADMIN_PASSWORD  || '@Benicio23' },
-  { name: 'Admin 2',  login: 'admin2',   password: process.env.ADMIN2_PASSWORD || 'troque-esta-senha' },
-  { name: 'Admin 3',  login: 'admin3',   password: process.env.ADMIN3_PASSWORD || 'troque-esta-senha-3' },
+  { name: 'Rayner',     login: 'rnadmin', password: process.env.ADMIN_PASSWORD  || '@Benicio23' },
+  { name: 'Marcos',     login: 'mcadmin', password: process.env.ADMIN2_PASSWORD || '@Samuel' },
+  { name: 'Jaqueline',  login: 'jnadmin', password: process.env.ADMIN3_PASSWORD || '@Samuel' },
 ];
 
 function findAdmin(login, password) {
