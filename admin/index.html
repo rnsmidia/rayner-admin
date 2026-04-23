@@ -393,6 +393,7 @@
   <div class="login-card">
     <div class="login-logo">Cena<span>Drop</span></div>
     <div class="login-sub">Painel Administrativo</div>
+    <input type="text" id="login-input" placeholder="Seu login (ex: rafael)" style="margin-bottom:12px" />
     <input type="password" id="pw-input" placeholder="Senha de acesso" />
     <button class="btn-primary" onclick="doLogin()">Entrar</button>
     <div class="login-error" id="login-err"></div>
@@ -502,11 +503,12 @@
 
   // ── AUTH ────────────────────────────────────────────────
   function doLogin() {
-    const pw = document.getElementById('pw-input').value;
+    const pw    = document.getElementById('pw-input').value;
+    const login = (document.getElementById('login-input')?.value || '').trim() || 'rafael';
     fetch(API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'login', password: pw })
+      body: JSON.stringify({ action: 'login', login, password: pw })
     }).then(r => r.json()).then(d => {
       if (d.ok) {
         TOKEN = pw;
