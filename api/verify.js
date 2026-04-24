@@ -17,7 +17,7 @@ export default async function handler(req, res) {
 
   try {
     const response = await fetch(
-      `${SUPABASE_URL}/rest/v1/licenses?key=eq.${encodeURIComponent(key.trim())}&select=id,key,active,email,note,device_id`,
+     `${SUPABASE_URL}/rest/v1/licenses?key=eq.${encodeURIComponent(key.trim())}&select=id,key,active,status,email,note,device_id`,
       { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' } }
     );
     const data = await response.json();
@@ -27,7 +27,7 @@ export default async function handler(req, res) {
 
     const license = data[0];
 
-    if (!license.active)
+   if (!license.active || license.status === 'inactive')
       return res.status(200).json({ valid: false, error: 'Licença desativada. Entre em contato com o suporte.' });
 
     // Se já tem um device registrado e é diferente, bloqueia
