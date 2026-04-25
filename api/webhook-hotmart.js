@@ -1,4 +1,11 @@
-// api/webhook-hotmart.js
+// api/webhook-hotmart.js — CenaDrop v7.0
+// Eventos tratados:
+//   COMPRA APROVADA  → gera chave + envia email
+//   CANCELAMENTO     → desativa chave
+//   CHARGEBACK       → desativa chave
+//   RENOVAÇÃO ANUAL  → mantém chave ativa (não faz nada, já está ativa)
+//   EXPIRAÇÃO ANUAL  → desativa chave (Hotmart sinaliza via SUBSCRIPTION_CANCELLATION)
+
 const { createClient } = require('@supabase/supabase-js');
 const { Resend } = require('resend');
 
@@ -9,6 +16,41 @@ const supabase = createClient(
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+// ─────────────────────────────────────────────────────────────
+// ✅ PREENCHA QUANDO O DOMÍNIO ESTIVER VERIFICADO NO RESEND
+// ─────────────────────────────────────────────────────────────
+const EMAIL_FROM = 'CenaDrop <contato@cenadrop.com.br>';
+// const EMAIL_FROM = 'CenaDrop <onboarding@resend.dev>'; // ← fallback temporário
+
+// ─────────────────────────────────────────────────────────────
+// ✅ COLE AQUI O HOTTOK DO WEBHOOK DA HOTMART (segurança)
+// Encontre em: Hotmart > Ferramentas > Webhooks > seu webhook > Hottok
+// ─────────────────────────────────────────────────────────────
+const HOTMART_HOTTOK = process.env.HOTMART_HOTTOK || ''; // deixe vazio para ignorar validação por enquanto
+
+// ─────────────────────────────────────────────────────────────
+// Eventos de COMPRA APROVADA
+// ─────────────────────────────────────────────────────────────
+const APPROVED_EVENTS = [
+  'PURCHASE_APPROVED',
+  'PURCHASE_COMPLETE',
+  'purchase.approved',
+];
+
+// ─────────────────────────────────────────────────────────────
+// Eventos de CANCELAMENTO / CHARGEBACK / EXPIRAÇÃO
+// ─────────────────────────────────────────────────────────────
+const CANCEL_EVENTS = [
+  'PURCHASE_REFUNDED',
+  'PURCHASE_CHARGEBACK',
+  'PURCHASE_CANCELLED',
+  'PURCHASE_PROTEST',
+  'SUBSCRIPTION_CANCELLATION', // ← expiração anual sem renovação
+];
+
+// ─────────────────────────────────────────────────────────────
+// Gerador de chave único
+// ─────────────────────────────────────────────────────────────
 function generateKey() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   const seg = () => Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
@@ -25,57 +67,122 @@ async function generateUniqueKey() {
   return key;
 }
 
+// ─────────────────────────────────────────────────────────────
+// Handler principal
+// ─────────────────────────────────────────────────────────────
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  // Validação do Hottok (segurança Hotmart)
+  if (HOTMART_HOTTOK) {
+    const hottok = req.headers['x-hotmart-hottok'] || req.query?.hottok || '';
+    if (hottok !== HOTMART_HOTTOK) {
+      console.warn('[Hotmart] Hottok inválido:', hottok);
+      return res.status(401).json({ error: 'Não autorizado' });
+    }
+  }
 
   try {
     const body  = req.body;
     const event = body?.event || body?.type || '';
     const data  = body?.data  || body;
 
-    const approvedEvents = ['PURCHASE_APPROVED', 'PURCHASE_COMPLETE', 'purchase.approved'];
-    if (!approvedEvents.includes(event)) {
-      return res.status(200).json({ ok: true, message: `Evento ${event} ignorado` });
+    console.log(`[Hotmart] Evento recebido: ${event}`);
+
+    // ── COMPRA APROVADA ──────────────────────────────────────
+    if (APPROVED_EVENTS.includes(event)) {
+      const buyer = data?.buyer || data?.purchase?.buyer || data?.customer || {};
+      const name        = buyer.name || buyer.full_name || 'Cliente';
+      const email       = buyer.email || '';
+      const phone       = buyer.phone || buyer.checkout_phone || '';
+      const productName = data?.product?.name || 'CenaDrop Flow';
+
+      if (!email) return res.status(400).json({ error: 'Email não encontrado no payload' });
+
+      // Verifica se já tem chave ativa para esse email
+      const { data: existing } = await supabase
+        .from('licenses')
+        .select('key, status')
+        .eq('email', email)
+        .eq('status', 'active')
+        .single();
+
+      if (existing) {
+        // Já tem chave — só reenvia o email
+        await sendWelcomeEmail({ name, email, key: existing.key, productName });
+        console.log(`[Hotmart] Chave já existente para ${email}, email reenviado`);
+        return res.status(200).json({ ok: true, message: 'Chave já existente, email reenviado' });
+      }
+
+      // Gera nova chave
+      const key = await generateUniqueKey();
+
+      await supabase.from('licenses').insert({
+        key,
+        email,
+        name,
+        phone,
+        status: 'active',
+        active: true,
+        source: 'hotmart',
+        product: productName,
+        created_at: new Date().toISOString(),
+        notes: `Compra automática via Hotmart em ${new Date().toLocaleDateString('pt-BR')}`,
+      });
+
+      await sendWelcomeEmail({ name, email, key, productName });
+
+      console.log(`[Hotmart] Nova chave gerada para ${email}: ${key}`);
+      return res.status(200).json({ ok: true, key, email });
     }
 
-    const buyer = data?.buyer || data?.purchase?.buyer || data?.customer || {};
-    const name        = buyer.name || buyer.full_name || 'Aluno';
-    const email       = buyer.email || '';
-    const phone       = buyer.phone || buyer.checkout_phone || '';
-    const productName = data?.product?.name || 'CenaDrop';
+    // ── CANCELAMENTO / CHARGEBACK / EXPIRAÇÃO ────────────────
+    if (CANCEL_EVENTS.includes(event)) {
+      const buyer = data?.buyer || data?.purchase?.buyer || data?.subscriber || data?.customer || {};
+      const email = buyer.email || '';
 
-    if (!email) return res.status(400).json({ error: 'Email não encontrado' });
+      if (!email) {
+        console.warn(`[Hotmart] Evento de cancelamento sem email: ${event}`);
+        return res.status(200).json({ ok: true, message: 'Cancelamento sem email, ignorado' });
+      }
 
-    const { data: existing } = await supabase
-      .from('licenses').select('key, status').eq('email', email).eq('status', 'active').single();
+      // Desativa todas as licenças ativas desse email
+      const { error } = await supabase
+        .from('licenses')
+        .update({
+          status: 'inactive',
+          active: false,
+          notes: `Desativado automaticamente via Hotmart — evento: ${event} em ${new Date().toLocaleDateString('pt-BR')}`,
+        })
+        .eq('email', email)
+        .eq('status', 'active');
 
-    if (existing) {
-      await sendWelcomeEmail({ name, email, key: existing.key, productName });
-      return res.status(200).json({ ok: true, message: 'Chave já existente, email reenviado' });
+      if (error) {
+        console.error(`[Hotmart] Erro ao desativar licença de ${email}:`, error);
+        return res.status(500).json({ error: 'Erro ao desativar licença' });
+      }
+
+      console.log(`[Hotmart] Licença desativada para ${email} — evento: ${event}`);
+      return res.status(200).json({ ok: true, message: `Licença desativada para ${email}` });
     }
 
-    const key = await generateUniqueKey();
-
-    await supabase.from('licenses').insert({
-      key, email, name, phone, status: 'active', source: 'hotmart', product: productName,
-      created_at: new Date().toISOString(),
-      notes: `Compra automática via Hotmart em ${new Date().toLocaleDateString('pt-BR')}`
-    });
-
-    await sendWelcomeEmail({ name, email, key, productName });
-
-    return res.status(200).json({ ok: true, key, email });
+    // ── EVENTO IGNORADO ──────────────────────────────────────
+    console.log(`[Hotmart] Evento ignorado: ${event}`);
+    return res.status(200).json({ ok: true, message: `Evento ${event} ignorado` });
 
   } catch (err) {
-    console.error('[Hotmart] Erro:', err);
+    console.error('[Hotmart] Erro interno:', err);
     return res.status(500).json({ error: 'Erro interno' });
   }
 };
 
+// ─────────────────────────────────────────────────────────────
+// Email de boas-vindas com a chave
+// ─────────────────────────────────────────────────────────────
 async function sendWelcomeEmail({ name, email, key, productName }) {
   const firstName = name.split(' ')[0];
   await resend.emails.send({
-    from: 'CenaDrop <onboarding@resend.dev>',
+    from: EMAIL_FROM,
     to: email,
     subject: `🎬 Seu acesso ao ${productName} chegou!`,
     html: `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
@@ -95,11 +202,19 @@ async function sendWelcomeEmail({ name, email, key, productName }) {
       <div class="h"><div class="logo">Cena<span>Drop</span></div></div>
       <div class="b">
         <div class="g">Olá, ${firstName}! 🎉</div>
-        <p class="t">Seu acesso ao <strong style="color:#ccc">${productName}</strong> foi aprovado. Sua chave exclusiva:</p>
-        <div class="kb"><div class="kl">Chave de Acesso</div><div class="kv">${key}</div></div>
-        <p class="t" style="font-size:13px;color:#555;">Instale a extensão, clique em "Ativar Licença" e cole sua chave. Problemas? Responda este email.</p>
+        <p class="t">Seu acesso ao <strong style="color:#ccc">${productName}</strong> foi aprovado. Sua chave exclusiva está abaixo:</p>
+        <div class="kb">
+          <div class="kl">Chave de Acesso</div>
+          <div class="kv">${key}</div>
+        </div>
+        <p class="t" style="font-size:13px;color:#555;">
+          Instale a extensão CenaDrop no Chrome, clique em "Ativar Licença" e cole sua chave.<br><br>
+          Problemas? Responda este email que te ajudamos.
+        </p>
       </div>
-      <div class="f"><p>© ${new Date().getFullYear()} CenaDrop</p></div>
-    </div></div></body></html>`
+      <div class="f">
+        <p>© ${new Date().getFullYear()} CenaDrop — cenadrop.com.br</p>
+      </div>
+    </div></div></body></html>`,
   });
 }
