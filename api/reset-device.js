@@ -1,15 +1,15 @@
-// api/reset-device.js
+// api/reset-device.js — CenaDrop v7.0
 // Limpa o device_id de uma licença, permitindo ativação num novo dispositivo.
 // Valida APENAS a chave — quem tem a chave pode transferir.
 
-import { createClient } from '@supabase/supabase-js';
+const { createClient } = require('@supabase/supabase-js');
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_KEY
 );
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -25,10 +25,9 @@ export default async function handler(req, res) {
 
   const normalizedKey = key.trim().toUpperCase();
 
-  // Busca a licença pelo key
   const { data: license, error } = await supabase
     .from('licenses')
-    .select('id, active, device_id')
+    .select('id, active, status')
     .eq('key', normalizedKey)
     .single();
 
@@ -36,11 +35,10 @@ export default async function handler(req, res) {
     return res.status(404).json({ ok: false, error: 'Chave inválida.' });
   }
 
-  if (!license.active) {
+  if (!license.active || license.status === 'inactive') {
     return res.status(403).json({ ok: false, error: 'Licença inativa.' });
   }
 
-  // Limpa o device_id — seta null para permitir ativação em qualquer novo dispositivo
   const { error: updateError } = await supabase
     .from('licenses')
     .update({ device_id: null })
@@ -53,4 +51,4 @@ export default async function handler(req, res) {
 
   console.log(`[reset-device] device_id limpo para chave: ${normalizedKey}`);
   return res.status(200).json({ ok: true, message: 'Dispositivo desvinculado com sucesso.' });
-}
+};
