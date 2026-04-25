@@ -40,10 +40,10 @@ export default async function handler(req, res) {
     return res.status(403).json({ ok: false, error: 'Licença inativa.' });
   }
 
-  // Limpa o device_id — permite ativação em qualquer novo dispositivo
+  // Limpa o device_id — seta null para permitir ativação em qualquer novo dispositivo
   const { error: updateError } = await supabase
     .from('licenses')
-    .update({ device_id: 'EMPTY' })
+    .update({ device_id: null })
     .eq('id', license.id);
 
   if (updateError) {
