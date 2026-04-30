@@ -458,24 +458,29 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 <!-- ══ S2 — O GRANDE DIFERENCIAL: GERAR CSV ══ -->
 <section class="slide" id="s2">
   <div class="slide-eyebrow">✦ Diferencial exclusivo</div>
-  <h2 class="slide-h">De roteiro a cenas <span>cinematográficas</span></h2>
-  <p class="slide-sub">Você escreve uma ideia. O CenaDrop transforma em um roteiro completo com cenas detalhadas, pronto para o Google Veo3 gerar os vídeos automaticamente.</p>
+  <h2 class="slide-h">Do roteiro às cenas <span>cinematográficas</span></h2>
+  <p class="slide-sub">Você já tem o roteiro. O CenaDrop gera o prompt master, você cola no Claude ou ChatGPT — e recebe o CSV pronto com todas as cenas detalhadas para automatizar no Veo3.</p>
   <div class="wrap">
     <div class="left">
       <div class="hero-feature">
         <div class="hf-label">✦ Aba "Gerar CSV" — Exclusivo CenaDrop</div>
-        <h3>Inteligência criativa integrada à extensão</h3>
-        <p>Escolha o estilo visual, o idioma e a quantidade de cenas. O sistema gera cada cena com: enquadramento, iluminação, movimento de câmera, atmosfera e áudio — tudo estruturado em CSV, pronto para automação imediata.</p>
+        <h3>Prompt master gerado pela extensão</h3>
+        <p>Cole seu roteiro pronto, escolha o estilo visual, o idioma e a quantidade de cenas. A extensão monta o prompt master completo — você copia, cola no Claude ou ChatGPT, e recebe o CSV com cada cena descrita em linguagem cinematográfica profissional.</p>
       </div>
       <div class="flow-arrow">
-        <div class="fa-from">💡 Sua ideia</div>
+        <div class="fa-from">📝 Seu roteiro</div>
         <div class="fa-arrow">→</div>
-        <div class="fa-to">🎬 Roteiro cinematográfico em CSV</div>
+        <div class="fa-to">✨ Prompt master gerado</div>
       </div>
       <div class="flow-arrow">
-        <div class="fa-from">📄 CSV gerado</div>
+        <div class="fa-from">🤖 Claude / ChatGPT</div>
         <div class="fa-arrow">→</div>
-        <div class="fa-to">🤖 Automação no Veo3</div>
+        <div class="fa-to">📄 CSV cinematográfico</div>
+      </div>
+      <div class="flow-arrow">
+        <div class="fa-from">📄 CSV importado</div>
+        <div class="fa-arrow">→</div>
+        <div class="fa-to">🎬 Automação no Veo3</div>
       </div>
     </div>
     <div class="right">
@@ -804,12 +809,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
     <div class="info">
       <div class="slide-eyebrow">✦ Diferencial — Aba Gerar CSV</div>
       <h2>Gerar <span>CSV Cinematográfico</span></h2>
-      <p>Esta aba transforma qualquer ideia em um roteiro completo com linguagem cinematográfica, pronto para o Veo3. Não precisa saber escrever prompts — o sistema faz isso por você.</p>
+      <p>Cole seu roteiro pronto na extensão. Ela gera o prompt master — você copia e cola no Claude ou ChatGPT, que devolve o CSV com todas as cenas em linguagem cinematográfica, pronto para importar.</p>
       <div class="flow-steps">
-        <div class="fs"><div class="fs-num">1</div><div class="fs-text"><strong>Escolha o estilo visual</strong> — define a estética de todas as cenas (cinematic, anime, tech, terror e mais 7 opções)</div></div>
-        <div class="fs"><div class="fs-num">2</div><div class="fs-text"><strong>Escolha o idioma</strong> — PT-BR, ES-ES ou EN-US. Os prompts são gerados no idioma selecionado</div></div>
-        <div class="fs"><div class="fs-num">3</div><div class="fs-text"><strong>Defina a quantidade de cenas</strong> — o sistema gera cada cena com: descrição, enquadramento, movimento de câmera, atmosfera e áudio</div></div>
-        <div class="fs"><div class="fs-num">4</div><div class="fs-text"><strong>Clique em Gerar</strong> — o CSV aparece pronto. Copie, salve e importe na aba Main para automatizar</div></div>
+        <div class="fs"><div class="fs-num">1</div><div class="fs-text"><strong>Cole seu roteiro</strong> — roteiro já escrito, qualquer formato. A extensão usa ele como base para montar o prompt master</div></div>
+        <div class="fs"><div class="fs-num">2</div><div class="fs-text"><strong>Configure estilo, idioma e cenas</strong> — 11 estilos visuais, 3 idiomas (PT-BR, ES-ES, EN-US) e quantidade de cenas desejada</div></div>
+        <div class="fs"><div class="fs-num">3</div><div class="fs-text"><strong>Clique "Gerar Meta-Prompt"</strong> — a extensão monta o prompt completo. Você copia e cola no Claude ou ChatGPT</div></div>
+        <div class="fs"><div class="fs-num">4</div><div class="fs-text"><strong>Cole o CSV de volta e baixe</strong> — a IA retorna o CSV pronto. Cole na extensão, clique em "Baixar CSV" e importe na aba Main para automatizar</div></div>
       </div>
       <div class="style-tags" style="margin-top:14px">
         <span class="st">cinematic</span><span class="st">anime</span><span class="st">realismo</span>
@@ -844,8 +849,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
         </div>
         <button class="pg-btn">✦ Gerar Meta-Prompt</button>
         <div class="pg-output">
-          <div class="pg-out-label">CSV GERADO</div>
-          scene_number,texto_base,subject_and_scale,<br>movement_and_cinematography,<br>native_audio,rules<br>1,"Cidade ao amanhecer",...
+          <div class="pg-out-label">META-PROMPT GERADO → copie e cole no Claude/GPT</div>
+          You are a visual prompt engineer...<br>Generate a CSV with 6 scenes in CenaDrop format.<br>Style: Cinematic | Lang: PT-BR<br><br>SCRIPT:<br>"Era uma noite de tempestade..."
         </div>
       </div>
     </div>
