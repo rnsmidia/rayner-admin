@@ -1,0 +1,30 @@
+SERVIDOR — CenaDrop Flow v7.0
+==============================
+Repositório GitHub: Darkflow-server
+Hospedagem: Vercel (darkflow-server.vercel.app)
+
+ESTRUTURA DO REPOSITÓRIO:
+  api/
+    verify.js          → /api/verify        — valida licença + registra device_id
+    admin.js           → /api/admin         — CRUD de licenças + login multi-admin
+    reset-device.js    → /api/reset-device  — desvincula device_id
+    webhook-hotmart.js → /api/webhook-hotmart — processa compras/cancelamentos
+  admin/
+    index.html         → /admin             — painel web de gerenciamento
+  vercel.json          → configuração de rewrites (/admin → admin/index.html)
+  package.json         → dependências: @supabase/supabase-js, resend
+
+VARIÁVEIS DE AMBIENTE (configurar na Vercel):
+  SUPABASE_URL           — URL do projeto Supabase
+  SUPABASE_SERVICE_KEY   — Service Role Key do Supabase
+  ADMIN_PASSWORD         — Senha do admin Rayner (fallback)
+  ADMIN2_PASSWORD        — Senha do admin Marcos (fallback)
+  ADMIN3_PASSWORD        — Senha do admin Jaqueline (fallback)
+  RESEND_API_KEY         — Chave da API do Resend (email transacional)
+  HOTMART_HOTTOK         — Token de segurança do webhook Hotmart
+
+COMO SUBIR NA VERCEL DO ZERO:
+  1. Suba esta pasta no GitHub como novo repositório
+  2. Conecte o repositório na Vercel (Import Project)
+  3. Configure as 7 variáveis de ambiente acima
+  4. Deploy → pronto

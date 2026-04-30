@@ -129,12 +129,14 @@ module.exports = async function handler(req, res) {
   // STATS
   if (action === 'stats') {
     const { data } = await supabase.from('licenses').select('status, source');
-    const total    = (data||[]).length;
-    const active   = (data||[]).filter(l => l.status === 'active').length;
-    const inactive = (data||[]).filter(l => l.status !== 'active').length;
-    const hotmart  = (data||[]).filter(l => l.source === 'hotmart').length;
-    const manual   = (data||[]).filter(l => l.source === 'manual').length;
-    return res.status(200).json({ total, active, inactive, hotmart, manual });
+    const total     = (data||[]).length;
+    const active    = (data||[]).filter(l => l.status === 'active').length;
+    const inactive  = (data||[]).filter(l => l.status !== 'active').length;
+    const hotmart   = (data||[]).filter(l => (l.source||'').startsWith('hotmart')).length;
+    const hotmartRN = (data||[]).filter(l => l.source === 'hotmart-RN').length;
+    const hotmartMC = (data||[]).filter(l => l.source === 'hotmart-MC').length;
+    const manual    = (data||[]).filter(l => l.source === 'manual').length;
+    return res.status(200).json({ total, active, inactive, hotmart, hotmartRN, hotmartMC, manual });
   }
 
   return res.status(400).json({ error: 'Ação desconhecida' });

@@ -23,10 +23,12 @@ const EMAIL_FROM = 'CenaDrop <contato@cenadrop.com.br>';
 // const EMAIL_FROM = 'CenaDrop <onboarding@resend.dev>'; // ← fallback temporário
 
 // ─────────────────────────────────────────────────────────────
-// ✅ COLE AQUI O HOTTOK DO WEBHOOK DA HOTMART (segurança)
-// Encontre em: Hotmart > Ferramentas > Webhooks > seu webhook > Hottok
+// ✅ HOTTOKS — um por conta Hotmart
+// Rayner (RN): defina HOTMART_HOTTOK_RN nas env vars da Vercel
+// Marcos (MC): defina HOTMART_HOTTOK_MC nas env vars da Vercel
 // ─────────────────────────────────────────────────────────────
-const HOTMART_HOTTOK = process.env.HOTMART_HOTTOK || ''; // deixe vazio para ignorar validação por enquanto
+const HOTMART_HOTTOK_RN = process.env.HOTMART_HOTTOK_RN || process.env.HOTMART_HOTTOK || '';
+const HOTMART_HOTTOK_MC = process.env.HOTMART_HOTTOK_MC || '';
 
 // ─────────────────────────────────────────────────────────────
 // Eventos de COMPRA APROVADA
@@ -73,10 +75,14 @@ async function generateUniqueKey() {
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  // Validação do Hottok (segurança Hotmart)
-  if (HOTMART_HOTTOK) {
+  // Identifica a origem da chamada: ?origem=RN ou ?origem=MC
+  const origem = (req.query?.origem || '').toUpperCase().replace(/[^A-Z]/g, '');
+
+  // Validação do Hottok — aceita o token de qualquer uma das contas
+  const validTokens = [HOTMART_HOTTOK_RN, HOTMART_HOTTOK_MC].filter(Boolean);
+  if (validTokens.length > 0) {
     const hottok = req.headers['x-hotmart-hottok'] || req.query?.hottok || '';
-    if (hottok !== HOTMART_HOTTOK) {
+    if (!validTokens.includes(hottok)) {
       console.warn('[Hotmart] Hottok inválido:', hottok);
       return res.status(401).json({ error: 'Não autorizado' });
     }
@@ -124,10 +130,10 @@ module.exports = async function handler(req, res) {
         phone,
         status: 'active',
         active: true,
-        source: 'hotmart',
+        source: origem ? `hotmart-${origem}` : 'hotmart',
         product: productName,
         created_at: new Date().toISOString(),
-        notes: `Compra automática via Hotmart em ${new Date().toLocaleDateString('pt-BR')}`,
+        notes: `Compra automática via Hotmart${origem ? ` (${origem})` : ''} em ${new Date().toLocaleDateString('pt-BR')}`,
       });
 
       await sendWelcomeEmail({ name, email, key, productName });

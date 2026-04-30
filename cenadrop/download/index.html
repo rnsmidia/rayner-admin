@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CenaDrop Flow — Download</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #080810;
+  --surface: #0f0f1c;
+  --card:    #13131f;
+  --border:  #1e1e30;
+  --border2: #2a2a40;
+  --accent:  #7c6fff;
+  --accent2: #ff6f91;
+  --green:   #4ade80;
+  --yellow:  #fbbf24;
+  --text:    #e8e8f0;
+  --muted:   #555570;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Syne', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
+}
+
+/* orbs */
+body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 0%, rgba(124,111,255,0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 30% at 80% 90%, rgba(255,111,145,0.04) 0%, transparent 60%);
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: 24px;
+  padding: 48px 40px;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 0 0 1px rgba(124,111,255,0.06), 0 24px 60px rgba(0,0,0,0.5);
+}
+
+.logo-box {
+  width: 72px; height: 72px; border-radius: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 24px;
+  box-shadow: 0 0 0 1px rgba(124,111,255,0.15), 0 0 40px rgba(124,111,255,0.12);
+}
+.logo-box span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 20px; font-weight: 700; color: var(--accent);
+}
+
+h1 {
+  font-size: 32px; font-weight: 800; letter-spacing: -0.5px;
+  margin-bottom: 6px;
+}
+h1 .a { color: var(--accent); }
+
+.version-badge {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 700; letter-spacing: 2px;
+  color: var(--yellow);
+  background: rgba(251,191,36,0.07);
+  border: 1px solid rgba(251,191,36,0.2);
+  border-radius: 20px;
+  padding: 4px 14px;
+  margin-bottom: 20px;
+}
+
+.desc {
+  font-size: 14px; color: var(--muted);
+  line-height: 1.7; margin-bottom: 32px;
+}
+
+.btn-download {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%;
+  background: linear-gradient(135deg, var(--accent), #9f7aea);
+  color: #fff;
+  border: none; border-radius: 14px;
+  padding: 16px 24px;
+  font-family: 'Syne', sans-serif;
+  font-size: 16px; font-weight: 800;
+  cursor: pointer; text-decoration: none;
+  transition: all .2s;
+  box-shadow: 0 4px 24px rgba(124,111,255,0.35);
+  letter-spacing: 0.3px;
+}
+.btn-download:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(124,111,255,0.5);
+}
+.btn-download:active { transform: translateY(0); }
+
+.btn-icon { font-size: 18px; }
+
+.divider {
+  height: 1px; margin: 28px 0;
+  background: linear-gradient(90deg, transparent, var(--border2), transparent);
+}
+
+.info-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 0;
+  font-size: 12px; color: var(--muted);
+  border-bottom: 1px solid var(--border);
+}
+.info-row:last-child { border-bottom: none; }
+.info-label { font-weight: 600; }
+.info-val {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text); font-size: 11px;
+}
+.info-val.green { color: var(--green); }
+.info-val.accent { color: var(--accent); }
+
+.steps-mini {
+  margin-top: 28px; text-align: left;
+}
+.steps-mini-title {
+  font-size: 10px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--muted);
+  margin-bottom: 14px; text-align: center;
+}
+.step-mini {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 8px 0; border-bottom: 1px solid var(--border);
+  font-size: 12px; color: var(--muted); line-height: 1.5;
+}
+.step-mini:last-child { border-bottom: none; }
+.step-mini-num {
+  width: 20px; height: 20px; border-radius: 6px; flex-shrink: 0;
+  background: rgba(124,111,255,0.1); border: 1px solid rgba(124,111,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  font-weight: 700; color: var(--accent);
+}
+
+.footer-note {
+  margin-top: 28px; font-size: 11px; color: var(--muted);
+  line-height: 1.6;
+}
+.footer-note a {
+  color: var(--accent); text-decoration: none;
+}
+.footer-note a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="card">
+
+  <div class="logo-box"><span>CD</span></div>
+
+  <h1>CenaDrop <span class="a">Flow</span></h1>
+  <div class="version-badge">v7.0 — EXTENSÃO CHROME</div>
+
+  <p class="desc">
+    Automatize o envio de cenas e o download de vídeos no Google Flow.<br>
+    Instale em segundos — sem Chrome Web Store.
+  </p>
+
+  <a class="btn-download" href="/cenadrop/download/cenadrop-latest.zip" download="CenaDrop-Flow-v7.zip">
+    <span class="btn-icon">⬇</span>
+    Baixar CenaDrop Flow v7.0
+  </a>
+
+  <div class="divider"></div>
+
+  <div>
+    <div class="info-row">
+      <span class="info-label">Versão</span>
+      <span class="info-val accent">7.0</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Compatibilidade</span>
+      <span class="info-val">Google Chrome</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Plataforma</span>
+      <span class="info-val">Google Flow (labs.google)</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Status</span>
+      <span class="info-val green">● Disponível</span>
+    </div>
+  </div>
+
+  <div class="steps-mini">
+    <div class="steps-mini-title">Como instalar</div>
+    <div class="step-mini">
+      <div class="step-mini-num">1</div>
+      <div>Baixe e descompacte o ZIP em uma pasta permanente no seu computador</div>
+    </div>
+    <div class="step-mini">
+      <div class="step-mini-num">2</div>
+      <div>Abra <strong style="color:var(--text)">chrome://extensions</strong> e ative o Modo Desenvolvedor</div>
+    </div>
+    <div class="step-mini">
+      <div class="step-mini-num">3</div>
+      <div>Clique em <strong style="color:var(--text)">Carregar sem compactação</strong> e selecione a pasta extraída</div>
+    </div>
+    <div class="step-mini">
+      <div class="step-mini-num">4</div>
+      <div>Fixe a extensão na barra e ative sua licença</div>
+    </div>
+  </div>
+
+  <p class="footer-note">
+    Dúvidas? Entre em contato pelo email
+    <a href="mailto:contato@cenadrop.com.br">contato@cenadrop.com.br</a><br>
+    © 2025 CenaDrop — cenadrop.com.br
+  </p>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CenaDrop Flow — Manual do Usuário v7.0</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:      #080810;
+      --surface: #0f0f1c;
+      --card:    #13131f;
+      --border:  #1e1e30;
+      --border2: #2a2a40;
+      --accent:  #7c6fff;
+      --accent2: #ff6f91;
+      --green:   #4ade80;
+      --red:     #f87171;
+      --yellow:  #fbbf24;
+      --text:    #e8e8f0;
+      --muted:   #555570;
+      --subtle:  #2a2a40;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Syne', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 72px 32px 56px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-orb1 {
+      position: absolute; top: -120px; left: 50%; transform: translateX(-50%);
+      width: 600px; height: 400px;
+      background: radial-gradient(ellipse, rgba(124,111,255,0.07) 0%, transparent 65%);
+      filter: blur(30px); pointer-events: none;
+    }
+    .hero-orb2 {
+      position: absolute; bottom: -80px; right: -60px;
+      width: 300px; height: 300px;
+      background: radial-gradient(ellipse, rgba(74,222,128,0.04) 0%, transparent 70%);
+      filter: blur(24px); pointer-events: none;
+    }
+    .hero-logo {
+      width: 72px; height: 72px; border-radius: 20px;
+      border: 1px solid rgba(124,111,255,0.25);
+      overflow: hidden;
+      margin: 0 auto 24px; position: relative; z-index: 1;
+      box-shadow: 0 0 0 1px rgba(124,111,255,0.15), 0 0 40px rgba(124,111,255,0.15);
+    }
+    .hero-logo img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    .hero h1 {
+      font-size: 38px; font-weight: 800; color: var(--text);
+      letter-spacing: -0.5px; margin-bottom: 10px;
+      position: relative; z-index: 1;
+    }
+    .hero h1 .accent { color: var(--accent); }
+    .hero-ver {
+      display: inline-block; font-size: 11px; font-weight: 700;
+      color: var(--yellow); letter-spacing: 3px;
+      padding: 3px 12px; background: rgba(251,191,36,0.06);
+      border: 1px solid rgba(251,191,36,0.2); border-radius: 20px;
+      margin-bottom: 16px; position: relative; z-index: 1;
+    }
+    .hero-tag {
+      font-size: 15px; color: var(--muted); font-style: italic;
+      position: relative; z-index: 1;
+    }
+
+    /* ── NAV ── */
+    .nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(8,8,16,0.96); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex; gap: 0; overflow-x: auto;
+    }
+    .nav::-webkit-scrollbar { display: none; }
+    .nav a {
+      display: inline-block; padding: 14px 16px;
+      font-size: 12px; font-weight: 700; color: var(--muted);
+      text-decoration: none; white-space: nowrap;
+      border-bottom: 2px solid transparent;
+      transition: all .2s; letter-spacing: 0.3px;
+    }
+    .nav a:hover { color: var(--text); }
+    .nav a.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .nav a .new-badge {
+      display: inline-block; background: var(--accent2); color: #fff;
+      border-radius: 6px; padding: 1px 5px; font-size: 9px; margin-left: 4px;
+      vertical-align: middle;
+    }
+
+    /* ── LAYOUT ── */
+    .container { max-width: 860px; margin: 0 auto; padding: 56px 32px 96px; }
+
+    /* ── SECTION ── */
+    .section { margin-bottom: 72px; }
+    .section-header {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 28px; padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-num {
+      width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+      background: rgba(124,111,255,0.08); border: 1px solid rgba(124,111,255,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'JetBrains Mono', monospace; font-size: 14px;
+      font-weight: 700; color: var(--accent);
+    }
+    .section h2 { font-size: 22px; font-weight: 800; color: var(--text); }
+    .section-intro { font-size: 13px; color: var(--muted); margin-bottom: 24px; line-height: 1.7; }
+
+    /* ── STEPS ── */
+    .steps { display: flex; flex-direction: column; gap: 12px; }
+    .step {
+      display: flex; gap: 16px; align-items: flex-start;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 18px 20px;
+      transition: border-color .2s;
+    }
+    .step:hover { border-color: var(--border2); }
+    .step-num {
+      width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0;
+      background: rgba(124,111,255,0.08); border: 1px solid rgba(124,111,255,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .step-content { flex: 1; }
+    .step-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 5px; }
+    .step-desc { font-size: 13px; color: var(--muted); line-height: 1.7; }
+    .step-desc strong { color: var(--text); font-weight: 700; }
+    .step-desc .g  { color: var(--green);  font-weight: 700; }
+    .step-desc .y  { color: var(--yellow); font-weight: 700; }
+    .step-desc .r  { color: var(--red);    font-weight: 700; }
+    .step-desc .a  { color: var(--accent); font-weight: 700; }
+    .step-desc code {
+      font-family: 'JetBrains Mono', monospace; font-size: 11px;
+      background: rgba(124,111,255,0.08); border: 1px solid rgba(124,111,255,0.2);
+      padding: 1px 7px; border-radius: 5px; color: var(--accent);
+    }
+
+    /* ── CALLOUTS ── */
+    .callout {
+      border-radius: 12px; padding: 16px 20px; margin: 20px 0;
+      display: flex; gap: 12px; align-items: flex-start;
+      font-size: 13px; line-height: 1.7;
+    }
+    .callout-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .callout.tip    { background: rgba(74,222,128,0.04);  border: 1px solid rgba(74,222,128,0.15); color: var(--muted); }
+    .callout.warn   { background: rgba(251,191,36,0.04);  border: 1px solid rgba(251,191,36,0.15); color: var(--muted); }
+    .callout.danger { background: rgba(248,113,113,0.04); border: 1px solid rgba(248,113,113,0.15); color: var(--muted); }
+    .callout.info   { background: rgba(124,111,255,0.04); border: 1px solid rgba(124,111,255,0.15); color: var(--muted); }
+    .callout strong { color: var(--text); }
+
+    /* ── CONFIG BOX ── */
+    .config-box {
+      background: var(--card); border: 1px solid var(--border2);
+      border-radius: 12px; padding: 20px 24px; margin: 16px 0;
+    }
+    .config-title {
+      font-size: 10px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 14px;
+    }
+    .config-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 0; border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .config-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .config-key { color: var(--muted); }
+    .config-val {
+      font-family: 'JetBrains Mono', monospace; font-size: 11px;
+      background: rgba(74,222,128,0.06); border: 1px solid rgba(74,222,128,0.2);
+      color: var(--green); padding: 3px 10px; border-radius: 6px; font-weight: 600;
+    }
+    .config-val.yellow {
+      background: rgba(251,191,36,0.06); border-color: rgba(251,191,36,0.2); color: var(--yellow);
+    }
+    .config-val.accent {
+      background: rgba(124,111,255,0.06); border-color: rgba(124,111,255,0.2); color: var(--accent);
+    }
+
+    /* ── KBD ── */
+    .kbd {
+      display: inline-flex; align-items: center;
+      background: var(--card); border: 1px solid var(--border2);
+      border-radius: 6px; padding: 2px 9px;
+      font-family: 'JetBrains Mono', monospace; font-size: 11px;
+      color: var(--text); font-weight: 600;
+    }
+
+    /* ── BADGE ── */
+    .badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 700;
+    }
+    .badge.g { background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.2); color: var(--green); }
+    .badge.y { background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.2); color: var(--yellow); }
+    .badge.a { background: rgba(124,111,255,0.08); border: 1px solid rgba(124,111,255,0.2); color: var(--accent); }
+
+    /* ── TAB VISUAL ── */
+    .tab-preview {
+      display: flex; gap: 6px; margin: 16px 0 6px;
+      padding: 10px 14px 0;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px 12px 0 0; border-bottom: none;
+    }
+    .tab-pill {
+      padding: 6px 14px; border-radius: 7px 7px 0 0;
+      font-size: 11px; font-weight: 700; cursor: default;
+      border: 1px solid var(--border); border-bottom: none;
+      background: var(--bg); color: var(--muted);
+      position: relative; bottom: -1px;
+    }
+    .tab-pill.active { background: var(--bg); color: var(--text); border-color: var(--border2); }
+    .tab-pill .nb { display: inline-block; background: var(--accent2); color: #fff; border-radius: 5px; padding: 1px 5px; font-size: 9px; margin-left: 3px; }
+    .tab-body {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 0 0 12px 12px; padding: 18px 20px;
+      margin-bottom: 20px;
+    }
+
+    /* ── FLOW LABEL ── */
+    .flow-steps {
+      display: flex; align-items: center; gap: 0; flex-wrap: wrap;
+      margin: 16px 0; gap: 4px;
+    }
+    .flow-step {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 8px 14px;
+      font-size: 12px; font-weight: 700; color: var(--muted);
+    }
+    .flow-step .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+    .flow-arrow { color: var(--border2); font-size: 14px; padding: 0 2px; }
+
+    /* ── DIVIDER ── */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(124,111,255,0.15), transparent);
+      margin: 40px 0;
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 36px 32px; text-align: center;
+      background: var(--surface);
+    }
+    .footer-logo { font-size: 14px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+    .footer-logo .a { color: var(--accent); }
+    .footer-ver { font-size: 11px; color: var(--muted); margin-bottom: 6px; font-family: 'JetBrains Mono', monospace; }
+    .footer-tag { font-size: 12px; color: #1e1e30; font-style: italic; }
+
+    html { scroll-behavior: smooth; }
+  </style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-orb1"></div>
+  <div class="hero-orb2"></div>
+  <div class="hero-logo"><img src="https://raynern.com.br/cenadrop/icon128.png" alt="CenaDrop"></div>
+  <div class="hero-ver">7.0v</div>
+  <h1>CenaDrop <span class="accent">Flow</span></h1>
+  <div class="hero-tag">Crie mais. Clique menos.</div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="#instalacao" class="active">1. Instalação</a>
+  <a href="#preparacao">2. Preparação</a>
+  <a href="#configuracao">3. Configuração</a>
+  <a href="#fluxo">4. Fluxo de uso</a>
+  <a href="#download">5. Download</a>
+  <a href="#reenvio">6. Reenvio automático</a>
+  <a href="#gerarsem">7. Gerar CSV <span class="new-badge">novo</span></a>
+  <a href="#bug">8. Bug conhecido</a>
+  <a href="#dicas">9. Dicas</a>
+</nav>
+
+<div class="container">
+
+  <!-- ══ 1. INSTALAÇÃO ══ -->
+  <div class="section" id="instalacao">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>Instalação da Extensão</h2>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Descompacte o arquivo ZIP</div>
+          <div class="step-desc">Após receber o arquivo, descompacte-o em uma pasta de fácil acesso no seu computador. <strong>Não mova nem exclua essa pasta depois da instalação</strong> — o Chrome precisa dela para manter a extensão funcionando.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Abra o gerenciador de extensões do Chrome</div>
+          <div class="step-desc">Na barra de endereços do Chrome, digite <code>chrome://extensions</code> e pressione Enter.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Ative o Modo Desenvolvedor</div>
+          <div class="step-desc">No canto superior direito da página de extensões, ative o botão <strong>"Modo do desenvolvedor"</strong>. Isso é necessário para instalar extensões fora da Chrome Web Store.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title">Carregue a pasta da extensão</div>
+          <div class="step-desc">Clique em <strong>"Carregar sem compactação"</strong> e selecione a pasta <code>cenadrop-extension/</code> que está dentro do ZIP descompactado.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <div class="step-title">Fixe na barra do Chrome</div>
+          <div class="step-desc">Clique no ícone de peça de quebra-cabeça 🧩 no canto superior direito do Chrome, encontre <strong>CenaDrop Flow</strong> e clique no alfinete para fixá-la na barra.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-content">
+          <div class="step-title">Ative sua licença</div>
+          <div class="step-desc">Clique no ícone da extensão na barra do Chrome. Na tela que abrir, insira a <span class="y">chave de licença</span> fornecida no momento da compra e clique em <strong>Ativar Licença</strong>.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout tip" style="margin-top:20px;">
+      <div class="callout-icon">💡</div>
+      <div><strong>Sua licença fica salva.</strong> Após a primeira ativação você não precisa digitar a chave novamente. A extensão verifica automaticamente a cada abertura.</div>
+    </div>
+  </div>
+
+  <!-- ══ 2. PREPARAÇÃO ══ -->
+  <div class="section" id="preparacao">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Preparando o Arquivo de Cenas</h2>
+    </div>
+
+    <p class="section-intro">A extensão aceita dois formatos de arquivo: <strong>JSON</strong> (gerado pelo Darkscript) e <strong>CSV</strong> (gerado pelo Darkscript, pelo Narrativa.IA ou pela aba Gerar CSV da própria extensão).</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Gere o arquivo no Darkscript ou Narrativa.IA</div>
+          <div class="step-desc">Acesse o <strong>Darkscript</strong> ou o <strong>Narrativa.IA</strong> e crie o roteiro das suas cenas. Ao finalizar, faça o download do arquivo <code>.json</code> ou <code>.csv</code> gerado. Esse arquivo contém todos os prompts que serão enviados automaticamente ao Google Flow.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Carregue o arquivo na extensão</div>
+          <div class="step-desc">Abra a extensão clicando no ícone <span class="a">CD</span> na barra do Chrome. Na aba <strong>▶ Enviar Cenas</strong>, clique na área <span class="g">📋 Clique para carregar JSON ou CSV</span> e selecione o arquivo.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Selecione as cenas que deseja enviar</div>
+          <div class="step-desc">Após carregar o arquivo, todas as cenas aparecem listadas com checkboxes. <strong>Por padrão todas ficam selecionadas.</strong> Você pode desmarcar cenas específicas ou usar os botões <strong>✓ Todas / ☐ Nenhuma / ↕ Inverter</strong> para selecionar em lote.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <div class="callout-icon">💡</div>
+      <div><strong>Sem limite de cenas.</strong> Você pode enviar quantas cenas quiser de uma vez. Não há limite máximo imposto pela extensão.</div>
+    </div>
+  </div>
+
+  <!-- ══ 3. CONFIGURAÇÃO ══ -->
+  <div class="section" id="configuracao">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Configuração do Google Flow</h2>
+    </div>
+
+    <p class="section-intro">Antes de iniciar, o Google Flow precisa estar aberto na página correta e configurado adequadamente. A extensão só funciona dentro de um projeto aberto.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Abra um projeto no Google Flow</div>
+          <div class="step-desc">Acesse <strong>labs.google/fx/tools/flow</strong> e abra ou crie um projeto. A URL deve conter <code>/tools/flow/project/</code>. <span class="r">A extensão não funciona na página inicial do Flow</span> — precisa estar dentro de um projeto.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Configure o modo de geração correto</div>
+          <div class="step-desc">Na parte inferior do Flow, verifique e configure as opções antes de iniciar:</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="config-box">
+      <div class="config-title">Configurações obrigatórias no Google Flow</div>
+      <div class="config-row">
+        <div class="config-key">Tipo de geração</div>
+        <div class="config-val">Vídeo</div>
+      </div>
+      <div class="config-row">
+        <div class="config-key">Elementos</div>
+        <div class="config-val yellow">Ativados</div>
+      </div>
+      <div class="config-row">
+        <div class="config-key">Proporção</div>
+        <div class="config-val">16:9 ou 9:16</div>
+      </div>
+      <div class="config-row">
+        <div class="config-key">Quantidade</div>
+        <div class="config-val">1×</div>
+      </div>
+      <div class="config-row">
+        <div class="config-key">Modelo</div>
+        <div class="config-val accent">Veo 3 — recomendado</div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-icon">⚠️</div>
+      <div><strong>Mantenha a aba do Flow aberta e visível</strong> durante todo o processo. Não minimize a janela e não troque para outra URL enquanto a extensão está enviando os prompts — isso pode interromper a automação.</div>
+    </div>
+  </div>
+
+  <!-- ══ 4. FLUXO DE USO ══ -->
+  <div class="section" id="fluxo">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>Fluxo de Uso — Enviando as Cenas</h2>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Clique em Iniciar</div>
+          <div class="step-desc">Com o arquivo carregado e as cenas selecionadas, clique no botão <span class="g">▶ Iniciar</span>. A extensão começará a enviar os prompts automaticamente ao Flow, um por um.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Acompanhe o envio pelo painel</div>
+          <div class="step-desc">O painel mostra em tempo real quantas cenas foram <span class="g">Enviadas</span>, quantas foram <span class="y">Baixadas</span> e o total. O log na parte inferior exibe o status de cada ação. A barra de progresso acompanha o andamento.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Aguarde a conclusão do envio</div>
+          <div class="step-desc">A extensão envia os prompts e captura o ID de cada vídeo gerado. Quando terminar, o botão <span class="y">⬇ Baixar Vídeos</span> aparecerá automaticamente. <strong>Não clique ainda</strong> — os vídeos precisam terminar de ser gerados pelo Flow primeiro.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title">Aguarde a geração no Flow</div>
+          <div class="step-desc">O tempo de geração depende do modelo escolhido e da quantidade de cenas. Observe os cards no Flow — aguarde até que as cenas apareçam com o vídeo gerado e prontas na tela.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <div class="callout-icon">💡</div>
+      <div><strong>Deixe tudo aberto e quieto.</strong> Após clicar em Iniciar, mantenha o popup da extensão e a aba do Flow visíveis na tela. Não troque de aba, não role a página manualmente e não interaja com o Flow — deixe a extensão trabalhar sozinha até o envio ser concluído.</div>
+    </div>
+  </div>
+
+  <!-- ══ 5. DOWNLOAD ══ -->
+  <div class="section" id="download">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>Baixando os Vídeos</h2>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-icon">⚠️</div>
+      <div><strong>Passo importante antes de baixar:</strong> role a página do Flow para que os cards dos vídeos estejam visíveis na tela. A extensão precisa interagir visualmente com cada card — se estiver fora da área visível, o hover não funciona e o download pode falhar.</div>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Posicione a página corretamente</div>
+          <div class="step-desc">Antes de clicar em Baixar, <strong>role a página do Flow para o início</strong> pressionando <span class="kbd">Home</span> ou <span class="kbd">Ctrl + Home</span>. A extensão percorre os cards de cima para baixo e rola automaticamente — começar do topo garante que nenhum card seja perdido.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Clique em Baixar Vídeos</div>
+          <div class="step-desc">Quando os vídeos estiverem prontos no Flow, clique no botão <span class="y">⬇ Baixar Vídeos</span> na extensão. A automação localiza cada card, faz hover, abre o menu e aciona o download.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Não interaja com o Flow durante o download</div>
+          <div class="step-desc">Enquanto o download está em andamento, <strong>não clique em nada no Flow</strong> e não role a página manualmente. A extensão controla o scroll automaticamente.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title">Os arquivos são salvos automaticamente</div>
+          <div class="step-desc">Cada vídeo é salvo na pasta de downloads padrão com o nome no formato <code>001_Flow_Video.mp4</code>, <code>002_Flow_Video.mp4</code> e assim por diante, seguindo a numeração das cenas.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 6. REENVIO ══ -->
+  <div class="section" id="reenvio">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>Reenvio Automático de Falhas</h2>
+    </div>
+
+    <p class="section-intro">Nem sempre todos os downloads funcionam na primeira tentativa. O Flow pode apresentar lentidão, vídeos que ainda não terminaram de gerar, ou cards que não respondem ao hover. A extensão tem um sistema de reenvio automático para lidar com esses casos.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Detecção automática de falhas</div>
+          <div class="step-desc">Ao final de cada rodada, a extensão identifica quais cenas <span class="r">não foram baixadas</span> — card não encontrado, menu não abriu, vídeo ainda gerando, etc.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Ciclo de reenvio — até 2 vezes</div>
+          <div class="step-desc">As cenas que falharam são <strong>reenviadas automaticamente ao Flow</strong> e um novo download é tentado. O ciclo se repete até <span class="y">2 vezes</span>. Ou seja: tentativa principal + 2 reenvios = 3 oportunidades por cena.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Resultado final informado</div>
+          <div class="step-desc">Ao encerrar todos os ciclos, a extensão exibe uma mensagem com o total baixado. Se ainda houver cenas que não foram baixadas, elas são listadas no log pelo número (<code>#03</code>, <code>#07</code>...) para você tratar manualmente.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <div class="callout-icon">💡</div>
+      <div><strong>Dica:</strong> se um vídeo falhou porque ainda estava sendo gerado, aguarde alguns minutos após o reenvio antes de clicar em Baixar novamente.</div>
+    </div>
+  </div>
+
+  <!-- ══ 7. GERAR CSV ══ -->
+  <div class="section" id="gerarsem">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>Gerar CSV — Para quem não usa o Darkscript</h2>
+    </div>
+
+    <p class="section-intro">A aba <strong>✦ Gerar CSV</strong> permite que qualquer pessoa — mesmo sem o Darkscript — gere um arquivo CSV a partir de um roteiro próprio e use na extensão. O fluxo funciona em dois momentos.</p>
+
+    <!-- Tab preview -->
+    <div class="tab-preview">
+      <div class="tab-pill">▶ Enviar Cenas</div>
+      <div class="tab-pill active">✦ Gerar CSV <span class="nb">novo</span></div>
+    </div>
+    <div class="tab-body">
+      <div style="font-size:12px;color:var(--muted);line-height:1.7;">Cole seu roteiro → escolha estilo e idioma → gere o meta-prompt → use no Claude ou Gemini → cole o CSV retornado → baixe o arquivo.</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h3 style="font-size:15px;font-weight:800;color:var(--accent);margin-bottom:16px;">Momento 1 — Gerar o Meta-Prompt</h3>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Cole seu roteiro</div>
+          <div class="step-desc">No campo <strong>"Cole seu roteiro aqui"</strong>, insira o texto do seu roteiro. Pode ser um script completo, uma sinopse detalhada ou um resumo narrativo.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Escolha o estilo visual</div>
+          <div class="step-desc">Selecione um dos <strong>11 estilos visuais</strong> disponíveis no dropdown — Cinematic, Anime, Realismo Fotográfico, Artístico, Fantasy, Educativo, Pop/Viral, Tech, Terror, Analógico/Retrô ou Cartoon 3D. Esse estilo será aplicado de forma consistente em todas as cenas geradas.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Defina o idioma e o número de cenas</div>
+          <div class="step-desc">Escolha o <strong>idioma do canal</strong> (Português, Espanhol ou Inglês) — o campo <code>texto_base</code> de cada cena será gerado nesse idioma. Defina também a <strong>quantidade de cenas</strong> que o roteiro deve ser dividido — o meta-prompt instruirá a IA a dividir o roteiro em exatamente esse número de trechos proporcionais.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title">Clique em "✦ Gerar Meta-Prompt"</div>
+          <div class="step-desc">O prompt será gerado automaticamente e exibido na tela. Clique em <span class="a">📋 Copiar</span> para copiar o conteúdo completo.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <div class="step-title">Use o prompt no Claude ou Gemini</div>
+          <div class="step-desc">Cole o meta-prompt em qualquer IA generativa — <strong>Claude</strong>, <strong>Gemini</strong> ou outras. A IA retornará o conteúdo CSV com as cenas do seu roteiro, já no formato CenaDrop, pronto para a próxima etapa.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <div class="callout-icon">ℹ️</div>
+      <div><strong>Por que o prompt está em inglês?</strong> O Google Veo3 interpreta melhor instruções visuais em inglês. Por isso todos os campos visuais do CSV (subject, environment, cinematography, audio, rules) são gerados em inglês — apenas o <code>texto_base</code> aparece no idioma do seu canal.</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h3 style="font-size:15px;font-weight:800;color:var(--green);margin-bottom:16px;">Momento 2 — Converter o Código CSV em Arquivo</h3>
+
+    <p class="section-intro">Muitas IAs retornam o CSV como texto puro na tela, e não como um arquivo para download. O Momento 2 resolve isso.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Copie o conteúdo CSV retornado pela IA</div>
+          <div class="step-desc">Selecione todo o texto CSV que a IA gerou — normalmente começa com a linha de cabeçalho <code>scene_number;texto_base;subject_and_scale;...</code> — e copie.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Cole no campo "Converter CSV"</div>
+          <div class="step-desc">Role para baixo na aba <strong>✦ Gerar CSV</strong> até o campo <strong>"Cole o código CSV gerado pela IA"</strong> e cole o conteúdo copiado.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Clique em "⬇ Baixar arquivo .csv"</div>
+          <div class="step-desc">A extensão valida o conteúdo e gera automaticamente o download do arquivo <code>cenadrop_cenas_N.csv</code>, onde N é o número de cenas. O arquivo já está no formato correto para ser carregado na aba <strong>▶ Enviar Cenas</strong>.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <div class="callout-icon">💡</div>
+      <div><strong>Fluxo completo sem sair da extensão:</strong> gere o prompt → use na IA → cole o CSV → baixe o arquivo → carregue na aba Enviar Cenas → Iniciar.</div>
+    </div>
+  </div>
+
+  <!-- ══ 8. BUG ══ -->
+  <div class="section" id="bug">
+    <div class="section-header">
+      <div class="section-num">8</div>
+      <h2>Bug Conhecido — Prompt não inserido</h2>
+    </div>
+
+    <div class="callout danger">
+      <div class="callout-icon">🐛</div>
+      <div><strong>Bug conhecido:</strong> em alguns momentos a extensão pode travar na etapa de inserção do prompt no Flow — o texto não é digitado no campo e o processo para de avançar.</div>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Identifique o problema</div>
+          <div class="step-desc">O log da extensão para de atualizar e a cena atual não avança por mais de 30 segundos. O campo de prompt no Flow aparece vazio ou sem o texto sendo inserido.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Clique em Parar</div>
+          <div class="step-desc">Clique no botão <span class="r">⏹ Parar</span> na extensão para interromper o processo atual.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Faça um hard refresh na página do Flow</div>
+          <div class="step-desc">Isso limpa o cache e reinicia o JavaScript da página sem fechar a aba:
+            <br><br>
+            <span class="badge g">Mac</span>&nbsp; <span class="kbd">⌘ Command</span> + <span class="kbd">⇧ Shift</span> + <span class="kbd">R</span>
+            <br><br>
+            <span class="badge y">Windows</span>&nbsp; <span class="kbd">Ctrl</span> + <span class="kbd">Shift</span> + <span class="kbd">R</span> &nbsp;ou&nbsp; <span class="kbd">Ctrl</span> + <span class="kbd">F5</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title">Recarregue o arquivo e reinicie</div>
+          <div class="step-desc">Após o refresh, carregue novamente o arquivo CSV ou JSON na extensão, selecione as cenas que ainda faltam e clique em <span class="g">▶ Iniciar</span> normalmente.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 9. DICAS ══ -->
+  <div class="section" id="dicas">
+    <div class="section-header">
+      <div class="section-num">9</div>
+      <h2>Dicas e Boas Práticas</h2>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">💡</div>
+        <div class="step-content">
+          <div class="step-title">Deixe a extensão e o Flow trabalhando juntos</div>
+          <div class="step-desc">Após clicar em <strong>Iniciar</strong>, mantenha o popup aberto e a aba do Flow visível. O processo funciona melhor com tudo na tela — não minimize, não troque de aba, não interaja com o Flow. Deixe quieto e acompanhe o log até o envio concluir.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">💡</div>
+        <div class="step-content">
+          <div class="step-title">Escolha bem as cenas antes de iniciar</div>
+          <div class="step-desc">Use os botões <strong>✓ Todas / ☐ Nenhuma / ↕ Inverter</strong> para controlar quais cenas serão processadas. Se quiser enviar apenas parte do roteiro, desmarque as demais antes de clicar em Iniciar.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">💡</div>
+        <div class="step-content">
+          <div class="step-title">Não feche a aba do Flow durante o download</div>
+          <div class="step-desc">Durante o download, a aba do Flow precisa estar aberta — a extensão interage diretamente com os cards visíveis. Fechar ou navegar para outra URL na mesma aba interrompe o processo.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">💡</div>
+        <div class="step-content">
+          <div class="step-title">Use o Veo 3 para aproveitar o áudio nativo</div>
+          <div class="step-desc">Se o seu CSV incluir a coluna <code>native_audio</code>, os prompts enviados ao Flow já contêm instruções de áudio. Use o modelo <strong>Veo 3</strong> para aproveitar ao máximo essa capacidade — sons ambiente, foley e atmosfera são gerados junto com o vídeo.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">💡</div>
+        <div class="step-content">
+          <div class="step-title">Licença vinculada ao seu navegador</div>
+          <div class="step-desc">Sua licença fica vinculada ao Chrome onde foi ativada. Se trocar de computador ou reinstalar o navegador, entre em contato com o suporte para transferir sua licença para o novo dispositivo.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">💡</div>
+        <div class="step-content">
+          <div class="step-title">Quer resultados mais avançados?</div>
+          <div class="step-desc">O <strong>Darkscript</strong> e o <strong>Narrativa.IA</strong> entregam CSVs cinematográficos com personagens consistentes, micros de estilo, estrutura narrativa, controle de clima e muito mais — tudo pronto para carregar diretamente na extensão e obter resultados de qualidade profissional.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="footer-logo">CenaDrop <span class="a">Flow</span></div>
+  <div class="footer-ver">7.0v — Manual do Usuário</div>
+  <div class="footer-tag">Crie mais. Clique menos.</div>
+</div>
+
+<script>
+  const sections = document.querySelectorAll('.section');
+  const navLinks = document.querySelectorAll('.nav a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => { if (window.scrollY >= s.offsetTop - 120) current = s.id; });
+    navLinks.forEach(a => { a.classList.toggle('active', a.getAttribute('href') === '#' + current); });
+  });
+</script>
+
+</body>
+</html>

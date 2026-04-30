@@ -1,0 +1,10 @@
+{
+  "rewrites": [
+    { "source": "/admin",              "destination": "/admin/index.html" },
+    { "source": "/admin/",             "destination": "/admin/index.html" },
+    { "source": "/cenadrop/download",  "destination": "/cenadrop/download/index.html" },
+    { "source": "/cenadrop/download/", "destination": "/cenadrop/download/index.html" },
+    { "source": "/cenadrop/manual",    "destination": "/cenadrop/manual/index.html" },
+    { "source": "/cenadrop/manual/",   "destination": "/cenadrop/manual/index.html" }
+  ]
+}
