@@ -24,15 +24,15 @@
 
 body {
   font-family: 'Syne', sans-serif;
-  background: #ffffff;
+  background: #05050e;
   color: var(--text);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  padding: 48px 24px;
-  gap: 32px;
+  padding: 48px 7% 48px 24px;
+  gap: 24px;
 }
 
 body::before {
@@ -40,14 +40,8 @@ body::before {
   position: fixed; inset: 0; pointer-events: none; z-index: 0;
   background-image: url('/cenadrop/CAPAproduto1280x720png.png');
   background-size: cover;
-  background-position: center;
-  opacity: 1.0;
-}
-
-body::after {
-  content: '';
-  position: fixed; inset: 0; pointer-events: none; z-index: 0;
-  background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(255,255,255,0.55) 0%, transparent 70%);
+  background-position: center left;
+  opacity: 0.45;
 }
 
 .card {
