@@ -213,8 +213,11 @@ async function sendWelcomeEmail({ name, email, key, productName }) {
           <div class="kl">Chave de Acesso</div>
           <div class="kv">${key}</div>
         </div>
+        <div style="text-align:center;margin:24px 0;">
+          <a href="https://raynern.com.br/cenadrop/download" style="display:inline-block;background:linear-gradient(135deg,#6c63ff,#9f7aea);color:#fff;text-decoration:none;font-weight:800;font-size:15px;padding:14px 32px;border-radius:12px;letter-spacing:0.3px;">⬇ Baixar CenaDrop Flow</a>
+        </div>
         <p class="t" style="font-size:13px;color:#555;">
-          Instale a extensão CenaDrop no Chrome, clique em "Ativar Licença" e cole sua chave.<br><br>
+          Baixe a extensão, instale no Chrome, clique em "Ativar Licença" e cole sua chave.<br><br>
           Problemas? Responda este email que te ajudamos.
         </p>
       </div>
