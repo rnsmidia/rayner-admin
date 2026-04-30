@@ -31,7 +31,14 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 32px 24px;
+  padding: 48px 24px;
+  gap: 32px;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse 80% 65% at 50% 46%, rgba(124,111,255,0.07) 0%, transparent 65%);
 }
 
 .card {
@@ -44,7 +51,11 @@ body {
   text-align: center;
   position: relative;
   z-index: 1;
-  box-shadow: 0 0 0 1px rgba(124,111,255,0.12), 0 24px 80px rgba(0,0,0,0.18);
+  box-shadow:
+    0 0 0 1px rgba(124,111,255,0.18),
+    0 0 40px rgba(124,111,255,0.18),
+    0 0 100px rgba(124,111,255,0.08),
+    0 32px 80px rgba(0,0,0,0.10);
 }
 
 .logo-box {
@@ -156,7 +167,7 @@ h1 .a { color: var(--accent); }
 </head>
 <body>
 
-<div class="card">
+<div class="card" style="position:relative; z-index:1;">
 
   <div class="logo-box"><img src="/cenadrop/icon128.png" alt="CenaDrop"></div>
 
@@ -220,6 +231,21 @@ h1 .a { color: var(--accent); }
     © 2025 CenaDrop — cenadrop.com.br
   </p>
 
+</div>
+
+<div style="
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  position: relative; z-index: 1;
+">
+  <div style="
+    width: 32px; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(124,111,255,0.4), transparent);
+  "></div>
+  <span style="
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 600; letter-spacing: 3px;
+    color: rgba(124,111,255,0.45); text-transform: uppercase;
+  ">Crie mais. Clique menos.</span>
 </div>
 
 </body>
