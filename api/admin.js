@@ -1,5 +1,6 @@
 // api/admin.js
 const { createClient } = require('@supabase/supabase-js');
+const { Resend } = require('resend');
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -137,6 +138,57 @@ module.exports = async function handler(req, res) {
     const hotmartMC = (data||[]).filter(l => l.source === 'hotmart-MC').length;
     const manual    = (data||[]).filter(l => l.source === 'manual').length;
     return res.status(200).json({ total, active, inactive, hotmart, hotmartRN, hotmartMC, manual });
+  }
+
+  // RESEND EMAIL
+  if (action === 'resend-email') {
+    const { data: lic } = await supabase.from('licenses').select('*').eq('key', body.key).single();
+    if (!lic) return res.status(404).json({ error: 'Licença não encontrada' });
+    if (!lic.email) return res.status(400).json({ error: 'Licença sem email cadastrado' });
+    try {
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      const firstName = (lic.name || 'Cliente').split(' ')[0];
+      await resend.emails.send({
+        from: 'CenaDrop <contato@cenadrop.com.br>',
+        to: lic.email,
+        subject: '🔑 Sua chave CenaDrop Flow',
+        html: `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+          body{margin:0;padding:0;background:#0a0a0a;font-family:'Segoe UI',Arial,sans-serif;}
+          .w{max-width:560px;margin:0 auto;padding:40px 20px;}
+          .c{background:#111;border:1px solid #222;border-radius:16px;overflow:hidden;}
+          .h{background:linear-gradient(135deg,#1a1a2e,#0f0f1a);padding:40px 32px;text-align:center;border-bottom:1px solid #222;}
+          .logo{font-size:28px;font-weight:800;color:#fff;}.logo span{color:#6c63ff;}
+          .b{padding:36px 32px;}.g{font-size:22px;color:#fff;font-weight:700;margin-bottom:12px;}
+          .t{color:#888;font-size:15px;line-height:1.7;margin-bottom:24px;}
+          .kb{background:#0d0d0d;border:2px solid #6c63ff;border-radius:12px;padding:24px;text-align:center;margin:28px 0;}
+          .kl{color:#555;font-size:12px;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;}
+          .kv{font-size:26px;font-weight:800;color:#6c63ff;letter-spacing:3px;font-family:'Courier New',monospace;}
+          .f{padding:24px 32px;border-top:1px solid #1a1a1a;text-align:center;}
+          .f p{color:#444;font-size:12px;margin:4px 0;}
+        </style></head><body><div class="w"><div class="c">
+          <div class="h"><div class="logo">Cena<span>Drop</span></div></div>
+          <div class="b">
+            <div class="g">Olá, ${firstName}! 👋</div>
+            <p class="t">Aqui está sua chave de acesso ao <strong style="color:#ccc">CenaDrop Flow</strong>:</p>
+            <div class="kb">
+              <div class="kl">Chave de Acesso</div>
+              <div class="kv">${lic.key}</div>
+            </div>
+            <div style="text-align:center;margin:24px 0;">
+              <a href="https://raynern.com.br/cenadrop/download" style="display:inline-block;background:linear-gradient(135deg,#6c63ff,#9f7aea);color:#fff;text-decoration:none;font-weight:800;font-size:15px;padding:14px 32px;border-radius:12px;">⬇ Baixar CenaDrop Flow</a>
+            </div>
+            <p class="t" style="font-size:13px;color:#555;">
+              Baixe a extensão, instale no Chrome, clique em "Ativar Licença" e cole sua chave.<br><br>
+              Problemas? Responda este email que te ajudamos.
+            </p>
+          </div>
+          <div class="f"><p>© ${new Date().getFullYear()} CenaDrop — cenadrop.com.br</p></div>
+        </div></div></body></html>`,
+      });
+      return res.status(200).json({ ok: true, message: `Email reenviado para ${lic.email}` });
+    } catch (err) {
+      return res.status(500).json({ error: 'Erro ao enviar email: ' + err.message });
+    }
   }
 
   return res.status(400).json({ error: 'Ação desconhecida' });

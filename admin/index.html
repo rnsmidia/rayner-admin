@@ -997,6 +997,7 @@ function renderLicenses(list) {
       <td style="color:var(--muted);font-size:12px">${fmtDate(l.created_at)}</td>
       <td><div class="actions">
         <button class="btn-icon" onclick="openEditModal('${l.key}')">✏️</button>
+        <button class="btn-icon" title="Reenviar email com chave" onclick="resendEmail('${l.key}','${l.email||''}')">📧</button>
         <button class="btn-icon warn" onclick="toggleKey('${l.key}')">${l.status==='active'?'🔒':'🔓'}</button>
         <button class="btn-icon warn" onclick="regenKey('${l.key}')">🔄</button>
         <button class="btn-icon danger" onclick="deleteKey('${l.key}')">🗑️</button>
@@ -1018,6 +1019,7 @@ function renderStudents(list) {
       <td><span class="badge ${l.status}">${l.status==='active'?'Ativa':'Inativa'}</span></td>
       <td style="color:var(--muted);font-size:12px">${fmtDate(l.created_at)}</td>
       <td><div class="actions">
+        <button class="btn-icon" title="Reenviar email com chave" onclick="resendEmail('${l.key}','${l.email||''}')">📧</button>
         <button class="btn-icon warn" onclick="toggleKey('${l.key}')">${l.status==='active'?'🔒':'🔓'}</button>
         <button class="btn-icon warn" onclick="regenKey('${l.key}')">🔄</button>
       </div></td>
@@ -1085,6 +1087,14 @@ async function confirmModal() {
 }
 
 // ── AÇÕES ─────────────────────────────────────
+async function resendEmail(key, email) {
+  if (!email) { alert('Esta licença não tem email cadastrado.'); return; }
+  if (!confirm(`Reenviar email com a chave para ${email}?`)) return;
+  const d = await apiCall('resend-email', { key });
+  if (d.ok) alert(`✅ Email reenviado para ${email}`);
+  else alert('❌ Erro: ' + (d.error || 'Falha ao enviar'));
+}
+
 async function toggleKey(key) {
   const d = await apiCall('toggle', { key });
   if (d.ok) { toast(d.status === 'active' ? '🔓 Ativada' : '🔒 Bloqueada', 'success'); loadAll(); }
