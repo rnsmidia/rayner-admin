@@ -417,20 +417,44 @@
 })();
 
 // Notify
-function handleNotify() {
-  const input = document.getElementById('emailInput');
+async function handleNotify() {
+  const input  = document.getElementById('emailInput');
+  const btn    = document.querySelector('.notify-btn');
   const success = document.getElementById('notifySuccess');
-  const email = input.value.trim();
+  const email  = input.value.trim();
+
   if (!email || !email.includes('@')) {
     input.style.borderColor = 'rgba(248,113,113,.5)';
     input.focus();
     setTimeout(() => input.style.borderColor = '', 1500);
     return;
   }
-  // Store locally (server-side integration can be added later)
-  input.style.display = 'none';
-  document.querySelector('.notify-btn').style.display = 'none';
-  success.classList.add('visible');
+
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+
+  try {
+    const res  = await fetch('/api/waitlist', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    const data = await res.json();
+
+    if (res.ok && (data.ok || data.already)) {
+      input.style.display = 'none';
+      btn.style.display   = 'none';
+      success.classList.add('visible');
+    } else {
+      btn.disabled = false;
+      btn.textContent = 'Me avisar';
+      input.style.borderColor = 'rgba(248,113,113,.5)';
+      setTimeout(() => input.style.borderColor = '', 1500);
+    }
+  } catch {
+    btn.disabled = false;
+    btn.textContent = 'Me avisar';
+  }
 }
 
 // Enter key on input
