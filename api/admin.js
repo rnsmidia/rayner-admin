@@ -270,6 +270,59 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({ ok: true });
   }
 
+  if (action === 'narrativa-resend') {
+    const { id } = body;
+    if (!id) return res.status(400).json({ error: 'ID obrigatório' });
+    const { data: user, error: fe } = await supabase.from('narrativa_users').select('email,name').eq('id', id).single();
+    if (fe || !user) return res.status(404).json({ error: 'Usuário não encontrado' });
+    const newPassword = randomBytes(6).toString('hex'); // 12 chars hex
+    const password_hash = hashNarrativaPassword(newPassword);
+    await supabase.from('narrativa_users').update({ password_hash }).eq('id', id);
+    try {
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      const firstName = user.name.split(' ')[0];
+      await resend.emails.send({
+        from: 'Narrativa IA <contato@cenadrop.com.br>',
+        to: user.email,
+        subject: '🔑 Seus novos dados de acesso — Narrativa IA Studio',
+        html: `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+          body{margin:0;padding:0;background:#09090f;font-family:'Segoe UI',Arial,sans-serif;}
+          .w{max-width:560px;margin:0 auto;padding:40px 20px;}
+          .c{background:#0d0d1e;border:1px solid rgba(124,92,248,.25);border-radius:16px;overflow:hidden;}
+          .h{background:linear-gradient(135deg,#1a0a3e,#0a0a1e);padding:40px 32px;text-align:center;border-bottom:1px solid rgba(124,92,248,.15);}
+          .logo{font-size:26px;font-weight:800;color:#fff;letter-spacing:2px;}.logo span{background:linear-gradient(135deg,#9b7fff,#4169ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+          .b{padding:36px 32px;}
+          .g{font-size:22px;color:#eeeef8;font-weight:700;margin-bottom:12px;}
+          .t{color:#8888aa;font-size:15px;line-height:1.7;margin-bottom:24px;}
+          .kb{background:#0a0a16;border:1px solid rgba(124,92,248,.3);border-radius:12px;padding:24px;margin:28px 0;}
+          .krow{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+          .krow:last-child{border-bottom:none;}
+          .kl{color:#55557a;font-size:12px;text-transform:uppercase;letter-spacing:1px;}
+          .kv{color:#9b7fff;font-size:14px;font-weight:700;font-family:monospace;}
+          .btn{display:inline-block;background:linear-gradient(135deg,#6234e2,#4169ff);color:#fff;text-decoration:none;font-weight:800;font-size:15px;padding:14px 32px;border-radius:12px;}
+          .f{padding:24px 32px;border-top:1px solid rgba(255,255,255,.05);text-align:center;}
+          .f p{color:#33334a;font-size:12px;margin:4px 0;}
+        </style></head><body><div class="w"><div class="c">
+          <div class="h"><div class="logo">NARRATIVA <span>IA</span></div></div>
+          <div class="b">
+            <div class="g">Olá, ${firstName}! 🔑</div>
+            <p class="t">Sua senha foi redefinida. Use as credenciais abaixo para acessar o <strong style="color:#ccc">Narrativa IA Studio</strong>:</p>
+            <div class="kb">
+              <div class="krow"><span class="kl">Email</span><span class="kv">${user.email}</span></div>
+              <div class="krow"><span class="kl">Nova Senha</span><span class="kv">${newPassword}</span></div>
+            </div>
+            <div style="text-align:center;margin:24px 0;">
+              <a href="https://raynern.com.br/narrativa-ia" class="btn">✨ Acessar Narrativa IA</a>
+            </div>
+            <p class="t" style="font-size:13px;color:#55557a;">Recomendamos alterar sua senha após o acesso. Em caso de dúvidas, responda este email.</p>
+          </div>
+          <div class="f"><p>© ${new Date().getFullYear()} Narrativa IA Studio</p></div>
+        </div></div></body></html>`,
+      });
+    } catch (e) { console.error('Email error:', e); }
+    return res.status(200).json({ ok: true });
+  }
+
   if (action === 'narrativa-toggle') {
     const { id } = body;
     const { data: cur } = await supabase.from('narrativa_users').select('active').eq('id', id).single();

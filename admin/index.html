@@ -909,6 +909,20 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
   </div>
 </div>
 
+<!-- MODAL NARRATIVA IA — NOVO USUÁRIO -->
+<div class="overlay" id="narrativa-create-overlay" onclick="closeNarrativaCreateModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h2>+ Novo Usuário Narrativa IA</h2>
+    <div class="field"><label>Nome</label><input type="text" id="nc-name" placeholder="Nome completo" /></div>
+    <div class="field"><label>Email</label><input type="email" id="nc-email" placeholder="email@exemplo.com" /></div>
+    <div class="field"><label>Senha</label><input type="password" id="nc-password" placeholder="Senha de acesso" /></div>
+    <div class="modal-actions">
+      <button class="btn-sm" onclick="closeNarrativaCreateModal()">Cancelar</button>
+      <button class="btn-sm accent" onclick="saveNarrativaCreate()">Criar Usuário</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL NARRATIVA IA — EDITAR USUÁRIO -->
 <div class="overlay" id="narrativa-edit-overlay" onclick="closeNarrativaEditModal(event)">
   <div class="modal" onclick="event.stopPropagation()">
@@ -1180,7 +1194,8 @@ function renderNarrativaUsers(list) {
       <td><span class="badge ${u.active ? 'active' : 'inactive'}">${u.active ? 'Ativo' : 'Inativo'}</span></td>
       <td style="color:var(--muted);font-size:12px">${fmtDate(u.created_at)}</td>
       <td><div class="actions">
-        <button class="btn-icon" onclick="openNarrativaEditModal('${u.id}','${u.name.replace(/'/g,"\\'")}','${u.email}')">✏️</button>
+        <button class="btn-icon" title="Reenviar credenciais" onclick="resendNarrativaEmail('${u.id}','${u.email}')">📧</button>
+        <button class="btn-icon" title="Editar usuário" onclick="openNarrativaEditModal('${u.id}','${u.name.replace(/'/g,"\\'")}','${u.email}')">✏️</button>
         <button class="btn-icon warn" onclick="toggleNarrativaUser('${u.id}',${u.active})">${u.active ? '🔒' : '🔓'}</button>
         <button class="btn-icon danger" onclick="deleteNarrativaUser('${u.id}','${u.email}')">🗑️</button>
       </div></td>
@@ -1194,30 +1209,25 @@ function filterNarrativaUsers() {
   ));
 }
 
-let narrativaModal = false;
 function openNarrativaModal() {
-  narrativaModal = true;
-  document.getElementById('modal-title').textContent = '+ Novo Usuário Narrativa IA';
-  document.getElementById('modal-confirm').textContent = 'Criar Usuário';
-  ['m-name','m-email','m-phone','m-notes'].forEach(id => document.getElementById(id).value = '');
-  document.querySelector('.field:nth-child(3)').style.display = 'none'; // oculta WhatsApp
-  document.querySelector('.field:nth-child(4)').innerHTML = '<label>Senha</label><input type="password" id="m-notes" placeholder="Senha de acesso" />';
-  document.getElementById('modal-overlay').classList.add('open');
+  ['nc-name','nc-email','nc-password'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('narrativa-create-overlay').classList.add('open');
+}
+function closeNarrativaCreateModal(e) {
+  if (!e || e.target === document.getElementById('narrativa-create-overlay'))
+    document.getElementById('narrativa-create-overlay').classList.remove('open');
+}
+async function saveNarrativaCreate() {
+  const name     = document.getElementById('nc-name').value.trim();
+  const email    = document.getElementById('nc-email').value.trim();
+  const password = document.getElementById('nc-password').value.trim();
+  if (!name || !email || !password) { toast('Preencha nome, email e senha', 'error'); return; }
+  const d = await apiCall('narrativa-create', { name, email, password });
+  if (d.ok) { toast(`✅ Usuário criado: ${email}`, 'success'); closeNarrativaCreateModal(); loadNarrativaUsers(); }
+  else toast('Erro: ' + (d.error || 'Falha ao criar'), 'error');
 }
 
 async function confirmModal() {
-  if (narrativaModal) {
-    const name = document.getElementById('m-name').value.trim();
-    const email = document.getElementById('m-email').value.trim();
-    const password = document.getElementById('m-notes').value.trim();
-    if (!name || !email || !password) { toast('Preencha nome, email e senha', 'error'); return; }
-    const d = await apiCall('narrativa-create', { name, email, password });
-    if (d.ok) { toast(`✅ Usuário criado: ${email}`, 'success'); closeModal(); loadNarrativaUsers(); }
-    else toast('Erro: ' + (d.error||'Falha ao criar'), 'error');
-    narrativaModal = false;
-    document.querySelector('.field:nth-child(3)').style.display = '';
-    return;
-  }
   const name = document.getElementById('m-name').value.trim();
   const email = document.getElementById('m-email').value.trim();
   const phone = document.getElementById('m-phone').value.trim();
@@ -1255,6 +1265,13 @@ async function saveNarrativaEdit() {
   const d = await apiCall('narrativa-update', payload);
   if (d.ok) { toast('✅ Usuário atualizado', 'success'); closeNarrativaEditModal(); loadNarrativaUsers(); }
   else toast('Erro: ' + (d.error || 'Falha ao atualizar'), 'error');
+}
+
+async function resendNarrativaEmail(id, email) {
+  if (!confirm(`Gerar nova senha e reenviar credenciais para ${email}?`)) return;
+  const d = await apiCall('narrativa-resend', { id });
+  if (d.ok) toast(`📧 Credenciais reenviadas para ${email}`, 'success');
+  else toast('Erro: ' + (d.error || 'Falha ao reenviar'), 'error');
 }
 
 async function toggleNarrativaUser(id, active) {
