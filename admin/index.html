@@ -714,9 +714,13 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
           <div class="prod-icon">✨</div>
           <div>
             <div class="prod-name">Narrativa IA</div>
-            <div class="prod-tag">Em breve</div>
+            <div class="prod-tag">Studio Web</div>
           </div>
         </button>
+        <div id="subnav-narrativa" class="subnav" style="display:none">
+          <button class="sn-btn" data-sec="dashboard" onclick="switchSection('narrativa','dashboard')">📊 Dashboard</button>
+          <button class="sn-btn" data-sec="users" onclick="switchSection('narrativa','users')">👤 Usuários <span class="sn-count" id="cnt-nusers">0</span></button>
+        </div>
       </div>
 
       <div class="sb-footer">
@@ -840,15 +844,51 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
 
       <!-- ── NARRATIVA IA ── -->
       <div class="prod-panel" id="panel-narrativa">
-        <div style="padding:24px">
-          <div class="coming-soon">
-            <div class="cs-icon">✨</div>
-            <h2>Narrativa <span>IA</span></h2>
-            <p>O painel do Narrativa IA está sendo desenvolvido. Em breve você poderá gerenciar licenças e alunos deste produto aqui.</p>
-            <div class="cs-pill">EM DESENVOLVIMENTO</div>
+
+        <!-- Dashboard -->
+        <div class="sec-panel" id="narrativa-dashboard">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon-wrap purple">👥</div>
+              <div><div class="stat-label">Total</div><div class="stat-val purple" id="ns-total">—</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap green">✅</div>
+              <div><div class="stat-label">Ativos</div><div class="stat-val green" id="ns-active">—</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap red">🔒</div>
+              <div><div class="stat-label">Inativos</div><div class="stat-val red" id="ns-inactive">—</div></div>
+            </div>
+          </div>
+          <div class="quick-row">
+            <button class="btn-sm accent" onclick="switchSection('narrativa','users')">👤 Ver Usuários</button>
+            <button class="btn-sm" onclick="loadNarrativaUsers()">↻ Atualizar</button>
           </div>
         </div>
-      </div>
+
+        <!-- Usuários -->
+        <div class="sec-panel" id="narrativa-users">
+          <div class="toolbar">
+            <div class="search-wrap">
+              <input type="text" id="search-nusers" placeholder="Buscar por nome ou email..." oninput="filterNarrativaUsers()" />
+            </div>
+            <button class="btn-sm accent" onclick="openNarrativaModal()">+ Novo Usuário</button>
+            <button class="btn-sm" onclick="loadNarrativaUsers()">↻</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Nome</th><th>Email</th><th>Status</th><th>Criado em</th><th>Ações</th></tr>
+              </thead>
+              <tbody id="nusers-tbody">
+                <tr><td colspan="5"><div class="loading">Carregando...</div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div><!-- /narrativa -->
 
     </div><!-- /main -->
   </div><!-- /app -->
@@ -865,6 +905,20 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
     <div class="modal-actions">
       <button class="btn-sm" onclick="closeModal()">Cancelar</button>
       <button class="btn-sm accent" id="modal-confirm" onclick="confirmModal()">Criar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NARRATIVA IA — EDITAR USUÁRIO -->
+<div class="overlay" id="narrativa-edit-overlay" onclick="closeNarrativaEditModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h2>✏️ Editar Usuário Narrativa IA</h2>
+    <div class="field"><label>Nome</label><input type="text" id="ne-name" placeholder="Nome completo" /></div>
+    <div class="field"><label>Email</label><input type="email" id="ne-email" placeholder="email@exemplo.com" /></div>
+    <div class="field"><label>Nova Senha <span style="font-weight:400;color:var(--muted)">(deixe em branco para manter)</span></label><input type="password" id="ne-password" placeholder="••••••••" /></div>
+    <div class="modal-actions">
+      <button class="btn-sm" onclick="closeNarrativaEditModal()">Cancelar</button>
+      <button class="btn-sm accent" onclick="saveNarrativaEdit()">Salvar</button>
     </div>
   </div>
 </div>
@@ -937,20 +991,22 @@ function switchProduct(prod) {
   document.getElementById(`btn-${prod}`).classList.add('active');
   document.querySelectorAll('.prod-panel').forEach(p => p.classList.remove('active'));
   document.getElementById(`panel-${prod}`).classList.add('active');
-  document.getElementById('subnav-cenadrop').style.display = prod === 'cenadrop' ? 'block' : 'none';
+  document.getElementById('subnav-cenadrop').style.display  = prod === 'cenadrop'  ? 'block' : 'none';
+  document.getElementById('subnav-narrativa').style.display = prod === 'narrativa' ? 'block' : 'none';
   document.getElementById('bc-prod').textContent = prod === 'cenadrop' ? 'CenaDrop' : 'Narrativa IA';
-  const labels = { dashboard:'Dashboard', licenses:'Licenças', students:'Alunos Hotmart' };
+  const labels = { dashboard:'Dashboard', licenses:'Licenças', students:'Alunos Hotmart', users:'Usuários' };
   document.getElementById('bc-sec').textContent = labels[curSec[prod] || 'dashboard'] || '—';
+  if (prod === 'narrativa') { switchSection('narrativa', curSec['narrativa'] || 'dashboard'); loadNarrativaUsers(); }
 }
 
 function switchSection(prod, sec) {
   curSec[prod] = sec;
-  document.querySelectorAll('#subnav-cenadrop .sn-btn').forEach(el =>
+  document.querySelectorAll(`#subnav-${prod} .sn-btn`).forEach(el =>
     el.classList.toggle('active', el.dataset.sec === sec)
   );
   document.querySelectorAll(`#panel-${prod} .sec-panel`).forEach(p => p.classList.remove('active'));
   document.getElementById(`${prod}-${sec}`)?.classList.add('active');
-  const labels = { dashboard:'Dashboard', licenses:'Licenças', students:'Alunos Hotmart' };
+  const labels = { dashboard:'Dashboard', licenses:'Licenças', students:'Alunos Hotmart', users:'Usuários' };
   document.getElementById('bc-sec').textContent = labels[sec] || sec;
   if (curProd !== prod) switchProduct(prod);
 }
@@ -1070,22 +1126,6 @@ function closeModal(e) {
     document.getElementById('modal-overlay').classList.remove('open');
 }
 
-async function confirmModal() {
-  const name = document.getElementById('m-name').value.trim();
-  const email = document.getElementById('m-email').value.trim();
-  const phone = document.getElementById('m-phone').value.trim();
-  const notes = document.getElementById('m-notes').value.trim();
-  if (modalMode === 'create') {
-    const d = await apiCall('create', { name, email, phone, notes });
-    if (d.ok) { toast(`✅ Chave criada: ${d.license.key}`, 'success'); closeModal(); loadAll(); }
-    else toast('Erro ao criar chave', 'error');
-  } else {
-    const d = await apiCall('update', { key: editingKey, name, email, phone, notes });
-    if (d.ok) { toast('✅ Atualizado', 'success'); closeModal(); loadAll(); }
-    else toast('Erro ao atualizar', 'error');
-  }
-}
-
 // ── AÇÕES ─────────────────────────────────────
 async function resendEmail(key, email) {
   if (!email) { alert('Esta licença não tem email cadastrado.'); return; }
@@ -1114,6 +1154,118 @@ async function deleteKey(key) {
 
 function copyKey(key) {
   navigator.clipboard.writeText(key).then(() => toast('📋 Chave copiada!', 'success'));
+}
+
+// ── NARRATIVA IA ──────────────────────────────
+let allNarrativaUsers = [];
+
+async function loadNarrativaUsers() {
+  const [ud, sd] = await Promise.all([apiCall('narrativa-list'), apiCall('narrativa-stats')]);
+  if (sd.total !== undefined) {
+    document.getElementById('ns-total').textContent   = sd.total;
+    document.getElementById('ns-active').textContent  = sd.active;
+    document.getElementById('ns-inactive').textContent= sd.inactive;
+    document.getElementById('cnt-nusers').textContent = sd.total;
+  }
+  if (ud.users) { allNarrativaUsers = ud.users; renderNarrativaUsers(allNarrativaUsers); }
+}
+
+function renderNarrativaUsers(list) {
+  const tb = document.getElementById('nusers-tbody');
+  if (!list.length) { tb.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="icon">👤</div><p>Nenhum usuário cadastrado ainda.</p></div></td></tr>`; return; }
+  tb.innerHTML = list.map(u => `
+    <tr>
+      <td style="font-weight:600">${u.name}</td>
+      <td style="color:var(--muted);font-size:12px">${u.email}</td>
+      <td><span class="badge ${u.active ? 'active' : 'inactive'}">${u.active ? 'Ativo' : 'Inativo'}</span></td>
+      <td style="color:var(--muted);font-size:12px">${fmtDate(u.created_at)}</td>
+      <td><div class="actions">
+        <button class="btn-icon" onclick="openNarrativaEditModal('${u.id}','${u.name.replace(/'/g,"\\'")}','${u.email}')">✏️</button>
+        <button class="btn-icon warn" onclick="toggleNarrativaUser('${u.id}',${u.active})">${u.active ? '🔒' : '🔓'}</button>
+        <button class="btn-icon danger" onclick="deleteNarrativaUser('${u.id}','${u.email}')">🗑️</button>
+      </div></td>
+    </tr>`).join('');
+}
+
+function filterNarrativaUsers() {
+  const q = document.getElementById('search-nusers').value.toLowerCase();
+  renderNarrativaUsers(allNarrativaUsers.filter(u =>
+    (u.name||'').toLowerCase().includes(q) || (u.email||'').toLowerCase().includes(q)
+  ));
+}
+
+let narrativaModal = false;
+function openNarrativaModal() {
+  narrativaModal = true;
+  document.getElementById('modal-title').textContent = '+ Novo Usuário Narrativa IA';
+  document.getElementById('modal-confirm').textContent = 'Criar Usuário';
+  ['m-name','m-email','m-phone','m-notes'].forEach(id => document.getElementById(id).value = '');
+  document.querySelector('.field:nth-child(3)').style.display = 'none'; // oculta WhatsApp
+  document.querySelector('.field:nth-child(4)').innerHTML = '<label>Senha</label><input type="password" id="m-notes" placeholder="Senha de acesso" />';
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+async function confirmModal() {
+  if (narrativaModal) {
+    const name = document.getElementById('m-name').value.trim();
+    const email = document.getElementById('m-email').value.trim();
+    const password = document.getElementById('m-notes').value.trim();
+    if (!name || !email || !password) { toast('Preencha nome, email e senha', 'error'); return; }
+    const d = await apiCall('narrativa-create', { name, email, password });
+    if (d.ok) { toast(`✅ Usuário criado: ${email}`, 'success'); closeModal(); loadNarrativaUsers(); }
+    else toast('Erro: ' + (d.error||'Falha ao criar'), 'error');
+    narrativaModal = false;
+    document.querySelector('.field:nth-child(3)').style.display = '';
+    return;
+  }
+  const name = document.getElementById('m-name').value.trim();
+  const email = document.getElementById('m-email').value.trim();
+  const phone = document.getElementById('m-phone').value.trim();
+  const notes = document.getElementById('m-notes').value.trim();
+  if (modalMode === 'create') {
+    const d = await apiCall('create', { name, email, phone, notes });
+    if (d.ok) { toast(`✅ Chave criada: ${d.license.key}`, 'success'); closeModal(); loadAll(); }
+    else toast('Erro ao criar chave', 'error');
+  } else {
+    const d = await apiCall('update', { key: editingKey, name, email, phone, notes });
+    if (d.ok) { toast('✅ Atualizado', 'success'); closeModal(); loadAll(); }
+    else toast('Erro ao atualizar', 'error');
+  }
+}
+
+let narrativaEditId = null;
+function openNarrativaEditModal(id, name, email) {
+  narrativaEditId = id;
+  document.getElementById('ne-name').value = name;
+  document.getElementById('ne-email').value = email;
+  document.getElementById('ne-password').value = '';
+  document.getElementById('narrativa-edit-overlay').classList.add('open');
+}
+function closeNarrativaEditModal(e) {
+  if (!e || e.target === document.getElementById('narrativa-edit-overlay'))
+    document.getElementById('narrativa-edit-overlay').classList.remove('open');
+}
+async function saveNarrativaEdit() {
+  const name     = document.getElementById('ne-name').value.trim();
+  const email    = document.getElementById('ne-email').value.trim();
+  const password = document.getElementById('ne-password').value.trim();
+  if (!name || !email) { toast('Preencha nome e email', 'error'); return; }
+  const payload = { id: narrativaEditId, name, email };
+  if (password) payload.password = password;
+  const d = await apiCall('narrativa-update', payload);
+  if (d.ok) { toast('✅ Usuário atualizado', 'success'); closeNarrativaEditModal(); loadNarrativaUsers(); }
+  else toast('Erro: ' + (d.error || 'Falha ao atualizar'), 'error');
+}
+
+async function toggleNarrativaUser(id, active) {
+  const d = await apiCall('narrativa-toggle', { id });
+  if (d.ok) { toast(d.active ? '🔓 Ativado' : '🔒 Bloqueado', 'success'); loadNarrativaUsers(); }
+}
+
+async function deleteNarrativaUser(id, email) {
+  if (!confirm(`Excluir permanentemente o usuário ${email}?`)) return;
+  const d = await apiCall('narrativa-delete', { id });
+  if (d.ok) { toast('🗑️ Usuário excluído', 'success'); loadNarrativaUsers(); }
 }
 
 // ── TOAST ─────────────────────────────────────
