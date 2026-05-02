@@ -9,6 +9,8 @@
     { "source": "/cenadrop/manual",            "destination": "/cenadrop/manual/index.html" },
     { "source": "/cenadrop/manual/",           "destination": "/cenadrop/manual/index.html" },
     { "source": "/cenadrop/apresentacao",      "destination": "/cenadrop/apresentacao/index.html" },
-    { "source": "/cenadrop/apresentacao/",     "destination": "/cenadrop/apresentacao/index.html" }
+    { "source": "/cenadrop/apresentacao/",     "destination": "/cenadrop/apresentacao/index.html" },
+    { "source": "/embreve",                    "destination": "/embreve/index.html" },
+    { "source": "/embreve/",                   "destination": "/embreve/index.html" }
   ]
 }
