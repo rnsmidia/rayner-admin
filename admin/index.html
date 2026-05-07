@@ -1079,23 +1079,10 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
               <div class="mon-header">
                 <div class="mon-logo vercel">▲</div>
                 <div><div class="mon-svc-name">Vercel</div><div class="mon-svc-plan">Hobby Plan</div></div>
-                <div class="mon-chip manual">Manual</div>
+                <div class="mon-chip ok" id="mon-vc-chip">Live</div>
               </div>
-              <div class="mon-metrics">
-                <div>
-                  <div class="mon-metric-label">Bandwidth</div>
-                  <div class="mon-metric-val">— <span class="mon-metric-sub">/ 100 GB /mês</span></div>
-                  <div class="mon-bar"><div class="mon-bar-fill yellow" style="width:0%"></div></div>
-                </div>
-                <div>
-                  <div class="mon-metric-label">Serverless Functions</div>
-                  <div class="mon-metric-val">— <span class="mon-metric-sub">/ 100 horas /mês</span></div>
-                </div>
-                <div>
-                  <div class="mon-metric-label">Deployments</div>
-                  <div class="mon-metric-val">— <span class="mon-metric-sub">/ 6.000 /mês</span></div>
-                </div>
-                <div class="mon-note">Acesse o dashboard Vercel para ver o uso em tempo real.</div>
+              <div class="mon-metrics" id="mon-vc-metrics">
+                <div class="loading">Carregando...</div>
               </div>
               <a href="https://vercel.com/dashboard" target="_blank" class="mon-link">Abrir Dashboard →</a>
             </div>
@@ -1131,23 +1118,10 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
               <div class="mon-header">
                 <div class="mon-logo github">⑂</div>
                 <div><div class="mon-svc-name">GitHub</div><div class="mon-svc-plan">Free Plan</div></div>
-                <div class="mon-chip manual">Manual</div>
+                <div class="mon-chip ok" id="mon-gh-chip">Live</div>
               </div>
-              <div class="mon-metrics">
-                <div>
-                  <div class="mon-metric-label">Actions / mês</div>
-                  <div class="mon-metric-val">— <span class="mon-metric-sub">/ 2.000 minutos</span></div>
-                  <div class="mon-bar"><div class="mon-bar-fill yellow" style="width:0%"></div></div>
-                </div>
-                <div>
-                  <div class="mon-metric-label">Storage de Packages</div>
-                  <div class="mon-metric-val">— <span class="mon-metric-sub">/ 500 MB</span></div>
-                </div>
-                <div>
-                  <div class="mon-metric-label">Repositórios privados</div>
-                  <div class="mon-metric-val">Ilimitados</div>
-                </div>
-                <div class="mon-note">Acesse Billing para acompanhar o consumo de Actions.</div>
+              <div class="mon-metrics" id="mon-gh-metrics">
+                <div class="loading">Carregando...</div>
               </div>
               <a href="https://github.com/settings/billing/summary" target="_blank" class="mon-link">Ver Billing →</a>
             </div>
@@ -1697,11 +1671,19 @@ async function loadMonitor() {
   const d = await apiCall('monitor');
   document.getElementById('mon-updated').textContent = 'atualizado às ' + new Date().toLocaleTimeString('pt-BR');
   if (d.supabase) renderSupabaseCard(d.supabase);
+  if (d.vercel)   renderVercelCard(d.vercel);
+  if (d.github)   renderGitHubCard(d.github);
 }
 
+function monBar(pct, color) {
+  return `<div class="mon-bar"><div class="mon-bar-fill ${color}" style="width:${Math.min(100,pct).toFixed(1)}%"></div></div>`;
+}
+function barColor(pct) { return pct > 80 ? 'red' : pct > 50 ? 'yellow' : 'green'; }
+function pctLabel(pct) { return pct < 0.1 ? '< 0,1%' : pct.toFixed(1) + '%'; }
+
 function renderSupabaseCard(sb) {
-  const pct = Math.min(100, (sb.estimatedMB / sb.limits.storageMB) * 100);
-  const barColor = pct > 80 ? 'red' : pct > 50 ? 'yellow' : 'green';
+  const pct = (sb.estimatedMB / sb.limits.storageMB) * 100;
+  const col  = barColor(pct);
   const chip = document.getElementById('mon-sb-chip');
   chip.className = 'mon-chip ' + (pct > 80 ? 'manual' : 'ok');
   chip.textContent = pct > 80 ? 'Atenção' : 'OK';
@@ -1712,23 +1694,71 @@ function renderSupabaseCard(sb) {
     <div>
       <div class="mon-metric-label">Total de linhas (BD)</div>
       <div class="mon-metric-val">${sb.totalRows.toLocaleString('pt-BR')} <span class="mon-metric-sub">registros</span></div>
-      <div class="mon-note" style="margin-top:4px">
-        CenaDrop: ${sb.tables.cenadrop} &nbsp;·&nbsp; NxSaúde: ${sb.tables.nxsaude} &nbsp;·&nbsp; Narrativa IA: ${sb.tables.narrativa}
-      </div>
+      <div class="mon-note" style="margin-top:4px">CenaDrop: ${sb.tables.cenadrop} &nbsp;·&nbsp; NxSaúde: ${sb.tables.nxsaude} &nbsp;·&nbsp; Narrativa IA: ${sb.tables.narrativa}</div>
     </div>
     <div>
       <div class="mon-metric-label">Armazenamento estimado</div>
       <div class="mon-metric-val">${sizeFmt} <span class="mon-metric-sub">/ 500 MB</span></div>
-      <div class="mon-bar"><div class="mon-bar-fill ${barColor}" style="width:${pct.toFixed(1)}%"></div></div>
-      <div class="mon-note" style="margin-top:4px">${pct < 0.1 ? '< 0,1' : pct.toFixed(1)}% utilizado (estimativa ~2 KB/linha)</div>
+      ${monBar(pct, col)}
+      <div class="mon-note" style="margin-top:4px">${pctLabel(pct)} utilizado (~2 KB/linha)</div>
     </div>
     <div>
       <div class="mon-metric-label">Auth / MAU</div>
-      <div class="mon-metric-val">— <span class="mon-metric-sub">/ 50.000 usuários ativos/mês</span></div>
+      <div class="mon-metric-val">— <span class="mon-metric-sub">/ 50.000 /mês</span></div>
     </div>
     <div>
       <div class="mon-metric-label">Bandwidth</div>
       <div class="mon-metric-val">— <span class="mon-metric-sub">/ 5 GB /mês</span></div>
+    </div>`;
+}
+
+function renderVercelCard(vc) {
+  const pct = (vc.deployments / vc.deploymentsLimit) * 100;
+  const col = barColor(pct);
+  document.getElementById('mon-vc-chip').className = 'mon-chip ' + (pct > 80 ? 'manual' : 'ok');
+  document.getElementById('mon-vc-chip').textContent = pct > 80 ? 'Atenção' : 'Live';
+  document.getElementById('mon-vc-metrics').innerHTML = `
+    <div>
+      <div class="mon-metric-label">Deployments / mês</div>
+      <div class="mon-metric-val">${vc.deployments} <span class="mon-metric-sub">/ ${vc.deploymentsLimit.toLocaleString('pt-BR')}</span></div>
+      ${monBar(pct, col)}
+      <div class="mon-note" style="margin-top:4px">${pctLabel(pct)} utilizado</div>
+    </div>
+    <div>
+      <div class="mon-metric-label">Bandwidth</div>
+      <div class="mon-metric-val">— <span class="mon-metric-sub">/ 100 GB /mês</span></div>
+      <div class="mon-note" style="margin-top:2px">Não exposto na API do plano Hobby</div>
+    </div>
+    <div>
+      <div class="mon-metric-label">Serverless Functions</div>
+      <div class="mon-metric-val">— <span class="mon-metric-sub">/ 100 horas /mês</span></div>
+    </div>`;
+}
+
+function renderGitHubCard(gh) {
+  const actPct   = gh.actionsLimit > 0 ? (gh.actionsMinutes / gh.actionsLimit) * 100 : 0;
+  const storePct = (gh.repoStorageMB / gh.repoStorageLimit) * 100;
+  const actCol   = barColor(actPct);
+  const storeCol = barColor(storePct);
+  document.getElementById('mon-gh-chip').className = 'mon-chip ' + (actPct > 80 || storePct > 80 ? 'manual' : 'ok');
+  document.getElementById('mon-gh-chip').textContent = actPct > 80 || storePct > 80 ? 'Atenção' : 'Live';
+  const repoList = (gh.repos || []).map(r => `${r.name}: ${r.sizeMB} MB`).join(' &nbsp;·&nbsp; ');
+  document.getElementById('mon-gh-metrics').innerHTML = `
+    <div>
+      <div class="mon-metric-label">Actions / mês</div>
+      <div class="mon-metric-val">${gh.actionsMinutes} min <span class="mon-metric-sub">/ ${gh.actionsLimit.toLocaleString('pt-BR')}</span></div>
+      ${monBar(actPct, actCol)}
+      <div class="mon-note" style="margin-top:4px">${pctLabel(actPct)} utilizado${gh.actionsMinutes === 0 ? ' (sem workflows configurados)' : ''}</div>
+    </div>
+    <div>
+      <div class="mon-metric-label">Storage dos repositórios</div>
+      <div class="mon-metric-val">${gh.repoStorageMB} MB <span class="mon-metric-sub">/ ${gh.repoStorageLimit} MB</span></div>
+      ${monBar(storePct, storeCol)}
+      <div class="mon-note" style="margin-top:4px">${repoList}</div>
+    </div>
+    <div>
+      <div class="mon-metric-label">Repositórios privados</div>
+      <div class="mon-metric-val">Ilimitados</div>
     </div>`;
 }
 
