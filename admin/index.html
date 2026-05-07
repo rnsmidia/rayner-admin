@@ -345,7 +345,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
 /* ════════════════════════════════════
    MAIN
 ════════════════════════════════════ */
-.main { margin-left: var(--sidebar-w); flex: 1; min-width: 0; height: 100vh; overflow-y: auto; }
+.main { margin-left: var(--sidebar-w); flex: 1; min-width: 0; }
 
 .topbar {
   background: var(--surface);
@@ -1228,7 +1228,8 @@ async function apiCall(action, extra = {}) {
 // ── NAV ───────────────────────────────────────
 function switchProduct(prod) {
   curProd = prod;
-  document.querySelector('.main').scrollTop = 0;
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
   document.querySelectorAll('.prod-btn').forEach(b => b.classList.remove('active'));
   document.getElementById(`btn-${prod}`).classList.add('active');
   document.querySelectorAll('.prod-panel').forEach(p => p.classList.remove('active'));
@@ -1248,6 +1249,8 @@ function switchProduct(prod) {
 
 function switchSection(prod, sec) {
   curSec[prod] = sec;
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
   document.querySelectorAll(`#subnav-${prod} .sn-btn`).forEach(el =>
     el.classList.toggle('active', el.dataset.sec === sec)
   );
