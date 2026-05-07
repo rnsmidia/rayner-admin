@@ -345,7 +345,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
 /* ════════════════════════════════════
    MAIN
 ════════════════════════════════════ */
-.main { margin-left: var(--sidebar-w); flex: 1; min-width: 0; }
+.main { margin-left: var(--sidebar-w); flex: 1; min-width: 0; height: 100vh; overflow-y: auto; }
 
 .topbar {
   background: var(--surface);
@@ -1092,23 +1092,10 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
               <div class="mon-header">
                 <div class="mon-logo resend">✉</div>
                 <div><div class="mon-svc-name">Resend</div><div class="mon-svc-plan">Free Plan</div></div>
-                <div class="mon-chip manual">Manual</div>
+                <div class="mon-chip ok" id="mon-rs-chip">Live</div>
               </div>
-              <div class="mon-metrics">
-                <div>
-                  <div class="mon-metric-label">Emails / mês</div>
-                  <div class="mon-metric-val">— <span class="mon-metric-sub">/ 3.000</span></div>
-                  <div class="mon-bar"><div class="mon-bar-fill purple" style="width:0%"></div></div>
-                </div>
-                <div>
-                  <div class="mon-metric-label">Emails / dia</div>
-                  <div class="mon-metric-val">— <span class="mon-metric-sub">/ 100</span></div>
-                </div>
-                <div>
-                  <div class="mon-metric-label">Domínios verificados</div>
-                  <div class="mon-metric-val">— <span class="mon-metric-sub">/ 1</span></div>
-                </div>
-                <div class="mon-note">Acesse o dashboard para ver métricas de entrega.</div>
+              <div class="mon-metrics" id="mon-rs-metrics">
+                <div class="loading">Carregando...</div>
               </div>
               <a href="https://resend.com/overview" target="_blank" class="mon-link">Abrir Dashboard →</a>
             </div>
@@ -1241,7 +1228,7 @@ async function apiCall(action, extra = {}) {
 // ── NAV ───────────────────────────────────────
 function switchProduct(prod) {
   curProd = prod;
-  window.scrollTo({ top: 0, behavior: 'instant' });
+  document.querySelector('.main').scrollTop = 0;
   document.querySelectorAll('.prod-btn').forEach(b => b.classList.remove('active'));
   document.getElementById(`btn-${prod}`).classList.add('active');
   document.querySelectorAll('.prod-panel').forEach(p => p.classList.remove('active'));
@@ -1671,6 +1658,7 @@ async function loadMonitor() {
   const d = await apiCall('monitor');
   document.getElementById('mon-updated').textContent = 'atualizado às ' + new Date().toLocaleTimeString('pt-BR');
   if (d.supabase) renderSupabaseCard(d.supabase);
+  if (d.resend)   renderResendCard(d.resend);
   if (d.vercel)   renderVercelCard(d.vercel);
   if (d.github)   renderGitHubCard(d.github);
 }
@@ -1710,6 +1698,29 @@ function renderSupabaseCard(sb) {
       <div class="mon-metric-label">Bandwidth</div>
       <div class="mon-metric-val">— <span class="mon-metric-sub">/ 5 GB /mês</span></div>
     </div>`;
+}
+
+function renderResendCard(rs) {
+  const pctMonth = (rs.emailsMonth / rs.limits.monthly) * 100;
+  const pctDay   = (rs.emailsToday / rs.limits.daily)   * 100;
+  const col = barColor(Math.max(pctMonth, pctDay));
+  const chip = document.getElementById('mon-rs-chip');
+  chip.className = 'mon-chip ' + (Math.max(pctMonth, pctDay) > 80 ? 'manual' : 'ok');
+  chip.textContent = Math.max(pctMonth, pctDay) > 80 ? 'Atenção' : 'Live';
+  document.getElementById('mon-rs-metrics').innerHTML = `
+    <div>
+      <div class="mon-metric-label">Emails disparados — mês</div>
+      <div class="mon-metric-val">${rs.emailsMonth} <span class="mon-metric-sub">/ ${rs.limits.monthly.toLocaleString('pt-BR')}</span></div>
+      ${monBar(pctMonth, barColor(pctMonth))}
+      <div class="mon-note" style="margin-top:4px">${pctLabel(pctMonth)} do limite mensal</div>
+    </div>
+    <div>
+      <div class="mon-metric-label">Emails disparados — hoje</div>
+      <div class="mon-metric-val">${rs.emailsToday} <span class="mon-metric-sub">/ ${rs.limits.daily}</span></div>
+      ${monBar(pctDay, barColor(pctDay))}
+      <div class="mon-note" style="margin-top:4px">${pctLabel(pctDay)} do limite diário</div>
+    </div>
+    <div class="mon-note" style="font-style:italic">Estimativa baseada em novos registros com email no banco — não inclui reenvios manuais.</div>`;
 }
 
 function renderVercelCard(vc) {

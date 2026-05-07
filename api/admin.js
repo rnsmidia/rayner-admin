@@ -451,26 +451,37 @@ module.exports = async function handler(req, res) {
 
   // MONITOR — uso dos serviços de infraestrutura
   if (action === 'monitor') {
-    const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).getTime();
-    const now        = Date.now();
+    const nowDate      = new Date();
+    const monthStart   = new Date(nowDate.getFullYear(), nowDate.getMonth(), 1);
+    const todayStart   = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate());
+    const monthStartMs = monthStart.getTime();
+    const nowMs        = nowDate.getTime();
+    const monthIso     = monthStart.toISOString();
+    const todayIso     = todayStart.toISOString();
 
-    const [r1, r2, r3, vercelRes, ghStorageRes, ghRunsRes] = await Promise.all([
+    const [r1, r2, r3, r4, r5, r6, r7, r8, vercelRes, ghStorageRes] = await Promise.all([
       // Supabase row counts
       supabase.from('licenses').select('*', { count: 'exact', head: true }).or('product.is.null,product.neq.nxsaude'),
       supabase.from('licenses').select('*', { count: 'exact', head: true }).eq('product', 'nxsaude'),
       supabase.from('narrativa_users').select('*', { count: 'exact', head: true }),
+      // Resend estimation — novos registros com email este mês (cada = 1 email enviado)
+      supabase.from('licenses').select('*', { count: 'exact', head: true })
+        .or('product.is.null,product.neq.nxsaude').not('email', 'is', null).gte('created_at', monthIso),
+      supabase.from('licenses').select('*', { count: 'exact', head: true })
+        .eq('product', 'nxsaude').not('email', 'is', null).gte('created_at', monthIso),
+      supabase.from('narrativa_users').select('*', { count: 'exact', head: true }).gte('created_at', monthIso),
+      // Resend estimation — hoje
+      supabase.from('licenses').select('*', { count: 'exact', head: true })
+        .not('email', 'is', null).gte('created_at', todayIso),
+      supabase.from('narrativa_users').select('*', { count: 'exact', head: true }).gte('created_at', todayIso),
       // Vercel deployments this month
-      fetch(`https://api.vercel.com/v6/deployments?teamId=${process.env.VERCEL_TEAM_ID}&limit=100&since=${monthStart}&until=${now}`, {
+      fetch(`https://api.vercel.com/v6/deployments?teamId=${process.env.VERCEL_TEAM_ID}&limit=100&since=${monthStartMs}&until=${nowMs}`, {
         headers: { Authorization: `Bearer ${process.env.VERCEL_TOKEN}` }
       }).then(r => r.json()).catch(() => ({})),
       // GitHub repo sizes
       fetch('https://api.github.com/user/repos?per_page=100&affiliation=owner', {
         headers: { Authorization: `Bearer ${process.env.GITHUB_TOKEN}`, Accept: 'application/vnd.github+json' }
       }).then(r => r.json()).catch(() => []),
-      // GitHub Actions runs this month
-      fetch(`https://api.github.com/repos/rnsmidia/rayner-admin/actions/runs?created=>=2026-05-01&per_page=1`, {
-        headers: { Authorization: `Bearer ${process.env.GITHUB_TOKEN}`, Accept: 'application/vnd.github+json' }
-      }).then(r => r.json()).catch(() => ({})),
     ]);
 
     const cdRows  = r1.count || 0;
@@ -479,19 +490,19 @@ module.exports = async function handler(req, res) {
     const totalRows   = cdRows + nxRows + nuRows;
     const estimatedMB = parseFloat((totalRows * 0.002).toFixed(4));
 
+    // Resend: email estimation from DB activity
+    const emailsMonth = (r4.count || 0) + (r5.count || 0) + (r6.count || 0);
+    const emailsToday = (r7.count || 0) + (r8.count || 0);
+
     // Vercel: count deployments
-    const deployments  = (vercelRes.deployments || []).length;
-    const paginationNext = vercelRes.pagination?.next;
+    const deployments = (vercelRes.deployments || []).length;
 
     // GitHub: total repo storage in MB
     const repos = Array.isArray(ghStorageRes) ? ghStorageRes : [];
-    const repoNames = ['rayner-admin', 'narrativa-ia', 'nxsaude-jejum'];
+    const repoNames  = ['rayner-admin', 'narrativa-ia', 'nxsaude-jejum'];
     const trackedRepos = repos.filter(r => repoNames.includes(r.name));
     const totalRepoKB  = trackedRepos.reduce((sum, r) => sum + (r.size || 0), 0);
     const repoSizesMB  = trackedRepos.map(r => ({ name: r.name, sizeMB: parseFloat((r.size / 1024).toFixed(1)) }));
-
-    // GitHub Actions runs (no workflows configured, so 0)
-    const actionsRuns = ghRunsRes.total_count || 0;
 
     return res.status(200).json({
       supabase: {
@@ -499,12 +510,15 @@ module.exports = async function handler(req, res) {
         totalRows, estimatedMB,
         limits: { storageMB: 500, bandwidthGB: 5, mau: 50000 }
       },
+      resend: {
+        emailsMonth, emailsToday,
+        limits: { monthly: 3000, daily: 100 }
+      },
       vercel: {
-        deployments, deploymentsLimit: 6000,
-        note: 'bandwidth não exposto na API do plano Hobby'
+        deployments, deploymentsLimit: 6000
       },
       github: {
-        actionsMinutes: actionsRuns, actionsLimit: 2000,
+        actionsMinutes: 0, actionsLimit: 2000,
         repoStorageMB: parseFloat((totalRepoKB / 1024).toFixed(1)),
         repoStorageLimit: 500,
         repos: repoSizesMB
