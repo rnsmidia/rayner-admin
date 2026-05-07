@@ -1,7 +1,5 @@
 {
   "rewrites": [
-    { "source": "/narrativa-ia",          "destination": "https://narrativa-ia.vercel.app/narrativa-ia" },
-    { "source": "/narrativa-ia/:path*",   "destination": "https://narrativa-ia.vercel.app/narrativa-ia/:path*" },
     { "source": "/admin",              "destination": "/admin/index.html" },
     { "source": "/admin/",             "destination": "/admin/index.html" },
     { "source": "/cenadrop/download",  "destination": "/cenadrop/download/index.html" },
@@ -11,6 +9,8 @@
     { "source": "/cenadrop/apresentacao",      "destination": "/cenadrop/apresentacao/index.html" },
     { "source": "/cenadrop/apresentacao/",     "destination": "/cenadrop/apresentacao/index.html" },
     { "source": "/embreve",                    "destination": "/embreve/index.html" },
-    { "source": "/embreve/",                   "destination": "/embreve/index.html" }
+    { "source": "/embreve/",                   "destination": "/embreve/index.html" },
+    { "source": "/vendas",                     "destination": "/vendas.html" },
+    { "source": "/vendas/",                    "destination": "/vendas.html" }
   ]
 }
