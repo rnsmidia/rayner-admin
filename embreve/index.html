@@ -4,302 +4,365 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Narrativa IA — Em Breve</title>
-<meta name="description" content="Transforme ideias em histórias cinematográficas com inteligência artificial.">
+<meta name="description" content="Transforme qualquer ideia em histórias cinematográficas completas com inteligência artificial.">
 <meta property="og:title" content="Narrativa IA — Em Breve">
-<meta property="og:description" content="Transforme ideias em histórias cinematográficas com inteligência artificial.">
+<meta property="og:description" content="A plataforma que gera roteiros, prompts visuais e CSVs prontos para vídeo com IA.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800;900&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; }
+:root {
+  --bg:     #05050E;
+  --card:   #0C0C1E;
+  --card2:  #111128;
+  --border: rgba(255,255,255,.06);
+  --border2: rgba(255,255,255,.1);
+  --accent:  #6214FF;
+  --accent2: #4169FF;
+  --accent3: #9B71FF;
+  --accent-light: #C4B1FF;
+  --text:    #EEEEF8;
+  --muted:   rgba(238,238,248,.5);
+  --muted2:  rgba(238,238,248,.22);
+  --green:   #4ade80;
+}
 
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+html, body { height: 100%; }
 body {
   font-family: 'Geist', system-ui, sans-serif;
-  background: #05050E;
-  color: #EEEEF8;
+  background: var(--bg);
+  color: var(--text);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
 
-/* ── AURORA ── */
-.aurora {
-  position: fixed; inset: 0; z-index: 0; pointer-events: none;
-  background:
-    radial-gradient(ellipse 100% 60% at 10% 30%, rgba(98,20,255,0.13) 0%, transparent 58%),
-    radial-gradient(ellipse 70% 55% at 88% 10%, rgba(65,105,255,0.08) 0%, transparent 52%),
-    radial-gradient(ellipse 55% 65% at 60% 90%, rgba(124,92,248,0.07) 0%, transparent 50%);
+/* ── BACKGROUND ── */
+.bg-noise {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: .03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 220px 220px;
 }
-@keyframes orb1 { 0%,100%{transform:translate(0,0) scale(1);opacity:.6} 33%{transform:translate(3%,-6%) scale(1.08);opacity:.9} 66%{transform:translate(-2%,4%) scale(.93);opacity:.5} }
-@keyframes orb2 { 0%,100%{transform:translate(0,0) scale(1);opacity:.45} 50%{transform:translate(-5%,6%) scale(1.12);opacity:.75} }
-.orb {
-  position: fixed; border-radius: 50%; pointer-events: none; z-index: 0;
-  will-change: transform;
-}
-.orb-1 {
-  top: -30vh; left: -20vw; width: 85vw; height: 85vh;
-  background: radial-gradient(ellipse, rgba(98,20,255,.16) 0%, transparent 65%);
-  animation: orb1 26s ease-in-out infinite;
-}
-.orb-2 {
-  bottom: -25vh; right: -15vw; width: 70vw; height: 70vh;
-  background: radial-gradient(ellipse, rgba(65,105,255,.10) 0%, transparent 65%);
-  animation: orb2 32s ease-in-out infinite;
-}
-
-/* ── GRID LINES ── */
+@keyframes orb1 { 0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(3%,-6%) scale(1.08)} 66%{transform:translate(-2%,4%) scale(.93)} }
+@keyframes orb2 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(-5%,6%) scale(1.12)} }
+.orb { position:fixed; border-radius:50%; pointer-events:none; z-index:0; will-change:transform; }
+.orb-1 { top:-40vh; left:-25vw; width:100vw; height:100vh; background:radial-gradient(ellipse, rgba(98,20,255,.18) 0%, transparent 60%); animation:orb1 28s ease-in-out infinite; }
+.orb-2 { bottom:-30vh; right:-20vw; width:80vw; height:80vh; background:radial-gradient(ellipse, rgba(65,105,255,.12) 0%, transparent 65%); animation:orb2 36s ease-in-out infinite; }
+.orb-3 { top:35%; left:50%; transform:translate(-50%,-50%); width:65vw; height:65vh; background:radial-gradient(ellipse, rgba(155,113,255,.055) 0%, transparent 70%); animation:orb2 44s ease-in-out infinite reverse; }
 .grid-lines {
-  position: fixed; inset: 0; z-index: 0; pointer-events: none;
-  background-image:
-    linear-gradient(rgba(98,20,255,.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(98,20,255,.04) 1px, transparent 1px);
-  background-size: 60px 60px;
-  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 80%);
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image: linear-gradient(rgba(98,20,255,.033) 1px, transparent 1px), linear-gradient(90deg, rgba(98,20,255,.033) 1px, transparent 1px);
+  background-size:64px 64px;
+  mask-image:radial-gradient(ellipse 90% 90% at 50% 50%, black 15%, transparent 80%);
 }
+.particles { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+.particle { position:absolute; border-radius:50%; background:rgba(98,20,255,.45); animation:pfloat linear infinite; }
+@keyframes pfloat { 0%{transform:translateY(100vh) scale(0);opacity:0} 8%{opacity:1} 92%{opacity:1} 100%{transform:translateY(-8vh) scale(1.2);opacity:0} }
 
 /* ── TOPBAR ── */
 .topbar {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  padding: 14px 40px;
-  display: flex; align-items: center; justify-content: space-between;
-  background: rgba(5,5,14,.75);
-  backdrop-filter: blur(14px);
-  border-bottom: 1px solid rgba(255,255,255,.05);
+  position:fixed; top:0; left:0; right:0; z-index:200;
+  padding:16px 48px;
+  display:flex; align-items:center; justify-content:space-between;
+  background:rgba(5,5,14,.82);
+  backdrop-filter:blur(20px) saturate(1.2);
+  border-bottom:1px solid rgba(255,255,255,.045);
 }
-.topbar-left {
-  display: flex; align-items: center; gap: 10px;
-}
-.topbar-icon {
-  height: 28px; width: auto;
-  filter: drop-shadow(0 0 8px rgba(98,20,255,.5));
-}
-.topbar-name {
-  font-size: 13px; font-weight: 700; letter-spacing: 0.05em;
-  color: rgba(238,238,248,.55);
-}
+.topbar-left { display:flex; align-items:center; gap:10px; }
+.topbar-icon { height:30px; width:auto; filter:drop-shadow(0 0 10px rgba(98,20,255,.65)); }
+.topbar-name { font-size:14px; font-weight:700; letter-spacing:.03em; color:rgba(238,238,248,.65); }
+@keyframes pill-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(98,20,255,.4)} 50%{box-shadow:0 0 0 7px rgba(98,20,255,0)} }
 .topbar-pill {
-  font-family: 'Geist Mono', monospace;
-  font-size: 10px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase;
-  color: #C4B1FF; padding: 4px 14px;
-  background: rgba(98,20,255,.1); border: 1px solid rgba(98,20,255,.25);
-  border-radius: 20px;
+  font-family:'Geist Mono',monospace;
+  font-size:10px; font-weight:600; letter-spacing:2.5px; text-transform:uppercase;
+  color:var(--accent-light); padding:5px 16px;
+  background:rgba(98,20,255,.1); border:1px solid rgba(98,20,255,.28);
+  border-radius:20px; animation:pill-pulse 3s ease-in-out infinite;
+  display:flex; align-items:center; gap:7px;
 }
-@keyframes pill-pulse {
-  0%,100% { box-shadow: 0 0 0 0 rgba(98,20,255,.3); }
-  50%      { box-shadow: 0 0 0 6px rgba(98,20,255,.0); }
-}
-.topbar-pill { animation: pill-pulse 3s ease-in-out infinite; }
-
-/* ── PAGE ── */
-.page {
-  position: relative; z-index: 1;
-  min-height: 100vh;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 120px 24px 80px;
-}
+.topbar-pill::before { content:''; display:block; width:6px; height:6px; border-radius:50%; background:var(--accent-light); }
 
 /* ── HERO ── */
-.hero { text-align: center; max-width: 680px; width: 100%; }
-
-/* LOGO PRINCIPAL */
-.logo-hero-wrap {
-  position: relative; display: inline-block;
-  margin-bottom: 36px;
+.hero-section {
+  position:relative; z-index:1;
+  min-height:100vh;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:130px 24px 100px;
+  text-align:center;
 }
-@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-@keyframes glow-pulse { 0%,100%{opacity:.45;transform:translate(-50%,-50%) scale(1)} 50%{opacity:.75;transform:translate(-50%,-50%) scale(1.15)} }
+.hero-eyebrow {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:6px 18px; border-radius:20px; margin-bottom:32px;
+  background:rgba(98,20,255,.08); border:1px solid rgba(98,20,255,.24);
+  font-family:'Geist Mono',monospace;
+  font-size:10px; font-weight:600; letter-spacing:2.5px; text-transform:uppercase;
+  color:var(--accent-light);
+}
+.hero-eyebrow-dot { width:6px; height:6px; border-radius:50%; background:var(--accent-light); animation:pill-pulse 2.8s ease-in-out infinite; }
+
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
+@keyframes glow-pulse { 0%,100%{opacity:.38;transform:scale(1)} 50%{opacity:.72;transform:scale(1.12)} }
+.logo-wrap { position:relative; display:inline-block; margin-bottom:44px; }
 .logo-glow {
-  position: absolute; top: 50%; left: 50%;
-  transform: translate(-50%,-50%);
-  width: 260px; height: 260px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(98,20,255,.45) 0%, transparent 65%);
-  filter: blur(35px);
-  animation: glow-pulse 4s ease-in-out infinite;
-  pointer-events: none;
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  width:340px; height:340px; border-radius:50%;
+  background:radial-gradient(circle, rgba(98,20,255,.55) 0%, transparent 65%);
+  filter:blur(44px); animation:glow-pulse 4.5s ease-in-out infinite; pointer-events:none;
 }
-.logo-hero-img {
-  width: 280px; height: auto;
-  position: relative; z-index: 1;
-  animation: float 7s ease-in-out infinite;
-  filter: drop-shadow(0 0 30px rgba(98,20,255,.55));
+.logo-img {
+  width:310px; height:auto; position:relative; z-index:1;
+  animation:float 8s ease-in-out infinite;
+  filter:drop-shadow(0 0 44px rgba(98,20,255,.65));
 }
 
-/* EM BREVE BADGE */
-.badge {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 6px 18px; border-radius: 20px;
-  background: rgba(98,20,255,.1); border: 1px solid rgba(98,20,255,.3);
-  font-family: 'Geist Mono', monospace;
-  font-size: 11px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase;
-  color: #C4B1FF; margin-bottom: 20px;
+.hero-title {
+  font-size:clamp(38px, 6.5vw, 78px);
+  font-weight:800; line-height:1.03;
+  letter-spacing:-3px; margin-bottom:22px;
+  max-width:800px;
 }
-.badge-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: #C4B1FF;
-  animation: pill-pulse 2.5s ease-in-out infinite;
+.hero-title-gradient {
+  background:linear-gradient(135deg, #fff 0%, var(--accent3) 45%, var(--accent2) 100%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
 }
 
-/* TAGLINE PRINCIPAL */
-.hero-tagline {
-  font-size: clamp(14px, 2vw, 18px); font-weight: 400;
-  color: rgba(238,238,248,.55); line-height: 1.7;
-  max-width: 520px; margin: 0 auto 48px;
+.hero-sub {
+  font-size:clamp(15px,2vw,18px); font-weight:400; color:var(--muted);
+  line-height:1.78; max-width:540px; margin:0 auto 18px;
 }
-.hero-tagline strong { color: #EEEEF8; font-weight: 600; }
+.hero-sub strong { color:var(--text); font-weight:600; }
 
-/* DIVIDER */
-.divider {
-  width: 1px; height: 60px; margin: 0 auto 48px;
-  background: linear-gradient(to bottom, rgba(98,20,255,.6), transparent);
+.rotator-wrap {
+  display:inline-flex; align-items:center; gap:10px;
+  font-size:14px; font-weight:500; color:var(--muted); margin-bottom:46px;
+}
+.rotator-label { color:var(--muted2); }
+.rotator-word {
+  font-weight:700; color:var(--accent-light);
+  font-family:'Geist Mono',monospace;
+  min-width:180px; text-align:left;
+  transition:opacity .3s, transform .3s;
 }
 
-/* ── FEATURES ── */
-.features {
-  display: flex; flex-wrap: wrap; gap: 10px;
-  justify-content: center; margin-bottom: 52px;
+.hero-form { display:flex; gap:10px; max-width:480px; width:100%; margin:0 auto 12px; }
+.hero-input {
+  flex:1; padding:15px 20px; border-radius:14px; outline:none;
+  background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1);
+  color:var(--text); font-family:'Geist',sans-serif; font-size:15px;
+  transition:border-color .2s, box-shadow .2s;
 }
-.feat {
-  display: flex; align-items: center; gap: 7px;
-  padding: 8px 16px; border-radius: 10px;
-  background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.07);
-  font-size: 12px; font-weight: 500; color: rgba(238,238,248,.55);
-  backdrop-filter: blur(6px); transition: all .2s;
+.hero-input::placeholder { color:rgba(238,238,248,.22); }
+.hero-input:focus { border-color:rgba(98,20,255,.5); box-shadow:0 0 0 3px rgba(98,20,255,.12); }
+.hero-btn {
+  padding:15px 26px; border-radius:14px; border:none; cursor:pointer;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff; font-family:'Geist',sans-serif; font-size:15px; font-weight:700;
+  white-space:nowrap; transition:all .2s;
+  box-shadow:0 4px 30px rgba(98,20,255,.5), inset 0 1px 0 rgba(255,255,255,.12);
 }
-.feat:hover {
-  border-color: rgba(98,20,255,.3); color: #EEEEF8;
-  background: rgba(98,20,255,.07);
-}
-.feat-icon { font-size: 14px; }
+.hero-btn:hover { transform:translateY(-2px); box-shadow:0 8px 40px rgba(98,20,255,.65), inset 0 1px 0 rgba(255,255,255,.12); }
+.hero-btn:active { transform:translateY(0); }
+.hero-btn:disabled { opacity:.5; cursor:not-allowed; transform:none; }
 
-/* ── NOTIFY BOX ── */
-.notify-wrap {
-  position: relative; max-width: 480px; margin: 0 auto 64px; width: 100%;
+.hero-hint { font-size:11.5px; color:var(--muted2); margin-bottom:70px; }
+
+.scroll-cue {
+  position:absolute; bottom:36px; left:50%; transform:translateX(-50%);
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+  font-size:10px; font-weight:600; letter-spacing:2px; text-transform:uppercase;
+  color:var(--muted2);
 }
-.notify-box {
-  background: rgba(10,10,22,.8);
-  border: 1px solid rgba(255,255,255,.08);
-  border-radius: 20px; padding: 32px;
-  position: relative; overflow: hidden;
-  backdrop-filter: blur(10px);
+@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(7px)} }
+.scroll-arrow { animation:bounce 2.2s ease-in-out infinite; font-size:16px; opacity:.3; }
+
+/* ── SECTIONS ── */
+.section { position:relative; z-index:1; padding:100px 24px; }
+.section-inner { max-width:1100px; margin:0 auto; }
+.section-label {
+  font-family:'Geist Mono',monospace;
+  font-size:10px; font-weight:600; letter-spacing:3px; text-transform:uppercase;
+  color:var(--accent3); margin-bottom:16px;
+  display:flex; align-items:center; gap:12px;
 }
-.notify-box::before {
-  content: '';
-  position: absolute; top: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, rgba(98,20,255,.9) 0%, rgba(65,105,255,.4) 50%, transparent 80%);
+.section-label::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,rgba(98,20,255,.3),transparent); }
+.section-title { font-size:clamp(26px,4vw,46px); font-weight:800; letter-spacing:-1.2px; line-height:1.08; margin-bottom:14px; }
+.section-sub { font-size:15px; color:var(--muted); line-height:1.75; max-width:520px; margin-bottom:56px; }
+
+.section-divider { position:relative; z-index:1; max-width:1100px; margin:0 auto; padding:0 24px; }
+.section-divider-line { height:1px; background:linear-gradient(90deg, transparent, var(--border), rgba(98,20,255,.13), var(--border), transparent); }
+
+/* ── SCENE CARDS ── */
+.scene-cards { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+.scene-card {
+  background:var(--card); border-radius:16px; border:1px solid var(--border);
+  overflow:hidden; transition:all .3s; position:relative;
 }
-.notify-box::after {
-  content: '';
-  position: absolute; bottom: -60px; right: -60px;
-  width: 160px; height: 160px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(98,20,255,.12) 0%, transparent 65%);
-  pointer-events: none;
+.scene-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2),transparent);
+  opacity:0; transition:opacity .3s;
 }
-.notify-title {
-  font-size: 16px; font-weight: 700; color: #EEEEF8;
-  margin-bottom: 6px;
+.scene-card:hover { border-color:rgba(98,20,255,.3); transform:translateY(-5px); box-shadow:0 24px 60px rgba(0,0,0,.55), 0 0 0 1px rgba(98,20,255,.15); }
+.scene-card:hover::before { opacity:1; }
+
+.scene-card-head {
+  padding:15px 18px 13px;
+  display:flex; align-items:center; justify-content:space-between;
+  border-bottom:1px solid var(--border);
 }
-.notify-sub {
-  font-size: 13px; color: rgba(238,238,248,.45); margin-bottom: 20px; line-height: 1.55;
+.scene-num { font-family:'Geist Mono',monospace; font-size:10px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--muted2); }
+.scene-style-badge {
+  font-size:10px; font-weight:600; padding:3px 10px; border-radius:8px;
+  background:rgba(98,20,255,.1); border:1px solid rgba(98,20,255,.2); color:var(--accent-light);
 }
-.notify-form { display: flex; gap: 8px; }
-.notify-input {
-  flex: 1; padding: 12px 16px; border-radius: 12px; outline: none;
-  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.09);
-  color: #EEEEF8; font-family: 'Geist', sans-serif; font-size: 14px;
-  transition: border-color .2s, box-shadow .2s;
+.scene-body { padding:16px 18px; }
+.scene-subject { font-size:13px; font-weight:500; color:var(--text); line-height:1.65; margin-bottom:14px; }
+.scene-tags { display:flex; flex-wrap:wrap; gap:6px; }
+.scene-tag {
+  font-size:10px; font-weight:600; padding:3px 9px; border-radius:6px;
+  background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07);
+  color:var(--muted); font-family:'Geist Mono',monospace;
 }
-.notify-input::placeholder { color: rgba(238,238,248,.25); }
-.notify-input:focus {
-  border-color: rgba(98,20,255,.5);
-  box-shadow: 0 0 0 3px rgba(98,20,255,.12);
+.scene-card-foot {
+  padding:10px 18px; border-top:1px solid var(--border);
+  display:flex; align-items:center; gap:7px;
 }
-.notify-btn {
-  padding: 12px 22px; border-radius: 12px; border: none; cursor: pointer;
-  background: linear-gradient(135deg, #6214FF, #4169FF);
-  color: #fff; font-family: 'Geist', sans-serif; font-size: 14px; font-weight: 700;
-  white-space: nowrap; transition: all .2s; position: relative; overflow: hidden;
-  box-shadow: 0 4px 24px rgba(98,20,255,.45);
+.scene-foot-dot { width:5px; height:5px; border-radius:50%; background:var(--green); flex-shrink:0; }
+.scene-foot-txt { font-size:10px; color:var(--muted2); font-family:'Geist Mono',monospace; }
+
+/* ── HOW IT WORKS ── */
+.steps-wrap { display:grid; grid-template-columns:1fr auto 1fr auto 1fr; align-items:start; gap:0; }
+.step { text-align:center; padding:0 20px; }
+.step-icon-wrap {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:60px; height:60px; border-radius:18px; margin:0 auto 20px;
+  background:rgba(98,20,255,.08); border:1px solid rgba(98,20,255,.22);
+  font-size:26px; position:relative;
 }
-.notify-btn::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,.12), transparent);
-  border-radius: 12px;
+.step-icon-wrap::after { content:''; position:absolute; inset:-5px; border-radius:22px; border:1px solid rgba(98,20,255,.08); }
+.step-title { font-size:16px; font-weight:700; margin-bottom:9px; }
+.step-desc { font-size:13px; color:var(--muted); line-height:1.68; }
+.step-connector { padding-top:30px; color:var(--muted2); font-size:22px; display:flex; align-items:flex-start; justify-content:center; }
+
+/* ── FEATURES GRID ── */
+.features-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+.feat-card {
+  background:var(--card); border-radius:16px; border:1px solid var(--border);
+  padding:26px 22px; transition:all .25s; position:relative; overflow:hidden;
 }
-.notify-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(98,20,255,.6);
+.feat-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,rgba(98,20,255,.3),transparent);
+  opacity:0; transition:opacity .3s;
 }
-.notify-btn:active { transform: translateY(0); }
-.notify-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+.feat-card:hover { border-color:rgba(98,20,255,.22); background:var(--card2); transform:translateY(-3px); box-shadow:0 16px 44px rgba(0,0,0,.45), 0 0 0 1px rgba(98,20,255,.1); }
+.feat-card:hover::before { opacity:1; }
+.feat-icon { font-size:24px; margin-bottom:14px; display:block; }
+.feat-title { font-size:14px; font-weight:700; margin-bottom:7px; }
+.feat-desc { font-size:12.5px; color:var(--muted); line-height:1.68; }
+
+/* ── WAITLIST ── */
+.waitlist-section { position:relative; z-index:1; padding:80px 24px 120px; }
+.waitlist-inner { max-width:620px; margin:0 auto; text-align:center; }
+.waitlist-count {
+  display:inline-flex; align-items:center; gap:10px;
+  padding:8px 20px; border-radius:20px; margin-bottom:28px;
+  background:rgba(74,222,128,.07); border:1px solid rgba(74,222,128,.18);
+  font-size:13px; font-weight:600; color:var(--green);
+}
+.waitlist-count-dot { width:7px; height:7px; border-radius:50%; background:var(--green); animation:pill-pulse 2.5s ease-in-out infinite; }
+.waitlist-card {
+  background:rgba(10,10,28,.92); border:1px solid rgba(255,255,255,.08);
+  border-radius:24px; padding:48px 44px;
+  position:relative; overflow:hidden; backdrop-filter:blur(12px);
+}
+.waitlist-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
+}
+.waitlist-card::after {
+  content:''; position:absolute; top:-90px; right:-90px;
+  width:260px; height:260px; border-radius:50%;
+  background:radial-gradient(circle, rgba(98,20,255,.14) 0%, transparent 65%);
+  pointer-events:none;
+}
+.waitlist-title { font-size:30px; font-weight:800; letter-spacing:-.6px; margin-bottom:10px; }
+.waitlist-sub { font-size:14px; color:var(--muted); line-height:1.65; margin-bottom:30px; }
+.waitlist-form { display:flex; gap:10px; margin-bottom:14px; position:relative; z-index:1; }
+.waitlist-input {
+  flex:1; padding:15px 18px; border-radius:14px; outline:none;
+  background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1);
+  color:var(--text); font-family:'Geist',sans-serif; font-size:14px;
+  transition:border-color .2s, box-shadow .2s;
+}
+.waitlist-input::placeholder { color:rgba(238,238,248,.2); }
+.waitlist-input:focus { border-color:rgba(98,20,255,.5); box-shadow:0 0 0 3px rgba(98,20,255,.12); }
+.waitlist-btn {
+  padding:15px 28px; border-radius:14px; border:none; cursor:pointer;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff; font-family:'Geist',sans-serif; font-size:14px; font-weight:700;
+  white-space:nowrap; transition:all .2s;
+  box-shadow:0 4px 24px rgba(98,20,255,.45), inset 0 1px 0 rgba(255,255,255,.12);
+  position:relative; z-index:1;
+}
+.waitlist-btn:hover { transform:translateY(-2px); box-shadow:0 8px 32px rgba(98,20,255,.62), inset 0 1px 0 rgba(255,255,255,.12); }
+.waitlist-btn:active { transform:translateY(0); }
+.waitlist-btn:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+.waitlist-hint { font-size:11px; color:var(--muted2); position:relative; z-index:1; }
 .notify-success {
-  display: none; margin-top: 14px; font-size: 13px; color: #4ade80; font-weight: 600;
-  padding: 12px 16px; background: rgba(74,222,128,.08);
-  border: 1px solid rgba(74,222,128,.2); border-radius: 10px; text-align: center;
+  display:none; margin-top:16px; font-size:13px; color:var(--green); font-weight:600;
+  padding:13px 18px; background:rgba(74,222,128,.08);
+  border:1px solid rgba(74,222,128,.2); border-radius:12px; text-align:center;
+  position:relative; z-index:1;
 }
-.notify-success.visible { display: block; }
+.notify-success.visible { display:block; }
 
 /* ── FOOTER ── */
 .footer {
-  display: flex; flex-direction: column; align-items: center; gap: 16px;
-  position: relative; z-index: 1;
+  position:relative; z-index:1;
+  padding:28px 48px 40px;
+  border-top:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;
 }
-.footer-made {
-  font-size: 11px; color: rgba(238,238,248,.2); letter-spacing: 0.05em;
-}
-.footer-rayner-wrap {
-  display: flex; align-items: center; gap: 12px;
-}
-.footer-rayner {
-  height: 22px; width: auto; opacity: .4;
-  filter: grayscale(1) brightness(2);
-  transition: opacity .2s, filter .2s;
-}
-.footer-rayner:hover { opacity: .75; filter: grayscale(.2) brightness(1.5); }
-.footer-links {
-  display: flex; gap: 20px; align-items: center;
-}
-.footer-link {
-  font-size: 11px; color: rgba(238,238,248,.2);
-  text-decoration: none; transition: color .15s;
-}
-.footer-link:hover { color: rgba(238,238,248,.55); }
-.footer-sep { color: rgba(238,238,248,.1); font-size: 11px; }
-
-/* ── PARTICLES ── */
-.particles { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
-.particle {
-  position: absolute; border-radius: 50%;
-  background: rgba(98,20,255,.4);
-  animation: pfloat linear infinite;
-}
-@keyframes pfloat {
-  0%   { transform: translateY(100vh) scale(0); opacity: 0; }
-  8%   { opacity: 1; }
-  92%  { opacity: 1; }
-  100% { transform: translateY(-8vh) scale(1.2); opacity: 0; }
-}
+.footer-left { display:flex; align-items:center; gap:10px; }
+.footer-icon { height:22px; width:auto; opacity:.35; filter:brightness(2); }
+.footer-name { font-size:12px; color:var(--muted2); font-weight:600; }
+.footer-copy { font-size:11px; color:var(--muted2); }
+.footer-right { display:flex; align-items:center; }
+.footer-rayner { height:20px; width:auto; opacity:.3; filter:grayscale(1) brightness(2); transition:opacity .2s; }
+.footer-rayner:hover { opacity:.6; }
 
 /* ── RESPONSIVE ── */
-@media (max-width: 540px) {
-  .topbar { padding: 12px 20px; }
-  .topbar-name { display: none; }
-  .notify-form { flex-direction: column; }
-  .notify-box { padding: 24px 20px; }
-  .logo-hero-img { width: 220px; }
+@media (max-width:768px) {
+  .topbar { padding:14px 20px; }
+  .topbar-name { display:none; }
+  .scene-cards { grid-template-columns:1fr; }
+  .steps-wrap { grid-template-columns:1fr; gap:28px; }
+  .step-connector { display:none; }
+  .features-grid { grid-template-columns:repeat(2,1fr); }
+  .waitlist-form { flex-direction:column; }
+  .waitlist-card { padding:32px 24px; }
+  .footer { padding:24px; flex-direction:column; align-items:flex-start; }
+}
+@media (max-width:480px) {
+  .features-grid { grid-template-columns:1fr; }
+  .hero-form { flex-direction:column; }
+  .logo-img { width:240px; }
+  .hero-title { letter-spacing:-1.5px; }
 }
 </style>
 </head>
 <body>
 
-<div class="aurora"></div>
+<div class="bg-noise"></div>
 <div class="orb orb-1"></div>
 <div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
 <div class="grid-lines"></div>
 <div class="particles" id="particles"></div>
 
-<!-- TOP BAR -->
+<!-- TOPBAR -->
 <header class="topbar">
   <div class="topbar-left">
     <img src="/embreve/narrativa-icon.png" alt="Narrativa IA" class="topbar-icon">
@@ -308,93 +371,288 @@ body {
   <div class="topbar-pill">Em Breve</div>
 </header>
 
-<!-- PAGE -->
-<main class="page">
-  <div class="hero">
+<!-- ── HERO ── -->
+<section class="hero-section">
 
-    <!-- Logo principal -->
-    <div class="logo-hero-wrap">
-      <div class="logo-glow"></div>
-      <img src="/embreve/narrativa-full.png" alt="Narrativa IA" class="logo-hero-img">
-    </div>
-
-    <!-- Badge -->
-    <div class="badge">
-      <div class="badge-dot"></div>
-      Em Breve
-    </div>
-
-    <!-- Tagline -->
-    <p class="hero-tagline">
-      A plataforma que transforma qualquer ideia em <strong>histórias cinematográficas completas</strong> — roteiros, prompts visuais e CSVs prontos para gerar vídeos com IA.
-    </p>
-
-    <div class="divider"></div>
-
-    <!-- Features -->
-    <div class="features">
-      <div class="feat"><span class="feat-icon">🎬</span> Geração de Roteiros</div>
-      <div class="feat"><span class="feat-icon">✦</span> Prompts para Veo3</div>
-      <div class="feat"><span class="feat-icon">📄</span> Export CSV direto</div>
-      <div class="feat"><span class="feat-icon">🌍</span> Multi-idioma</div>
-      <div class="feat"><span class="feat-icon">⚡</span> 11 estilos visuais</div>
-      <div class="feat"><span class="feat-icon">📊</span> Análise de Trends</div>
-    </div>
-
-    <!-- Notify -->
-    <div class="notify-wrap">
-      <div class="notify-box">
-        <div class="notify-title">Seja o primeiro a saber</div>
-        <div class="notify-sub">Deixe seu e-mail e te avisamos quando o acesso abrir.</div>
-        <div class="notify-form">
-          <input type="email" class="notify-input" id="emailInput" placeholder="seu@email.com">
-          <button class="notify-btn" id="notifyBtn" onclick="handleNotify()">Me avisar</button>
-        </div>
-        <div class="notify-success" id="notifySuccess">
-          ✓ Anotado! Você será notificado assim que abrirmos o acesso.
-        </div>
-      </div>
-    </div>
-
+  <div class="hero-eyebrow">
+    <div class="hero-eyebrow-dot"></div>
+    Plataforma de IA Cinematográfica
   </div>
 
-  <!-- FOOTER -->
-  <footer class="footer">
-    <div class="footer-made">Um produto</div>
-    <div class="footer-rayner-wrap">
-      <img src="/embreve/rayner-logo.png" alt="Rayner Nascimento" class="footer-rayner">
+  <div class="logo-wrap">
+    <div class="logo-glow"></div>
+    <img src="/embreve/narrativa-full.png" alt="Narrativa IA" class="logo-img">
+  </div>
+
+  <h1 class="hero-title">
+    <span class="hero-title-gradient">Histórias cinematográficas.</span><br>
+    Geradas por IA.
+  </h1>
+
+  <p class="hero-sub">
+    Transforme qualquer ideia em <strong>roteiros, prompts visuais e CSVs</strong> prontos para gerar vídeos com IA — em minutos.
+  </p>
+
+  <div class="rotator-wrap">
+    <span class="rotator-label">Gera automaticamente</span>
+    <span class="rotator-word" id="rotatorWord">roteiros completos</span>
+  </div>
+
+  <div class="hero-form">
+    <input type="email" class="hero-input" id="heroEmailInput" placeholder="seu@email.com">
+    <button class="hero-btn" id="heroBtnNotify">Quero acesso antecipado</button>
+  </div>
+  <div class="notify-success" id="heroSuccess">✓ Você está na lista! Avisaremos assim que abrirmos o acesso.</div>
+  <p class="hero-hint">Sem spam — apenas o aviso de lançamento.</p>
+
+  <div class="scroll-cue">
+    <span>Ver mais</span>
+    <span class="scroll-arrow">↓</span>
+  </div>
+</section>
+
+<div class="section-divider"><div class="section-divider-line"></div></div>
+
+<!-- ── SCENE PREVIEW ── -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">Prévia do produto</div>
+    <h2 class="section-title">Cada cena, cinematograficamente descrita</h2>
+    <p class="section-sub">O Narrativa IA gera cenas ricas e detalhadas — prontas para carregar no CenaDrop Flow e gerar vídeos no Veo3.</p>
+
+    <div class="scene-cards">
+
+      <div class="scene-card">
+        <div class="scene-card-head">
+          <span class="scene-num">Cena 03</span>
+          <span class="scene-style-badge">🎬 Cinematic</span>
+        </div>
+        <div class="scene-body">
+          <p class="scene-subject">Detetive examina fotografia antiga sob luz fraca de abajur. Chuva bate na janela embaçada. Expressão tensa, cigarro nos lábios.</p>
+          <div class="scene-tags">
+            <span class="scene-tag">noir</span>
+            <span class="scene-tag">noite</span>
+            <span class="scene-tag">close-up</span>
+            <span class="scene-tag">câmera lenta</span>
+          </div>
+        </div>
+        <div class="scene-card-foot">
+          <div class="scene-foot-dot"></div>
+          <span class="scene-foot-txt">Narrativa IA · gerado automaticamente</span>
+        </div>
+      </div>
+
+      <div class="scene-card">
+        <div class="scene-card-head">
+          <span class="scene-num">Cena 07</span>
+          <span class="scene-style-badge">🧙 Fantasy</span>
+        </div>
+        <div class="scene-body">
+          <p class="scene-subject">Personagem atravessa floresta densa iluminada por bioluminescência azul-esverdeada. Névoa rasteira. Criaturas mágicas ao redor.</p>
+          <div class="scene-tags">
+            <span class="scene-tag">magia</span>
+            <span class="scene-tag">wide shot</span>
+            <span class="scene-tag">épico</span>
+            <span class="scene-tag">slow motion</span>
+          </div>
+        </div>
+        <div class="scene-card-foot">
+          <div class="scene-foot-dot"></div>
+          <span class="scene-foot-txt">Narrativa IA · gerado automaticamente</span>
+        </div>
+      </div>
+
+      <div class="scene-card">
+        <div class="scene-card-head">
+          <span class="scene-num">Cena 12</span>
+          <span class="scene-style-badge">🧠 Tech</span>
+        </div>
+        <div class="scene-body">
+          <p class="scene-subject">Megacidade futurista vista de drone ao amanhecer. Arranha-céus com hologramas pulsando. Névoa entre prédios e tráfego aéreo.</p>
+          <div class="scene-tags">
+            <span class="scene-tag">sci-fi</span>
+            <span class="scene-tag">aéreo</span>
+            <span class="scene-tag">golden hour</span>
+            <span class="scene-tag">4k</span>
+          </div>
+        </div>
+        <div class="scene-card-foot">
+          <div class="scene-foot-dot"></div>
+          <span class="scene-foot-txt">Narrativa IA · gerado automaticamente</span>
+        </div>
+      </div>
+
     </div>
-    <div class="footer-links">
-      <span class="footer-link">© 2025 Rayner Nascimento</span>
+  </div>
+</section>
+
+<div class="section-divider"><div class="section-divider-line"></div></div>
+
+<!-- ── HOW IT WORKS ── -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">Como funciona</div>
+    <h2 class="section-title">Do roteiro ao vídeo em 3 passos</h2>
+    <p class="section-sub">Cole qualquer texto, configure o estilo e deixe a IA transformar sua ideia em cenas prontas para gerar vídeo.</p>
+
+    <div class="steps-wrap">
+      <div class="step">
+        <div class="step-icon-wrap">✍️</div>
+        <div class="step-title">Cole seu roteiro</div>
+        <p class="step-desc">Qualquer texto serve — ideia bruta, sinopse ou roteiro completo. O Narrativa IA interpreta e estrutura o conteúdo automaticamente.</p>
+      </div>
+      <div class="step-connector">→</div>
+      <div class="step">
+        <div class="step-icon-wrap">⚡</div>
+        <div class="step-title">IA gera as cenas</div>
+        <p class="step-desc">Cada cena recebe descrição visual, movimento de câmera, estilo cinematográfico e narração embutida — em múltiplos estilos.</p>
+      </div>
+      <div class="step-connector">→</div>
+      <div class="step">
+        <div class="step-icon-wrap">🚀</div>
+        <div class="step-title">Exporte e gere vídeo</div>
+        <p class="step-desc">Baixe o CSV e carregue direto no CenaDrop Flow. O Flow cuida do resto — enviando cada cena ao Veo3 automaticamente.</p>
+      </div>
     </div>
-  </footer>
-</main>
+  </div>
+</section>
+
+<div class="section-divider"><div class="section-divider-line"></div></div>
+
+<!-- ── FEATURES ── -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">Recursos</div>
+    <h2 class="section-title">Tudo que você precisa para criar em escala</h2>
+    <p class="section-sub">Desenvolvido para criadores que usam IA para produzir vídeos em volume sem abrir mão da qualidade visual.</p>
+
+    <div class="features-grid">
+      <div class="feat-card">
+        <span class="feat-icon">🎬</span>
+        <div class="feat-title">11 Estilos Visuais</div>
+        <p class="feat-desc">Cinematic, Anime, Fantasy, Horror, Retrô e mais — cada estilo com prompts calibrados para máxima qualidade no Veo3.</p>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">🎙️</span>
+        <div class="feat-title">Narração Embutida</div>
+        <p class="feat-desc">Cada cena inclui texto de narração integrado ao prompt visual — resultado mais coeso, imersivo e cinematográfico.</p>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">📄</span>
+        <div class="feat-title">Export CSV Direto</div>
+        <p class="feat-desc">Arquivo no formato exato do CenaDrop Flow, pronto para carregar e iniciar o envio automático de todas as cenas.</p>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">🌍</span>
+        <div class="feat-title">Multi-idioma</div>
+        <p class="feat-desc">Gere cenas em Português, Inglês ou Espanhol. Ideal para canais internacionais e estratégias multi-mercado.</p>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">📊</span>
+        <div class="feat-title">Análise de Trends</div>
+        <p class="feat-desc">Identifique temas e estilos em alta no YouTube para alinhar sua produção com o que está performando agora.</p>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">⚡</span>
+        <div class="feat-title">Geração Rápida</div>
+        <p class="feat-desc">De 5 a 150 cenas geradas em segundos. Escale sua produção sem escalar o tempo investido por vídeo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"><div class="section-divider-line"></div></div>
+
+<!-- ── WAITLIST ── -->
+<section class="waitlist-section">
+  <div class="waitlist-inner">
+    <div class="waitlist-count">
+      <div class="waitlist-count-dot"></div>
+      <span id="waitlistCount">247</span>&nbsp;criadores já na lista
+    </div>
+    <div class="waitlist-card">
+      <h2 class="waitlist-title">Garanta acesso antecipado</h2>
+      <p class="waitlist-sub">Os primeiros a entrar terão acesso prioritário e condições especiais de lançamento. A lista está crescendo.</p>
+      <div class="waitlist-form">
+        <input type="email" class="waitlist-input" id="waitlistEmailInput" placeholder="seu@email.com">
+        <button class="waitlist-btn" id="waitlistBtnNotify">Me avisar</button>
+      </div>
+      <div class="notify-success" id="waitlistSuccess">✓ Você está na lista! Avisaremos assim que abrirmos o acesso.</div>
+      <p class="waitlist-hint">Sem spam — apenas o aviso de lançamento.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer class="footer">
+  <div class="footer-left">
+    <img src="/embreve/narrativa-icon.png" alt="Narrativa IA" class="footer-icon">
+    <span class="footer-name">Narrativa IA</span>
+  </div>
+  <span class="footer-copy">© 2025 Rayner Nascimento</span>
+  <div class="footer-right">
+    <img src="/embreve/rayner-logo.png" alt="Rayner" class="footer-rayner">
+  </div>
+</footer>
 
 <script>
 // Particles
 (function() {
   const wrap = document.getElementById('particles');
-  const n = window.innerWidth < 600 ? 8 : 16;
+  const n = window.innerWidth < 600 ? 10 : 22;
   for (let i = 0; i < n; i++) {
     const p = document.createElement('div');
     p.className = 'particle';
-    const s = 1.5 + Math.random() * 3;
-    p.style.cssText = `width:${s}px;height:${s}px;left:${Math.random()*100}%;animation-duration:${14+Math.random()*22}s;animation-delay:${Math.random()*20}s;opacity:${.15+Math.random()*.35};`;
+    const s = 1.2 + Math.random() * 2.5;
+    p.style.cssText = `width:${s}px;height:${s}px;left:${Math.random()*100}%;animation-duration:${18+Math.random()*26}s;animation-delay:${Math.random()*26}s;opacity:${.08+Math.random()*.2};`;
     wrap.appendChild(p);
   }
 })();
 
-// Notify
-async function handleNotify() {
-  const input   = document.getElementById('emailInput');
-  const btn     = document.getElementById('notifyBtn');
-  const success = document.getElementById('notifySuccess');
+// Word rotator
+(function() {
+  const words = ['roteiros completos', 'prompts para Veo3', 'CSVs para CenaDrop', 'personagens únicos', '11 estilos visuais', 'narração embutida'];
+  let i = 0;
+  const el = document.getElementById('rotatorWord');
+  if (!el) return;
+  el.style.transition = 'opacity .28s, transform .28s';
+  setInterval(() => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(8px)';
+    setTimeout(() => {
+      i = (i + 1) % words.length;
+      el.textContent = words[i];
+      el.style.opacity = '1';
+      el.style.transform = 'translateY(0)';
+    }, 300);
+  }, 2600);
+})();
+
+// Waitlist counter animation
+(function() {
+  const el = document.getElementById('waitlistCount');
+  if (!el) return;
+  const target = 247;
+  let current = target - 38;
+  el.textContent = current;
+  const iv = setInterval(() => {
+    current += Math.random() > .5 ? 2 : 1;
+    el.textContent = current;
+    if (current >= target) { el.textContent = target; clearInterval(iv); }
+  }, 44);
+})();
+
+// Shared notify handler
+async function handleNotify(emailId, btnId, successId) {
+  const input   = document.getElementById(emailId);
+  const btn     = document.getElementById(btnId);
+  const success = document.getElementById(successId);
   const email   = input.value.trim();
 
   if (!email || !email.includes('@')) {
     input.style.borderColor = 'rgba(248,113,113,.55)';
     input.focus();
-    setTimeout(() => input.style.borderColor = '', 1600);
+    setTimeout(() => input.style.borderColor = '', 1800);
     return;
   }
 
@@ -402,32 +660,30 @@ async function handleNotify() {
   btn.textContent = 'Enviando...';
 
   try {
-    const res  = await fetch('/api/waitlist', {
+    const res  = await fetch('https://raynern.com.br/api/waitlist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email }),
     });
     const data = await res.json();
-
     if (res.ok && (data.ok || data.already)) {
       input.style.display = 'none';
       btn.style.display   = 'none';
       success.classList.add('visible');
     } else {
-      btn.disabled    = false;
-      btn.textContent = 'Me avisar';
+      btn.disabled = false; btn.textContent = 'Me avisar';
       input.style.borderColor = 'rgba(248,113,113,.55)';
-      setTimeout(() => input.style.borderColor = '', 1600);
+      setTimeout(() => input.style.borderColor = '', 1800);
     }
   } catch {
-    btn.disabled    = false;
-    btn.textContent = 'Me avisar';
+    btn.disabled = false; btn.textContent = 'Me avisar';
   }
 }
 
-document.getElementById('emailInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter') handleNotify();
-});
+document.getElementById('heroBtnNotify').addEventListener('click', () => handleNotify('heroEmailInput','heroBtnNotify','heroSuccess'));
+document.getElementById('heroEmailInput').addEventListener('keydown', e => { if (e.key==='Enter') handleNotify('heroEmailInput','heroBtnNotify','heroSuccess'); });
+document.getElementById('waitlistBtnNotify').addEventListener('click', () => handleNotify('waitlistEmailInput','waitlistBtnNotify','waitlistSuccess'));
+document.getElementById('waitlistEmailInput').addEventListener('keydown', e => { if (e.key==='Enter') handleNotify('waitlistEmailInput','waitlistBtnNotify','waitlistSuccess'); });
 </script>
 </body>
 </html>
