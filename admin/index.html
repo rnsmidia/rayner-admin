@@ -1267,6 +1267,7 @@ async function apiCall(action, extra = {}) {
 // ── NAV ───────────────────────────────────────
 function switchProduct(prod) {
   curProd = prod;
+  window.scrollTo({ top: 0, behavior: 'instant' });
   document.querySelectorAll('.prod-btn').forEach(b => b.classList.remove('active'));
   document.getElementById(`btn-${prod}`).classList.add('active');
   document.querySelectorAll('.prod-panel').forEach(p => p.classList.remove('active'));
