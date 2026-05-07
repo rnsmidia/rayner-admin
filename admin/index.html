@@ -411,6 +411,20 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
 
 .quick-row { display: flex; gap: 10px; flex-wrap: wrap; }
 
+/* ── RISK BANNER ──────────────────────────────── */
+.risk-banner {
+  display: flex; gap: 14px; align-items: flex-start;
+  border-radius: 12px; padding: 16px 20px; margin-bottom: 20px;
+  animation: fadeIn .3s ease;
+}
+.risk-banner.ok      { display: none; }
+.risk-banner.warning { background: var(--yellow-s); border: 1px solid rgba(255,159,67,.4); }
+.risk-banner.danger  { background: var(--red-s);    border: 1px solid rgba(234,84,85,.4); }
+.risk-banner .rb-icon { font-size: 22px; line-height: 1; flex-shrink: 0; margin-top: 2px; }
+.risk-banner .rb-title { font-weight: 700; color: var(--text); font-size: 14px; margin-bottom: 6px; }
+.risk-banner .rb-list { margin: 0; padding-left: 16px; color: var(--text2); font-size: 13px; line-height: 1.7; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:none; } }
+
 /* ════════════════════════════════════
    TOOLBAR
 ════════════════════════════════════ */
@@ -598,6 +612,64 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
 }
 
 /* ════════════════════════════════════
+   MONITOR
+════════════════════════════════════ */
+.mon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 16px;
+}
+.mon-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+  display: flex; flex-direction: column; gap: 14px;
+}
+.mon-header {
+  display: flex; align-items: center; gap: 12px;
+}
+.mon-logo {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 19px; font-weight: 800; flex-shrink: 0;
+}
+.mon-logo.supabase { background: rgba(62,207,142,.15); color: #3ecf8e; }
+.mon-logo.vercel   { background: rgba(0,0,0,.07);      color: var(--text); }
+.mon-logo.resend   { background: rgba(99,102,241,.12); color: #6366f1; }
+.mon-logo.github   { background: rgba(36,41,47,.08);   color: var(--text2); }
+.mon-svc-name { font-size: 15px; font-weight: 700; color: var(--text); }
+.mon-svc-plan { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.mon-chip {
+  margin-left: auto;
+  font-size: 10px; font-weight: 700;
+  padding: 3px 9px; border-radius: 20px;
+}
+.mon-chip.ok      { background: var(--green-s);  color: var(--green);  border: 1px solid rgba(40,199,111,.2); }
+.mon-chip.manual  { background: var(--yellow-s); color: var(--yellow); border: 1px solid rgba(255,159,67,.2); }
+.mon-metrics { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+.mon-metric-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 3px; }
+.mon-metric-val   { font-size: 15px; font-weight: 700; color: var(--text); }
+.mon-metric-sub   { font-size: 12px; font-weight: 400; color: var(--muted); }
+.mon-bar { height: 5px; background: var(--border); border-radius: 3px; margin-top: 6px; overflow: hidden; }
+.mon-bar-fill { height: 100%; border-radius: 3px; transition: width .6s ease; }
+.mon-bar-fill.green  { background: var(--green); }
+.mon-bar-fill.yellow { background: var(--yellow); }
+.mon-bar-fill.red    { background: var(--red); }
+.mon-bar-fill.purple { background: var(--accent); }
+.mon-note { font-size: 11px; color: var(--muted); line-height: 1.5; margin-top: 4px; }
+.mon-link {
+  display: block; text-align: center;
+  padding: 9px; border-radius: 8px;
+  background: var(--subtle); border: 1px solid var(--border);
+  color: var(--text2); font-size: 12px; font-weight: 600;
+  text-decoration: none; transition: all .18s;
+}
+.mon-link:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ════════════════════════════════════
    RESPONSIVE
 ════════════════════════════════════ */
 @media (max-width: 768px) {
@@ -720,6 +792,33 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
         <div id="subnav-narrativa" class="subnav" style="display:none">
           <button class="sn-btn" data-sec="dashboard" onclick="switchSection('narrativa','dashboard')">📊 Dashboard</button>
           <button class="sn-btn" data-sec="users" onclick="switchSection('narrativa','users')">👤 Usuários <span class="sn-count" id="cnt-nusers">0</span></button>
+        </div>
+
+        <!-- Nexus Saúde -->
+        <button class="prod-btn" id="btn-nexus" onclick="switchProduct('nexus')">
+          <div class="prod-icon">💚</div>
+          <div>
+            <div class="prod-name">Nexus Saúde</div>
+            <div class="prod-tag">Jejum Após os 45</div>
+          </div>
+        </button>
+        <div id="subnav-nexus" class="subnav" style="display:none">
+          <button class="sn-btn active" data-sec="dashboard" onclick="switchSection('nexus','dashboard')">📊 Dashboard</button>
+          <button class="sn-btn" data-sec="buyers" onclick="switchSection('nexus','buyers')">🛒 Compradores <span class="sn-count" id="cnt-nxbuyers">0</span></button>
+        </div>
+      </div>
+
+        <!-- Monitor -->
+        <div class="sb-section-label" style="margin-top:10px">Sistema</div>
+        <button class="prod-btn" id="btn-monitor" onclick="switchProduct('monitor')">
+          <div class="prod-icon">📡</div>
+          <div>
+            <div class="prod-name">Monitor</div>
+            <div class="prod-tag">Planos gratuitos</div>
+          </div>
+        </button>
+        <div id="subnav-monitor" class="subnav" style="display:none">
+          <button class="sn-btn" data-sec="usage" onclick="switchSection('monitor','usage')">📊 Uso dos Serviços</button>
         </div>
       </div>
 
@@ -890,6 +989,173 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
 
       </div><!-- /narrativa -->
 
+      <!-- ── NEXUS SAÚDE ── -->
+      <div class="prod-panel" id="panel-nexus">
+
+        <!-- Dashboard -->
+        <div class="sec-panel active" id="nexus-dashboard">
+
+          <!-- Banner de risco (oculto quando tudo ok) -->
+          <div id="nx-risk-banner" class="risk-banner ok"></div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon-wrap green">🛒</div>
+              <div><div class="stat-label">Total de Compras</div><div class="stat-val green" id="nx-total">—</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap green">✅</div>
+              <div><div class="stat-label">Ativos</div><div class="stat-val green" id="nx-active">—</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap red">❌</div>
+              <div><div class="stat-label">Cancelados</div><div class="stat-val red" id="nx-inactive">—</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap orange">⚡</div>
+              <div><div class="stat-label">Cancel. Rápidos ≤7d</div><div class="stat-val orange" id="nx-fast-cancels">—</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap yellow">📊</div>
+              <div><div class="stat-label">Taxa de Cancelamento</div><div class="stat-val yellow" id="nx-cancel-rate">—</div></div>
+            </div>
+          </div>
+          <div class="quick-row">
+            <button class="btn-sm accent" onclick="switchSection('nexus','buyers')">🛒 Ver Compradores</button>
+            <button class="btn-sm" onclick="loadNexusData()">↻ Atualizar</button>
+          </div>
+        </div>
+
+        <!-- Compradores -->
+        <div class="sec-panel" id="nexus-buyers">
+          <div class="toolbar">
+            <div class="search-wrap">
+              <input type="text" id="search-nxbuyers" placeholder="Buscar por nome ou email..." oninput="filterNexusBuyers()" />
+            </div>
+            <button class="btn-sm" onclick="loadNexusData()">↻</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Nome</th><th>Email</th><th>Status</th><th>Compra</th><th>Cancelamento</th><th>Ações</th></tr>
+              </thead>
+              <tbody id="nx-tbody">
+                <tr><td colspan="6"><div class="loading">Carregando...</div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div><!-- /nexus -->
+
+      <!-- ── MONITOR ── -->
+      <div class="prod-panel" id="panel-monitor">
+        <div class="sec-panel active" id="monitor-usage">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+            <div>
+              <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:3px">Monitoramento de Planos Gratuitos</div>
+              <div style="font-size:13px;color:var(--muted)">Uso da infraestrutura — <span id="mon-updated">carregando...</span></div>
+            </div>
+            <button class="btn-sm" onclick="loadMonitor()">↻ Atualizar</button>
+          </div>
+
+          <div class="mon-grid">
+
+            <!-- Supabase -->
+            <div class="mon-card">
+              <div class="mon-header">
+                <div class="mon-logo supabase">⚡</div>
+                <div><div class="mon-svc-name">Supabase</div><div class="mon-svc-plan">Free Plan</div></div>
+                <div class="mon-chip ok" id="mon-sb-chip">Live</div>
+              </div>
+              <div class="mon-metrics" id="mon-sb-metrics">
+                <div class="loading">Carregando...</div>
+              </div>
+              <a href="https://app.supabase.com" target="_blank" class="mon-link">Abrir Dashboard →</a>
+            </div>
+
+            <!-- Vercel -->
+            <div class="mon-card">
+              <div class="mon-header">
+                <div class="mon-logo vercel">▲</div>
+                <div><div class="mon-svc-name">Vercel</div><div class="mon-svc-plan">Hobby Plan</div></div>
+                <div class="mon-chip manual">Manual</div>
+              </div>
+              <div class="mon-metrics">
+                <div>
+                  <div class="mon-metric-label">Bandwidth</div>
+                  <div class="mon-metric-val">— <span class="mon-metric-sub">/ 100 GB /mês</span></div>
+                  <div class="mon-bar"><div class="mon-bar-fill yellow" style="width:0%"></div></div>
+                </div>
+                <div>
+                  <div class="mon-metric-label">Serverless Functions</div>
+                  <div class="mon-metric-val">— <span class="mon-metric-sub">/ 100 horas /mês</span></div>
+                </div>
+                <div>
+                  <div class="mon-metric-label">Deployments</div>
+                  <div class="mon-metric-val">— <span class="mon-metric-sub">/ 6.000 /mês</span></div>
+                </div>
+                <div class="mon-note">Acesse o dashboard Vercel para ver o uso em tempo real.</div>
+              </div>
+              <a href="https://vercel.com/dashboard" target="_blank" class="mon-link">Abrir Dashboard →</a>
+            </div>
+
+            <!-- Resend -->
+            <div class="mon-card">
+              <div class="mon-header">
+                <div class="mon-logo resend">✉</div>
+                <div><div class="mon-svc-name">Resend</div><div class="mon-svc-plan">Free Plan</div></div>
+                <div class="mon-chip manual">Manual</div>
+              </div>
+              <div class="mon-metrics">
+                <div>
+                  <div class="mon-metric-label">Emails / mês</div>
+                  <div class="mon-metric-val">— <span class="mon-metric-sub">/ 3.000</span></div>
+                  <div class="mon-bar"><div class="mon-bar-fill purple" style="width:0%"></div></div>
+                </div>
+                <div>
+                  <div class="mon-metric-label">Emails / dia</div>
+                  <div class="mon-metric-val">— <span class="mon-metric-sub">/ 100</span></div>
+                </div>
+                <div>
+                  <div class="mon-metric-label">Domínios verificados</div>
+                  <div class="mon-metric-val">— <span class="mon-metric-sub">/ 1</span></div>
+                </div>
+                <div class="mon-note">Acesse o dashboard para ver métricas de entrega.</div>
+              </div>
+              <a href="https://resend.com/overview" target="_blank" class="mon-link">Abrir Dashboard →</a>
+            </div>
+
+            <!-- GitHub -->
+            <div class="mon-card">
+              <div class="mon-header">
+                <div class="mon-logo github">⑂</div>
+                <div><div class="mon-svc-name">GitHub</div><div class="mon-svc-plan">Free Plan</div></div>
+                <div class="mon-chip manual">Manual</div>
+              </div>
+              <div class="mon-metrics">
+                <div>
+                  <div class="mon-metric-label">Actions / mês</div>
+                  <div class="mon-metric-val">— <span class="mon-metric-sub">/ 2.000 minutos</span></div>
+                  <div class="mon-bar"><div class="mon-bar-fill yellow" style="width:0%"></div></div>
+                </div>
+                <div>
+                  <div class="mon-metric-label">Storage de Packages</div>
+                  <div class="mon-metric-val">— <span class="mon-metric-sub">/ 500 MB</span></div>
+                </div>
+                <div>
+                  <div class="mon-metric-label">Repositórios privados</div>
+                  <div class="mon-metric-val">Ilimitados</div>
+                </div>
+                <div class="mon-note">Acesse Billing para acompanhar o consumo de Actions.</div>
+              </div>
+              <a href="https://github.com/settings/billing/summary" target="_blank" class="mon-link">Ver Billing →</a>
+            </div>
+
+          </div>
+        </div>
+      </div><!-- /monitor -->
+
     </div><!-- /main -->
   </div><!-- /app -->
 </div>
@@ -1007,10 +1273,15 @@ function switchProduct(prod) {
   document.getElementById(`panel-${prod}`).classList.add('active');
   document.getElementById('subnav-cenadrop').style.display  = prod === 'cenadrop'  ? 'block' : 'none';
   document.getElementById('subnav-narrativa').style.display = prod === 'narrativa' ? 'block' : 'none';
-  document.getElementById('bc-prod').textContent = prod === 'cenadrop' ? 'CenaDrop' : 'Narrativa IA';
-  const labels = { dashboard:'Dashboard', licenses:'Licenças', students:'Alunos Hotmart', users:'Usuários' };
+  document.getElementById('subnav-nexus').style.display     = prod === 'nexus'     ? 'block' : 'none';
+  document.getElementById('subnav-monitor').style.display   = prod === 'monitor'   ? 'block' : 'none';
+  const prodLabels = { cenadrop: 'CenaDrop', narrativa: 'Narrativa IA', nexus: 'Nexus Saúde', monitor: 'Sistema' };
+  document.getElementById('bc-prod').textContent = prodLabels[prod] || prod;
+  const labels = { dashboard:'Dashboard', licenses:'Licenças', students:'Alunos Hotmart', users:'Usuários', buyers:'Compradores', usage:'Monitor de Uso' };
   document.getElementById('bc-sec').textContent = labels[curSec[prod] || 'dashboard'] || '—';
   if (prod === 'narrativa') { switchSection('narrativa', curSec['narrativa'] || 'dashboard'); loadNarrativaUsers(); }
+  if (prod === 'nexus')     { switchSection('nexus',     curSec['nexus']     || 'dashboard'); loadNexusData(); }
+  if (prod === 'monitor')   { switchSection('monitor',   'usage'); loadMonitor(); }
 }
 
 function switchSection(prod, sec) {
@@ -1283,6 +1554,181 @@ async function deleteNarrativaUser(id, email) {
   if (!confirm(`Excluir permanentemente o usuário ${email}?`)) return;
   const d = await apiCall('narrativa-delete', { id });
   if (d.ok) { toast('🗑️ Usuário excluído', 'success'); loadNarrativaUsers(); }
+}
+
+// ── NEXUS SAÚDE ──────────────────────────────
+let allNexusBuyers = [];
+
+async function loadNexusData() {
+  const [bd, sd] = await Promise.all([apiCall('nexus-list'), apiCall('nexus-stats')]);
+  if (sd.total !== undefined) {
+    document.getElementById('nx-total').textContent     = sd.total;
+    document.getElementById('nx-active').textContent    = sd.active;
+    document.getElementById('nx-inactive').textContent  = sd.inactive;
+    document.getElementById('cnt-nxbuyers').textContent = sd.total;
+  }
+  if (bd.buyers) {
+    allNexusBuyers = bd.buyers;
+    renderNexusBuyers(allNexusBuyers);
+    analyzeNexusRisk(allNexusBuyers);
+  }
+}
+
+function analyzeNexusRisk(list) {
+  const total     = list.length;
+  const cancelled = list.filter(b => b.status !== 'active');
+
+  // Cancelamentos rápidos: ≤ 7 dias após a compra
+  const fastCancels = cancelled.filter(b => {
+    const cd   = parseCancelDate(b.notes);
+    const days = daysBetween(b.created_at, cd);
+    return days !== null && days <= 7;
+  });
+
+  // Cancelamentos nos últimos 30 dias
+  const cutoff = Date.now() - 30 * 86400000;
+  const recent30 = cancelled.filter(b => {
+    const cd = parseCancelDate(b.notes);
+    if (!cd) return false;
+    const [d, mo, y] = cd.split('/');
+    return new Date(`${y}-${mo}-${d}`).getTime() >= cutoff;
+  });
+
+  const cancelRate = total > 0 ? Math.round(cancelled.length / total * 100) : 0;
+  const fastRate   = cancelled.length > 0 ? Math.round(fastCancels.length / cancelled.length * 100) : 0;
+
+  // Atualiza cards
+  document.getElementById('nx-fast-cancels').textContent = fastCancels.length;
+  document.getElementById('nx-cancel-rate').textContent  = cancelRate + '%';
+
+  // Aplica cor dinâmica na taxa
+  const rateEl = document.getElementById('nx-cancel-rate');
+  rateEl.className = 'stat-val ' + (cancelRate > 30 ? 'red' : cancelRate > 15 ? 'orange' : 'yellow');
+
+  // Monta alertas
+  const issues = [];
+  if (fastCancels.length >= 4)   issues.push(`${fastCancels.length} cancelamentos em ≤7 dias — padrão de download e chargeback.`);
+  else if (fastCancels.length >= 2) issues.push(`${fastCancels.length} cancelamentos ocorreram em menos de 7 dias após a compra.`);
+  if (cancelRate > 30)           issues.push(`Taxa de cancelamento em ${cancelRate}% — muito acima do normal.`);
+  else if (cancelRate > 15)      issues.push(`Taxa de cancelamento em ${cancelRate}% — acima do esperado (normal < 15%).`);
+  if (fastRate > 50 && fastCancels.length >= 2)
+                                 issues.push(`${fastRate}% dos cancelamentos foram rápidos — possível exploração do produto.`);
+  if (recent30.length >= 3)      issues.push(`${recent30.length} cancelamentos nos últimos 30 dias.`);
+
+  // Define nível
+  const level = (cancelRate > 30 || fastCancels.length >= 4) ? 'danger'
+              : (cancelRate > 15 || fastCancels.length >= 2) ? 'warning'
+              : 'ok';
+
+  const banner = document.getElementById('nx-risk-banner');
+  if (level === 'ok' || total === 0) {
+    banner.className = 'risk-banner ok';
+    return;
+  }
+
+  const icon  = level === 'danger' ? '🚨' : '⚠️';
+  const title = level === 'danger' ? 'Alerta: padrão suspeito de cancelamentos detectado'
+                                   : 'Atenção: cancelamentos acima do esperado';
+  banner.className = `risk-banner ${level}`;
+  banner.innerHTML = `
+    <div class="rb-icon">${icon}</div>
+    <div>
+      <div class="rb-title">${title}</div>
+      <ul class="rb-list">${issues.map(i => `<li>${i}</li>`).join('')}</ul>
+    </div>`;
+}
+
+function parseCancelDate(notes) {
+  if (!notes) return null;
+  const m = notes.match(/Cancelado em (\d{2}\/\d{2}\/\d{4})/);
+  return m ? m[1] : null;
+}
+
+function daysBetween(isoStart, ddmmyyyy) {
+  if (!isoStart || !ddmmyyyy) return null;
+  const [d, mo, y] = ddmmyyyy.split('/');
+  const end   = new Date(`${y}-${mo}-${d}`);
+  const start = new Date(isoStart);
+  return Math.round((end - start) / 86400000);
+}
+
+function renderNexusBuyers(list) {
+  const tb = document.getElementById('nx-tbody');
+  if (!list.length) { tb.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="icon">🛒</div><p>Nenhuma compra registrada ainda.</p></div></td></tr>`; return; }
+  tb.innerHTML = list.map(b => {
+    const cancelDate = parseCancelDate(b.notes);
+    const days       = daysBetween(b.created_at, cancelDate);
+    const cancelCell = cancelDate
+      ? `<div style="font-size:12px;color:#f87171;">${cancelDate}</div>
+         <div style="font-size:11px;color:var(--muted)">${days !== null ? `${days}d após compra` : ''}</div>`
+      : `<span style="color:var(--muted)">—</span>`;
+    return `<tr>
+      <td style="font-weight:600">${b.name || '<span style="color:var(--muted)">—</span>'}</td>
+      <td style="color:var(--muted);font-size:12px">${b.email || '—'}</td>
+      <td><span class="badge ${b.status}">${b.status === 'active' ? 'Ativo' : 'Cancelado'}</span></td>
+      <td style="color:var(--muted);font-size:12px">${fmtDate(b.created_at)}</td>
+      <td>${cancelCell}</td>
+      <td><div class="actions">
+        <button class="btn-icon" title="Reenviar email de boas-vindas" onclick="resendNexusEmail('${b.key}','${(b.email||'').replace(/'/g,"\\'")}')">📧</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+function filterNexusBuyers() {
+  const q = document.getElementById('search-nxbuyers').value.toLowerCase();
+  renderNexusBuyers(allNexusBuyers.filter(b =>
+    (b.name||'').toLowerCase().includes(q) || (b.email||'').toLowerCase().includes(q)
+  ));
+}
+
+async function resendNexusEmail(key, email) {
+  if (!email) { alert('Este registro não tem email cadastrado.'); return; }
+  if (!confirm(`Reenviar email de boas-vindas para ${email}?`)) return;
+  const d = await apiCall('nexus-resend', { key });
+  if (d.ok) toast(`📧 Email reenviado para ${email}`, 'success');
+  else alert('Erro: ' + (d.error || 'Falha ao enviar'));
+}
+
+// ── MONITOR ───────────────────────────────────
+async function loadMonitor() {
+  document.getElementById('mon-updated').textContent = 'carregando...';
+  const d = await apiCall('monitor');
+  document.getElementById('mon-updated').textContent = 'atualizado às ' + new Date().toLocaleTimeString('pt-BR');
+  if (d.supabase) renderSupabaseCard(d.supabase);
+}
+
+function renderSupabaseCard(sb) {
+  const pct = Math.min(100, (sb.estimatedMB / sb.limits.storageMB) * 100);
+  const barColor = pct > 80 ? 'red' : pct > 50 ? 'yellow' : 'green';
+  const chip = document.getElementById('mon-sb-chip');
+  chip.className = 'mon-chip ' + (pct > 80 ? 'manual' : 'ok');
+  chip.textContent = pct > 80 ? 'Atenção' : 'OK';
+  const sizeFmt = sb.estimatedMB < 1
+    ? (sb.estimatedMB * 1000).toFixed(0) + ' KB'
+    : sb.estimatedMB.toFixed(2) + ' MB';
+  document.getElementById('mon-sb-metrics').innerHTML = `
+    <div>
+      <div class="mon-metric-label">Total de linhas (BD)</div>
+      <div class="mon-metric-val">${sb.totalRows.toLocaleString('pt-BR')} <span class="mon-metric-sub">registros</span></div>
+      <div class="mon-note" style="margin-top:4px">
+        CenaDrop: ${sb.tables.cenadrop} &nbsp;·&nbsp; NxSaúde: ${sb.tables.nxsaude} &nbsp;·&nbsp; Narrativa IA: ${sb.tables.narrativa}
+      </div>
+    </div>
+    <div>
+      <div class="mon-metric-label">Armazenamento estimado</div>
+      <div class="mon-metric-val">${sizeFmt} <span class="mon-metric-sub">/ 500 MB</span></div>
+      <div class="mon-bar"><div class="mon-bar-fill ${barColor}" style="width:${pct.toFixed(1)}%"></div></div>
+      <div class="mon-note" style="margin-top:4px">${pct < 0.1 ? '< 0,1' : pct.toFixed(1)}% utilizado (estimativa ~2 KB/linha)</div>
+    </div>
+    <div>
+      <div class="mon-metric-label">Auth / MAU</div>
+      <div class="mon-metric-val">— <span class="mon-metric-sub">/ 50.000 usuários ativos/mês</span></div>
+    </div>
+    <div>
+      <div class="mon-metric-label">Bandwidth</div>
+      <div class="mon-metric-val">— <span class="mon-metric-sub">/ 5 GB /mês</span></div>
+    </div>`;
 }
 
 // ── TOAST ─────────────────────────────────────

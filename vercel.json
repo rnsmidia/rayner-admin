@@ -1,16 +1,36 @@
 {
+  "redirects": [
+    { "source": "/narrativa-ia",  "destination": "https://narrativaia.com.br", "permanent": false },
+    { "source": "/narrativa-ia/", "destination": "https://narrativaia.com.br", "permanent": false },
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "cenadrop.com.br" }],
+      "destination": "/vendas",
+      "permanent": false
+    },
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "www.cenadrop.com.br" }],
+      "destination": "/vendas",
+      "permanent": false
+    }
+  ],
   "rewrites": [
-    { "source": "/admin",              "destination": "/admin/index.html" },
-    { "source": "/admin/",             "destination": "/admin/index.html" },
-    { "source": "/cenadrop/download",  "destination": "/cenadrop/download/index.html" },
-    { "source": "/cenadrop/download/", "destination": "/cenadrop/download/index.html" },
-    { "source": "/cenadrop/manual",            "destination": "/cenadrop/manual/index.html" },
-    { "source": "/cenadrop/manual/",           "destination": "/cenadrop/manual/index.html" },
-    { "source": "/cenadrop/apresentacao",      "destination": "/cenadrop/apresentacao/index.html" },
-    { "source": "/cenadrop/apresentacao/",     "destination": "/cenadrop/apresentacao/index.html" },
-    { "source": "/embreve",                    "destination": "/embreve/index.html" },
-    { "source": "/embreve/",                   "destination": "/embreve/index.html" },
-    { "source": "/vendas",                     "destination": "/vendas.html" },
-    { "source": "/vendas/",                    "destination": "/vendas.html" }
+    { "source": "/admin",                  "destination": "/admin/index.html" },
+    { "source": "/admin/",                 "destination": "/admin/index.html" },
+    { "source": "/cenadrop/download",      "destination": "/cenadrop/download/index.html" },
+    { "source": "/cenadrop/download/",     "destination": "/cenadrop/download/index.html" },
+    { "source": "/cenadrop/manual",        "destination": "/cenadrop/manual/index.html" },
+    { "source": "/cenadrop/manual/",       "destination": "/cenadrop/manual/index.html" },
+    { "source": "/cenadrop/apresentacao",  "destination": "/cenadrop/apresentacao/index.html" },
+    { "source": "/cenadrop/apresentacao/", "destination": "/cenadrop/apresentacao/index.html" },
+    { "source": "/embreve",                "destination": "/embreve/index.html" },
+    { "source": "/embreve/",               "destination": "/embreve/index.html" },
+    { "source": "/vendas",                 "destination": "/vendas.html" },
+    { "source": "/vendas/",                "destination": "/vendas.html" },
+    { "source": "/download",               "destination": "/cenadrop/download/index.html" },
+    { "source": "/download/",              "destination": "/cenadrop/download/index.html" },
+    { "source": "/manual",                 "destination": "/cenadrop/manual/index.html" },
+    { "source": "/manual/",                "destination": "/cenadrop/manual/index.html" }
   ]
 }

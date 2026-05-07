@@ -9,6 +9,13 @@ function hashNarrativaPassword(password) {
   return `${salt}:${hash}`;
 }
 
+function verifyNarrativaPassword(password, stored) {
+  const [salt, hash] = stored.split(':');
+  if (!salt || !hash) return false;
+  const derived = pbkdf2Sync(password, salt, 100_000, 64, 'sha512').toString('hex');
+  return derived === hash;
+}
+
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_KEY
@@ -84,9 +91,11 @@ module.exports = async function handler(req, res) {
     return res.status(401).json({ error: 'Não autorizado' });
   }
 
-  // LIST
+  // LIST — apenas licenças CenaDrop (exclui nxsaude)
   if (action === 'list' || (req.method === 'GET' && !action)) {
-    const { data, error } = await supabase.from('licenses').select('*').order('created_at', { ascending: false });
+    const { data, error } = await supabase.from('licenses').select('*')
+      .or('product.is.null,product.neq.nxsaude')
+      .order('created_at', { ascending: false });
     if (error) return res.status(500).json({ error: error.message });
     return res.status(200).json({ licenses: data });
   }
@@ -136,7 +145,8 @@ module.exports = async function handler(req, res) {
 
   // STATS
   if (action === 'stats') {
-    const { data } = await supabase.from('licenses').select('status, source');
+    const { data } = await supabase.from('licenses').select('status, source')
+      .or('product.is.null,product.neq.nxsaude');
     const total     = (data||[]).length;
     const active    = (data||[]).filter(l => l.status === 'active').length;
     const inactive  = (data||[]).filter(l => l.status !== 'active').length;
@@ -246,7 +256,7 @@ module.exports = async function handler(req, res) {
               <div class="krow"><span class="kl">Senha</span><span class="kv">${password}</span></div>
             </div>
             <div style="text-align:center;margin:24px 0;">
-              <a href="https://raynern.com.br/narrativa-ia" class="btn">✨ Acessar Narrativa IA</a>
+              <a href="https://narrativaia.com.br" class="btn">✨ Acessar Narrativa IA</a>
             </div>
             <p class="t" style="font-size:13px;color:#55557a;">Guarde essas credenciais em lugar seguro. Em caso de dúvidas, responda este email.</p>
           </div>
@@ -312,7 +322,7 @@ module.exports = async function handler(req, res) {
               <div class="krow"><span class="kl">Nova Senha</span><span class="kv">${newPassword}</span></div>
             </div>
             <div style="text-align:center;margin:24px 0;">
-              <a href="https://raynern.com.br/narrativa-ia" class="btn">✨ Acessar Narrativa IA</a>
+              <a href="https://narrativaia.com.br" class="btn">✨ Acessar Narrativa IA</a>
             </div>
             <p class="t" style="font-size:13px;color:#55557a;">Recomendamos alterar sua senha após o acesso. Em caso de dúvidas, responda este email.</p>
           </div>
@@ -342,6 +352,123 @@ module.exports = async function handler(req, res) {
     const active   = (data||[]).filter(u => u.active).length;
     const inactive = total - active;
     return res.status(200).json({ total, active, inactive });
+  }
+
+  // LOGIN PÚBLICO — usuários do Narrativa IA Studio
+  if (action === 'narrativa-login') {
+    const { email, password } = body;
+    if (!email || !password)
+      return res.status(400).json({ error: 'Email e senha obrigatórios' });
+    const { data: rows } = await supabase
+      .from('narrativa_users')
+      .select('id, email, name, password_hash, active')
+      .eq('email', email.toLowerCase())
+      .limit(1);
+    const user = (rows || [])[0];
+    if (!user || !user.active || !verifyNarrativaPassword(password, user.password_hash))
+      return res.status(401).json({ error: 'Email ou senha incorretos' });
+    const NARRATIVA_APP = process.env.NARRATIVA_APP_URL || '';
+    return res.status(200).json({ ok: true, name: user.name, redirect: NARRATIVA_APP });
+  }
+
+  // ── NEXUS SAÚDE — COMPRADORES ─────────────────────────────
+  if (action === 'nexus-list') {
+    const { data, error } = await supabase
+      .from('licenses')
+      .select('key, name, email, status, created_at, notes')
+      .eq('product', 'nxsaude')
+      .order('created_at', { ascending: false });
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ buyers: data });
+  }
+
+  if (action === 'nexus-resend') {
+    const { key } = body;
+    const { data: buyer } = await supabase.from('licenses').select('*').eq('key', key).single();
+    if (!buyer) return res.status(404).json({ error: 'Comprador não encontrado' });
+    if (!buyer.email) return res.status(400).json({ error: 'Sem email cadastrado' });
+    try {
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      const firstName = (buyer.name || 'Aluno').split(' ')[0];
+      const PLATFORM_URL = 'https://nxsaude.app.br';
+      const SENHA_PADRAO = 'protocolo45+';
+      const WHATSAPP_URL = 'https://chat.whatsapp.com/CtNvcyiWxT6FGS6iv0fmi0?mode=gi_t';
+      await resend.emails.send({
+        from: 'NX Saúde <ola@nxsaude.app.br>',
+        to: buyer.email,
+        subject: `Seus dados de acesso ao Protocolo de Jejum Após os 45, ${firstName}`,
+        html: `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#0a1628;font-family:'Segoe UI',Arial,sans-serif;">
+<div style="max-width:580px;margin:0 auto;padding:32px 16px;">
+<div style="background:#0D1B2A;border:1px solid rgba(20,184,166,.2);border-radius:16px;overflow:hidden;">
+<div style="background:linear-gradient(135deg,#0F2A3D,#112236);padding:36px 40px;text-align:center;border-bottom:1px solid rgba(255,255,255,.06);">
+  <div style="font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#14B8A6;margin-bottom:10px;">NX SAÚDE</div>
+  <div style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#ffffff;line-height:1.3;">Guia Prático<br><span style="color:#14B8A6;">Protocolo Simples de Jejum Após os 45</span></div>
+</div>
+<div style="padding:40px;">
+  <p style="font-size:18px;font-weight:700;color:#ffffff;margin:0 0 8px;">Olá, ${firstName}. Aqui estão seus dados de acesso.</p>
+  <p style="font-size:15px;color:#94A3B8;line-height:1.7;margin:0 0 32px;">Conforme solicitado, seguem suas credenciais de acesso ao programa.</p>
+  <div style="background:#112236;border:1px solid rgba(20,184,166,.2);border-radius:12px;padding:28px;margin-bottom:28px;">
+    <div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#14B8A6;margin-bottom:16px;">Seus dados de acesso</div>
+    <div style="margin-bottom:14px;"><div style="font-size:12px;color:#64748B;margin-bottom:4px;">Plataforma</div><div style="font-size:15px;font-weight:600;color:#E2E8F0;">nxsaude.app.br</div></div>
+    <div><div style="font-size:12px;color:#64748B;margin-bottom:4px;">Senha</div>
+    <div style="display:inline-block;background:rgba(20,184,166,.12);border:1px solid rgba(20,184,166,.3);border-radius:8px;padding:8px 16px;font-size:17px;font-weight:700;color:#14B8A6;letter-spacing:1px;font-family:'Courier New',monospace;">${SENHA_PADRAO}</div></div>
+  </div>
+  <div style="text-align:center;margin-bottom:32px;">
+    <a href="${PLATFORM_URL}" style="display:inline-block;background:#14B8A6;color:#0D1B2A;text-decoration:none;font-weight:700;font-size:16px;padding:16px 40px;border-radius:10px;">Acessar o Programa</a>
+  </div>
+  <div style="background:rgba(20,184,166,.06);border:1px solid rgba(20,184,166,.15);border-radius:12px;padding:24px;text-align:center;">
+    <div style="font-size:15px;font-weight:700;color:#ffffff;margin-bottom:6px;">💬 Comunidade no WhatsApp</div>
+    <a href="${WHATSAPP_URL}" style="display:inline-block;background:rgba(37,211,102,.15);border:1px solid rgba(37,211,102,.35);color:#25D366;text-decoration:none;font-weight:700;font-size:14px;padding:12px 28px;border-radius:8px;">Entrar no Grupo</a>
+  </div>
+</div>
+<div style="padding:20px 40px;border-top:1px solid rgba(255,255,255,.06);text-align:center;">
+  <p style="font-size:11px;color:#334155;margin:0;">© ${new Date().getFullYear()} NX Saúde · nxsaude.app.br</p>
+</div>
+</div></div></body></html>`,
+      });
+      return res.status(200).json({ ok: true });
+    } catch (err) {
+      return res.status(500).json({ error: 'Erro ao enviar: ' + err.message });
+    }
+  }
+
+  if (action === 'nexus-stats') {
+    const { data } = await supabase.from('licenses').select('status').eq('product', 'nxsaude');
+    const total    = (data||[]).length;
+    const active   = (data||[]).filter(l => l.status === 'active').length;
+    const inactive = total - active;
+    return res.status(200).json({ total, active, inactive });
+  }
+
+  if (action === 'nexus-toggle') {
+    const { key } = body;
+    const { data: cur } = await supabase.from('licenses').select('status').eq('key', key).single();
+    const newStatus = cur?.status === 'active' ? 'inactive' : 'active';
+    await supabase.from('licenses').update({ status: newStatus, active: newStatus === 'active' }).eq('key', key);
+    return res.status(200).json({ ok: true, status: newStatus });
+  }
+
+  // MONITOR — uso dos serviços de infraestrutura
+  if (action === 'monitor') {
+    const [r1, r2, r3] = await Promise.all([
+      supabase.from('licenses').select('*', { count: 'exact', head: true }).or('product.is.null,product.neq.nxsaude'),
+      supabase.from('licenses').select('*', { count: 'exact', head: true }).eq('product', 'nxsaude'),
+      supabase.from('narrativa_users').select('*', { count: 'exact', head: true }),
+    ]);
+    const cdRows    = r1.count || 0;
+    const nxRows    = r2.count || 0;
+    const nuRows    = r3.count || 0;
+    const totalRows = cdRows + nxRows + nuRows;
+    const estimatedMB = parseFloat((totalRows * 0.002).toFixed(4));
+    return res.status(200).json({
+      supabase: {
+        tables: { cenadrop: cdRows, nxsaude: nxRows, narrativa: nuRows },
+        totalRows,
+        estimatedMB,
+        limits: { storageMB: 500, bandwidthGB: 5, mau: 50000 }
+      }
+    });
   }
 
   return res.status(400).json({ error: 'Ação desconhecida' });
