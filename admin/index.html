@@ -1710,6 +1710,21 @@ async function resendNexusEmail(key, email) {
 }
 
 // ── NEXUS CLIQUES ─────────────────────────────
+const YT_API_KEY = '';  // Cole aqui a YouTube Data API v3 key quando tiver
+const ytTitleCache = {};
+
+async function resolveYtTitle(videoId) {
+  if (!YT_API_KEY || videoId === 'direct') return null;
+  if (ytTitleCache[videoId]) return ytTitleCache[videoId];
+  try {
+    const r = await fetch(`https://www.googleapis.com/youtube/v3/videos?id=${videoId}&part=snippet&key=${YT_API_KEY}`);
+    const j = await r.json();
+    const title = j?.items?.[0]?.snippet?.title || null;
+    if (title) ytTitleCache[videoId] = title;
+    return title;
+  } catch { return null; }
+}
+
 async function loadNexusDashClicks() {
   const d = await apiCall('nexus-visits', { days: 30 });
   if (d.total !== undefined) document.getElementById('nx-clicks-dash').textContent = d.total;
@@ -1727,16 +1742,29 @@ async function loadNexusClicks() {
   document.getElementById('cnt-nxclicks').textContent     = d.total;
   const nonDirect = (d.breakdown || []).filter(r => r.video !== 'direct');
   document.getElementById('nx-clicks-videos').textContent = nonDirect.length;
+
+  // Resolver títulos do YouTube em paralelo
+  const titles = await Promise.all((d.breakdown || []).map(r => resolveYtTitle(r.video)));
+
   const top = nonDirect[0] || d.breakdown?.[0];
-  document.getElementById('nx-clicks-top').textContent    = top ? (top.video === 'direct' ? '—' : `v=${top.video}`) : '—';
+  const topTitle = top ? (await resolveYtTitle(top.video)) : null;
+  document.getElementById('nx-clicks-top').textContent = top
+    ? (top.video === 'direct' ? '—' : topTitle || top.video)
+    : '—';
+
   const tb = document.getElementById('nx-clicks-tbody');
   if (!d.total) {
     tb.innerHTML = `<tr><td colspan="4"><div class="empty-state"><div class="icon">📈</div><p>Nenhum clique registrado no período.</p></div></td></tr>`;
     return;
   }
-  tb.innerHTML = (d.breakdown || []).map(row => {
+  tb.innerHTML = (d.breakdown || []).map((row, i) => {
     const pct   = d.total ? Math.round(row.count / d.total * 100) : 0;
-    const label = row.video === 'direct' ? '🔗 Acesso direto (sem parâmetro)' : `🎬 Vídeo <strong>?v=${row.video}</strong>`;
+    const title = titles[i];
+    const label = row.video === 'direct'
+      ? '🔗 Acesso direto (sem parâmetro)'
+      : title
+        ? `🎬 <strong>${title}</strong> <span style="color:var(--muted);font-size:11px;font-family:'JetBrains Mono',monospace">${row.video}</span>`
+        : `🎬 <span style="font-family:'JetBrains Mono',monospace">${row.video}</span>`;
     return `<tr>
       <td>${label}</td>
       <td style="text-align:right;font-weight:700;font-family:'JetBrains Mono',monospace">${row.count}</td>
