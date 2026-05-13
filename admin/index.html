@@ -805,6 +805,7 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
         <div id="subnav-nexus" class="subnav" style="display:none">
           <button class="sn-btn active" data-sec="dashboard" onclick="switchSection('nexus','dashboard')">📊 Dashboard</button>
           <button class="sn-btn" data-sec="buyers" onclick="switchSection('nexus','buyers')">🛒 Compradores <span class="sn-count" id="cnt-nxbuyers">0</span></button>
+          <button class="sn-btn" data-sec="clicks" onclick="switchSection('nexus','clicks');loadNexusClicks()">📈 Cliques <span class="sn-count" id="cnt-nxclicks">—</span></button>
         </div>
       </div>
 
@@ -1019,8 +1020,15 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
               <div><div class="stat-label">Taxa de Cancelamento</div><div class="stat-val yellow" id="nx-cancel-rate">—</div></div>
             </div>
           </div>
+          <div class="stats-grid" style="margin-top:16px">
+            <div class="stat-card">
+              <div class="stat-icon-wrap" style="background:rgba(20,184,166,.12)">📈</div>
+              <div><div class="stat-label">Cliques (30d)</div><div class="stat-val" style="color:#14B8A6" id="nx-clicks-dash">—</div></div>
+            </div>
+          </div>
           <div class="quick-row">
             <button class="btn-sm accent" onclick="switchSection('nexus','buyers')">🛒 Ver Compradores</button>
+            <button class="btn-sm accent" onclick="switchSection('nexus','clicks');loadNexusClicks()" style="background:rgba(20,184,166,.15);color:#14B8A6;border-color:rgba(20,184,166,.3)">📈 Ver Cliques</button>
             <button class="btn-sm" onclick="loadNexusData()">↻ Atualizar</button>
           </div>
         </div>
@@ -1042,6 +1050,53 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
                 <tr><td colspan="6"><div class="loading">Carregando...</div></td></tr>
               </tbody>
             </table>
+          </div>
+        </div>
+
+        <!-- Cliques YouTube -->
+        <div class="sec-panel" id="nexus-clicks">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+            <div>
+              <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:3px">Cliques na Página de Vendas</div>
+              <div style="font-size:13px;color:var(--muted)">Visitas vindas dos links do YouTube com parâmetro <code style="background:var(--subtle);padding:1px 5px;border-radius:4px">?v=</code></div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <select id="clicks-period" onchange="loadNexusClicks()" style="padding:6px 10px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;cursor:pointer">
+                <option value="7">Últimos 7 dias</option>
+                <option value="30" selected>Últimos 30 dias</option>
+                <option value="90">Últimos 90 dias</option>
+                <option value="365">Último ano</option>
+              </select>
+              <button class="btn-sm" onclick="loadNexusClicks()">↻</button>
+            </div>
+          </div>
+          <div class="stats-grid" style="margin-bottom:20px">
+            <div class="stat-card">
+              <div class="stat-icon-wrap" style="background:rgba(20,184,166,.12)">📈</div>
+              <div><div class="stat-label">Total de Visitas</div><div class="stat-val" style="color:#14B8A6" id="nx-clicks-total">—</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap" style="background:rgba(124,58,237,.12)">🎬</div>
+              <div><div class="stat-label">Vídeos com Clique</div><div class="stat-val" style="color:var(--accent)" id="nx-clicks-videos">—</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap" style="background:rgba(245,158,11,.12)">⭐</div>
+              <div><div class="stat-label">Vídeo que Mais Converte</div><div class="stat-val" style="color:var(--yellow);font-size:18px" id="nx-clicks-top">—</div></div>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Origem</th><th style="text-align:right">Cliques</th><th style="text-align:right">% do total</th><th>Proporção</th></tr>
+              </thead>
+              <tbody id="nx-clicks-tbody">
+                <tr><td colspan="4"><div class="loading">Carregando...</div></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="margin-top:16px;padding:14px;background:var(--subtle);border-radius:8px;font-size:13px;color:var(--muted);line-height:1.6">
+            💡 Use <strong style="color:var(--text)">?v=01</strong>, <strong style="color:var(--text)">?v=02</strong> etc. nos links do YouTube para identificar cada vídeo.<br>
+            Exemplo: <code style="background:var(--border);padding:1px 6px;border-radius:4px">https://nxsaude.app.br/vendas?v=01</code>
           </div>
         </div>
 
@@ -1242,7 +1297,7 @@ function switchProduct(prod) {
   const labels = { dashboard:'Dashboard', licenses:'Licenças', students:'Alunos Hotmart', users:'Usuários', buyers:'Compradores', usage:'Monitor de Uso' };
   document.getElementById('bc-sec').textContent = labels[curSec[prod] || 'dashboard'] || '—';
   if (prod === 'narrativa') { switchSection('narrativa', curSec['narrativa'] || 'dashboard'); loadNarrativaUsers(); }
-  if (prod === 'nexus')     { switchSection('nexus',     curSec['nexus']     || 'dashboard'); loadNexusData(); }
+  if (prod === 'nexus')     { switchSection('nexus',     curSec['nexus']     || 'dashboard'); loadNexusData(); loadNexusDashClicks(); }
   if (prod === 'monitor')   { switchSection('monitor',   'usage'); loadMonitor(); }
 }
 
@@ -1255,7 +1310,7 @@ function switchSection(prod, sec) {
   );
   document.querySelectorAll(`#panel-${prod} .sec-panel`).forEach(p => p.classList.remove('active'));
   document.getElementById(`${prod}-${sec}`)?.classList.add('active');
-  const labels = { dashboard:'Dashboard', licenses:'Licenças', students:'Alunos Hotmart', users:'Usuários' };
+  const labels = { dashboard:'Dashboard', licenses:'Licenças', students:'Alunos Hotmart', users:'Usuários', buyers:'Compradores', clicks:'Cliques' };
   document.getElementById('bc-sec').textContent = labels[sec] || sec;
   if (curProd !== prod) switchProduct(prod);
 }
@@ -1652,6 +1707,43 @@ async function resendNexusEmail(key, email) {
   const d = await apiCall('nexus-resend', { key });
   if (d.ok) toast(`📧 Email reenviado para ${email}`, 'success');
   else alert('Erro: ' + (d.error || 'Falha ao enviar'));
+}
+
+// ── NEXUS CLIQUES ─────────────────────────────
+async function loadNexusDashClicks() {
+  const d = await apiCall('nexus-visits', { days: 30 });
+  if (d.total !== undefined) document.getElementById('nx-clicks-dash').textContent = d.total;
+}
+
+async function loadNexusClicks() {
+  const days = parseInt(document.getElementById('clicks-period')?.value || '30', 10);
+  document.getElementById('nx-clicks-tbody').innerHTML = `<tr><td colspan="4"><div class="loading">Carregando...</div></td></tr>`;
+  const d = await apiCall('nexus-visits', { days });
+  if (d.error) {
+    document.getElementById('nx-clicks-tbody').innerHTML = `<tr><td colspan="4" style="color:var(--red);padding:16px">${d.error}</td></tr>`;
+    return;
+  }
+  document.getElementById('nx-clicks-total').textContent  = d.total;
+  document.getElementById('cnt-nxclicks').textContent     = d.total;
+  const nonDirect = (d.breakdown || []).filter(r => r.video !== 'direct');
+  document.getElementById('nx-clicks-videos').textContent = nonDirect.length;
+  const top = nonDirect[0] || d.breakdown?.[0];
+  document.getElementById('nx-clicks-top').textContent    = top ? (top.video === 'direct' ? '—' : `v=${top.video}`) : '—';
+  const tb = document.getElementById('nx-clicks-tbody');
+  if (!d.total) {
+    tb.innerHTML = `<tr><td colspan="4"><div class="empty-state"><div class="icon">📈</div><p>Nenhum clique registrado no período.</p></div></td></tr>`;
+    return;
+  }
+  tb.innerHTML = (d.breakdown || []).map(row => {
+    const pct   = d.total ? Math.round(row.count / d.total * 100) : 0;
+    const label = row.video === 'direct' ? '🔗 Acesso direto (sem parâmetro)' : `🎬 Vídeo <strong>?v=${row.video}</strong>`;
+    return `<tr>
+      <td>${label}</td>
+      <td style="text-align:right;font-weight:700;font-family:'JetBrains Mono',monospace">${row.count}</td>
+      <td style="text-align:right;color:var(--muted)">${pct}%</td>
+      <td style="min-width:120px"><div style="background:var(--border);border-radius:4px;overflow:hidden;height:6px"><div style="background:#14B8A6;height:100%;width:${pct}%;transition:width .4s"></div></div></td>
+    </tr>`;
+  }).join('');
 }
 
 // ── MONITOR ───────────────────────────────────

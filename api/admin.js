@@ -82,6 +82,14 @@ module.exports = async function handler(req, res) {
     return res.status(401).json({ error: 'Login ou senha incorretos' });
   }
 
+  // TRACK VISIT — público, sem autenticação
+  if (action === 'track-visit') {
+    const raw   = String(body.video || 'direct');
+    const video = raw.slice(0, 50).replace(/[^a-zA-Z0-9_\-]/g, '') || 'direct';
+    await supabase.from('page_visits').insert({ video });
+    return res.status(200).json({ ok: true });
+  }
+
   // AUTH
   const authHeader = req.headers['authorization'] || '';
   const token = authHeader.replace('Bearer ', '');
@@ -447,6 +455,25 @@ module.exports = async function handler(req, res) {
     const newStatus = cur?.status === 'active' ? 'inactive' : 'active';
     await supabase.from('licenses').update({ status: newStatus, active: newStatus === 'active' }).eq('key', key);
     return res.status(200).json({ ok: true, status: newStatus });
+  }
+
+  // NEXUS VISITS — cliques na página de vendas por vídeo
+  if (action === 'nexus-visits') {
+    const days  = Math.min(parseInt(body.days || '30', 10), 365);
+    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+    const { data, error } = await supabase
+      .from('page_visits')
+      .select('video, created_at')
+      .gte('created_at', since)
+      .order('created_at', { ascending: false });
+    if (error) return res.status(500).json({ error: error.message });
+    const total    = (data || []).length;
+    const byVideo  = {};
+    for (const row of (data || [])) byVideo[row.video] = (byVideo[row.video] || 0) + 1;
+    const breakdown = Object.entries(byVideo)
+      .map(([video, count]) => ({ video, count }))
+      .sort((a, b) => b.count - a.count);
+    return res.status(200).json({ total, breakdown });
   }
 
   // MONITOR — uso dos serviços de infraestrutura
