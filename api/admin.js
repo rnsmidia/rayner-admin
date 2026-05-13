@@ -86,7 +86,13 @@ module.exports = async function handler(req, res) {
   if (action === 'track-visit') {
     const raw   = String(body.video || 'direct');
     const video = raw.slice(0, 50).replace(/[^a-zA-Z0-9_\-]/g, '') || 'direct';
-    await supabase.from('page_visits').insert({ video });
+    await supabase.from('licenses').insert({
+      key:     'VISIT-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7),
+      product: 'nx_visit',
+      status:  'visit',
+      source:  video,
+      notes:   video
+    });
     return res.status(200).json({ ok: true });
   }
 
@@ -103,6 +109,7 @@ module.exports = async function handler(req, res) {
   if (action === 'list' || (req.method === 'GET' && !action)) {
     const { data, error } = await supabase.from('licenses').select('*')
       .or('product.is.null,product.neq.nxsaude')
+      .neq('product', 'nx_visit')
       .order('created_at', { ascending: false });
     if (error) return res.status(500).json({ error: error.message });
     return res.status(200).json({ licenses: data });
@@ -154,7 +161,8 @@ module.exports = async function handler(req, res) {
   // STATS
   if (action === 'stats') {
     const { data } = await supabase.from('licenses').select('status, source')
-      .or('product.is.null,product.neq.nxsaude');
+      .or('product.is.null,product.neq.nxsaude')
+      .neq('product', 'nx_visit');
     const total     = (data||[]).length;
     const active    = (data||[]).filter(l => l.status === 'active').length;
     const inactive  = (data||[]).filter(l => l.status !== 'active').length;
@@ -462,14 +470,15 @@ module.exports = async function handler(req, res) {
     const days  = Math.min(parseInt(body.days || '30', 10), 365);
     const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
     const { data, error } = await supabase
-      .from('page_visits')
-      .select('video, created_at')
+      .from('licenses')
+      .select('source, created_at')
+      .eq('product', 'nx_visit')
       .gte('created_at', since)
       .order('created_at', { ascending: false });
     if (error) return res.status(500).json({ error: error.message });
     const total    = (data || []).length;
     const byVideo  = {};
-    for (const row of (data || [])) byVideo[row.video] = (byVideo[row.video] || 0) + 1;
+    for (const row of (data || [])) byVideo[row.source] = (byVideo[row.source] || 0) + 1;
     const breakdown = Object.entries(byVideo)
       .map(([video, count]) => ({ video, count }))
       .sort((a, b) => b.count - a.count);
@@ -488,12 +497,12 @@ module.exports = async function handler(req, res) {
 
     const [r1, r2, r3, r4, r5, r6, r7, r8, vercelRes, ghStorageRes] = await Promise.all([
       // Supabase row counts
-      supabase.from('licenses').select('*', { count: 'exact', head: true }).or('product.is.null,product.neq.nxsaude'),
+      supabase.from('licenses').select('*', { count: 'exact', head: true }).or('product.is.null,product.neq.nxsaude').neq('product', 'nx_visit'),
       supabase.from('licenses').select('*', { count: 'exact', head: true }).eq('product', 'nxsaude'),
       supabase.from('narrativa_users').select('*', { count: 'exact', head: true }),
       // Resend estimation — novos registros com email este mês (cada = 1 email enviado)
       supabase.from('licenses').select('*', { count: 'exact', head: true })
-        .or('product.is.null,product.neq.nxsaude').not('email', 'is', null).gte('created_at', monthIso),
+        .or('product.is.null,product.neq.nxsaude').neq('product', 'nx_visit').not('email', 'is', null).gte('created_at', monthIso),
       supabase.from('licenses').select('*', { count: 'exact', head: true })
         .eq('product', 'nxsaude').not('email', 'is', null).gte('created_at', monthIso),
       supabase.from('narrativa_users').select('*', { count: 'exact', head: true }).gte('created_at', monthIso),
