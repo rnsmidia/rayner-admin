@@ -28,9 +28,15 @@
     { "source": "/embreve/",               "destination": "/embreve/index.html" },
     { "source": "/vendas",                 "destination": "/vendas.html" },
     { "source": "/vendas/",                "destination": "/vendas.html" },
+    { "source": "/cenadrop/downloadsrt",    "destination": "/cenadrop/downloadsrt/index.html" },
+    { "source": "/cenadrop/downloadsrt/",  "destination": "/cenadrop/downloadsrt/index.html" },
     { "source": "/download",               "destination": "/cenadrop/download/index.html" },
     { "source": "/download/",              "destination": "/cenadrop/download/index.html" },
+    { "source": "/downloadsrt",            "destination": "/cenadrop/downloadsrt/index.html" },
+    { "source": "/downloadsrt/",           "destination": "/cenadrop/downloadsrt/index.html" },
     { "source": "/manual",                 "destination": "/cenadrop/manual/index.html" },
-    { "source": "/manual/",                "destination": "/cenadrop/manual/index.html" }
+    { "source": "/manual/",                "destination": "/cenadrop/manual/index.html" },
+    { "source": "/stratark",               "destination": "/stratark/index.html" },
+    { "source": "/stratark/",              "destination": "/stratark/index.html" }
   ]
 }
