@@ -714,17 +714,17 @@ section { position: relative; }
 .depo-item {
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(201,162,39,0.18);
+  border: 1px solid rgba(201,162,39,0.25);
   border-radius: 16px;
-  transition: all 0.35s;
+  transition: all 0.4s ease;
   cursor: pointer;
-  background: #0b0b0b;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+  background: #080808;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.7), inset 0 0 0 1px rgba(255,255,255,0.03);
 }
 .depo-item:hover {
-  border-color: rgba(201,162,39,0.45);
-  transform: translateY(-4px);
-  box-shadow: 0 16px 48px rgba(0,0,0,0.6), 0 0 20px rgba(201,162,39,0.08);
+  border-color: rgba(201,162,39,0.55);
+  transform: translateY(-6px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 30px rgba(201,162,39,0.12);
 }
 
 .depo-item img {
@@ -732,19 +732,33 @@ section { position: relative; }
   height: auto;
   display: block;
   border-radius: 15px;
-  transition: transform 0.4s;
+  transition: transform 0.45s ease;
 }
-.depo-item:hover img { transform: scale(1.02); }
+.depo-item:hover img { transform: scale(1.03); }
 
 /* Linha dourada topo do card */
 .depo-item::before {
   content: '';
   position: absolute;
-  top: 0; left: 10%; right: 10%;
+  top: 0; left: 8%; right: 8%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(201,162,39,0.5), transparent);
+  background: linear-gradient(90deg, transparent, rgba(201,162,39,0.65), transparent);
   z-index: 1;
 }
+
+/* Glow dourado no hover */
+.depo-item::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(201,162,39,0.06) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.depo-item:hover::after { opacity: 1; }
 
 /* Rodapé depoimentos */
 .depo-footer {
@@ -1271,40 +1285,31 @@ footer {
 
     <div class="depo-grid">
       <div class="depo-item">
-        <img src="/academyelite/images/depoimentos/depoimento-alice.jpg" alt="Depoimento Alice" loading="lazy">
+        <img src="/academyelite/images/depoimentos/card-01.png" alt="Resultado: 10,4 mil views em 48h, CTR 11,1%" loading="lazy">
       </div>
       <div class="depo-item">
-        <img src="/academyelite/images/depoimentos/depoimento-joel.png" alt="Depoimento Joel" loading="lazy">
+        <img src="/academyelite/images/depoimentos/card-07.png" alt="Resultado: canal quase desistindo, 71,8 mil impressões" loading="lazy">
       </div>
       <div class="depo-item">
-        <img src="/academyelite/images/depoimentos/depoimento-vendas.png" alt="Depoimento Vendas" loading="lazy">
+        <img src="/academyelite/images/depoimentos/card-09.png" alt="Resultado: R$13.419,77 em 14 dias" loading="lazy">
       </div>
       <div class="depo-item">
-        <img src="/academyelite/images/depoimentos/depoimento-dark.png" alt="Depoimento Dark" loading="lazy">
+        <img src="/academyelite/images/depoimentos/card-05.png" alt="Resultado: 165,5 mil views, R$2.916,64" loading="lazy">
       </div>
       <div class="depo-item">
-        <img src="/academyelite/images/depoimentos/depoimento-josuel.png" alt="Depoimento Josuel" loading="lazy">
+        <img src="/academyelite/images/depoimentos/card-06.png" alt="Resultado: 263,9 mil views, R$7.615,35" loading="lazy">
       </div>
       <div class="depo-item">
-        <img src="/academyelite/images/depoimentos/depoimento-receita.png" alt="Depoimento Receita" loading="lazy">
+        <img src="/academyelite/images/depoimentos/card-03.png" alt="Resultado: canal monetizado, retenção 4,4%" loading="lazy">
       </div>
       <div class="depo-item">
-        <img src="/academyelite/images/depoimentos/depoimento-diego.png" alt="Depoimento Diego" loading="lazy">
+        <img src="/academyelite/images/depoimentos/card-02.png" alt="Resultado: 9.419 views em 48h" loading="lazy">
       </div>
       <div class="depo-item">
-        <img src="/academyelite/images/depoimentos/depoimento-irvson.png" alt="Depoimento Irvson" loading="lazy">
+        <img src="/academyelite/images/depoimentos/card-08.png" alt="Resultado: monetização aprovada" loading="lazy">
       </div>
       <div class="depo-item">
-        <img src="/academyelite/images/depoimentos/depoimento-video.png" alt="Depoimento Video" loading="lazy">
-      </div>
-      <div class="depo-item">
-        <img src="/academyelite/images/depoimentos/depoimento-img1.jpg" alt="Depoimento" loading="lazy">
-      </div>
-      <div class="depo-item">
-        <img src="/academyelite/images/depoimentos/depoimento-img4.png" alt="Depoimento" loading="lazy">
-      </div>
-      <div class="depo-item">
-        <img src="/academyelite/images/depoimentos/depoimento-img5.png" alt="Depoimento" loading="lazy">
+        <img src="/academyelite/images/depoimentos/card-04.png" alt="Resultado: 9.419 views, 7 dias de vídeos" loading="lazy">
       </div>
     </div>
 
