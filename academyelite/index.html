@@ -896,42 +896,66 @@ section { position: relative; }
 }
 
 .form-wrap {
-  max-width: 540px;
+  max-width: 600px;
   margin: 0 auto;
   padding: 0 24px;
 }
 
 .form-card {
-  background: var(--black3);
-  border: 1px solid rgba(201,162,39,0.15);
-  padding: 52px 48px;
+  background: rgba(8, 6, 2, 0.9);
+  border: 1px solid rgba(201,162,39,0.38);
+  border-radius: 20px;
+  padding: 56px 52px;
   position: relative;
   overflow: hidden;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 0 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(201,162,39,0.06) inset;
 }
 
-.form-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+/* Label "LISTA PRIORITÁRIA" */
+.form-lista-label {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.form-lista-label .lista-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201,162,39,0.45));
+}
+.form-lista-label .lista-line:last-child {
+  background: linear-gradient(270deg, transparent, rgba(201,162,39,0.45));
+}
+.form-lista-label span {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold);
+  white-space: nowrap;
 }
 
 .form-card-title {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 28px;
+  font-size: 46px;
   font-weight: 600;
   color: var(--white);
-  margin-bottom: 6px;
+  margin-bottom: 12px;
   text-align: center;
+  line-height: 1.1;
 }
 
 .form-card-sub {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--white-muted);
   text-align: center;
-  margin-bottom: 36px;
-  line-height: 1.5;
+  margin-bottom: 40px;
+  line-height: 1.6;
+  font-weight: 300;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .form-group {
@@ -940,84 +964,137 @@ section { position: relative; }
 
 .form-label {
   display: block;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--gold2);
   margin-bottom: 8px;
-  opacity: 0.8;
 }
 
 .form-input {
   width: 100%;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
   color: var(--white);
   font-family: 'Inter', sans-serif;
   font-size: 15px;
   font-weight: 300;
-  padding: 14px 18px;
+  padding: 15px 18px;
   outline: none;
-  transition: all 0.2s;
-  border-radius: 0;
+  transition: all 0.25s;
+  border-radius: 10px;
   -webkit-appearance: none;
 }
 
-.form-input::placeholder { color: rgba(255,255,255,0.25); }
+.form-input::placeholder { color: rgba(255,255,255,0.22); }
 
 .form-input:focus {
-  border-color: rgba(201,162,39,0.4);
-  background: rgba(201,162,39,0.03);
-  box-shadow: 0 0 0 3px rgba(201,162,39,0.06);
+  border-color: rgba(201,162,39,0.5);
+  background: rgba(201,162,39,0.04);
+  box-shadow: 0 0 0 3px rgba(201,162,39,0.08);
 }
 
 .form-input:hover:not(:focus) {
-  border-color: rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.18);
 }
 
 /* Input telefone */
 .phone-prefix {
   display: flex;
-  gap: 0;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: all 0.25s;
+}
+.phone-prefix:focus-within {
+  border-color: rgba(201,162,39,0.5);
+  box-shadow: 0 0 0 3px rgba(201,162,39,0.08);
 }
 
 .prefix-box {
-  background: rgba(201,162,39,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-right: none;
-  color: var(--gold2);
-  font-size: 15px;
-  padding: 14px 14px;
+  background: rgba(255,255,255,0.06);
+  border: none;
+  border-right: 1px solid rgba(255,255,255,0.12);
+  color: var(--white);
+  font-size: 14px;
+  padding: 15px 14px;
   white-space: nowrap;
   font-weight: 400;
   display: flex;
   align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.prefix-box .prefix-arrow {
+  color: rgba(255,255,255,0.4);
+  font-size: 10px;
 }
 
 .phone-prefix .form-input {
-  border-left: none;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none !important;
 }
 
 .btn-submit {
   width: 100%;
-  margin-top: 8px;
+  margin-top: 10px;
   padding: 18px;
+  font-family: 'Inter', sans-serif;
   font-size: 13px;
-  letter-spacing: 0.15em;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
   border: none;
   cursor: pointer;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #B8911F 0%, #D4AF37 40%, #C9A227 70%, #B8911F 100%);
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.3s;
+  box-shadow: 0 4px 20px rgba(201,162,39,0.25);
 }
+.btn-submit:hover {
+  background: linear-gradient(135deg, #C9A227 0%, #E8C84A 40%, #D4AF37 70%, #C9A227 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 36px rgba(201,162,39,0.4);
+}
+.btn-submit:active { transform: translateY(0); }
 
+/* Badge segurança */
 .form-note {
-  margin-top: 20px;
-  font-size: 12px;
-  color: var(--white-muted);
-  text-align: center;
-  line-height: 1.6;
-  opacity: 0.7;
+  margin-top: 22px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(201,162,39,0.05);
+  border: 1px solid rgba(201,162,39,0.14);
+  border-radius: 10px;
+  padding: 14px 18px;
 }
-.form-note span { color: var(--gold2); }
+.form-note-icon {
+  color: var(--gold);
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+}
+.form-note-text strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gold2);
+  margin-bottom: 2px;
+}
+.form-note-text small {
+  font-size: 11px;
+  color: var(--white-muted);
+  line-height: 1.4;
+}
 
 /* Success state */
 .form-success {
@@ -1061,27 +1138,26 @@ section { position: relative; }
 ────────────────────────────────────────── */
 footer {
   background: #050505;
-  border-top: 1px solid rgba(201,162,39,0.08);
-  padding: 40px 24px;
+  border-top: 1px solid rgba(201,162,39,0.1);
+  padding: 44px 24px;
   text-align: center;
 }
 
 .footer-logo {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: 0.2em;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.5em;
   color: var(--gold2);
   text-transform: uppercase;
-  margin-bottom: 16px;
-  opacity: 0.7;
+  margin-bottom: 14px;
 }
 
 .footer-copy {
   font-size: 12px;
   color: var(--white-muted);
-  opacity: 0.4;
-  letter-spacing: 0.04em;
+  opacity: 0.35;
+  letter-spacing: 0.06em;
 }
 
 /* ──────────────────────────────────────────
@@ -1432,6 +1508,13 @@ footer {
   <div class="form-wrap">
     <div class="form-card fade-up">
       <div class="form-fields">
+
+        <div class="form-lista-label">
+          <div class="lista-line"></div>
+          <span>Lista Prioritária</span>
+          <div class="lista-line"></div>
+        </div>
+
         <h3 class="form-card-title">Garantir minha vaga</h3>
         <p class="form-card-sub">
           Preencha seus dados e entre para a lista VIP do Elite Dark Academy.
@@ -1468,7 +1551,7 @@ footer {
           <div class="form-group">
             <label class="form-label" for="whatsapp">WhatsApp</label>
             <div class="phone-prefix">
-              <span class="prefix-box">🇧🇷 +55</span>
+              <span class="prefix-box">🇧🇷 +55 <span class="prefix-arrow">▾</span></span>
               <input
                 class="form-input"
                 type="tel"
@@ -1481,7 +1564,7 @@ footer {
             </div>
           </div>
 
-          <button type="submit" class="btn-gold btn-submit" id="submit-btn">
+          <button type="submit" class="btn-submit" id="submit-btn">
             Entrar na Lista VIP
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <path d="M5 12h14M12 5l7 7-7 7"/>
@@ -1489,10 +1572,17 @@ footer {
           </button>
         </form>
 
-        <p class="form-note">
-          <span>Suas informações estão seguras.</span><br>
-          Nunca enviamos spam. Você pode cancelar a qualquer momento.
-        </p>
+        <div class="form-note">
+          <svg class="form-note-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="M9 12l2 2 4-4" stroke-width="2"/>
+          </svg>
+          <div class="form-note-text">
+            <strong>Suas informações estão seguras.</strong>
+            <small>Nunca enviamos spam. Você pode cancelar a qualquer momento.</small>
+          </div>
+        </div>
+
       </div>
 
       <!-- SUCCESS STATE -->
@@ -1516,8 +1606,8 @@ footer {
 
 <!-- ──── FOOTER ──── -->
 <footer>
-  <div class="footer-logo">Elite Dark Academy</div>
-  <p class="footer-copy">© 2026 Marcos de Castro · Todos os direitos reservados</p>
+  <div class="footer-logo">Elite &nbsp; Dark &nbsp; Academy</div>
+  <p class="footer-copy">© 2026 Marcos de Castro &nbsp;·&nbsp; Todos os direitos reservados</p>
 </footer>
 
 <script>
