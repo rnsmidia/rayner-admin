@@ -1163,7 +1163,19 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
           <div class="stats-grid" style="margin-bottom:24px">
             <div class="stat-card">
               <div class="stat-icon-wrap purple">📋</div>
-              <div><div class="stat-label">Total Inscritos</div><div class="stat-val purple" id="acy-total">—</div></div>
+              <div><div class="stat-label">Total</div><div class="stat-val purple" id="acy-total">—</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap green">✅</div>
+              <div><div class="stat-label">Selecionados</div><div class="stat-val green" id="acy-selecionado">—</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap yellow">⏳</div>
+              <div><div class="stat-label">Em análise</div><div class="stat-val yellow" id="acy-analise">—</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap red">🚫</div>
+              <div><div class="stat-label">Descartados</div><div class="stat-val red" id="acy-descartado">—</div></div>
             </div>
             <div class="stat-card">
               <div class="stat-icon-wrap green">📅</div>
@@ -1173,6 +1185,14 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
               <div class="stat-icon-wrap yellow">📆</div>
               <div><div class="stat-label">Últimos 7 dias</div><div class="stat-val yellow" id="acy-week">—</div></div>
             </div>
+          </div>
+
+          <!-- Filtros de status -->
+          <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+            <button class="btn-sm" id="acy-filter-all"       onclick="setAcademyFilter('')">Todos</button>
+            <button class="btn-sm" id="acy-filter-selecionado" onclick="setAcademyFilter('selecionado')" style="color:#28c76f;border-color:rgba(40,199,111,.3)">✅ Selecionados</button>
+            <button class="btn-sm" id="acy-filter-em_analise"  onclick="setAcademyFilter('em_analise')"  style="color:#ff9f43;border-color:rgba(255,159,67,.3)">⏳ Em análise</button>
+            <button class="btn-sm" id="acy-filter-descartado"  onclick="setAcademyFilter('descartado')"  style="color:#ea5455;border-color:rgba(234,84,85,.3)">🚫 Descartados</button>
           </div>
 
           <!-- Toolbar -->
@@ -1193,12 +1213,13 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
                   <th>Nome</th>
                   <th>E-mail</th>
                   <th>WhatsApp</th>
+                  <th>Status</th>
                   <th>Inscrito em</th>
                   <th></th>
                 </tr>
               </thead>
               <tbody id="academy-tbody">
-                <tr><td colspan="6"><div class="empty-state"><div class="icon">📋</div><p>Carregando...</p></div></td></tr>
+                <tr><td colspan="7"><div class="empty-state"><div class="icon">📋</div><p>Carregando...</p></div></td></tr>
               </tbody>
             </table>
           </div>
@@ -2061,55 +2082,103 @@ function toast(msg, type = '') {
 }
 
 // ── ELITE DARK ACADEMY WAITLIST ───────────────
+let academyStatusFilter = '';
+
+const ACY_STATUS = {
+  selecionado: { label: 'Selecionado', color: '#28c76f', bg: 'rgba(40,199,111,.12)' },
+  em_analise:  { label: 'Em análise',  color: '#ff9f43', bg: 'rgba(255,159,67,.12)' },
+  descartado:  { label: 'Descartado',  color: '#ea5455', bg: 'rgba(234,84,85,.12)'  },
+};
+
 async function loadAcademyWaitlist() {
   const [stats, list] = await Promise.all([
     apiCall('academy-stats'),
     apiCall('academy-list'),
   ]);
-  if (stats.total !== undefined) {
-    document.getElementById('acy-total').textContent = stats.total;
-    document.getElementById('acy-today').textContent = stats.today;
-    document.getElementById('acy-week').textContent  = stats.week;
-    document.getElementById('cnt-academy').textContent = stats.total;
-  }
   if (list.waitlist) {
     allAcademyWaitlist = list.waitlist;
-    renderAcademy(allAcademyWaitlist);
+    const sel  = allAcademyWaitlist.filter(r => r.status === 'selecionado').length;
+    const ana  = allAcademyWaitlist.filter(r => r.status === 'em_analise').length;
+    const desc = allAcademyWaitlist.filter(r => r.status === 'descartado').length;
+    document.getElementById('acy-total').textContent       = allAcademyWaitlist.length;
+    document.getElementById('acy-selecionado').textContent = sel;
+    document.getElementById('acy-analise').textContent     = ana;
+    document.getElementById('acy-descartado').textContent  = desc;
+    document.getElementById('cnt-academy').textContent     = allAcademyWaitlist.length;
   }
+  if (stats.today !== undefined) {
+    document.getElementById('acy-today').textContent = stats.today;
+    document.getElementById('acy-week').textContent  = stats.week;
+  }
+  applyAcademyFilter();
 }
+
+function setAcademyFilter(status) {
+  academyStatusFilter = status;
+  ['all','selecionado','em_analise','descartado'].forEach(k => {
+    const el = document.getElementById('acy-filter-' + k);
+    if (el) el.style.fontWeight = ((status === '' && k === 'all') || status === k) ? '700' : '400';
+  });
+  applyAcademyFilter();
+}
+
+function applyAcademyFilter() {
+  const q   = (document.getElementById('search-academy')?.value || '').toLowerCase();
+  let list  = allAcademyWaitlist;
+  if (academyStatusFilter) list = list.filter(r => r.status === academyStatusFilter);
+  if (q) list = list.filter(r =>
+    (r.nome||'').toLowerCase().includes(q) ||
+    (r.email||'').toLowerCase().includes(q) ||
+    (r.whatsapp||'').includes(q)
+  );
+  renderAcademy(list);
+}
+
+function filterAcademy() { applyAcademyFilter(); }
 
 function renderAcademy(list) {
   const tb = document.getElementById('academy-tbody');
   if (!list.length) {
-    tb.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="icon">📋</div><p>Nenhum inscrito ainda.</p></div></td></tr>`;
+    tb.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="icon">📋</div><p>Nenhum inscrito encontrado.</p></div></td></tr>`;
     return;
   }
-  tb.innerHTML = list.map((r, i) => `
-    <tr>
+  tb.innerHTML = list.map((r, i) => {
+    const st = ACY_STATUS[r.status] || ACY_STATUS['em_analise'];
+    return `<tr>
       <td style="color:var(--muted);font-size:12px">${i + 1}</td>
       <td style="font-weight:600">${r.nome || '—'}</td>
       <td style="color:var(--muted)">${r.email || '—'}</td>
       <td>${r.whatsapp ? `<span style="font-family:'JetBrains Mono',monospace;font-size:12px">+55 ${r.whatsapp}</span>` : '<span style="color:var(--muted)">—</span>'}</td>
+      <td><span onclick="cycleAcademyStatus(${r.id},'${r.status || 'em_analise'}')" title="Clique para alternar" style="display:inline-block;padding:3px 11px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;background:${st.bg};color:${st.color};border:1px solid ${st.color}44;user-select:none">${st.label}</span></td>
       <td style="color:var(--muted);font-size:12px">${fmtDate(r.created_at)}</td>
       <td><div class="actions">
         <button class="btn-icon" title="Copiar e-mail" onclick="navigator.clipboard.writeText('${r.email}');toast('E-mail copiado!')">📋</button>
         <button class="btn-icon" title="Remover" onclick="deleteAcademy(${r.id},'${r.nome}')">🗑️</button>
       </div></td>
-    </tr>
-  `).join('');
+    </tr>`;
+  }).join('');
 }
 
-function filterAcademy() {
-  const q = document.getElementById('search-academy').value.toLowerCase();
-  renderAcademy(q ? allAcademyWaitlist.filter(r =>
-    (r.nome||'').toLowerCase().includes(q) ||
-    (r.email||'').toLowerCase().includes(q) ||
-    (r.whatsapp||'').includes(q)
-  ) : allAcademyWaitlist);
+async function cycleAcademyStatus(id, current) {
+  const order = ['em_analise', 'selecionado', 'descartado'];
+  const next  = order[(order.indexOf(current) + 1) % order.length];
+  const r     = await apiCall('academy-update-status', { id, status: next });
+  if (r.ok) {
+    const lead = allAcademyWaitlist.find(l => l.id === id);
+    if (lead) lead.status = next;
+    const sel  = allAcademyWaitlist.filter(l => l.status === 'selecionado').length;
+    const ana  = allAcademyWaitlist.filter(l => l.status === 'em_analise').length;
+    const desc = allAcademyWaitlist.filter(l => l.status === 'descartado').length;
+    document.getElementById('acy-selecionado').textContent = sel;
+    document.getElementById('acy-analise').textContent     = ana;
+    document.getElementById('acy-descartado').textContent  = desc;
+    applyAcademyFilter();
+    toast('Status → ' + ACY_STATUS[next].label);
+  } else toast('Erro ao atualizar.', 'error');
 }
 
 async function deleteAcademy(id, nome) {
-  if (!confirm(`Remover "${nome}" da lista VIP?`)) return;
+  if (!confirm('Remover "' + nome + '" da lista VIP?')) return;
   const r = await apiCall('academy-delete', { id });
   if (r.ok) { toast('Removido.'); loadAcademyWaitlist(); }
   else toast('Erro ao remover.', 'error');
@@ -2156,14 +2225,16 @@ async function loadAcademyFunnel() {
 
 function exportAcademyCSV() {
   if (!allAcademyWaitlist.length) { toast('Nenhum dado para exportar.'); return; }
-  const rows = [['#','Nome','Email','WhatsApp','Inscrito em']];
+  const rows = [['#','Nome','Email','WhatsApp','Status','Inscrito em']];
   allAcademyWaitlist.forEach((r, i) => rows.push([
-    i+1, r.nome, r.email, r.whatsapp || '', fmtDate(r.created_at)
+    i+1, r.nome, r.email, r.whatsapp || '',
+    ACY_STATUS[r.status]?.label || r.status || 'Em análise',
+    fmtDate(r.created_at)
   ]));
-  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const csv = rows.map(r => r.map(v => '"' + String(v).replace(/"/g,'""') + '"').join(',')).join('\n');
   const a = document.createElement('a');
   a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent('﻿' + csv);
-  a.download = `academy-elite-waitlist-${new Date().toISOString().slice(0,10)}.csv`;
+  a.download = 'academy-elite-waitlist-' + new Date().toISOString().slice(0,10) + '.csv';
   a.click();
 }
 </script>

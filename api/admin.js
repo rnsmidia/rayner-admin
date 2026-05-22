@@ -591,6 +591,15 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({ ok: true });
   }
 
+  if (action === 'academy-update-status') {
+    const { id, status } = req.body;
+    const valid = ['em_analise', 'selecionado', 'descartado'];
+    if (!id || !valid.includes(status)) return res.status(400).json({ error: 'Dados inválidos' });
+    const { error } = await supabase.from('academyelite_waitlist').update({ status }).eq('id', id);
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ ok: true });
+  }
+
   // ── ACADEMY ELITE — FUNIL ANALYTICS ──────────────────────────
   if (action === 'academy-funnel-stats') {
     const { data } = await supabase
