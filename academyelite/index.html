@@ -461,48 +461,121 @@ section { position: relative; }
    MARCOS SECTION
 ────────────────────────────────────────── */
 .sobre {
-  padding: 100px 0;
   background: var(--black);
-}
-
-.sobre-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 80px;
-  align-items: center;
-}
-
-.sobre-photo-wrap {
   position: relative;
-}
-
-.sobre-photo-frame {
-  position: relative;
-  aspect-ratio: 4/5;
   overflow: hidden;
-  background: #fff;
-  outline: 6px solid var(--black);
-  box-shadow: 0 0 0 1px rgba(201,162,39,0.35), 16px 16px 0 0 rgba(201,162,39,0.12);
 }
-.sobre-photo-frame::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border: 1px solid rgba(201,162,39,0.3);
-  z-index: 2;
-  pointer-events: none;
-}
-.sobre-photo-frame::after { display: none; }
 
-.sobre-photo-frame img {
+.sobre-split {
+  display: grid;
+  grid-template-columns: 55% 45%;
+  min-height: 80vh;
+}
+
+/* ── Imagem esquerda ── */
+.sobre-img-panel {
+  position: relative;
+  overflow: hidden;
+  background: #000;
+}
+.sobre-img-panel img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center top;
-  filter: contrast(1.05);
+  object-position: center center;
+  display: block;
+}
+.sobre-img-panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 50%, rgba(0,0,0,0.7) 80%, rgba(0,0,0,1) 100%);
 }
 
-/* Placeholder enquanto foto de perfil editada não está disponível */
+/* ── Texto direita ── */
+.sobre-text-panel {
+  background: var(--black);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 80px 70px 80px 50px;
+}
+
+.sobre-bio {
+  font-size: 15px;
+  color: var(--white-muted);
+  line-height: 1.8;
+  font-weight: 300;
+  margin-bottom: 20px;
+}
+.sobre-bio strong { color: var(--white); font-weight: 500; }
+
+.sobre-stats {
+  display: flex;
+  gap: 0;
+  margin-top: 48px;
+  padding-top: 0;
+  border-top: none;
+}
+
+.sobre-stat {
+  flex: 1;
+  text-align: center;
+  padding: 0 20px;
+  border-right: 1px solid rgba(201,162,39,0.25);
+}
+.sobre-stat:first-child { padding-left: 0; }
+.sobre-stat:last-child { border-right: none; }
+
+.sobre-stat-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 42px;
+  font-weight: 700;
+  color: var(--gold2);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.sobre-stat-label {
+  font-size: 11px;
+  color: var(--white-muted);
+  letter-spacing: 0.06em;
+  font-weight: 400;
+}
+
+/* ── Urgency strip redesenhada ── */
+.urgency-strip {
+  background: linear-gradient(135deg, #0a0800 0%, #111000 50%, #0a0800 100%);
+  border-top: 1px solid rgba(201,162,39,0.2);
+  border-bottom: 1px solid rgba(201,162,39,0.2);
+  padding: 56px 24px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.urgency-strip::before, .urgency-strip::after {
+  content: '';
+  position: absolute;
+  top: 50%; transform: translateY(-50%);
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(201,162,39,0.12) 0%, transparent 70%);
+}
+.urgency-strip::before { left: -100px; }
+.urgency-strip::after  { right: -100px; }
+
+.urgency-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(24px, 3.5vw, 44px);
+  font-weight: 600;
+  line-height: 1.3;
+  position: relative;
+  z-index: 1;
+}
+.urgency-text span { color: var(--white); }
+.urgency-text em { color: var(--gold2); font-style: italic; }
+
+/* placeholder legado */
 .sobre-photo-placeholder {
   width: 100%;
   height: 100%;
@@ -1052,66 +1125,57 @@ footer {
 
 <!-- ──── SOBRE MARCOS ──── -->
 <section class="sobre">
-  <div class="section-inner">
-    <div class="sobre-grid">
+  <div class="sobre-split">
 
-      <div class="sobre-photo-wrap fade-up">
-        <div class="sobre-photo-frame">
-          <!-- FOTO MARCOS perfil: use foto-perfil-marcos.jpg quando editada -->
-          <!-- Por ora, exibe uma das fotos originais -->
-          <img
-            src="/academyelite/images/marcos/foto-perfil-marcos.jpg"
-            alt="Marcos de Castro"
-            onerror="this.parentElement.innerHTML = '<div class=\'sobre-photo-placeholder\'><svg width=\'40\' height=\'40\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'1\'><path d=\'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2\'/><circle cx=\'12\' cy=\'7\' r=\'4\'/></svg><span style=\'font-size:11px;letter-spacing:.1em\'>FOTO MARCOS</span></div>'"
-          >
-        </div>
-        <div class="sobre-gold-accent"></div>
-      </div>
-
-      <div class="sobre-content">
-        <div class="section-label fade-up">Quem está por trás</div>
-        <h2 class="section-title fade-up fade-up-d1">
-          Marcos de Castro.<br>
-          <em>Operação real.</em>
-        </h2>
-
-        <p class="sobre-bio fade-up fade-up-d2">
-          <strong>Marcos de Castro</strong> não ensina teoria. Ele opera canais que escalam,
-          monetizam e se sustentam — e agora abre sua estrutura para um grupo
-          extremamente limitado de pessoas.
-        </p>
-
-        <p class="sobre-bio fade-up fade-up-d2">
-          Cada estratégia, cada ferramenta, cada encontro que você terá no
-          Elite Dark Academy vem de uma operação real, testada e validada.
-          Não é um curso. É acesso direto ao bastidor premium.
-        </p>
-
-        <div class="sobre-stats fade-up fade-up-d3">
-          <div>
-            <div class="sobre-stat-num">VIP</div>
-            <div class="sobre-stat-label">Vagas exclusivas</div>
-          </div>
-          <div>
-            <div class="sobre-stat-num">100%</div>
-            <div class="sobre-stat-label">Acesso à operação real</div>
-          </div>
-          <div>
-            <div class="sobre-stat-num">AO VIVO</div>
-            <div class="sobre-stat-label">Encontros estratégicos</div>
-          </div>
-        </div>
-      </div>
-
+    <!-- Esquerda: Marcos tech/analytics -->
+    <div class="sobre-img-panel fade-up">
+      <img src="/academyelite/images/marcos-operacao.jpg" alt="Marcos de Castro — Operação real">
     </div>
+
+    <!-- Direita: texto -->
+    <div class="sobre-text-panel">
+      <div class="section-label fade-up">Quem está por trás</div>
+      <h2 class="section-title fade-up fade-up-d1" style="margin-bottom:28px;">
+        Marcos de Castro.<br>
+        <em>Operação real.</em>
+      </h2>
+
+      <p class="sobre-bio fade-up fade-up-d2">
+        <strong>Marcos de Castro</strong> não ensina teoria. Ele opera canais que escalam,
+        monetizam e se sustentam — e agora abre sua estrutura para um grupo
+        extremamente limitado de pessoas.
+      </p>
+
+      <p class="sobre-bio fade-up fade-up-d2">
+        Cada estratégia, cada ferramenta, cada encontro que você terá no
+        Elite Dark Academy vem de uma operação real, testada e validada.
+        Não é um curso. É acesso direto ao bastidor premium.
+      </p>
+
+      <div class="sobre-stats fade-up fade-up-d3">
+        <div class="sobre-stat">
+          <div class="sobre-stat-num">VIP</div>
+          <div class="sobre-stat-label">Vagas exclusivas</div>
+        </div>
+        <div class="sobre-stat">
+          <div class="sobre-stat-num">100%</div>
+          <div class="sobre-stat-label">Acesso à operação real</div>
+        </div>
+        <div class="sobre-stat">
+          <div class="sobre-stat-num">AO VIVO</div>
+          <div class="sobre-stat-label">Encontros estratégicos</div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </section>
 
-<!-- ──── URGENCY ──── -->
+<!-- ──── URGENCY STRIP ──── -->
 <div class="urgency-strip">
   <div class="urgency-text">
-    <span>Depois disso,</span> meu foco será apenas no Academy.
-    <br><em style="font-size: 0.85em; opacity: 0.8;">Esta é minha despedida da proximidade aberta.</em>
+    Depois disso, <em>meu foco será apenas no Academy.</em><br>
+    <span style="font-size:0.7em;opacity:0.75;font-style:italic;">Esta é minha despedida da proximidade aberta.</span>
   </div>
 </div>
 
