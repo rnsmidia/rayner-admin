@@ -1185,6 +1185,8 @@ function showStep(id) {
   document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   updateProgress(id);
+  const hideHeader = id === 'step-success' || id === 'step-disq';
+  document.querySelector('.page-header').style.display = hideHeader ? 'none' : '';
   document.querySelector('.qual-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
