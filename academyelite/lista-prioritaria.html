@@ -11,8 +11,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --black: #000000;
-  --black2: #080808;
   --gold: #C9A227;
   --gold2: #D4AF37;
   --gold3: #E8C84A;
@@ -25,101 +23,200 @@
 html { scroll-behavior: smooth; }
 
 body {
-  background: var(--black);
+  background: #000;
   color: var(--white);
   font-family: 'Inter', sans-serif;
   font-size: 16px;
   line-height: 1.6;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  overflow-x: hidden;
 }
 
 a { color: inherit; text-decoration: none; }
 
-/* ── HEADER ─────────────────────────────── */
+/* ── FUNDO COM FOTO ──────────────────────────────── */
+.bg-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+.bg-layer img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: 30% center;
+  display: block;
+}
+.bg-layer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    rgba(0,0,0,0.92) 0%,
+    rgba(0,0,0,0.78) 40%,
+    rgba(0,0,0,0.65) 70%,
+    rgba(0,0,0,0.55) 100%
+  );
+}
+
+/* ── ESTRUTURA ───────────────────────────────────── */
+.page-wrap {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── HEADER ──────────────────────────────────────── */
 .page-header {
-  padding: 22px 32px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  border-bottom: 1px solid rgba(201,162,39,0.1);
+  justify-content: space-between;
+  padding: 24px 40px;
+  border-bottom: 1px solid rgba(201,162,39,0.12);
+  backdrop-filter: blur(6px);
+  background: rgba(0,0,0,0.3);
 }
-.header-logo img { height: 38px; width: auto; display: block; }
 
-/* ── MAIN ────────────────────────────────── */
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.45);
+  text-transform: uppercase;
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 8px 16px;
+  border-radius: 100px;
+  transition: all 0.25s;
+  cursor: pointer;
+  background: transparent;
+  font-family: 'Inter', sans-serif;
+}
+.btn-back:hover {
+  color: var(--white-dim);
+  border-color: rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.05);
+}
+.btn-back svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+.header-logo { display: flex; align-items: center; }
+.header-logo img { height: 36px; width: auto; display: block; }
+
+.header-spacer { width: 110px; }
+
+/* ── MAIN ────────────────────────────────────────── */
 .page-main {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 48px 24px;
+  padding: 40px 24px 60px;
 }
 
-/* ── CARD ────────────────────────────────── */
+/* ── CARD ────────────────────────────────────────── */
 .qual-card {
-  background: rgba(8,6,2,0.97);
-  border: 1px solid rgba(201,162,39,0.32);
-  border-radius: 20px;
-  padding: 56px 52px;
+  background: rgba(4,3,1,0.88);
+  border: 1px solid rgba(201,162,39,0.28);
+  border-radius: 22px;
+  padding: 52px 50px;
   width: 100%;
-  max-width: 560px;
+  max-width: 540px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 0 100px rgba(0,0,0,0.7), 0 0 0 1px rgba(201,162,39,0.05) inset;
+  backdrop-filter: blur(20px);
+  box-shadow:
+    0 0 0 1px rgba(201,162,39,0.05) inset,
+    0 32px 80px rgba(0,0,0,0.6),
+    0 0 120px rgba(0,0,0,0.4);
 }
+
+/* Glow dourado no topo do card */
 .qual-card::before {
   content: '';
   position: absolute;
-  top: -100px; left: 50%;
+  top: -60px; left: 50%;
   transform: translateX(-50%);
-  width: 320px; height: 320px;
-  background: radial-gradient(circle, rgba(201,162,39,0.05) 0%, transparent 65%);
+  width: 280px; height: 220px;
+  background: radial-gradient(ellipse, rgba(201,162,39,0.07) 0%, transparent 70%);
   pointer-events: none;
 }
 
-/* ── PROGRESS ────────────────────────────── */
+/* Logo marca d'água dentro do card */
+.qual-card::after {
+  content: '';
+  position: absolute;
+  bottom: -30px; right: -30px;
+  width: 220px; height: 220px;
+  background: url('/academyelite/images/logo-selo.png') center / contain no-repeat;
+  opacity: 0.04;
+  pointer-events: none;
+}
+
+/* ── LOGO NO CARD ────────────────────────────────── */
+.card-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 28px;
+}
+.card-logo img {
+  height: 52px;
+  width: auto;
+  filter: brightness(1.1);
+}
+
+/* ── DIVIDER DOURADO ─────────────────────────────── */
+.gold-divider {
+  width: 40px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  margin: 0 auto 28px;
+}
+
+/* ── PROGRESS ────────────────────────────────────── */
 .progress-bar {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  margin-bottom: 44px;
+  margin-bottom: 36px;
 }
 .progress-dot {
-  width: 8px; height: 8px;
+  width: 7px; height: 7px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.1);
   transition: all 0.4s;
   flex-shrink: 0;
 }
 .progress-dot.active {
   background: var(--gold);
-  box-shadow: 0 0 10px rgba(201,162,39,0.5);
-  width: 22px;
+  box-shadow: 0 0 8px rgba(201,162,39,0.5);
+  width: 20px;
   border-radius: 4px;
 }
-.progress-dot.done { background: rgba(201,162,39,0.45); }
+.progress-dot.done { background: rgba(201,162,39,0.4); }
 .progress-line {
-  width: 36px; height: 1px;
-  background: rgba(255,255,255,0.08);
+  width: 32px; height: 1px;
+  background: rgba(255,255,255,0.07);
   transition: background 0.4s;
   flex-shrink: 0;
 }
-.progress-line.done { background: rgba(201,162,39,0.35); }
+.progress-line.done { background: rgba(201,162,39,0.3); }
 
-/* ── STEPS ───────────────────────────────── */
+/* ── STEPS ───────────────────────────────────────── */
 .step { display: none; }
 .step.active {
   display: block;
-  animation: fadeInUp 0.35s ease forwards;
+  animation: fadeUp 0.35s ease forwards;
 }
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(14px); }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── STEP HEADER ─────────────────────────── */
+/* ── STEP HEADER ─────────────────────────────────── */
 .step-tag {
   display: inline-flex;
   align-items: center;
@@ -129,48 +226,48 @@ a { color: inherit; text-decoration: none; }
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--gold);
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 .step-tag::before {
   content: '';
   display: inline-block;
-  width: 18px; height: 1px;
+  width: 16px; height: 1px;
   background: var(--gold);
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
 .step-title {
   font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(28px, 5vw, 36px);
+  font-size: clamp(26px, 4.5vw, 34px);
   font-weight: 600;
   color: var(--white);
-  line-height: 1.18;
+  line-height: 1.2;
   margin-bottom: 8px;
 }
 .step-title em { font-style: italic; color: var(--gold2); }
 
 .step-sub {
-  font-size: 14px;
+  font-size: 13.5px;
   color: var(--white-muted);
   line-height: 1.65;
-  margin-bottom: 32px;
+  margin-bottom: 28px;
   font-weight: 300;
 }
 
-/* ── OPTIONS ─────────────────────────────── */
+/* ── OPTIONS ─────────────────────────────────────── */
 .options-list {
   display: flex;
   flex-direction: column;
-  gap: 11px;
-  margin-bottom: 28px;
+  gap: 10px;
+  margin-bottom: 24px;
 }
 
 .option-card {
   display: flex;
   align-items: flex-start;
-  gap: 14px;
-  padding: 17px 20px;
-  border: 1px solid rgba(255,255,255,0.09);
+  gap: 13px;
+  padding: 15px 18px;
+  border: 1px solid rgba(255,255,255,0.08);
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.22s;
@@ -178,19 +275,19 @@ a { color: inherit; text-decoration: none; }
   user-select: none;
 }
 .option-card:hover {
-  border-color: rgba(201,162,39,0.3);
+  border-color: rgba(201,162,39,0.28);
   background: rgba(201,162,39,0.03);
 }
 .option-card.selected {
-  border-color: rgba(201,162,39,0.75);
+  border-color: rgba(201,162,39,0.7);
   background: rgba(201,162,39,0.07);
-  box-shadow: 0 0 0 1px rgba(201,162,39,0.15) inset;
+  box-shadow: 0 0 0 1px rgba(201,162,39,0.12) inset;
 }
 
 .option-radio {
-  width: 20px; height: 20px;
+  width: 19px; height: 19px;
   border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.2);
+  border: 2px solid rgba(255,255,255,0.18);
   flex-shrink: 0;
   margin-top: 1px;
   display: flex;
@@ -210,7 +307,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .option-text {
-  font-size: 14px;
+  font-size: 13.5px;
   color: var(--white-muted);
   line-height: 1.5;
   font-weight: 300;
@@ -218,10 +315,10 @@ a { color: inherit; text-decoration: none; }
 }
 .option-card.selected .option-text { color: var(--white); font-weight: 400; }
 
-/* ── BOTÕES ──────────────────────────────── */
+/* ── BOTÃO PRÓXIMO ───────────────────────────────── */
 .btn-next {
   width: 100%;
-  padding: 17px;
+  padding: 16px;
   font-family: 'Inter', sans-serif;
   font-size: 12px;
   font-weight: 700;
@@ -237,16 +334,16 @@ a { color: inherit; text-decoration: none; }
   justify-content: center;
   gap: 10px;
   transition: all 0.3s;
-  box-shadow: 0 4px 20px rgba(201,162,39,0.2);
-  opacity: 0.35;
+  box-shadow: 0 4px 18px rgba(201,162,39,0.18);
+  opacity: 0.3;
   pointer-events: none;
 }
 .btn-next.enabled { opacity: 1; pointer-events: all; }
-.btn-next.enabled:hover { transform: translateY(-2px); box-shadow: 0 8px 36px rgba(201,162,39,0.38); }
+.btn-next.enabled:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(201,162,39,0.35); }
 .btn-next.enabled:active { transform: translateY(0); }
 
-/* ── FORM ────────────────────────────────── */
-.form-group { margin-bottom: 18px; }
+/* ── FORM ────────────────────────────────────────── */
+.form-group { margin-bottom: 17px; }
 
 .form-label {
   display: block;
@@ -261,28 +358,29 @@ a { color: inherit; text-decoration: none; }
 .form-input {
   width: 100%;
   background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.11);
+  border: 1px solid rgba(255,255,255,0.1);
   color: var(--white);
   font-family: 'Inter', sans-serif;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 300;
-  padding: 14px 18px;
+  padding: 13px 16px;
   outline: none;
   transition: all 0.22s;
   border-radius: 10px;
   -webkit-appearance: none;
+  appearance: none;
 }
-.form-input::placeholder { color: rgba(255,255,255,0.2); }
+.form-input::placeholder { color: rgba(255,255,255,0.18); }
 .form-input:focus {
   border-color: rgba(201,162,39,0.5);
   background: rgba(201,162,39,0.04);
   box-shadow: 0 0 0 3px rgba(201,162,39,0.07);
 }
-.form-input:hover:not(:focus) { border-color: rgba(255,255,255,0.16); }
+.form-input:hover:not(:focus) { border-color: rgba(255,255,255,0.15); }
 
 .phone-wrap {
   display: flex;
-  border: 1px solid rgba(255,255,255,0.11);
+  border: 1px solid rgba(255,255,255,0.1);
   border-radius: 10px;
   overflow: hidden;
   transition: all 0.22s;
@@ -292,29 +390,24 @@ a { color: inherit; text-decoration: none; }
   box-shadow: 0 0 0 3px rgba(201,162,39,0.07);
 }
 .phone-prefix-box {
-  background: rgba(255,255,255,0.05);
+  background: rgba(255,255,255,0.04);
   border: none;
-  border-right: 1px solid rgba(255,255,255,0.11);
+  border-right: 1px solid rgba(255,255,255,0.1);
   color: var(--white);
-  font-size: 14px;
-  padding: 14px 14px;
+  font-size: 13px;
+  padding: 13px 13px;
   white-space: nowrap;
   display: flex;
   align-items: center;
   flex-shrink: 0;
   font-weight: 300;
 }
-.phone-wrap .form-input {
-  border: none;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none !important;
-}
+.phone-wrap .form-input { border: none; border-radius: 0; background: transparent; box-shadow: none !important; }
 
 .btn-submit {
   width: 100%;
-  margin-top: 6px;
-  padding: 17px;
+  margin-top: 5px;
+  padding: 16px;
   font-family: 'Inter', sans-serif;
   font-size: 12px;
   font-weight: 700;
@@ -330,478 +423,413 @@ a { color: inherit; text-decoration: none; }
   justify-content: center;
   gap: 10px;
   transition: all 0.3s;
-  box-shadow: 0 4px 20px rgba(201,162,39,0.22);
+  box-shadow: 0 4px 18px rgba(201,162,39,0.2);
 }
-.btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 36px rgba(201,162,39,0.38); }
+.btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(201,162,39,0.35); }
 .btn-submit:active { transform: translateY(0); }
-.btn-submit:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+.btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-/* ── AVISO PREÇO (form) ───────────────────── */
+/* Aviso preço */
 .price-info {
   background: rgba(201,162,39,0.05);
-  border: 1px solid rgba(201,162,39,0.18);
-  border-radius: 11px;
-  padding: 15px 18px;
-  margin-bottom: 26px;
+  border: 1px solid rgba(201,162,39,0.16);
+  border-radius: 10px;
+  padding: 13px 16px;
+  margin-bottom: 22px;
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: 11px;
 }
-.price-info-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
-.price-info-text { font-size: 12.5px; color: var(--white-muted); line-height: 1.5; }
-.price-info-text strong { color: var(--gold2); font-size: 13px; display: block; margin-bottom: 2px; }
+.price-info-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.price-info-text { font-size: 12px; color: var(--white-muted); line-height: 1.5; }
+.price-info-text strong { color: var(--gold2); font-size: 12.5px; display: block; margin-bottom: 2px; }
 
-/* ── SUCCESS ─────────────────────────────── */
+/* ── SUCCESS ─────────────────────────────────────── */
 .success-icon {
-  width: 62px; height: 62px;
+  width: 60px; height: 60px;
   border-radius: 50%;
   background: rgba(201,162,39,0.08);
-  border: 1px solid rgba(201,162,39,0.28);
+  border: 1px solid rgba(201,162,39,0.26);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 22px;
+  margin: 0 auto 20px;
   color: var(--gold);
 }
-.success-icon svg { width: 26px; height: 26px; }
+.success-icon svg { width: 24px; height: 24px; }
 
 .success-title {
   font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(30px, 5vw, 38px);
+  font-size: clamp(28px, 5vw, 36px);
   font-weight: 600;
   text-align: center;
   line-height: 1.18;
   margin-bottom: 10px;
 }
 .success-title em { font-style: italic; color: var(--gold2); }
+
 .success-msg {
-  font-size: 14px;
+  font-size: 13.5px;
   color: var(--white-muted);
   text-align: center;
   line-height: 1.7;
   font-weight: 300;
-  margin-bottom: 28px;
+  margin-bottom: 26px;
 }
 
 .price-badge {
   background: rgba(201,162,39,0.06);
-  border: 1px solid rgba(201,162,39,0.22);
+  border: 1px solid rgba(201,162,39,0.2);
   border-radius: 14px;
-  padding: 22px 24px;
-  margin-bottom: 24px;
+  padding: 20px 22px;
+  margin-bottom: 22px;
   text-align: center;
 }
 .badge-label {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--gold);
-  display: block;
-  margin-bottom: 12px;
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--gold); display: block; margin-bottom: 11px;
 }
 .badge-price {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 44px;
-  font-weight: 700;
-  color: var(--white);
-  line-height: 1;
-  margin-bottom: 4px;
+  font-size: 42px; font-weight: 700;
+  color: var(--white); line-height: 1; margin-bottom: 4px;
 }
-.badge-installments { font-size: 14px; color: var(--white-muted); font-weight: 300; }
+.badge-installments { font-size: 13px; color: var(--white-muted); font-weight: 300; }
 .badge-saving {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--gold2);
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11.5px; font-weight: 600; color: var(--gold2);
   background: rgba(201,162,39,0.1);
-  padding: 5px 14px;
-  border-radius: 100px;
-  margin-top: 11px;
-  letter-spacing: 0.02em;
+  padding: 5px 13px; border-radius: 100px; margin-top: 10px;
 }
-.badge-saving svg { flex-shrink: 0; }
 .badge-original {
-  font-size: 11.5px;
-  color: rgba(255,255,255,0.28);
-  text-decoration: line-through;
-  margin-top: 6px;
-  display: block;
+  font-size: 11px; color: rgba(255,255,255,0.25);
+  text-decoration: line-through; margin-top: 5px; display: block;
 }
 
 .btn-whatsapp {
   width: 100%;
-  padding: 17px;
+  padding: 16px;
   font-family: 'Inter', sans-serif;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
+  font-size: 12px; font-weight: 700;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  border: none; border-radius: 10px; cursor: pointer;
   background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
   color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
   transition: all 0.3s;
-  box-shadow: 0 4px 20px rgba(34,197,94,0.22);
-  text-decoration: none;
-  margin-bottom: 14px;
+  box-shadow: 0 4px 18px rgba(34,197,94,0.2);
+  text-decoration: none; margin-bottom: 12px;
 }
-.btn-whatsapp:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(34,197,94,0.32); }
+.btn-whatsapp:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(34,197,94,0.3); }
 
-.success-note {
-  text-align: center;
-  font-size: 12px;
-  color: rgba(255,255,255,0.3);
-  letter-spacing: 0.02em;
-}
+.success-note { text-align: center; font-size: 11.5px; color: rgba(255,255,255,0.28); }
 
-/* ── DESCLASSIFICADO ─────────────────────── */
+/* ── DESCLASSIFICADO ─────────────────────────────── */
 .disq-icon {
-  width: 54px; height: 54px;
-  border-radius: 50%;
+  width: 52px; height: 52px; border-radius: 50%;
   background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 22px;
-  color: var(--white-muted);
+  border: 1px solid rgba(255,255,255,0.09);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 20px; color: var(--white-muted);
 }
 .disq-title {
   font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(26px, 5vw, 32px);
-  font-weight: 600;
-  text-align: center;
-  margin-bottom: 10px;
-  color: var(--white);
+  font-size: clamp(24px, 4.5vw, 30px); font-weight: 600;
+  text-align: center; margin-bottom: 10px;
 }
 .disq-msg {
-  font-size: 14px;
-  color: var(--white-muted);
-  text-align: center;
-  line-height: 1.7;
-  font-weight: 300;
-  margin-bottom: 28px;
+  font-size: 13.5px; color: var(--white-muted);
+  text-align: center; line-height: 1.7;
+  font-weight: 300; margin-bottom: 26px;
 }
 .btn-disq-notify {
-  width: 100%;
-  padding: 16px;
-  font-family: 'Inter', sans-serif;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 10px;
-  cursor: pointer;
-  background: transparent;
-  color: var(--white-muted);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  transition: all 0.25s;
-  margin-top: 6px;
+  width: 100%; padding: 15px;
+  font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;
+  letter-spacing: 0.13em; text-transform: uppercase;
+  border: 1px solid rgba(255,255,255,0.13); border-radius: 10px;
+  cursor: pointer; background: transparent; color: var(--white-muted);
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  transition: all 0.25s; margin-top: 5px;
 }
-.btn-disq-notify:hover {
-  border-color: rgba(255,255,255,0.28);
-  color: var(--white);
-  background: rgba(255,255,255,0.04);
-}
-.btn-disq-notify:disabled { opacity: 0.4; cursor: not-allowed; }
-.disq-ok {
-  text-align: center;
-  font-size: 13px;
-  color: var(--gold2);
-  padding-top: 10px;
-  display: none;
-}
+.btn-disq-notify:hover { border-color: rgba(255,255,255,0.25); color: var(--white); background: rgba(255,255,255,0.04); }
+.btn-disq-notify:disabled { opacity: 0.35; cursor: not-allowed; }
+.disq-ok { text-align: center; font-size: 13px; color: var(--gold2); padding-top: 10px; display: none; }
 
-/* ── FOOTER ──────────────────────────────── */
+/* ── FOOTER ──────────────────────────────────────── */
 .page-footer {
+  position: relative; z-index: 1;
   padding: 18px 24px;
   text-align: center;
-  font-size: 11.5px;
-  color: rgba(255,255,255,0.2);
+  font-size: 11px; color: rgba(255,255,255,0.2);
   border-top: 1px solid rgba(255,255,255,0.05);
   letter-spacing: 0.04em;
+  backdrop-filter: blur(6px);
+  background: rgba(0,0,0,0.3);
 }
 
-/* ── RESPONSIVE ──────────────────────────── */
+/* ── RESPONSIVE ──────────────────────────────────── */
 @media (max-width: 600px) {
+  .page-header { padding: 18px 20px; }
+  .header-spacer { width: 80px; }
   .qual-card { padding: 36px 22px; }
-  .step-title { font-size: 26px; }
-  .badge-price { font-size: 36px; }
+  .card-logo img { height: 42px; }
 }
 </style>
 </head>
 <body>
 
-<header class="page-header">
-  <div class="header-logo">
-    <img src="/academyelite/images/marcos/logo-academyelite.png" alt="Elite Dark Academy">
-  </div>
-</header>
+<!-- Fundo com foto do Marcos -->
+<div class="bg-layer">
+  <img src="/academyelite/images/marcos/hero-banner.jpg" alt="" aria-hidden="true">
+</div>
 
-<main class="page-main">
-  <div class="qual-card">
+<div class="page-wrap">
 
-    <!-- Barra de progresso -->
-    <div class="progress-bar" id="progress-bar">
-      <div class="progress-dot active" id="dot-1"></div>
-      <div class="progress-line" id="line-1"></div>
-      <div class="progress-dot" id="dot-2"></div>
-      <div class="progress-line" id="line-2"></div>
-      <div class="progress-dot" id="dot-3"></div>
+  <!-- HEADER -->
+  <header class="page-header">
+    <button class="btn-back" onclick="history.back()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      Voltar
+    </button>
+
+    <div class="header-logo">
+      <img src="/academyelite/images/marcos/logo-academyelite.png" alt="Elite Dark Academy">
     </div>
 
-    <!-- ═══════════════════════════════════════
-         PASSO 1 — Situação atual
-    ═══════════════════════════════════════ -->
-    <div class="step active" id="step-1">
-      <div class="step-tag">Passo 1 de 2</div>
-      <h2 class="step-title">Qual é sua situação<br><em>hoje?</em></h2>
-      <p class="step-sub">Escolha a opção que melhor te descreve.</p>
+    <div class="header-spacer"></div>
+  </header>
 
-      <div class="options-list" data-group="1">
-        <div class="option-card" data-value="a">
-          <div class="option-radio"></div>
-          <span class="option-text">Tenho canal ativo e quero escalar views e monetização</span>
-        </div>
-        <div class="option-card" data-value="b">
-          <div class="option-radio"></div>
-          <span class="option-text">Tenho resultados, mas preciso de estrutura para crescer mais rápido</span>
-        </div>
-        <div class="option-card" data-value="c">
-          <div class="option-radio"></div>
-          <span class="option-text">Estou começando e quero evitar os erros que atrasam o crescimento</span>
-        </div>
+  <!-- MAIN -->
+  <main class="page-main">
+    <div class="qual-card">
+
+      <!-- Logo dentro do card -->
+      <div class="card-logo">
+        <img src="/academyelite/images/logo-tipografia.png" alt="Elite Dark Academy">
+      </div>
+      <div class="gold-divider"></div>
+
+      <!-- Barra de progresso -->
+      <div class="progress-bar" id="progress-bar">
+        <div class="progress-dot active" id="dot-1"></div>
+        <div class="progress-line" id="line-1"></div>
+        <div class="progress-dot" id="dot-2"></div>
+        <div class="progress-line" id="line-2"></div>
+        <div class="progress-dot" id="dot-3"></div>
       </div>
 
-      <button class="btn-next" id="btn-next-1">
-        Continuar
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-      </button>
-    </div>
+      <!-- ═══════════════════════════════════════
+           PASSO 1 — Situação atual
+      ═══════════════════════════════════════ -->
+      <div class="step active" id="step-1">
+        <div class="step-tag">Passo 1 de 2</div>
+        <h2 class="step-title">Qual é sua situação<br><em>hoje?</em></h2>
+        <p class="step-sub">Escolha a opção que melhor te descreve.</p>
 
-    <!-- ═══════════════════════════════════════
-         PASSO 2 — Filtro financeiro
-    ═══════════════════════════════════════ -->
-    <div class="step" id="step-2">
-      <div class="step-tag">Passo 2 de 2</div>
-      <h2 class="step-title">Você está pronto para<br><em>investir agora?</em></h2>
-      <p class="step-sub">Seja honesto — isso nos ajuda a entender se podemos te ajudar neste momento.</p>
-
-      <div class="options-list" data-group="2">
-        <div class="option-card" data-value="a">
-          <div class="option-radio"></div>
-          <span class="option-text">Sim — quando a oportunidade certa aparece, eu ajo</span>
-        </div>
-        <div class="option-card" data-value="b">
-          <div class="option-radio"></div>
-          <span class="option-text">Quero entender melhor o que inclui antes de decidir</span>
-        </div>
-        <div class="option-card" data-value="c">
-          <div class="option-radio"></div>
-          <span class="option-text">No momento não tenho como investir</span>
-        </div>
-      </div>
-
-      <button class="btn-next" id="btn-next-2">
-        Continuar
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-      </button>
-    </div>
-
-    <!-- ═══════════════════════════════════════
-         PASSO 3 — Preenchimento dos dados
-    ═══════════════════════════════════════ -->
-    <div class="step" id="step-3">
-      <div class="step-tag">Quase lá</div>
-      <h2 class="step-title">Garantir minha<br><em>vaga VIP</em></h2>
-      <p class="step-sub">Preencha seus dados para confirmar sua posição na lista prioritária.</p>
-
-      <div class="price-info">
-        <span class="price-info-icon">🔒</span>
-        <div class="price-info-text">
-          <strong>Vaga prioritária — condição exclusiva</strong>
-          Lista: R$1.997 &nbsp;·&nbsp; No lançamento fora da lista: R$2.997
-        </div>
-      </div>
-
-      <form id="qual-form" novalidate>
-        <div class="form-group">
-          <label class="form-label" for="f-nome">Nome completo</label>
-          <input class="form-input" type="text" id="f-nome" name="nome" placeholder="Seu nome" autocomplete="name" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="f-email">E-mail</label>
-          <input class="form-input" type="email" id="f-email" name="email" placeholder="seu@email.com" autocomplete="email" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="f-whatsapp">WhatsApp</label>
-          <div class="phone-wrap">
-            <span class="phone-prefix-box">🇧🇷 +55</span>
-            <input class="form-input" type="tel" id="f-whatsapp" name="whatsapp" placeholder="(00) 00000-0000" autocomplete="tel">
+        <div class="options-list" data-group="1">
+          <div class="option-card" data-value="a">
+            <div class="option-radio"></div>
+            <span class="option-text">Tenho canal ativo e quero escalar views e monetização</span>
+          </div>
+          <div class="option-card" data-value="b">
+            <div class="option-radio"></div>
+            <span class="option-text">Tenho resultados, mas preciso de estrutura para crescer mais rápido</span>
+          </div>
+          <div class="option-card" data-value="c">
+            <div class="option-radio"></div>
+            <span class="option-text">Estou começando e quero evitar os erros que atrasam o crescimento</span>
           </div>
         </div>
-        <button type="submit" class="btn-submit" id="f-submit">
-          Confirmar minha vaga
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+
+        <button class="btn-next" id="btn-next-1">
+          Continuar
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
-      </form>
-    </div>
-
-    <!-- ═══════════════════════════════════════
-         SUCESSO — Acesso liberado
-    ═══════════════════════════════════════ -->
-    <div class="step" id="step-success">
-      <div class="success-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <polyline points="20 6 9 17 4 12"/>
-        </svg>
       </div>
 
-      <h2 class="success-title">Você está na<br><em>lista VIP.</em></h2>
-      <p class="success-msg">
-        Sua vaga foi confirmada. Quando o Elite Dark Academy abrir,<br>
-        você terá acesso primeiro — com a condição exclusiva de lista.
-      </p>
+      <!-- ═══════════════════════════════════════
+           PASSO 2 — Filtro financeiro
+      ═══════════════════════════════════════ -->
+      <div class="step" id="step-2">
+        <div class="step-tag">Passo 2 de 2</div>
+        <h2 class="step-title">Você está pronto para<br><em>investir agora?</em></h2>
+        <p class="step-sub">Seja honesto — isso nos ajuda a entender se podemos te ajudar neste momento.</p>
 
-      <div class="price-badge">
-        <span class="badge-label">Sua condição de lista prioritária</span>
-        <div class="badge-price">R$1.997</div>
-        <div class="badge-installments">ou 12x de R$206,54</div>
-        <div class="badge-saving">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-          Você economiza R$1.000 vs. lançamento
+        <div class="options-list" data-group="2">
+          <div class="option-card" data-value="a">
+            <div class="option-radio"></div>
+            <span class="option-text">Sim — quando a oportunidade certa aparece, eu ajo</span>
+          </div>
+          <div class="option-card" data-value="b">
+            <div class="option-radio"></div>
+            <span class="option-text">Quero entender melhor o que inclui antes de decidir</span>
+          </div>
+          <div class="option-card" data-value="c">
+            <div class="option-radio"></div>
+            <span class="option-text">No momento não tenho como investir</span>
+          </div>
         </div>
-        <span class="badge-original">De R$5.997 &nbsp;·&nbsp; Fora da lista no lançamento: R$2.997</span>
+
+        <button class="btn-next" id="btn-next-2">
+          Continuar
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
       </div>
 
-      <a
-        href="https://chat.whatsapp.com/IcnFbVkXwNbG1VTXqxPulm?mode=gi_t"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="btn-whatsapp"
-      >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-        </svg>
-        Entrar no Grupo VIP
-      </a>
+      <!-- ═══════════════════════════════════════
+           PASSO 3 — Dados
+      ═══════════════════════════════════════ -->
+      <div class="step" id="step-3">
+        <div class="step-tag">Quase lá</div>
+        <h2 class="step-title">Garantir minha<br><em>vaga VIP</em></h2>
+        <p class="step-sub">Preencha seus dados para confirmar sua posição na lista prioritária.</p>
 
-      <p class="success-note">O link também será enviado para o seu e-mail.</p>
+        <div class="price-info">
+          <span class="price-info-icon">🔒</span>
+          <div class="price-info-text">
+            <strong>Condição exclusiva de lista</strong>
+            Na lista: R$1.997 &nbsp;·&nbsp; Fora da lista no lançamento: R$2.997
+          </div>
+        </div>
+
+        <form id="qual-form" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="f-nome">Nome completo</label>
+            <input class="form-input" type="text" id="f-nome" name="nome" placeholder="Seu nome" autocomplete="name" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="f-email">E-mail</label>
+            <input class="form-input" type="email" id="f-email" name="email" placeholder="seu@email.com" autocomplete="email" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="f-whatsapp">WhatsApp</label>
+            <div class="phone-wrap">
+              <span class="phone-prefix-box">🇧🇷 +55</span>
+              <input class="form-input" type="tel" id="f-whatsapp" name="whatsapp" placeholder="(00) 00000-0000" autocomplete="tel">
+            </div>
+          </div>
+          <button type="submit" class="btn-submit" id="f-submit">
+            Confirmar minha vaga
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </form>
+      </div>
+
+      <!-- ═══════════════════════════════════════
+           SUCESSO
+      ═══════════════════════════════════════ -->
+      <div class="step" id="step-success">
+        <div class="success-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+        <h2 class="success-title">Você está na<br><em>lista VIP.</em></h2>
+        <p class="success-msg">
+          Sua vaga foi confirmada. Quando o Elite Dark Academy abrir,<br>
+          você terá acesso primeiro — com condição exclusiva de lista.
+        </p>
+        <div class="price-badge">
+          <span class="badge-label">Sua condição de lista prioritária</span>
+          <div class="badge-price">R$1.997</div>
+          <div class="badge-installments">ou 12x de R$206,54</div>
+          <div class="badge-saving">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            Você economiza R$1.000 vs. lançamento
+          </div>
+          <span class="badge-original">De R$5.997 &nbsp;·&nbsp; Fora da lista: R$2.997</span>
+        </div>
+        <a href="https://chat.whatsapp.com/IcnFbVkXwNbG1VTXqxPulm?mode=gi_t" target="_blank" rel="noopener noreferrer" class="btn-whatsapp">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+          </svg>
+          Entrar no Grupo VIP
+        </a>
+        <p class="success-note">O link também será enviado para o seu e-mail.</p>
+      </div>
+
+      <!-- ═══════════════════════════════════════
+           DESCLASSIFICADO
+      ═══════════════════════════════════════ -->
+      <div class="step" id="step-disq">
+        <div class="disq-icon">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 8v4M12 16h.01" stroke-width="2"/>
+          </svg>
+        </div>
+        <h2 class="disq-title">Entendemos a<br>sua situação.</h2>
+        <p class="disq-msg">
+          Parece que esse não é o momento ideal para você.<br><br>
+          Quando as condições estiverem certas, a Elite Dark Academy estará aqui.
+          Deixe seu e-mail e te avisamos quando reabrirmos.
+        </p>
+        <div class="form-group">
+          <label class="form-label" for="d-email">Seu e-mail</label>
+          <input class="form-input" type="email" id="d-email" placeholder="seu@email.com" autocomplete="email">
+        </div>
+        <button class="btn-disq-notify" id="btn-disq-notify">
+          Me avise na próxima oportunidade
+        </button>
+        <p class="disq-ok" id="disq-ok">✓ Anotado. Você será notificado quando abrirmos novamente.</p>
+      </div>
+
     </div>
+  </main>
 
-    <!-- ═══════════════════════════════════════
-         DESCLASSIFICADO — Não é o momento
-    ═══════════════════════════════════════ -->
-    <div class="step" id="step-disq">
-      <div class="disq-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <circle cx="12" cy="12" r="10"/>
-          <path d="M12 8v4M12 16h.01" stroke-width="2"/>
-        </svg>
-      </div>
+  <footer class="page-footer">
+    © 2026 Elite Dark Academy &nbsp;·&nbsp; Marcos de Castro &nbsp;·&nbsp; Todos os direitos reservados
+  </footer>
 
-      <h2 class="disq-title">Entendemos a<br>sua situação.</h2>
-      <p class="disq-msg">
-        Parece que esse não é o momento ideal para você.<br><br>
-        Quando as condições estiverem certas, a Elite Dark Academy estará aqui.
-        Deixe seu e-mail abaixo e te avisamos na próxima abertura.
-      </p>
-
-      <div class="form-group">
-        <label class="form-label" for="d-email">Seu e-mail</label>
-        <input class="form-input" type="email" id="d-email" placeholder="seu@email.com" autocomplete="email">
-      </div>
-
-      <button class="btn-disq-notify" id="btn-disq-notify">
-        Me avise na próxima oportunidade
-      </button>
-
-      <p class="disq-ok" id="disq-ok">✓ Anotado. Você será notificado quando abrirmos novamente.</p>
-    </div>
-
-  </div>
-</main>
-
-<footer class="page-footer">
-  © 2026 Elite Dark Academy &nbsp;·&nbsp; Marcos de Castro &nbsp;·&nbsp; Todos os direitos reservados
-</footer>
+</div><!-- /.page-wrap -->
 
 <script>
-// ── Estado global ──────────────────────────────────────────────────────────────
-let q1 = null;
-let q2 = null;
+let q1 = null, q2 = null;
 
-// ── Seleção de opções ──────────────────────────────────────────────────────────
 document.querySelectorAll('.options-list').forEach(list => {
   list.querySelectorAll('.option-card').forEach(card => {
     card.addEventListener('click', function () {
       list.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
       this.classList.add('selected');
-
-      const group = list.dataset.group;
-      const val   = this.dataset.value;
-
-      if (group === '1') { q1 = val; document.getElementById('btn-next-1').classList.add('enabled'); }
-      if (group === '2') { q2 = val; document.getElementById('btn-next-2').classList.add('enabled'); }
+      const g = list.dataset.group, v = this.dataset.value;
+      if (g === '1') { q1 = v; document.getElementById('btn-next-1').classList.add('enabled'); }
+      if (g === '2') { q2 = v; document.getElementById('btn-next-2').classList.add('enabled'); }
     });
   });
 });
 
-// ── Navegação entre passos ─────────────────────────────────────────────────────
 function showStep(id) {
   document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   updateProgress(id);
+  document.querySelector('.qual-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function updateProgress(id) {
   const map = { 'step-1': 1, 'step-2': 2, 'step-3': 3, 'step-success': 3 };
   const cur  = map[id] ?? 0;
-
-  ['dot-1','dot-2','dot-3'].forEach((dotId, i) => {
-    const dot = document.getElementById(dotId);
-    dot.classList.remove('active','done');
-    if (i + 1 < cur)      dot.classList.add('done');
-    else if (i + 1 === cur) dot.classList.add('active');
+  ['dot-1','dot-2','dot-3'].forEach((dId, i) => {
+    const d = document.getElementById(dId);
+    d.classList.remove('active','done');
+    if (i + 1 < cur) d.classList.add('done');
+    else if (i + 1 === cur) d.classList.add('active');
   });
-  ['line-1','line-2'].forEach((lineId, i) => {
-    const line = document.getElementById(lineId);
-    line.classList.toggle('done', i + 1 < cur);
+  ['line-1','line-2'].forEach((lId, i) => {
+    document.getElementById(lId).classList.toggle('done', i + 1 < cur);
   });
 }
 
-// ── Passo 1 → Passo 2 ─────────────────────────────────────────────────────────
-document.getElementById('btn-next-1').addEventListener('click', () => {
-  if (!q1) return;
-  showStep('step-2');
-});
+document.getElementById('btn-next-1').addEventListener('click', () => { if (q1) showStep('step-2'); });
 
-// ── Passo 2 → Form ou Desclassificado ─────────────────────────────────────────
 document.getElementById('btn-next-2').addEventListener('click', () => {
   if (!q2) return;
-
-  if (q2 === 'c') {
-    document.getElementById('progress-bar').style.display = 'none';
-    showStep('step-disq');
-    return;
-  }
-
+  if (q2 === 'c') { document.getElementById('progress-bar').style.display = 'none'; showStep('step-disq'); return; }
   showStep('step-3');
 });
 
-// ── Máscara de telefone ────────────────────────────────────────────────────────
 document.getElementById('f-whatsapp').addEventListener('input', function () {
   let v = this.value.replace(/\D/g, '').slice(0, 11);
   if      (v.length >= 7) v = v.replace(/^(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
@@ -810,58 +838,33 @@ document.getElementById('f-whatsapp').addEventListener('input', function () {
   this.value = v;
 });
 
-// ── Submissão do formulário principal ─────────────────────────────────────────
 document.getElementById('qual-form').addEventListener('submit', async function (e) {
   e.preventDefault();
-
   const nome     = document.getElementById('f-nome').value.trim();
   const email    = document.getElementById('f-email').value.trim();
   const whatsapp = document.getElementById('f-whatsapp').value.trim();
-
   if (!nome || nome.length < 2) { alert('Por favor, insira seu nome.'); return; }
   if (!email || !email.includes('@')) { alert('Por favor, insira um e-mail válido.'); return; }
-
   const btn = document.getElementById('f-submit');
-  btn.textContent = 'Confirmando...';
-  btn.disabled = true;
-
+  btn.textContent = 'Confirmando...'; btn.disabled = true;
   try {
-    const res  = await fetch('/api/academyelite-waitlist', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ nome, email, whatsapp, q1, q2 }),
-    });
+    const res  = await fetch('/api/academyelite-waitlist', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome, email, whatsapp, q1, q2 }) });
     const data = await res.json();
-
-    if (res.ok || data.ok) {
-      document.getElementById('progress-bar').style.visibility = 'hidden';
-      showStep('step-success');
-    } else {
-      throw new Error(data.error || 'Erro ao enviar');
-    }
+    if (res.ok || data.ok) { document.getElementById('progress-bar').style.visibility = 'hidden'; showStep('step-success'); }
+    else throw new Error(data.error || 'Erro');
   } catch (err) {
     console.error(err);
-    btn.innerHTML = 'Confirmar minha vaga <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+    btn.innerHTML = 'Confirmar minha vaga <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
     btn.disabled = false;
-    alert('Ocorreu um erro. Por favor, tente novamente.');
+    alert('Ocorreu um erro. Tente novamente.');
   }
 });
 
-// ── Botão "avise-me" na tela de desclassificado ────────────────────────────────
 document.getElementById('btn-disq-notify').addEventListener('click', async function () {
   const email = document.getElementById('d-email').value.trim();
   if (!email || !email.includes('@')) { alert('Insira um e-mail válido.'); return; }
-
   this.disabled = true;
-
-  try {
-    await fetch('/api/academyelite-waitlist', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ nome: 'Futuro Lead', email, whatsapp: '', q1, q2: 'c', disqualified: true }),
-    });
-  } catch (_) {}
-
+  try { await fetch('/api/academyelite-waitlist', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome: 'Futuro Lead', email, whatsapp: '', q1, q2: 'c', disqualified: true }) }); } catch (_) {}
   document.getElementById('disq-ok').style.display = 'block';
   document.getElementById('d-email').style.display  = 'none';
   this.style.display = 'none';
