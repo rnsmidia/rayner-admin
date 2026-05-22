@@ -664,22 +664,39 @@ a { color: inherit; text-decoration: none; }
 .offer-closing strong { color: var(--white); font-weight: 500; }
 
 /* ── DESCLASSIFICADO ─────────────────────────────── */
-.disq-icon {
-  width: 52px; height: 52px; border-radius: 50%;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.09);
-  display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 20px; color: var(--white-muted);
+.disq-seal {
+  display: flex; justify-content: center;
+  margin-bottom: 22px;
+}
+.disq-seal img {
+  width: 90px; height: 90px; border-radius: 50%;
+  filter: grayscale(1) brightness(0.55) sepia(0.2);
+  opacity: 0.7;
 }
 .disq-title {
   font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(24px, 4.5vw, 30px); font-weight: 600;
-  text-align: center; margin-bottom: 10px;
+  font-size: clamp(24px, 4.5vw, 32px); font-weight: 600;
+  text-align: center; margin-bottom: 10px; line-height: 1.2;
+}
+.disq-subtitle {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.2em;
+  text-transform: uppercase; color: rgba(255,255,255,0.3);
+  text-align: center; margin-bottom: 18px;
 }
 .disq-msg {
   font-size: 13.5px; color: var(--white-muted);
-  text-align: center; line-height: 1.7;
-  font-weight: 300; margin-bottom: 26px;
+  text-align: center; line-height: 1.75;
+  font-weight: 300; margin-bottom: 24px;
+}
+.disq-divider {
+  width: 100%; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+  margin-bottom: 22px;
+}
+.disq-notify-label {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.14em;
+  text-transform: uppercase; color: rgba(255,255,255,0.35);
+  text-align: center; margin-bottom: 12px;
 }
 .btn-disq-notify {
   width: 100%; padding: 15px;
@@ -688,11 +705,14 @@ a { color: inherit; text-decoration: none; }
   border: 1px solid rgba(255,255,255,0.13); border-radius: 10px;
   cursor: pointer; background: transparent; color: var(--white-muted);
   display: flex; align-items: center; justify-content: center; gap: 10px;
-  transition: all 0.25s; margin-top: 5px;
+  transition: all 0.25s; margin-top: 10px;
 }
 .btn-disq-notify:hover { border-color: rgba(255,255,255,0.25); color: var(--white); background: rgba(255,255,255,0.04); }
 .btn-disq-notify:disabled { opacity: 0.35; cursor: not-allowed; }
-.disq-ok { text-align: center; font-size: 13px; color: var(--gold2); padding-top: 10px; display: none; }
+.disq-ok {
+  text-align: center; font-size: 13px; color: rgba(255,255,255,0.5);
+  padding-top: 14px; display: none; line-height: 1.6;
+}
 
 /* ── SUCCESS REDESIGN ────────────────────────────── */
 .success-seal {
@@ -1102,26 +1122,31 @@ a { color: inherit; text-decoration: none; }
            DESCLASSIFICADO
       ═══════════════════════════════════════ -->
       <div class="step" id="step-disq">
-        <div class="disq-icon">
-          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <circle cx="12" cy="12" r="10"/>
-            <path d="M12 8v4M12 16h.01" stroke-width="2"/>
-          </svg>
+
+        <div class="disq-seal">
+          <img src="/academyelite/images/logoouro.png" alt="Elite Dark Academy">
         </div>
-        <h2 class="disq-title">Entendemos a<br>sua situação.</h2>
+
+        <div class="disq-subtitle">Elite Dark Academy</div>
+        <h2 class="disq-title">Este não é<br>o seu momento.</h2>
         <p class="disq-msg">
-          Parece que esse não é o momento ideal para você.<br><br>
-          Quando as condições estiverem certas, a Elite Dark Academy estará aqui.
-          Deixe seu e-mail e te avisamos quando reabrirmos.
+          Construir um negócio sólido exige mais do que vontade —
+          exige timing. Se as condições financeiras não estão certas agora,
+          respeitar isso já é um sinal de maturidade.
         </p>
+
+        <div class="disq-divider"></div>
+
+        <div class="disq-notify-label">Quando estiver pronto, estaremos aqui</div>
         <div class="form-group">
-          <label class="form-label" for="d-email">Seu e-mail</label>
-          <input class="form-input" type="email" id="d-email" placeholder="seu@email.com" autocomplete="email">
+          <input class="form-input" type="email" id="d-email" placeholder="seu@email.com" autocomplete="email" style="text-align:center">
         </div>
         <button class="btn-disq-notify" id="btn-disq-notify">
-          Me avise na próxima oportunidade
+          Quero ser avisado na próxima abertura
         </button>
-        <p class="disq-ok" id="disq-ok">✓ Anotado. Você será notificado quando abrirmos novamente.</p>
+        <p class="disq-ok" id="disq-ok">
+          Anotado. Você será o primeiro a saber<br>quando abrirmos novamente.
+        </p>
       </div>
 
     </div>
@@ -1185,8 +1210,10 @@ function showStep(id) {
   document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   updateProgress(id);
-  const hideHeader = id === 'step-success' || id === 'step-disq';
-  document.querySelector('.page-header').style.display = hideHeader ? 'none' : '';
+  const isEnd = id === 'step-success' || id === 'step-disq';
+  document.querySelector('.page-header').style.display = isEnd ? 'none' : '';
+  document.querySelector('.card-logo').style.display   = isEnd ? 'none' : '';
+  document.querySelector('.gold-divider').style.display = isEnd ? 'none' : '';
   document.querySelector('.qual-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
