@@ -694,6 +694,132 @@ a { color: inherit; text-decoration: none; }
 .btn-disq-notify:disabled { opacity: 0.35; cursor: not-allowed; }
 .disq-ok { text-align: center; font-size: 13px; color: var(--gold2); padding-top: 10px; display: none; }
 
+/* ── SUCCESS REDESIGN ────────────────────────────── */
+.success-seal {
+  display: flex; justify-content: center;
+  margin-bottom: 20px;
+  position: relative;
+}
+.success-seal img {
+  width: 110px; height: 110px;
+  border-radius: 50%;
+  filter: drop-shadow(0 0 28px rgba(201,162,39,0.35)) drop-shadow(0 0 8px rgba(201,162,39,0.2));
+  animation: sealGlow 3s ease-in-out infinite alternate;
+}
+@keyframes sealGlow {
+  from { filter: drop-shadow(0 0 18px rgba(201,162,39,0.25)) drop-shadow(0 0 6px rgba(201,162,39,0.15)); }
+  to   { filter: drop-shadow(0 0 36px rgba(201,162,39,0.5))  drop-shadow(0 0 12px rgba(201,162,39,0.3)); }
+}
+
+/* Pilares principais */
+.pillars-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.pillar-card {
+  background: rgba(201,162,39,0.05);
+  border: 1px solid rgba(201,162,39,0.18);
+  border-radius: 12px;
+  padding: 14px 10px;
+  text-align: center;
+}
+.pillar-icon { font-size: 22px; margin-bottom: 6px; line-height: 1; }
+.pillar-name {
+  font-size: 11px; font-weight: 600;
+  color: var(--white); line-height: 1.3;
+  margin-bottom: 6px;
+}
+.pillar-val {
+  font-size: 11px; color: var(--gold2); font-weight: 500;
+  background: rgba(201,162,39,0.1);
+  padding: 2px 8px; border-radius: 20px; display: inline-block;
+}
+
+/* Lista compacta 2 colunas */
+.vstack-section-label {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--gold);
+  margin-bottom: 10px; opacity: 0.7;
+}
+.vstack-compact {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 0; margin-bottom: 18px;
+  border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; overflow: hidden;
+}
+.vci {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 9px 11px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  border-right: 1px solid rgba(255,255,255,0.05);
+  transition: background 0.2s;
+}
+.vci:nth-child(even) { border-right: none; }
+.vci:nth-last-child(-n+2) { border-bottom: none; }
+.vci:hover { background: rgba(255,255,255,0.02); }
+.vci-check { color: var(--gold); font-size: 9px; flex-shrink: 0; margin-top: 3px; line-height: 1; }
+.vci-name {
+  font-size: 11.5px; color: var(--white-dim); line-height: 1.3; font-weight: 400;
+  flex: 1;
+}
+.vci-val {
+  font-size: 10px; color: rgba(255,255,255,0.28);
+  white-space: nowrap; flex-shrink: 0; font-weight: 300;
+  align-self: flex-start; margin-top: 1px;
+}
+
+/* Âncora de preço redesenhada */
+.price-anchor-wrap {
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(201,162,39,0.22);
+  border-radius: 16px; overflow: hidden;
+  margin-bottom: 18px;
+  position: relative;
+}
+.price-anchor-wrap::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.pa-rows {
+  padding: 16px 18px 0;
+}
+.pa-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.pa-row-label { font-size: 12px; color: rgba(255,255,255,0.4); font-weight: 300; }
+.pa-row-value {
+  font-size: 13px; font-weight: 500;
+  text-decoration: line-through; color: rgba(255,255,255,0.22);
+  font-family: 'Cormorant Garamond', serif;
+}
+.pa-saving {
+  padding: 8px 18px;
+  font-size: 11px; color: var(--gold2); font-weight: 500;
+  display: flex; align-items: center; gap: 6px;
+}
+.pa-saving svg { opacity: 0.7; }
+.pa-main {
+  background: rgba(201,162,39,0.07);
+  border-top: 1px solid rgba(201,162,39,0.2);
+  padding: 18px 20px;
+  text-align: center;
+}
+.pa-main-label {
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 8px;
+}
+.pa-main-price {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 52px; font-weight: 700;
+  color: var(--white); line-height: 1; margin-bottom: 4px;
+}
+.pa-main-installments { font-size: 13px; color: var(--white-muted); font-weight: 300; }
+.pa-main-installments strong { color: var(--gold2); font-weight: 500; }
+
 /* ── FOOTER ──────────────────────────────────────── */
 .page-footer {
   position: relative; z-index: 1;
@@ -861,145 +987,105 @@ a { color: inherit; text-decoration: none; }
       ═══════════════════════════════════════ -->
       <div class="step" id="step-success">
 
-        <!-- Confirmação -->
-        <div class="success-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <polyline points="20 6 9 17 4 12"/>
-          </svg>
-        </div>
-        <h2 class="success-title">Você está na<br><em>lista VIP.</em></h2>
-        <p class="success-msg">
-          Vaga confirmada. Veja tudo que você acessa quando as portas abrirem.
-        </p>
-
-        <!-- Stack de valor -->
-        <div class="vstack-header">
-          <span>Tudo que você recebe</span>
-          <div class="vstack-header-line"></div>
+        <!-- Selo da Academia -->
+        <div class="success-seal">
+          <img src="/academyelite/images/logoouro.png" alt="Elite Dark Academy">
         </div>
 
-        <div class="vstack-list">
-          <div class="vstack-item">
-            <div class="vstack-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
-            <div class="vstack-info">
-              <div class="vstack-name">Mentoria Premium de 3 Meses</div>
-              <div class="vstack-desc">Acompanhamento estratégico para construção, crescimento, monetização e escala de canais dark.</div>
-            </div>
-            <div class="vstack-price">R$1.997</div>
+        <h2 class="success-title" style="text-align:center">Vaga garantida.<br><em>Bem-vindo à lista VIP.</em></h2>
+        <p class="success-msg">Veja tudo que você acessa quando as portas abrirem.</p>
+
+        <!-- Pilares principais -->
+        <div class="pillars-grid">
+          <div class="pillar-card">
+            <div class="pillar-icon">🎯</div>
+            <div class="pillar-name">Mentoria<br>3 Meses</div>
+            <div class="pillar-val">R$1.997</div>
           </div>
-          <div class="vstack-item">
-            <div class="vstack-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
-            <div class="vstack-info">
-              <div class="vstack-name">Aulas Semanais ao Vivo com Marcos e Rayner</div>
-              <div class="vstack-desc">Estratégia, execução prática, análise e implementação em encontros alternados.</div>
-            </div>
-            <div class="vstack-price">R$997</div>
+          <div class="pillar-card">
+            <div class="pillar-icon">📡</div>
+            <div class="pillar-name">Aulas ao<br>Vivo</div>
+            <div class="pillar-val">R$997</div>
           </div>
-          <div class="vstack-item">
-            <div class="vstack-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
-            <div class="vstack-info">
-              <div class="vstack-name">Análise Estratégica de Canais ao Vivo</div>
-              <div class="vstack-desc">Correção, diagnóstico de gargalos, identificação de oportunidades e plano de melhoria.</div>
-            </div>
-            <div class="vstack-price">R$997</div>
-          </div>
-          <div class="vstack-item">
-            <div class="vstack-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
-            <div class="vstack-info">
-              <div class="vstack-name">Estruturação Completa de Operação</div>
-              <div class="vstack-desc">Rotina, produção, processos, pipeline, escala e gestão de canais.</div>
-            </div>
-            <div class="vstack-price">R$697</div>
-          </div>
-          <div class="vstack-item">
-            <div class="vstack-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
-            <div class="vstack-info">
-              <div class="vstack-name">Acesso às Ferramentas por 1 Ano</div>
-              <div class="vstack-desc">Criação de vídeos, pesquisa, gestão, descoberta de nichos, tendências e produção em escala.</div>
-            </div>
-            <div class="vstack-price">R$997</div>
-          </div>
-          <div class="vstack-item">
-            <div class="vstack-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
-            <div class="vstack-info">
-              <div class="vstack-name">Todos os Cursos do Marcos Inclusos</div>
-              <div class="vstack-desc">Ecossistema completo para complementar a formação e acelerar a curva de aprendizado.</div>
-            </div>
-            <div class="vstack-price">R$697</div>
-          </div>
-          <div class="vstack-item">
-            <div class="vstack-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
-            <div class="vstack-info">
-              <div class="vstack-name">Biblioteca de Prompts Premium</div>
-              <div class="vstack-desc">Prompts para nichos, títulos, roteiros, thumbnails, vídeos e produção com IA.</div>
-            </div>
-            <div class="vstack-price">R$297</div>
-          </div>
-          <div class="vstack-item">
-            <div class="vstack-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
-            <div class="vstack-info">
-              <div class="vstack-name">Templates de Thumbnails</div>
-              <div class="vstack-desc">Modelos estratégicos para aumentar clique, curiosidade e percepção de valor.</div>
-            </div>
-            <div class="vstack-price">R$197</div>
-          </div>
-          <div class="vstack-item">
-            <div class="vstack-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
-            <div class="vstack-info">
-              <div class="vstack-name">Estruturas de Títulos Validadas</div>
-              <div class="vstack-desc">Modelos baseados em formatos que já funcionam em canais dark.</div>
-            </div>
-            <div class="vstack-price">R$197</div>
-          </div>
-          <div class="vstack-item">
-            <div class="vstack-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
-            <div class="vstack-info">
-              <div class="vstack-name">Banco de Ideias Virais e Nichos Atualizados</div>
-              <div class="vstack-desc">Temas, oportunidades, nichos ascendentes e ideias com potencial de crescimento.</div>
-            </div>
-            <div class="vstack-price">R$297</div>
-          </div>
-          <div class="vstack-item">
-            <div class="vstack-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
-            <div class="vstack-info">
-              <div class="vstack-name">Aula de Canais Internacionais</div>
-              <div class="vstack-desc">Expansão, idiomas, RPM, adaptação de formatos e oportunidades fora do Brasil.</div>
-            </div>
-            <div class="vstack-price">R$327</div>
+          <div class="pillar-card">
+            <div class="pillar-icon">🛠</div>
+            <div class="pillar-name">Ferramentas<br>por 1 Ano</div>
+            <div class="pillar-val">R$997</div>
           </div>
         </div>
 
-        <!-- Totais + âncora -->
-        <div class="anchor-total">
-          <div class="anchor-row">
-            <span class="anchor-row-label">Valor total individual</span>
-            <span class="anchor-row-value">R$7.600</span>
+        <!-- Lista compacta dos demais itens -->
+        <div class="vstack-section-label">+ 8 itens inclusos</div>
+        <div class="vstack-compact">
+          <div class="vci">
+            <span class="vci-check">◆</span>
+            <span class="vci-name">Análise Estratégica ao Vivo</span>
+            <span class="vci-val">R$997</span>
           </div>
-          <div class="anchor-row">
-            <span class="anchor-row-label">Valor real da estrutura</span>
-            <span class="anchor-row-value">R$5.997</span>
+          <div class="vci">
+            <span class="vci-check">◆</span>
+            <span class="vci-name">Todos os Cursos do Marcos</span>
+            <span class="vci-val">R$697</span>
           </div>
-          <div class="anchor-row highlight">
-            <span class="anchor-row-label">Sua condição de lista prioritária</span>
-            <span class="anchor-row-value">R$1.997</span>
+          <div class="vci">
+            <span class="vci-check">◆</span>
+            <span class="vci-name">Operação Completa de Canal</span>
+            <span class="vci-val">R$697</span>
+          </div>
+          <div class="vci">
+            <span class="vci-check">◆</span>
+            <span class="vci-name">Biblioteca de Prompts IA</span>
+            <span class="vci-val">R$297</span>
+          </div>
+          <div class="vci">
+            <span class="vci-check">◆</span>
+            <span class="vci-name">Templates de Thumbnails</span>
+            <span class="vci-val">R$197</span>
+          </div>
+          <div class="vci">
+            <span class="vci-check">◆</span>
+            <span class="vci-name">Estruturas de Títulos</span>
+            <span class="vci-val">R$197</span>
+          </div>
+          <div class="vci">
+            <span class="vci-check">◆</span>
+            <span class="vci-name">Banco de Ideias Virais</span>
+            <span class="vci-val">R$297</span>
+          </div>
+          <div class="vci">
+            <span class="vci-check">◆</span>
+            <span class="vci-name">Aula Canais Internacionais</span>
+            <span class="vci-val">R$327</span>
           </div>
         </div>
 
-        <!-- Preço final -->
-        <div class="price-final">
-          <div class="price-final-from">De <s>R$5.997</s> por apenas</div>
-          <div class="price-final-main">R$1.997</div>
-          <div class="price-final-sub">à vista &nbsp;·&nbsp; ou <strong>12x de R$197</strong></div>
-          <div class="price-final-saving">
+        <!-- Âncora de preço -->
+        <div class="price-anchor-wrap">
+          <div class="pa-rows">
+            <div class="pa-row">
+              <span class="pa-row-label">Valor total individual</span>
+              <span class="pa-row-value">R$7.600</span>
+            </div>
+            <div class="pa-row" style="border-bottom:none;padding-bottom:4px">
+              <span class="pa-row-label">Valor real da estrutura</span>
+              <span class="pa-row-value">R$5.997</span>
+            </div>
+          </div>
+          <div class="pa-saving">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-            Você economiza R$4.000 no valor total
+            Economia de R$4.000 para quem está na lista
+          </div>
+          <div class="pa-main">
+            <div class="pa-main-label">Sua condição exclusiva — lista VIP</div>
+            <div class="pa-main-price">R$1.997</div>
+            <div class="pa-main-installments">à vista &nbsp;·&nbsp; ou <strong>12× de R$197</strong></div>
           </div>
         </div>
 
         <!-- Copy de fechamento -->
         <div class="offer-closing">
-          <p>Você não está pagando apenas por uma mentoria. Você está entrando em um <strong>ecossistema completo</strong> com estratégia, ferramentas, análise, execução e direção para construir canais dark como ativos digitais.</p>
-          <p>Enquanto a maioria continua tentando descobrir tudo sozinha, <strong>você entra com mapa, método e acompanhamento.</strong></p>
+          <p>Você não está pagando por uma mentoria. Você está entrando em um <strong>ecossistema completo</strong> — estratégia, ferramentas, análise e execução para construir canais dark como ativos digitais.</p>
+          <p>Enquanto a maioria tenta descobrir tudo sozinha, <strong>você entra com mapa, método e acompanhamento.</strong></p>
         </div>
 
         <!-- CTA grupo -->
@@ -1009,7 +1095,7 @@ a { color: inherit; text-decoration: none; }
           </svg>
           Entrar no Grupo VIP
         </a>
-        <p class="success-note">Acesso limitado para a primeira turma &nbsp;·&nbsp; Elite Dark Academy</p>
+        <p class="success-note">Acesso limitado — primeira turma &nbsp;·&nbsp; Elite Dark Academy</p>
       </div>
 
       <!-- ═══════════════════════════════════════
