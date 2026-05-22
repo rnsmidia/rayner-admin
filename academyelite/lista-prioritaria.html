@@ -525,6 +525,136 @@ a { color: inherit; text-decoration: none; }
 
 .success-note { text-align: center; font-size: 11.5px; color: rgba(255,255,255,0.28); }
 
+/* ── VALUE STACK ─────────────────────────────────── */
+.vstack-header {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 16px;
+}
+.vstack-header span {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--gold); white-space: nowrap;
+}
+.vstack-header-line {
+  flex: 1; height: 1px;
+  background: linear-gradient(90deg, rgba(201,162,39,0.35), transparent);
+}
+
+.vstack-list {
+  margin-bottom: 20px;
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.vstack-item {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 12px;
+  padding: 11px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  transition: background 0.2s;
+}
+.vstack-item:last-child { border-bottom: none; }
+.vstack-item:hover { background: rgba(255,255,255,0.02); }
+
+.vstack-check {
+  color: var(--gold); flex-shrink: 0; margin-top: 2px;
+}
+.vstack-check svg { width: 13px; height: 13px; }
+
+.vstack-info { flex: 1; min-width: 0; }
+.vstack-name {
+  font-size: 12.5px; color: var(--white);
+  font-weight: 500; line-height: 1.3;
+}
+.vstack-desc {
+  font-size: 11px; color: rgba(255,255,255,0.38);
+  line-height: 1.4; margin-top: 2px; font-weight: 300;
+}
+.vstack-price {
+  font-size: 11.5px; color: rgba(255,255,255,0.35);
+  white-space: nowrap; font-weight: 300; flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* ── TOTAL + ÂNCORA ──────────────────────────────── */
+.anchor-total {
+  background: rgba(201,162,39,0.04);
+  border: 1px solid rgba(201,162,39,0.15);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 18px;
+}
+.anchor-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.anchor-row:last-child { border-bottom: none; padding-bottom: 0; }
+.anchor-row-label {
+  font-size: 12px; color: var(--white-muted); font-weight: 300;
+}
+.anchor-row-value {
+  font-size: 12.5px; font-weight: 500;
+  text-decoration: line-through;
+  color: rgba(255,255,255,0.3);
+}
+.anchor-row.highlight .anchor-row-label {
+  color: var(--white); font-weight: 600; font-size: 13px;
+}
+.anchor-row.highlight .anchor-row-value {
+  text-decoration: none;
+  color: var(--gold2); font-size: 13px;
+}
+
+.price-final {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(201,162,39,0.3);
+  border-radius: 14px;
+  padding: 22px 20px;
+  text-align: center;
+  margin-bottom: 18px;
+  position: relative; overflow: hidden;
+}
+.price-final::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.price-final-from {
+  font-size: 12px; color: rgba(255,255,255,0.35);
+  margin-bottom: 4px; letter-spacing: 0.04em;
+}
+.price-final-from s { color: rgba(255,255,255,0.3); }
+.price-final-main {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 50px; font-weight: 700;
+  color: var(--white); line-height: 1; margin-bottom: 6px;
+}
+.price-final-sub {
+  font-size: 13px; color: var(--white-muted); font-weight: 300;
+}
+.price-final-sub strong { color: var(--gold2); font-weight: 500; }
+.price-final-saving {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 600; color: var(--gold2);
+  background: rgba(201,162,39,0.1);
+  padding: 4px 12px; border-radius: 100px; margin-top: 10px;
+}
+
+/* ── CLOSING COPY ────────────────────────────────── */
+.offer-closing {
+  background: rgba(255,255,255,0.02);
+  border-left: 2px solid rgba(201,162,39,0.4);
+  border-radius: 0 8px 8px 0;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+}
+.offer-closing p {
+  font-size: 13px; color: var(--white-muted);
+  line-height: 1.7; font-weight: 300; margin-bottom: 10px;
+}
+.offer-closing p:last-child { margin-bottom: 0; }
+.offer-closing strong { color: var(--white); font-weight: 500; }
+
 /* ── DESCLASSIFICADO ─────────────────────────────── */
 .disq-icon {
   width: 52px; height: 52px; border-radius: 50%;
@@ -722,6 +852,8 @@ a { color: inherit; text-decoration: none; }
            SUCESSO
       ═══════════════════════════════════════ -->
       <div class="step" id="step-success">
+
+        <!-- Confirmação -->
         <div class="success-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <polyline points="20 6 9 17 4 12"/>
@@ -729,26 +861,147 @@ a { color: inherit; text-decoration: none; }
         </div>
         <h2 class="success-title">Você está na<br><em>lista VIP.</em></h2>
         <p class="success-msg">
-          Sua vaga foi confirmada. Quando o Elite Dark Academy abrir,<br>
-          você terá acesso primeiro — com condição exclusiva de lista.
+          Vaga confirmada. Veja tudo que você acessa quando as portas abrirem.
         </p>
-        <div class="price-badge">
-          <span class="badge-label">Sua condição de lista prioritária</span>
-          <div class="badge-price">R$1.997</div>
-          <div class="badge-installments">ou 12x de R$206,54</div>
-          <div class="badge-saving">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-            Você economiza R$1.000 vs. lançamento
-          </div>
-          <span class="badge-original">De R$5.997 &nbsp;·&nbsp; Fora da lista: R$2.997</span>
+
+        <!-- Stack de valor -->
+        <div class="vstack-header">
+          <span>Tudo que você recebe</span>
+          <div class="vstack-header-line"></div>
         </div>
+
+        <div class="vstack-list">
+          <div class="vstack-item">
+            <div class="vstack-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="vstack-info">
+              <div class="vstack-name">Mentoria Premium de 3 Meses</div>
+              <div class="vstack-desc">Acompanhamento estratégico para construção, crescimento, monetização e escala de canais dark.</div>
+            </div>
+            <div class="vstack-price">R$1.997</div>
+          </div>
+          <div class="vstack-item">
+            <div class="vstack-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="vstack-info">
+              <div class="vstack-name">Aulas Semanais ao Vivo com Marcos e Rayner</div>
+              <div class="vstack-desc">Estratégia, execução prática, análise e implementação em encontros alternados.</div>
+            </div>
+            <div class="vstack-price">R$997</div>
+          </div>
+          <div class="vstack-item">
+            <div class="vstack-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="vstack-info">
+              <div class="vstack-name">Análise Estratégica de Canais ao Vivo</div>
+              <div class="vstack-desc">Correção, diagnóstico de gargalos, identificação de oportunidades e plano de melhoria.</div>
+            </div>
+            <div class="vstack-price">R$997</div>
+          </div>
+          <div class="vstack-item">
+            <div class="vstack-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="vstack-info">
+              <div class="vstack-name">Estruturação Completa de Operação</div>
+              <div class="vstack-desc">Rotina, produção, processos, pipeline, escala e gestão de canais.</div>
+            </div>
+            <div class="vstack-price">R$697</div>
+          </div>
+          <div class="vstack-item">
+            <div class="vstack-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="vstack-info">
+              <div class="vstack-name">Acesso às Ferramentas por 1 Ano</div>
+              <div class="vstack-desc">Criação de vídeos, pesquisa, gestão, descoberta de nichos, tendências e produção em escala.</div>
+            </div>
+            <div class="vstack-price">R$997</div>
+          </div>
+          <div class="vstack-item">
+            <div class="vstack-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="vstack-info">
+              <div class="vstack-name">Todos os Cursos do Marcos Inclusos</div>
+              <div class="vstack-desc">Ecossistema completo para complementar a formação e acelerar a curva de aprendizado.</div>
+            </div>
+            <div class="vstack-price">R$697</div>
+          </div>
+          <div class="vstack-item">
+            <div class="vstack-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="vstack-info">
+              <div class="vstack-name">Biblioteca de Prompts Premium</div>
+              <div class="vstack-desc">Prompts para nichos, títulos, roteiros, thumbnails, vídeos e produção com IA.</div>
+            </div>
+            <div class="vstack-price">R$297</div>
+          </div>
+          <div class="vstack-item">
+            <div class="vstack-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="vstack-info">
+              <div class="vstack-name">Templates de Thumbnails</div>
+              <div class="vstack-desc">Modelos estratégicos para aumentar clique, curiosidade e percepção de valor.</div>
+            </div>
+            <div class="vstack-price">R$197</div>
+          </div>
+          <div class="vstack-item">
+            <div class="vstack-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="vstack-info">
+              <div class="vstack-name">Estruturas de Títulos Validadas</div>
+              <div class="vstack-desc">Modelos baseados em formatos que já funcionam em canais dark.</div>
+            </div>
+            <div class="vstack-price">R$197</div>
+          </div>
+          <div class="vstack-item">
+            <div class="vstack-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="vstack-info">
+              <div class="vstack-name">Banco de Ideias Virais e Nichos Atualizados</div>
+              <div class="vstack-desc">Temas, oportunidades, nichos ascendentes e ideias com potencial de crescimento.</div>
+            </div>
+            <div class="vstack-price">R$297</div>
+          </div>
+          <div class="vstack-item">
+            <div class="vstack-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="vstack-info">
+              <div class="vstack-name">Aula de Canais Internacionais</div>
+              <div class="vstack-desc">Expansão, idiomas, RPM, adaptação de formatos e oportunidades fora do Brasil.</div>
+            </div>
+            <div class="vstack-price">R$327</div>
+          </div>
+        </div>
+
+        <!-- Totais + âncora -->
+        <div class="anchor-total">
+          <div class="anchor-row">
+            <span class="anchor-row-label">Valor total individual</span>
+            <span class="anchor-row-value">R$7.600</span>
+          </div>
+          <div class="anchor-row">
+            <span class="anchor-row-label">Valor real da estrutura</span>
+            <span class="anchor-row-value">R$5.997</span>
+          </div>
+          <div class="anchor-row highlight">
+            <span class="anchor-row-label">Sua condição de lista prioritária</span>
+            <span class="anchor-row-value">R$1.997</span>
+          </div>
+        </div>
+
+        <!-- Preço final -->
+        <div class="price-final">
+          <div class="price-final-from">De <s>R$5.997</s> por apenas</div>
+          <div class="price-final-main">R$1.997</div>
+          <div class="price-final-sub">à vista &nbsp;·&nbsp; ou <strong>12x de R$197</strong></div>
+          <div class="price-final-saving">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            Você economiza R$4.000 no valor total
+          </div>
+        </div>
+
+        <!-- Copy de fechamento -->
+        <div class="offer-closing">
+          <p>Você não está pagando apenas por uma mentoria. Você está entrando em um <strong>ecossistema completo</strong> com estratégia, ferramentas, análise, execução e direção para construir canais dark como ativos digitais.</p>
+          <p>Enquanto a maioria continua tentando descobrir tudo sozinha, <strong>você entra com mapa, método e acompanhamento.</strong></p>
+        </div>
+
+        <!-- CTA grupo -->
         <a href="https://chat.whatsapp.com/IcnFbVkXwNbG1VTXqxPulm?mode=gi_t" target="_blank" rel="noopener noreferrer" class="btn-whatsapp">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
           </svg>
           Entrar no Grupo VIP
         </a>
-        <p class="success-note">O link também será enviado para o seu e-mail.</p>
+        <p class="success-note">Acesso limitado para a primeira turma &nbsp;·&nbsp; Elite Dark Academy</p>
       </div>
 
       <!-- ═══════════════════════════════════════
