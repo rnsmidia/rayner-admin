@@ -1154,8 +1154,17 @@ function track(event, params = {}) {
   }).catch(() => {});
 }
 
-// Evento de entrada no funil
-track('funnel_start', { step: 0 });
+// Preview mode — pula direto para a tela desejada sem trackear
+const _preview = new URLSearchParams(location.search).get('preview');
+if (_preview === 'success') {
+  document.getElementById('progress-bar').style.visibility = 'hidden';
+  showStep('step-success');
+} else if (_preview === 'disq') {
+  document.getElementById('progress-bar').style.display = 'none';
+  showStep('step-disq');
+} else {
+  track('funnel_start', { step: 0 });
+}
 
 // ── Estado global ──────────────────────────────────────────────────────────────
 let q1 = null, q2 = null;
