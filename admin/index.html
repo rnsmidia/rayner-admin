@@ -672,12 +672,51 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
 /* ════════════════════════════════════
    RESPONSIVE
 ════════════════════════════════════ */
+/* ════════════════════════════════════
+   FUNNEL VISUAL
+════════════════════════════════════ */
+.funnel-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  margin-top: 20px;
+}
+.funnel-card-title {
+  font-size: 13px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1px;
+  color: var(--muted); margin-bottom: 20px;
+}
+.funnel-step {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 14px;
+}
+.funnel-label {
+  font-size: 13px; font-weight: 600;
+  color: var(--text); min-width: 170px; flex-shrink: 0;
+}
+.funnel-bar-wrap {
+  flex: 1; height: 8px;
+  background: var(--border); border-radius: 4px; overflow: hidden;
+}
+.funnel-bar-fill {
+  height: 100%; border-radius: 4px;
+  transition: width .6s ease;
+}
+.funnel-meta {
+  font-size: 12px; color: var(--muted);
+  min-width: 90px; text-align: right; flex-shrink: 0;
+  font-family: 'JetBrains Mono', monospace;
+}
+
 @media (max-width: 768px) {
   .sidebar { display: none; }
   .main { margin-left: 0; }
   .sec-panel { padding: 14px; }
   td:nth-child(5), th:nth-child(5),
   td:nth-child(6), th:nth-child(6) { display: none; }
+  .funnel-label { min-width: 120px; font-size: 12px; }
 }
 </style>
 </head>
@@ -819,6 +858,7 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
         </button>
         <div id="subnav-academy" class="subnav" style="display:none">
           <button class="sn-btn active" data-sec="waitlist" onclick="switchSection('academy','waitlist')">📋 Lista VIP <span class="sn-count" id="cnt-academy">—</span></button>
+          <button class="sn-btn" data-sec="funnel" onclick="switchSection('academy','funnel');loadAcademyFunnel()">📊 Funil</button>
         </div>
 
         <!-- Monitor -->
@@ -1164,6 +1204,56 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
           </div>
 
         </div>
+
+        <!-- Funil Analytics -->
+        <div class="sec-panel" id="academy-funnel">
+
+          <!-- Stats cards -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon-wrap purple">👁️</div>
+              <div><div class="stat-label">Visitantes</div><div class="stat-val purple" id="fn-visits">—</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap green">✅</div>
+              <div><div class="stat-label">Qualificados</div><div class="stat-val green" id="fn-qualified">—</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap red">❌</div>
+              <div><div class="stat-label">Desqualificados</div><div class="stat-val red" id="fn-disq">—</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap yellow">📋</div>
+              <div><div class="stat-label">Leads capturados</div><div class="stat-val yellow" id="fn-leads">—</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap green">💬</div>
+              <div><div class="stat-label">Cliques WhatsApp</div><div class="stat-val green" id="fn-wa">—</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap orange">📈</div>
+              <div><div class="stat-label">Taxa de qualif.</div><div class="stat-val orange" id="fn-rate-q">—</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap purple">🎯</div>
+              <div><div class="stat-label">Taxa de conversão</div><div class="stat-val purple" id="fn-rate-l">—</div></div>
+            </div>
+          </div>
+
+          <!-- Funil visual -->
+          <div class="funnel-card">
+            <div class="funnel-card-title">Funil de Conversão — etapa a etapa</div>
+            <div id="funnel-steps">
+              <div style="color:var(--muted);font-size:13px">Carregando...</div>
+            </div>
+          </div>
+
+          <div class="quick-row" style="margin-top:16px">
+            <button class="btn-sm" onclick="loadAcademyFunnel()">↻ Atualizar</button>
+          </div>
+
+        </div>
+
       </div>
 
       <div class="prod-panel" id="panel-monitor">
@@ -2023,6 +2113,45 @@ async function deleteAcademy(id, nome) {
   const r = await apiCall('academy-delete', { id });
   if (r.ok) { toast('Removido.'); loadAcademyWaitlist(); }
   else toast('Erro ao remover.', 'error');
+}
+
+// ── ACADEMY ELITE — FUNIL ─────────────────────
+async function loadAcademyFunnel() {
+  const d = await apiCall('academy-funnel-stats');
+  if (d.error) return;
+
+  const { visits = 0, step1 = 0, qualified = 0, disqualified = 0, formView = 0, leads = 0, whatsapp = 0 } = d;
+
+  document.getElementById('fn-visits').textContent    = visits;
+  document.getElementById('fn-qualified').textContent = qualified;
+  document.getElementById('fn-disq').textContent      = disqualified;
+  document.getElementById('fn-leads').textContent     = leads;
+  document.getElementById('fn-wa').textContent        = whatsapp;
+
+  const rateQ = visits > 0 ? Math.round(qualified / visits * 100) : 0;
+  const rateL = qualified > 0 ? Math.round(leads / qualified * 100) : 0;
+  document.getElementById('fn-rate-q').textContent = rateQ + '%';
+  document.getElementById('fn-rate-l').textContent = rateL + '%';
+
+  const steps = [
+    { label: 'Visitantes',       count: visits,    color: '#7c3aed', base: visits },
+    { label: 'Responderam Q1',   count: step1,     color: '#6366f1', base: visits },
+    { label: 'Qualificados (Q2)',count: qualified,  color: '#28c76f', base: visits },
+    { label: 'Viram formulário', count: formView,   color: '#ff9f43', base: visits },
+    { label: 'Leads capturados', count: leads,      color: '#ea5455', base: visits },
+    { label: 'Clique WhatsApp',  count: whatsapp,   color: '#25D366', base: visits },
+  ];
+
+  document.getElementById('funnel-steps').innerHTML = steps.map(s => {
+    const pct = s.base > 0 ? (s.count / s.base * 100) : 0;
+    return `<div class="funnel-step">
+      <div class="funnel-label">${s.label}</div>
+      <div class="funnel-bar-wrap">
+        <div class="funnel-bar-fill" style="width:${pct.toFixed(1)}%;background:${s.color}"></div>
+      </div>
+      <div class="funnel-meta">${s.count} &nbsp;<span style="color:var(--muted)">${pct.toFixed(0)}%</span></div>
+    </div>`;
+  }).join('');
 }
 
 function exportAcademyCSV() {

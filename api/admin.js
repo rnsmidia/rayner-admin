@@ -591,5 +591,23 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({ ok: true });
   }
 
+  // ── ACADEMY ELITE — FUNIL ANALYTICS ──────────────────────────
+  if (action === 'academy-funnel-stats') {
+    const { data } = await supabase
+      .from('academyelite_funnel_events')
+      .select('event, session_id');
+    const rows = data || [];
+    const uniq = evt => new Set(rows.filter(r => r.event === evt).map(r => r.session_id)).size;
+    return res.status(200).json({
+      visits:       uniq('funnel_start'),
+      step1:        uniq('step_complete'),
+      qualified:    uniq('qualified'),
+      disqualified: uniq('disqualified'),
+      formView:     uniq('form_view'),
+      leads:        uniq('lead_captured'),
+      whatsapp:     uniq('whatsapp_click'),
+    });
+  }
+
   return res.status(400).json({ error: 'Ação desconhecida' });
 };
