@@ -809,6 +809,18 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
         </div>
       </div>
 
+        <!-- Elite Dark Academy -->
+        <button class="prod-btn" id="btn-academy" onclick="switchProduct('academy')">
+          <div class="prod-icon">🏆</div>
+          <div>
+            <div class="prod-name">Elite Dark</div>
+            <div class="prod-tag">Lista VIP</div>
+          </div>
+        </button>
+        <div id="subnav-academy" class="subnav" style="display:none">
+          <button class="sn-btn active" data-sec="waitlist" onclick="switchSection('academy','waitlist')">📋 Lista VIP <span class="sn-count" id="cnt-academy">—</span></button>
+        </div>
+
         <!-- Monitor -->
         <div class="sb-section-label" style="margin-top:10px">Sistema</div>
         <button class="prod-btn" id="btn-monitor" onclick="switchProduct('monitor')">
@@ -1103,6 +1115,57 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
       </div><!-- /nexus -->
 
       <!-- ── MONITOR ── -->
+      <!-- ── ELITE DARK ACADEMY ── -->
+      <div class="prod-panel" id="panel-academy">
+        <div class="sec-panel active" id="academy-waitlist">
+
+          <!-- Stats -->
+          <div class="stats-grid" style="margin-bottom:24px">
+            <div class="stat-card">
+              <div class="stat-icon-wrap purple">📋</div>
+              <div><div class="stat-label">Total Inscritos</div><div class="stat-val purple" id="acy-total">—</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap green">📅</div>
+              <div><div class="stat-label">Hoje</div><div class="stat-val green" id="acy-today">—</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap yellow">📆</div>
+              <div><div class="stat-label">Últimos 7 dias</div><div class="stat-val yellow" id="acy-week">—</div></div>
+            </div>
+          </div>
+
+          <!-- Toolbar -->
+          <div class="toolbar">
+            <div class="search-wrap">
+              <input type="text" id="search-academy" placeholder="Buscar por nome, email ou WhatsApp..." oninput="filterAcademy()" />
+            </div>
+            <button class="btn-sm accent" onclick="exportAcademyCSV()">⬇ Exportar CSV</button>
+            <button class="btn-sm" onclick="loadAcademyWaitlist()">↻ Atualizar</button>
+          </div>
+
+          <!-- Tabela -->
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Nome</th>
+                  <th>E-mail</th>
+                  <th>WhatsApp</th>
+                  <th>Inscrito em</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="academy-tbody">
+                <tr><td colspan="6"><div class="empty-state"><div class="icon">📋</div><p>Carregando...</p></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+
       <div class="prod-panel" id="panel-monitor">
         <div class="sec-panel active" id="monitor-usage">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
@@ -1223,7 +1286,8 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
 <script>
 const API = '/api/admin';
 let TOKEN = '', allLicenses = [], modalMode = 'create', editingKey = '';
-let curProd = 'cenadrop', curSec = { cenadrop: 'dashboard' };
+let curProd = 'cenadrop', curSec = { cenadrop: 'dashboard', academy: 'waitlist' };
+let allAcademyWaitlist = [];
 
 // ── AUTH ──────────────────────────────────────
 function doLogin() {
@@ -1292,13 +1356,15 @@ function switchProduct(prod) {
   document.getElementById('subnav-narrativa').style.display = prod === 'narrativa' ? 'block' : 'none';
   document.getElementById('subnav-nexus').style.display     = prod === 'nexus'     ? 'block' : 'none';
   document.getElementById('subnav-monitor').style.display   = prod === 'monitor'   ? 'block' : 'none';
-  const prodLabels = { cenadrop: 'CenaDrop', narrativa: 'Narrativa IA', nexus: 'Nexus Saúde', monitor: 'Sistema' };
+  document.getElementById('subnav-academy').style.display   = prod === 'academy'   ? 'block' : 'none';
+  const prodLabels = { cenadrop: 'CenaDrop', narrativa: 'Narrativa IA', nexus: 'Nexus Saúde', monitor: 'Sistema', academy: 'Elite Dark Academy' };
   document.getElementById('bc-prod').textContent = prodLabels[prod] || prod;
   const labels = { dashboard:'Dashboard', licenses:'Licenças', students:'Alunos Hotmart', users:'Usuários', buyers:'Compradores', usage:'Monitor de Uso' };
   document.getElementById('bc-sec').textContent = labels[curSec[prod] || 'dashboard'] || '—';
   if (prod === 'narrativa') { switchSection('narrativa', curSec['narrativa'] || 'dashboard'); loadNarrativaUsers(); }
   if (prod === 'nexus')     { switchSection('nexus',     curSec['nexus']     || 'dashboard'); loadNexusData(); loadNexusDashClicks(); }
   if (prod === 'monitor')   { switchSection('monitor',   'usage'); loadMonitor(); }
+  if (prod === 'academy')   { switchSection('academy',   'waitlist'); loadAcademyWaitlist(); }
 }
 
 function switchSection(prod, sec) {
@@ -1902,6 +1968,74 @@ function toast(msg, type = '') {
   el.textContent = msg; el.className = `show ${type}`;
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => { el.className = ''; }, 3000);
+}
+
+// ── ELITE DARK ACADEMY WAITLIST ───────────────
+async function loadAcademyWaitlist() {
+  const [stats, list] = await Promise.all([
+    apiCall('academy-stats'),
+    apiCall('academy-list'),
+  ]);
+  if (stats.total !== undefined) {
+    document.getElementById('acy-total').textContent = stats.total;
+    document.getElementById('acy-today').textContent = stats.today;
+    document.getElementById('acy-week').textContent  = stats.week;
+    document.getElementById('cnt-academy').textContent = stats.total;
+  }
+  if (list.waitlist) {
+    allAcademyWaitlist = list.waitlist;
+    renderAcademy(allAcademyWaitlist);
+  }
+}
+
+function renderAcademy(list) {
+  const tb = document.getElementById('academy-tbody');
+  if (!list.length) {
+    tb.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="icon">📋</div><p>Nenhum inscrito ainda.</p></div></td></tr>`;
+    return;
+  }
+  tb.innerHTML = list.map((r, i) => `
+    <tr>
+      <td style="color:var(--muted);font-size:12px">${i + 1}</td>
+      <td style="font-weight:600">${r.nome || '—'}</td>
+      <td style="color:var(--muted)">${r.email || '—'}</td>
+      <td>${r.whatsapp ? `<span style="font-family:'JetBrains Mono',monospace;font-size:12px">+55 ${r.whatsapp}</span>` : '<span style="color:var(--muted)">—</span>'}</td>
+      <td style="color:var(--muted);font-size:12px">${fmtDate(r.created_at)}</td>
+      <td><div class="actions">
+        <button class="btn-icon" title="Copiar e-mail" onclick="navigator.clipboard.writeText('${r.email}');toast('E-mail copiado!')">📋</button>
+        <button class="btn-icon" title="Remover" onclick="deleteAcademy(${r.id},'${r.nome}')">🗑️</button>
+      </div></td>
+    </tr>
+  `).join('');
+}
+
+function filterAcademy() {
+  const q = document.getElementById('search-academy').value.toLowerCase();
+  renderAcademy(q ? allAcademyWaitlist.filter(r =>
+    (r.nome||'').toLowerCase().includes(q) ||
+    (r.email||'').toLowerCase().includes(q) ||
+    (r.whatsapp||'').includes(q)
+  ) : allAcademyWaitlist);
+}
+
+async function deleteAcademy(id, nome) {
+  if (!confirm(`Remover "${nome}" da lista VIP?`)) return;
+  const r = await apiCall('academy-delete', { id });
+  if (r.ok) { toast('Removido.'); loadAcademyWaitlist(); }
+  else toast('Erro ao remover.', 'error');
+}
+
+function exportAcademyCSV() {
+  if (!allAcademyWaitlist.length) { toast('Nenhum dado para exportar.'); return; }
+  const rows = [['#','Nome','Email','WhatsApp','Inscrito em']];
+  allAcademyWaitlist.forEach((r, i) => rows.push([
+    i+1, r.nome, r.email, r.whatsapp || '', fmtDate(r.created_at)
+  ]));
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent('﻿' + csv);
+  a.download = `academy-elite-waitlist-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
 }
 </script>
 </body>

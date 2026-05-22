@@ -562,5 +562,34 @@ module.exports = async function handler(req, res) {
     });
   }
 
+  // ── ACADEMY ELITE WAITLIST ────────────────────
+  if (action === 'academy-stats') {
+    const todayIso = new Date(new Date().setHours(0,0,0,0)).toISOString();
+    const weekIso  = new Date(Date.now() - 7*24*60*60*1000).toISOString();
+    const [total, today, week] = await Promise.all([
+      supabase.from('academyelite_waitlist').select('*', { count: 'exact', head: true }),
+      supabase.from('academyelite_waitlist').select('*', { count: 'exact', head: true }).gte('created_at', todayIso),
+      supabase.from('academyelite_waitlist').select('*', { count: 'exact', head: true }).gte('created_at', weekIso),
+    ]);
+    return res.status(200).json({ total: total.count || 0, today: today.count || 0, week: week.count || 0 });
+  }
+
+  if (action === 'academy-list') {
+    const { data, error } = await supabase
+      .from('academyelite_waitlist')
+      .select('id, nome, email, whatsapp, created_at')
+      .order('created_at', { ascending: false });
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ waitlist: data || [] });
+  }
+
+  if (action === 'academy-delete') {
+    const { id } = req.body;
+    if (!id) return res.status(400).json({ error: 'ID obrigatório' });
+    const { error } = await supabase.from('academyelite_waitlist').delete().eq('id', id);
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ ok: true });
+  }
+
   return res.status(400).json({ error: 'Ação desconhecida' });
 };
