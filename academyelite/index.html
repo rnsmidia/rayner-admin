@@ -8,6 +8,14 @@
 <meta property="og:title" content="Elite Dark Academy — Lista de Espera VIP">
 <meta property="og:description" content="Não é mais sobre assistir aulas. É sobre entrar na operação do Marcos de Castro de forma VIP.">
 <meta property="og:image" content="/academyelite/images/marcos/hero-banner.jpg">
+<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-BN8R1SVLLT"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-BN8R1SVLLT');
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -1276,6 +1284,9 @@ document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 
 document.querySelectorAll('a[href="#form"]').forEach(a => {
   a.href = '/academyelite/lista-prioritaria';
+  a.addEventListener('click', () => {
+    if (typeof gtag !== 'undefined') gtag('event', 'cta_click', { page: 'academyelite' });
+  });
 });
 </script>
 </body>
