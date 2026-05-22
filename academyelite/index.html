@@ -727,14 +727,51 @@ section { position: relative; }
   box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 30px rgba(201,162,39,0.12);
 }
 
-.depo-item img {
+.depo-item .img-card {
   width: 100%;
   height: auto;
   display: block;
   border-radius: 15px;
-  transition: transform 0.45s ease;
+  transition: opacity 0.45s ease;
+  position: relative;
+  z-index: 2;
 }
-.depo-item:hover img { transform: scale(1.03); }
+.depo-item:hover .img-card { opacity: 0; }
+
+.depo-item .img-original {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #080808;
+  border-radius: 15px;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  z-index: 3;
+}
+.depo-item:hover .img-original { opacity: 1; }
+
+/* Badge "ver original" */
+.depo-hint {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: rgba(0,0,0,0.6);
+  border: 1px solid rgba(201,162,39,0.35);
+  color: rgba(201,162,39,0.85);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 4px 9px;
+  border-radius: 4px;
+  z-index: 4;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  backdrop-filter: blur(4px);
+}
+.depo-item:hover .depo-hint { opacity: 0; }
 
 /* Linha dourada topo do card */
 .depo-item::before {
@@ -1286,33 +1323,51 @@ footer {
     <div class="depo-grid">
       <!-- Linha 1: cards compactos -->
       <div class="depo-item">
-        <img src="/academyelite/images/depoimentos/card-01.png" alt="Resultado: 10,4 mil views em 48h, CTR 11,1%" loading="lazy">
+        <img class="img-card" src="/academyelite/images/depoimentos/card-01.png" alt="Resultado: 10,4 mil views em 48h, CTR 11,1%" loading="lazy">
+        <img class="img-original" src="/academyelite/images/depoimentos/depoimento-img2.jpg" alt="Screenshot original" loading="lazy">
+        <span class="depo-hint">ver original</span>
       </div>
       <div class="depo-item">
-        <img src="/academyelite/images/depoimentos/card-03.png" alt="Resultado: canal monetizado, retenção 4,4%" loading="lazy">
+        <img class="img-card" src="/academyelite/images/depoimentos/card-03.png" alt="Resultado: canal monetizado, retenção 4,4%" loading="lazy">
+        <img class="img-original" src="/academyelite/images/depoimentos/depoimento-alice.jpg" alt="Screenshot original" loading="lazy">
+        <span class="depo-hint">ver original</span>
       </div>
       <div class="depo-item">
-        <img src="/academyelite/images/depoimentos/card-06.png" alt="Resultado: 263,9 mil views, R$7.615,35" loading="lazy">
+        <img class="img-card" src="/academyelite/images/depoimentos/card-06.png" alt="Resultado: 263,9 mil views, R$7.615,35" loading="lazy">
+        <img class="img-original" src="/academyelite/images/depoimentos/depoimento-diego.png" alt="Screenshot original" loading="lazy">
+        <span class="depo-hint">ver original</span>
       </div>
       <!-- Linha 2: cards compactos -->
       <div class="depo-item">
-        <img src="/academyelite/images/depoimentos/card-02.png" alt="Resultado: 9.419 views em 48h" loading="lazy">
+        <img class="img-card" src="/academyelite/images/depoimentos/card-02.png" alt="Resultado: 9.419 views em 48h" loading="lazy">
+        <img class="img-original" src="/academyelite/images/depoimentos/depoimento-dark.png" alt="Screenshot original" loading="lazy">
+        <span class="depo-hint">ver original</span>
       </div>
       <div class="depo-item">
-        <img src="/academyelite/images/depoimentos/card-04.png" alt="Resultado: 9.419 views, 7 dias de vídeos" loading="lazy">
+        <img class="img-card" src="/academyelite/images/depoimentos/card-04.png" alt="Resultado: 9.419 views, 7 dias de vídeos" loading="lazy">
+        <img class="img-original" src="/academyelite/images/depoimentos/depoimento-dark.png" alt="Screenshot original" loading="lazy">
+        <span class="depo-hint">ver original</span>
       </div>
       <div class="depo-item">
-        <img src="/academyelite/images/depoimentos/card-09.png" alt="Resultado: R$13.419,77 em 14 dias" loading="lazy">
+        <img class="img-card" src="/academyelite/images/depoimentos/card-09.png" alt="Resultado: R$13.419,77 em 14 dias" loading="lazy">
+        <img class="img-original" src="/academyelite/images/depoimentos/depoimento-receita.png" alt="Screenshot original" loading="lazy">
+        <span class="depo-hint">ver original</span>
       </div>
       <!-- Linha 3: cards mais altos juntos -->
       <div class="depo-item">
-        <img src="/academyelite/images/depoimentos/card-05.png" alt="Resultado: 165,5 mil views, R$2.916,64" loading="lazy">
+        <img class="img-card" src="/academyelite/images/depoimentos/card-05.png" alt="Resultado: 165,5 mil views, R$2.916,64" loading="lazy">
+        <img class="img-original" src="/academyelite/images/depoimentos/depoimento-img1.jpg" alt="Screenshot original" loading="lazy">
+        <span class="depo-hint">ver original</span>
       </div>
       <div class="depo-item">
-        <img src="/academyelite/images/depoimentos/card-07.png" alt="Resultado: canal quase desistindo, 71,8 mil impressões" loading="lazy">
+        <img class="img-card" src="/academyelite/images/depoimentos/card-07.png" alt="Resultado: canal quase desistindo, 71,8 mil impressões" loading="lazy">
+        <img class="img-original" src="/academyelite/images/depoimentos/depoimento-img4.png" alt="Screenshot original" loading="lazy">
+        <span class="depo-hint">ver original</span>
       </div>
       <div class="depo-item">
-        <img src="/academyelite/images/depoimentos/card-08.png" alt="Resultado: monetização aprovada" loading="lazy">
+        <img class="img-card" src="/academyelite/images/depoimentos/card-08.png" alt="Resultado: monetização aprovada" loading="lazy">
+        <img class="img-original" src="/academyelite/images/depoimentos/depoimento-img6.png" alt="Screenshot original" loading="lazy">
+        <span class="depo-hint">ver original</span>
       </div>
     </div>
 
