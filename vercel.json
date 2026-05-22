@@ -38,7 +38,9 @@
     { "source": "/manual/",                "destination": "/cenadrop/manual/index.html" },
     { "source": "/stratark",               "destination": "/stratark/index.html" },
     { "source": "/stratark/",              "destination": "/stratark/index.html" },
-    { "source": "/academyelite",           "destination": "/academyelite/index.html" },
-    { "source": "/academyelite/",          "destination": "/academyelite/index.html" }
+    { "source": "/academyelite",                        "destination": "/academyelite/index.html" },
+    { "source": "/academyelite/",                       "destination": "/academyelite/index.html" },
+    { "source": "/academyelite/lista-prioritaria",      "destination": "/academyelite/lista-prioritaria.html" },
+    { "source": "/academyelite/lista-prioritaria/",     "destination": "/academyelite/lista-prioritaria.html" }
   ]
 }

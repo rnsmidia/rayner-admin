@@ -1688,12 +1688,8 @@ if (form) {
   });
 }
 
-// ── Smooth scroll for hero CTA ──
 document.querySelectorAll('a[href="#form"]').forEach(a => {
-  a.addEventListener('click', function (e) {
-    e.preventDefault();
-    document.getElementById('form').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
+  a.href = '/academyelite/lista-prioritaria';
 });
 </script>
 </body>
