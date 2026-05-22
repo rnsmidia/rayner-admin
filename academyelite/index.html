@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Elite Dark Academy — Lista de Espera VIP</title>
+<meta name="description" content="Acesso exclusivo à estrutura, estratégias e operação de Marcos de Castro. Vagas extremamente limitadas.">
+<meta property="og:title" content="Elite Dark Academy — Lista de Espera VIP">
+<meta property="og:description" content="Não é mais sobre assistir aulas. É sobre entrar na operação do Marcos de Castro de forma VIP.">
+<meta property="og:image" content="/academyelite/images/marcos/hero-banner.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black: #000000;
+  --black2: #080808;
+  --black3: #0e0e0e;
+  --black4: #141414;
+  --gold: #C9A227;
+  --gold2: #D4AF37;
+  --gold3: #E8C84A;
+  --gold-dim: rgba(201,162,39,0.15);
+  --gold-glow: rgba(201,162,39,0.08);
+  --white: #ffffff;
+  --white-dim: rgba(255,255,255,0.85);
+  --white-muted: rgba(255,255,255,0.5);
+  --white-subtle: rgba(255,255,255,0.12);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; height: auto; display: block; }
+
+/* ──────────────────────────────────────────
+   ANNOUNCEMENT BAR
+────────────────────────────────────────── */
+.ann-bar {
+  background: linear-gradient(90deg, #1a1200, #3a2a00, #1a1200);
+  border-bottom: 1px solid rgba(201,162,39,0.3);
+  text-align: center;
+  padding: 11px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--gold3);
+  position: relative;
+  overflow: hidden;
+}
+.ann-bar::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(201,162,39,0.08), transparent);
+  animation: shimmer 3s infinite;
+}
+@keyframes shimmer { to { left: 200%; } }
+.ann-dot { display: inline-block; width: 6px; height: 6px; background: var(--gold); border-radius: 50%; margin-right: 8px; vertical-align: middle; animation: pulse-dot 2s infinite; }
+@keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.8)} }
+
+/* ──────────────────────────────────────────
+   HERO
+────────────────────────────────────────── */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 80px 24px 100px;
+  overflow: hidden;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+/* Placeholder visual enquanto a foto editada não está disponível */
+.hero-photo-placeholder {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #0a0700 0%, #000 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Quando a foto hero-banner.jpg for adicionada, ela vai aqui */
+.hero-bg-img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  opacity: 0.55;
+  display: none; /* ativar quando tiver a imagem */
+}
+.hero-bg-img.loaded { display: block; }
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0,0,0,0.3) 0%,
+    rgba(0,0,0,0.1) 40%,
+    rgba(0,0,0,0.7) 75%,
+    rgba(0,0,0,1) 100%
+  );
+}
+
+.hero-noise {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(201,162,39,0.5);
+  background: rgba(201,162,39,0.06);
+  color: var(--gold2);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 7px 18px;
+  border-radius: 100px;
+  margin-bottom: 36px;
+  backdrop-filter: blur(4px);
+}
+.hero-badge svg { width: 12px; height: 12px; }
+
+.hero-logo {
+  margin: 0 auto 40px;
+  /* Espaço reservado para logo do produto */
+}
+
+.hero-logo-placeholder {
+  display: inline-block;
+  padding: 12px 0;
+}
+
+.hero-logo-placeholder .logo-icon {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  color: var(--gold);
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+h1.hero-headline {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(36px, 6vw, 68px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--white);
+  margin-bottom: 12px;
+}
+
+h1.hero-headline em {
+  font-style: italic;
+  color: var(--gold2);
+}
+
+.hero-divider {
+  width: 60px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  margin: 28px auto;
+}
+
+.hero-sub {
+  font-size: clamp(16px, 2.2vw, 20px);
+  color: var(--white-dim);
+  line-height: 1.65;
+  max-width: 620px;
+  margin: 0 auto 12px;
+  font-weight: 300;
+}
+
+.hero-sub strong {
+  color: var(--white);
+  font-weight: 500;
+}
+
+.hero-farewell {
+  font-size: 14px;
+  color: var(--gold2);
+  font-style: italic;
+  margin-bottom: 44px;
+  opacity: 0.85;
+}
+
+.btn-gold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: linear-gradient(135deg, var(--gold) 0%, #a8841e 50%, var(--gold2) 100%);
+  color: #000;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 18px 44px;
+  border-radius: 2px;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+.btn-gold::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.btn-gold:hover::before { opacity: 1; }
+.btn-gold:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(201,162,39,0.35); }
+.btn-gold:active { transform: translateY(0); }
+
+.btn-gold-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: transparent;
+  color: var(--gold2);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 17px 44px;
+  border-radius: 2px;
+  border: 1px solid rgba(201,162,39,0.5);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+.btn-gold-outline:hover {
+  background: rgba(201,162,39,0.08);
+  border-color: var(--gold);
+  box-shadow: 0 0 20px rgba(201,162,39,0.1);
+}
+
+.hero-cta-note {
+  margin-top: 18px;
+  font-size: 12px;
+  color: var(--white-muted);
+  letter-spacing: 0.04em;
+}
+.hero-cta-note span { color: var(--gold2); font-weight: 500; }
+
+/* ──────────────────────────────────────────
+   SECTION SEPARATOR
+────────────────────────────────────────── */
+.sep {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(201,162,39,0.25) 30%, rgba(201,162,39,0.25) 70%, transparent 100%);
+  margin: 0;
+}
+
+.sep-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 0 40px;
+  margin: 0;
+}
+.sep-center::before, .sep-center::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201,162,39,0.25));
+}
+.sep-center::after { background: linear-gradient(270deg, transparent, rgba(201,162,39,0.25)); }
+.sep-diamond {
+  width: 8px; height: 8px;
+  border: 1px solid var(--gold);
+  transform: rotate(45deg);
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+/* ──────────────────────────────────────────
+   SECTION BASE
+────────────────────────────────────────── */
+section { position: relative; }
+
+.section-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.section-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 16px;
+  opacity: 0.9;
+}
+
+.section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(32px, 4.5vw, 52px);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--white);
+}
+
+.section-title em { font-style: italic; color: var(--gold2); }
+
+/* ──────────────────────────────────────────
+   FEATURES SECTION
+────────────────────────────────────────── */
+.features {
+  padding: 90px 0 100px;
+  background: var(--black2);
+}
+
+.features-header {
+  text-align: center;
+  margin-bottom: 64px;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  background: rgba(201,162,39,0.1);
+  border: 1px solid rgba(201,162,39,0.1);
+}
+
+.feature-card {
+  background: var(--black2);
+  padding: 48px 36px;
+  position: relative;
+  transition: background 0.3s;
+}
+.feature-card:hover { background: #0d0d0d; }
+
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.feature-card:hover::before { opacity: 1; }
+
+.feature-icon {
+  width: 48px; height: 48px;
+  border: 1px solid rgba(201,162,39,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 28px;
+  color: var(--gold);
+}
+.feature-icon svg { width: 22px; height: 22px; }
+
+.feature-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold2);
+  margin-bottom: 10px;
+  opacity: 0.7;
+}
+
+.feature-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 16px;
+  line-height: 1.2;
+}
+
+.feature-desc {
+  font-size: 14px;
+  color: var(--white-muted);
+  line-height: 1.7;
+  font-weight: 300;
+}
+
+.feature-tag {
+  display: inline-block;
+  margin-top: 24px;
+  font-size: 11px;
+  color: var(--gold2);
+  border: 1px solid rgba(201,162,39,0.2);
+  padding: 4px 12px;
+  letter-spacing: 0.06em;
+}
+
+/* ──────────────────────────────────────────
+   MARCOS SECTION
+────────────────────────────────────────── */
+.sobre {
+  padding: 100px 0;
+  background: var(--black);
+}
+
+.sobre-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+
+.sobre-photo-wrap {
+  position: relative;
+}
+
+.sobre-photo-frame {
+  position: relative;
+  aspect-ratio: 4/5;
+  overflow: hidden;
+  background: #0a0a0a;
+}
+.sobre-photo-frame::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(201,162,39,0.2);
+  z-index: 2;
+  pointer-events: none;
+}
+.sobre-photo-frame::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 40%;
+  background: linear-gradient(0deg, rgba(0,0,0,0.8), transparent);
+  z-index: 1;
+}
+
+.sobre-photo-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  filter: grayscale(20%) contrast(1.05);
+}
+
+/* Placeholder enquanto foto de perfil editada não está disponível */
+.sobre-photo-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #0a0a0a 0%, #111 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: rgba(201,162,39,0.3);
+  font-size: 13px;
+  letter-spacing: 0.1em;
+}
+
+.sobre-gold-accent {
+  position: absolute;
+  bottom: -20px;
+  left: -20px;
+  width: 80px;
+  height: 80px;
+  border-left: 1px solid var(--gold);
+  border-bottom: 1px solid var(--gold);
+  opacity: 0.3;
+}
+
+.sobre-content .section-label { margin-bottom: 12px; }
+
+.sobre-content .section-title {
+  margin-bottom: 28px;
+}
+
+.sobre-bio {
+  font-size: 15px;
+  color: var(--white-muted);
+  line-height: 1.8;
+  font-weight: 300;
+  margin-bottom: 20px;
+}
+.sobre-bio strong { color: var(--white); font-weight: 500; }
+
+.sobre-stats {
+  display: flex;
+  gap: 40px;
+  margin-top: 40px;
+  padding-top: 40px;
+  border-top: 1px solid rgba(201,162,39,0.1);
+}
+
+.sobre-stat-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 38px;
+  font-weight: 700;
+  color: var(--gold2);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.sobre-stat-label {
+  font-size: 12px;
+  color: var(--white-muted);
+  letter-spacing: 0.06em;
+  font-weight: 400;
+}
+
+/* ──────────────────────────────────────────
+   DEPOIMENTOS
+────────────────────────────────────────── */
+.depoimentos {
+  padding: 90px 0 100px;
+  background: var(--black2);
+}
+
+.depoimentos-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.depo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.depo-item {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(201,162,39,0.08);
+  transition: all 0.3s;
+  cursor: pointer;
+  background: #0a0a0a;
+}
+.depo-item:hover {
+  border-color: rgba(201,162,39,0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+}
+
+.depo-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.4s;
+}
+.depo-item:hover img { transform: scale(1.02); }
+
+/* ──────────────────────────────────────────
+   URGENCY STRIP
+────────────────────────────────────────── */
+.urgency-strip {
+  background: linear-gradient(90deg, #0d0900, #1a1200, #0d0900);
+  border-top: 1px solid rgba(201,162,39,0.15);
+  border-bottom: 1px solid rgba(201,162,39,0.15);
+  padding: 32px 24px;
+  text-align: center;
+}
+
+.urgency-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(20px, 3vw, 30px);
+  font-weight: 600;
+  color: var(--gold2);
+  letter-spacing: 0.02em;
+}
+
+.urgency-text span { color: var(--white); }
+
+/* ──────────────────────────────────────────
+   FINAL CTA
+────────────────────────────────────────── */
+.final-cta {
+  padding: 120px 0 80px;
+  background: var(--black);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.final-cta::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(201,162,39,0.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.final-cta-content {
+  position: relative;
+  z-index: 1;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.final-cta .section-title {
+  margin-bottom: 28px;
+}
+
+.final-cta-copy {
+  font-size: 18px;
+  color: var(--white-muted);
+  line-height: 1.7;
+  font-weight: 300;
+  margin-bottom: 48px;
+}
+
+.final-cta-copy strong { color: var(--white); font-weight: 500; }
+
+/* ──────────────────────────────────────────
+   FORM SECTION
+────────────────────────────────────────── */
+.form-section {
+  padding: 0 0 120px;
+  background: var(--black);
+}
+
+.form-wrap {
+  max-width: 540px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.form-card {
+  background: var(--black3);
+  border: 1px solid rgba(201,162,39,0.15);
+  padding: 52px 48px;
+  position: relative;
+  overflow: hidden;
+}
+
+.form-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.form-card-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.form-card-sub {
+  font-size: 13px;
+  color: var(--white-muted);
+  text-align: center;
+  margin-bottom: 36px;
+  line-height: 1.5;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold2);
+  margin-bottom: 8px;
+  opacity: 0.8;
+}
+
+.form-input {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--white);
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 300;
+  padding: 14px 18px;
+  outline: none;
+  transition: all 0.2s;
+  border-radius: 0;
+  -webkit-appearance: none;
+}
+
+.form-input::placeholder { color: rgba(255,255,255,0.25); }
+
+.form-input:focus {
+  border-color: rgba(201,162,39,0.4);
+  background: rgba(201,162,39,0.03);
+  box-shadow: 0 0 0 3px rgba(201,162,39,0.06);
+}
+
+.form-input:hover:not(:focus) {
+  border-color: rgba(255,255,255,0.15);
+}
+
+/* Input telefone */
+.phone-prefix {
+  display: flex;
+  gap: 0;
+}
+
+.prefix-box {
+  background: rgba(201,162,39,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-right: none;
+  color: var(--gold2);
+  font-size: 15px;
+  padding: 14px 14px;
+  white-space: nowrap;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+}
+
+.phone-prefix .form-input {
+  border-left: none;
+}
+
+.btn-submit {
+  width: 100%;
+  margin-top: 8px;
+  padding: 18px;
+  font-size: 13px;
+  letter-spacing: 0.15em;
+  border: none;
+  cursor: pointer;
+}
+
+.form-note {
+  margin-top: 20px;
+  font-size: 12px;
+  color: var(--white-muted);
+  text-align: center;
+  line-height: 1.6;
+  opacity: 0.7;
+}
+.form-note span { color: var(--gold2); }
+
+/* Success state */
+.form-success {
+  display: none;
+  text-align: center;
+  padding: 20px 0;
+}
+
+.form-success.visible { display: block; }
+.form-fields.hidden { display: none; }
+
+.success-icon {
+  width: 56px; height: 56px;
+  border: 1px solid var(--gold);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+  color: var(--gold);
+}
+.success-icon svg { width: 24px; height: 24px; }
+
+.success-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 12px;
+}
+
+.success-msg {
+  font-size: 14px;
+  color: var(--white-muted);
+  line-height: 1.7;
+  font-weight: 300;
+}
+
+/* ──────────────────────────────────────────
+   FOOTER
+────────────────────────────────────────── */
+footer {
+  background: #050505;
+  border-top: 1px solid rgba(201,162,39,0.08);
+  padding: 40px 24px;
+  text-align: center;
+}
+
+.footer-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  color: var(--gold2);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  opacity: 0.7;
+}
+
+.footer-copy {
+  font-size: 12px;
+  color: var(--white-muted);
+  opacity: 0.4;
+  letter-spacing: 0.04em;
+}
+
+/* ──────────────────────────────────────────
+   SCROLL ANIMATIONS
+────────────────────────────────────────── */
+.fade-up {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.fade-up-d1 { transition-delay: 0.1s; }
+.fade-up-d2 { transition-delay: 0.2s; }
+.fade-up-d3 { transition-delay: 0.3s; }
+.fade-up-d4 { transition-delay: 0.4s; }
+
+/* ──────────────────────────────────────────
+   RESPONSIVE
+────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .features-grid { grid-template-columns: 1fr; }
+  .sobre-grid { grid-template-columns: 1fr; gap: 48px; }
+  .sobre-photo-wrap { max-width: 320px; margin: 0 auto; }
+  .depo-grid { grid-template-columns: 1fr 1fr; }
+  .form-card { padding: 40px 24px; }
+  .sobre-stats { gap: 24px; }
+}
+
+@media (max-width: 480px) {
+  .depo-grid { grid-template-columns: 1fr; }
+  .hero { padding: 60px 20px 80px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ANNOUNCEMENT BAR -->
+<div class="ann-bar">
+  <span class="ann-dot"></span>
+  VAGAS EXTREMAMENTE LIMITADAS &nbsp;·&nbsp; LISTA DE ESPERA VIP ABERTA
+</div>
+
+<!-- ──── HERO ──── -->
+<section class="hero">
+  <div class="hero-bg">
+    <div class="hero-photo-placeholder">
+      <!-- FOTO HERO: hero-banner.jpg será colocada aqui -->
+      <img
+        class="hero-bg-img"
+        src="images/marcos/hero-banner.jpg"
+        alt="Marcos de Castro"
+        onload="this.classList.add('loaded')"
+      >
+    </div>
+    <div class="hero-overlay"></div>
+    <div class="hero-noise"></div>
+  </div>
+
+  <div class="hero-content">
+    <!-- Logo placeholder → substituir por logo-academyelite.png -->
+    <div class="hero-logo">
+      <div class="hero-logo-placeholder">
+        <span class="logo-icon">Elite Dark Academy</span>
+      </div>
+    </div>
+
+    <div class="hero-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+      Acesso Restrito
+    </div>
+
+    <h1 class="hero-headline">
+      Não é mais sobre<br>
+      <em>assistir aulas.</em>
+    </h1>
+
+    <div class="hero-divider"></div>
+
+    <p class="hero-sub">
+      É sobre entrar na operação do<strong> Marcos de Castro</strong> de forma VIP.<br>
+      Você terá acesso extremamente limitado direto à minha estrutura,
+      estratégias, ferramentas e encontros pessoais para construir canais
+      fortes, escaláveis e monetizáveis.
+    </p>
+
+    <p class="hero-farewell">
+      Essa será minha despedida da proximidade aberta.<br>
+      Depois disso, meu foco será apenas no Academy.
+    </p>
+
+    <a href="#form" class="btn-gold">
+      Quero Entrar na Lista VIP
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+    </a>
+
+    <p class="hero-cta-note">
+      <span>Vagas extremamente limitadas.</span><br>
+      Apenas quem estiver na lista terá prioridade no acesso.
+    </p>
+  </div>
+</section>
+
+<!-- ──── SEPARATOR ──── -->
+<div class="sep-center">
+  <div class="sep-diamond"></div>
+</div>
+
+<!-- ──── FEATURES ──── -->
+<section class="features">
+  <div class="section-inner">
+    <div class="features-header">
+      <div class="section-label fade-up">O que está incluso</div>
+      <h2 class="section-title fade-up fade-up-d1">
+        Uma estrutura <em>completa.</em><br>Nada superficial.
+      </h2>
+    </div>
+
+    <div class="features-grid">
+
+      <div class="feature-card fade-up">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <div class="feature-label">Mentoria</div>
+        <h3 class="feature-title">Mentoria Premium &amp; Encontros Estratégicos</h3>
+        <p class="feature-desc">
+          Aulas ao vivo com foco total em estratégia, crescimento,
+          monetização e escala. Acesso direto ao Marcos em encontros
+          exclusivos para membros VIP.
+        </p>
+        <span class="feature-tag">AO VIVO</span>
+      </div>
+
+      <div class="feature-card fade-up fade-up-d2">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="2" y="3" width="20" height="14" rx="2"/>
+            <path d="M8 21h8M12 17v4"/>
+            <path d="M7 8l3 3 5-5"/>
+          </svg>
+        </div>
+        <div class="feature-label">Ferramentas</div>
+        <h3 class="feature-title">Ferramentas Inclusas</h3>
+        <p class="feature-desc">
+          Estrutura completa para operação de canais. Acesso às mesmas
+          ferramentas e sistemas que Marcos utiliza na sua operação real,
+          integradas ao seu fluxo de trabalho.
+        </p>
+        <span class="feature-tag">Necessário Plano Ultra Gemini</span>
+      </div>
+
+      <div class="feature-card fade-up fade-up-d3">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+        </div>
+        <div class="feature-label">Análises</div>
+        <h3 class="feature-title">Análises Estratégicas</h3>
+        <p class="feature-desc">
+          Correções reais e direcionamento personalizado. Seu canal
+          analisado por quem constrói operações escaláveis, com feedback
+          direto e acionável.
+        </p>
+        <span class="feature-tag">DIRECIONAMENTO REAL</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ──── SEPARATOR ──── -->
+<div class="sep"></div>
+
+<!-- ──── SOBRE MARCOS ──── -->
+<section class="sobre">
+  <div class="section-inner">
+    <div class="sobre-grid">
+
+      <div class="sobre-photo-wrap fade-up">
+        <div class="sobre-photo-frame">
+          <!-- FOTO MARCOS perfil: use foto-perfil-marcos.jpg quando editada -->
+          <!-- Por ora, exibe uma das fotos originais -->
+          <img
+            src="images/marcos/foto-perfil-marcos.jpg"
+            alt="Marcos de Castro"
+            onerror="this.parentElement.innerHTML = '<div class=\'sobre-photo-placeholder\'><svg width=\'40\' height=\'40\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'1\'><path d=\'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2\'/><circle cx=\'12\' cy=\'7\' r=\'4\'/></svg><span style=\'font-size:11px;letter-spacing:.1em\'>FOTO MARCOS</span></div>'"
+          >
+        </div>
+        <div class="sobre-gold-accent"></div>
+      </div>
+
+      <div class="sobre-content">
+        <div class="section-label fade-up">Quem está por trás</div>
+        <h2 class="section-title fade-up fade-up-d1">
+          Marcos de Castro.<br>
+          <em>Operação real.</em>
+        </h2>
+
+        <p class="sobre-bio fade-up fade-up-d2">
+          <strong>Marcos de Castro</strong> não ensina teoria. Ele opera canais que escalam,
+          monetizam e se sustentam — e agora abre sua estrutura para um grupo
+          extremamente limitado de pessoas.
+        </p>
+
+        <p class="sobre-bio fade-up fade-up-d2">
+          Cada estratégia, cada ferramenta, cada encontro que você terá no
+          Elite Dark Academy vem de uma operação real, testada e validada.
+          Não é um curso. É acesso direto ao bastidor premium.
+        </p>
+
+        <div class="sobre-stats fade-up fade-up-d3">
+          <div>
+            <div class="sobre-stat-num">VIP</div>
+            <div class="sobre-stat-label">Vagas exclusivas</div>
+          </div>
+          <div>
+            <div class="sobre-stat-num">100%</div>
+            <div class="sobre-stat-label">Acesso à operação real</div>
+          </div>
+          <div>
+            <div class="sobre-stat-num">AO VIVO</div>
+            <div class="sobre-stat-label">Encontros estratégicos</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ──── URGENCY ──── -->
+<div class="urgency-strip">
+  <div class="urgency-text">
+    <span>Depois disso,</span> meu foco será apenas no Academy.
+    <br><em style="font-size: 0.85em; opacity: 0.8;">Esta é minha despedida da proximidade aberta.</em>
+  </div>
+</div>
+
+<!-- ──── DEPOIMENTOS ──── -->
+<section class="depoimentos">
+  <div class="section-inner">
+    <div class="depoimentos-header">
+      <div class="section-label fade-up">Resultados reais</div>
+      <h2 class="section-title fade-up fade-up-d1">
+        Quem já está na <em>operação.</em>
+      </h2>
+    </div>
+
+    <div class="depo-grid">
+      <div class="depo-item fade-up">
+        <img src="images/depoimentos/depoimento-alice.jpg" alt="Depoimento Alice" loading="lazy">
+      </div>
+      <div class="depo-item fade-up fade-up-d1">
+        <img src="images/depoimentos/depoimento-joel.png" alt="Depoimento Joel" loading="lazy">
+      </div>
+      <div class="depo-item fade-up fade-up-d2">
+        <img src="images/depoimentos/depoimento-vendas.png" alt="Depoimento Vendas" loading="lazy">
+      </div>
+      <div class="depo-item fade-up fade-up-d1">
+        <img src="images/depoimentos/depoimento-dark.png" alt="Depoimento Dark" loading="lazy">
+      </div>
+      <div class="depo-item fade-up fade-up-d2">
+        <img src="images/depoimentos/depoimento-josuel.png" alt="Depoimento Josuel" loading="lazy">
+      </div>
+      <div class="depo-item fade-up fade-up-d3">
+        <img src="images/depoimentos/depoimento-receita.png" alt="Depoimento Receita" loading="lazy">
+      </div>
+      <div class="depo-item fade-up">
+        <img src="images/depoimentos/depoimento-diego.png" alt="Depoimento Diego" loading="lazy">
+      </div>
+      <div class="depo-item fade-up fade-up-d1">
+        <img src="images/depoimentos/depoimento-irvson.png" alt="Depoimento Irvson" loading="lazy">
+      </div>
+      <div class="depo-item fade-up fade-up-d2">
+        <img src="images/depoimentos/depoimento-video.png" alt="Depoimento Video" loading="lazy">
+      </div>
+      <div class="depo-item fade-up">
+        <img src="images/depoimentos/depoimento-img1.jpg" alt="Depoimento" loading="lazy">
+      </div>
+      <div class="depo-item fade-up fade-up-d1">
+        <img src="images/depoimentos/depoimento-img4.png" alt="Depoimento" loading="lazy">
+      </div>
+      <div class="depo-item fade-up fade-up-d2">
+        <img src="images/depoimentos/depoimento-img5.png" alt="Depoimento" loading="lazy">
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ──── FINAL CTA ──── -->
+<section class="final-cta">
+  <div class="section-inner">
+    <div class="final-cta-content">
+      <div class="section-label fade-up">Última chamada</div>
+      <h2 class="section-title fade-up fade-up-d1">
+        A próxima fase<br><em>começa agora.</em>
+      </h2>
+
+      <div class="hero-divider" style="margin: 32px auto;"></div>
+
+      <p class="final-cta-copy fade-up fade-up-d2">
+        Se você quer continuar sozinho, tudo bem.<br>
+        Mas se quer entrar em um ambiente <strong>premium, estratégico e com acompanhamento real</strong>…<br>
+        essa será sua oportunidade.
+      </p>
+
+      <a href="#form" class="btn-gold fade-up fade-up-d3">
+        Entrar na Lista de Espera VIP
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </a>
+
+      <p class="hero-cta-note fade-up fade-up-d4" style="margin-top: 20px;">
+        <span>As primeiras vagas serão liberadas prioritariamente</span><br>
+        para quem estiver cadastrado.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ──── FORM ──── -->
+<section class="form-section" id="form">
+  <div class="form-wrap">
+    <div class="form-card fade-up">
+      <div class="form-fields">
+        <h3 class="form-card-title">Garantir minha vaga</h3>
+        <p class="form-card-sub">
+          Preencha seus dados e entre para a lista VIP do Elite Dark Academy.
+          As primeiras informações serão enviadas primeiro para você.
+        </p>
+
+        <form id="elite-form" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="nome">Nome completo</label>
+            <input
+              class="form-input"
+              type="text"
+              id="nome"
+              name="nome"
+              placeholder="Seu nome"
+              autocomplete="name"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="email">E-mail</label>
+            <input
+              class="form-input"
+              type="email"
+              id="email"
+              name="email"
+              placeholder="seu@email.com"
+              autocomplete="email"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="whatsapp">WhatsApp</label>
+            <div class="phone-prefix">
+              <span class="prefix-box">🇧🇷 +55</span>
+              <input
+                class="form-input"
+                type="tel"
+                id="whatsapp"
+                name="whatsapp"
+                placeholder="(00) 00000-0000"
+                autocomplete="tel"
+                required
+              >
+            </div>
+          </div>
+
+          <button type="submit" class="btn-gold btn-submit" id="submit-btn">
+            Entrar na Lista VIP
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </button>
+        </form>
+
+        <p class="form-note">
+          <span>Suas informações estão seguras.</span><br>
+          Nunca enviamos spam. Você pode cancelar a qualquer momento.
+        </p>
+      </div>
+
+      <!-- SUCCESS STATE -->
+      <div class="form-success" id="form-success">
+        <div class="success-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+        <h3 class="success-title">Você entrou para a lista VIP.</h3>
+        <p class="success-msg">
+          As próximas informações do Elite Dark Academy<br>
+          serão enviadas primeiro para você.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ──── FOOTER ──── -->
+<footer>
+  <div class="footer-logo">Elite Dark Academy</div>
+  <p class="footer-copy">© 2026 Marcos de Castro · Todos os direitos reservados</p>
+</footer>
+
+<script>
+// ── Scroll animations ──
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+// ── Phone mask ──
+const phoneInput = document.getElementById('whatsapp');
+if (phoneInput) {
+  phoneInput.addEventListener('input', function () {
+    let v = this.value.replace(/\D/g, '').slice(0, 11);
+    if (v.length >= 7) {
+      v = v.replace(/^(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
+    } else if (v.length >= 3) {
+      v = v.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+    } else if (v.length >= 1) {
+      v = v.replace(/^(\d{0,2})/, '($1');
+    }
+    this.value = v;
+  });
+}
+
+// ── Form submit ──
+const form = document.getElementById('elite-form');
+const submitBtn = document.getElementById('submit-btn');
+const successDiv = document.getElementById('form-success');
+const formFields = form.closest('.form-fields');
+
+if (form) {
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const nome = document.getElementById('nome').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const whatsapp = document.getElementById('whatsapp').value.trim();
+
+    if (!nome || !email || !whatsapp) {
+      alert('Por favor, preencha todos os campos.');
+      return;
+    }
+
+    if (!email.includes('@')) {
+      alert('Por favor, insira um e-mail válido.');
+      return;
+    }
+
+    submitBtn.textContent = 'Enviando...';
+    submitBtn.disabled = true;
+
+    try {
+      const res = await fetch('/api/academyelite-waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome, email, whatsapp })
+      });
+
+      const data = await res.json();
+
+      if (res.ok || data.ok) {
+        formFields.classList.add('hidden');
+        successDiv.classList.add('visible');
+        // scroll to success
+        successDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        throw new Error(data.error || 'Erro ao enviar');
+      }
+    } catch (err) {
+      console.error(err);
+      submitBtn.textContent = 'Entrar na Lista VIP →';
+      submitBtn.disabled = false;
+      alert('Ocorreu um erro. Por favor, tente novamente.');
+    }
+  });
+}
+
+// ── Smooth scroll for hero CTA ──
+document.querySelectorAll('a[href="#form"]').forEach(a => {
+  a.addEventListener('click', function (e) {
+    e.preventDefault();
+    document.getElementById('form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+</script>
+</body>
+</html>
