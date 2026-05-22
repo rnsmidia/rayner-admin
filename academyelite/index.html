@@ -664,14 +664,26 @@ section { position: relative; }
   overflow: hidden;
 }
 
+/* Background image layer */
+.depoimentos-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url('/academyelite/images/bg-depoimentos.jpg');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.18;
+  z-index: 0;
+  pointer-events: none;
+}
+
 /* Glow dourado nas laterais via CSS */
 .depoimentos::before {
   content: '';
   position: absolute;
   left: -120px; top: 50%;
   transform: translateY(-50%);
-  width: 400px; height: 700px;
-  background: radial-gradient(ellipse, rgba(201,162,39,0.18) 0%, transparent 70%);
+  width: 500px; height: 800px;
+  background: radial-gradient(ellipse, rgba(201,162,39,0.22) 0%, transparent 70%);
   pointer-events: none;
   z-index: 0;
 }
@@ -680,8 +692,8 @@ section { position: relative; }
   position: absolute;
   right: -120px; top: 50%;
   transform: translateY(-50%);
-  width: 400px; height: 700px;
-  background: radial-gradient(ellipse, rgba(201,162,39,0.18) 0%, transparent 70%);
+  width: 500px; height: 800px;
+  background: radial-gradient(ellipse, rgba(201,162,39,0.22) 0%, transparent 70%);
   pointer-events: none;
   z-index: 0;
 }
@@ -1248,6 +1260,7 @@ footer {
 
 <!-- ──── DEPOIMENTOS ──── -->
 <section class="depoimentos">
+  <div class="depoimentos-bg"></div>
   <div class="section-inner">
     <div class="depoimentos-header">
       <div class="section-label fade-up">Resultados reais</div>
