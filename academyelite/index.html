@@ -835,22 +835,35 @@ section { position: relative; }
 /* ──────────────────────────────────────────
    FINAL CTA
 ────────────────────────────────────────── */
-.final-cta {
-  padding: 120px 0 80px;
-  background: var(--black);
-  text-align: center;
+/* ──────────────────────────────────────────
+   CTA + FORM WRAPPER (background unificado)
+────────────────────────────────────────── */
+.cta-wrapper {
   position: relative;
+  background: var(--black);
   overflow: hidden;
 }
 
-.final-cta::before {
+.cta-wrapper::before {
   content: '';
   position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  width: 600px; height: 600px;
-  background: radial-gradient(circle, rgba(201,162,39,0.04) 0%, transparent 70%);
+  inset: 0;
+  background-image: url('/academyelite/images/bg-cta.png');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.55;
   pointer-events: none;
+  z-index: 0;
+}
+
+.cta-wrapper > * { position: relative; z-index: 1; }
+
+.final-cta {
+  padding: 120px 0 80px;
+  background: transparent;
+  text-align: center;
+  position: relative;
+  overflow: visible;
 }
 
 .final-cta-content {
@@ -879,7 +892,7 @@ section { position: relative; }
 ────────────────────────────────────────── */
 .form-section {
   padding: 0 0 120px;
-  background: var(--black);
+  background: transparent;
 }
 
 .form-wrap {
@@ -1382,6 +1395,7 @@ footer {
 </section>
 
 <!-- ──── FINAL CTA ──── -->
+<div class="cta-wrapper">
 <section class="final-cta">
   <div class="section-inner">
     <div class="final-cta-content">
@@ -1498,6 +1512,7 @@ footer {
     </div>
   </div>
 </section>
+</div><!-- /.cta-wrapper -->
 
 <!-- ──── FOOTER ──── -->
 <footer>
