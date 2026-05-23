@@ -80,12 +80,10 @@ module.exports = async function handler(req, res) {
 
   // Validação do Hottok — aceita o token de qualquer uma das contas
   const validTokens = [HOTMART_HOTTOK_RN, HOTMART_HOTTOK_MC].filter(Boolean);
-  if (validTokens.length > 0) {
-    const hottok = req.headers['x-hotmart-hottok'] || req.query?.hottok || '';
-    if (!validTokens.includes(hottok)) {
-      console.warn('[Hotmart] Hottok inválido:', hottok);
-      return res.status(401).json({ error: 'Não autorizado' });
-    }
+  const hottok = req.headers['x-hotmart-hottok'] || req.query?.hottok || '';
+  if (validTokens.length === 0 || !validTokens.includes(hottok)) {
+    console.warn('[Hotmart] Hottok inválido:', hottok);
+    return res.status(401).json({ error: 'Não autorizado' });
   }
 
   try {
