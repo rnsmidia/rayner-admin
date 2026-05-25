@@ -183,17 +183,17 @@ section{padding:90px 24px;position:relative;z-index:1;}
 .forwho-item h4{font-size:14px;font-weight:700;margin-bottom:4px;}
 .forwho-item p{font-size:13px;color:var(--muted);line-height:1.55;}
 
-/* ── STYLES SECTION ── */
-.macro-group{margin-top:48px;}
-.macro-group+.macro-group{margin-top:44px;}
-.macro-label{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-bottom:16px;}
-.macro-label::before{content:'';display:inline-block;width:24px;height:1px;background:var(--border2);}
-.macro-label::after{content:'';display:inline-block;width:24px;height:1px;background:var(--border2);}
-.micros-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;}
-.micro-thumb{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;cursor:default;transition:border-color .25s,transform .25s,box-shadow .25s;}
-.micro-thumb:hover{border-color:rgba(124,111,255,.45);transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,.5),0 0 24px rgba(124,111,255,.1);}
-.micro-thumb img{width:100%;aspect-ratio:1;object-fit:cover;display:block;}
-.micro-thumb-label{padding:7px 10px;font-size:11px;font-weight:600;color:var(--muted);text-align:center;line-height:1.3;}
+/* ── MARQUEE ── */
+.marquee-wrap{overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,black 8%,black 92%,transparent);mask-image:linear-gradient(90deg,transparent,black 8%,black 92%,transparent);display:flex;flex-direction:column;gap:10px;}
+.marquee-track{display:flex;gap:10px;width:max-content;}
+.marquee-track.go-right{animation:mq-right 50s linear infinite;}
+.marquee-track.go-left{animation:mq-left 50s linear infinite;}
+.marquee-wrap:hover .marquee-track{animation-play-state:paused;}
+@keyframes mq-right{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+@keyframes mq-left{0%{transform:translateX(-50%);}100%{transform:translateX(0);}}
+.mq-thumb{width:148px;height:148px;border-radius:12px;overflow:hidden;flex-shrink:0;border:1px solid var(--border);transition:border-color .25s,transform .3s,box-shadow .3s;cursor:default;}
+.mq-thumb:hover{border-color:rgba(124,111,255,.5);transform:scale(1.06);box-shadow:0 12px 36px rgba(0,0,0,.6),0 0 24px rgba(124,111,255,.15);}
+.mq-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
 
 /* ── TERMINAL BLOCK ── */
 .terminal{background:#0a0a16;border:1px solid rgba(124,111,255,.15);border-radius:14px;padding:24px 28px;font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:40px;position:relative;overflow:hidden;}
@@ -642,110 +642,85 @@ footer a:hover{color:var(--accent2);}
 
 <!-- STYLES -->
 <section style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
-  <div class="container reveal" style="text-align:center;">
+  <div class="container reveal" style="text-align:center;margin-bottom:52px;">
     <div class="section-tag">Estilos visuais</div>
     <h2 class="section-title">11 macros. 33 sub-estilos.<br>Um para cada história.</h2>
-    <p class="section-sub" style="margin:0 auto;">Escolha o look da sua cena a partir de uma galeria visual — cada thumbnail mostra o resultado real do sub-estilo no Veo3.</p>
+    <p class="section-sub" style="margin:0 auto;">Selecione o visual da sua cena em segundos — o CenaDrop configura todos os parâmetros do Veo3 automaticamente.</p>
   </div>
-  <div class="container">
-    <!-- Cinematic -->
-    <div class="macro-group reveal">
-      <div class="macro-label">🎬 Cinematic</div>
-      <div class="micros-grid">
-        <div class="micro-thumb"><img src="/cenadrop/micros/cinematic_realista.png" alt="Cinematic Realista" loading="lazy"><div class="micro-thumb-label">Realista</div></div>
-        <div class="micro-thumb"><img src="/cenadrop/micros/cinematic_narrativa.png" alt="Narrativa Cinematográfica" loading="lazy"><div class="micro-thumb-label">Narrativa</div></div>
-        <div class="micro-thumb"><img src="/cenadrop/micros/cinematic_documentario.png" alt="Documentário" loading="lazy"><div class="micro-thumb-label">Documentário</div></div>
-      </div>
+  <div class="marquee-wrap">
+    <!-- fileira 1 → direita (16 thumbs × 2 para loop) -->
+    <div class="marquee-track go-right">
+      <div class="mq-thumb"><img src="/cenadrop/micros/cinematic_realista.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/cinematic_narrativa.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/cinematic_documentario.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/anime_cinematografico.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/anime_emocional.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/anime_tradicional.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/realismo_foto.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/realismo_drama.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/artistico_aquarela.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/artistico_memoria.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/artistico_surrealismo.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/fantasy_epica.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/fantasy_feerica.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/fantasy_sombria.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/educativo_whiteboard.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/educativo_animado.png" loading="lazy" alt=""></div>
+      <!-- duplicata para loop -->
+      <div class="mq-thumb"><img src="/cenadrop/micros/cinematic_realista.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/cinematic_narrativa.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/cinematic_documentario.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/anime_cinematografico.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/anime_emocional.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/anime_tradicional.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/realismo_foto.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/realismo_drama.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/artistico_aquarela.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/artistico_memoria.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/artistico_surrealismo.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/fantasy_epica.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/fantasy_feerica.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/fantasy_sombria.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/educativo_whiteboard.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/educativo_animado.png" loading="lazy" alt=""></div>
     </div>
-    <!-- Anime -->
-    <div class="macro-group reveal">
-      <div class="macro-label">🎌 Anime</div>
-      <div class="micros-grid">
-        <div class="micro-thumb"><img src="/cenadrop/micros/anime_cinematografico.png" alt="Anime Cinematográfico" loading="lazy"><div class="micro-thumb-label">Cinematográfico</div></div>
-        <div class="micro-thumb"><img src="/cenadrop/micros/anime_emocional.png" alt="Anime Emocional" loading="lazy"><div class="micro-thumb-label">Emocional</div></div>
-        <div class="micro-thumb"><img src="/cenadrop/micros/anime_tradicional.png" alt="Anime Tradicional" loading="lazy"><div class="micro-thumb-label">Tradicional</div></div>
-      </div>
-    </div>
-    <!-- Realismo Fotográfico -->
-    <div class="macro-group reveal">
-      <div class="macro-label">📷 Realismo Fotográfico</div>
-      <div class="micros-grid">
-        <div class="micro-thumb"><img src="/cenadrop/micros/realismo_foto.png" alt="Foto Realista" loading="lazy"><div class="micro-thumb-label">Foto Realista</div></div>
-        <div class="micro-thumb"><img src="/cenadrop/micros/realismo_drama.png" alt="Drama Visual" loading="lazy"><div class="micro-thumb-label">Drama Visual</div></div>
-      </div>
-    </div>
-    <!-- Artístico / Pintura -->
-    <div class="macro-group reveal">
-      <div class="macro-label">🎨 Artístico / Pintura</div>
-      <div class="micros-grid">
-        <div class="micro-thumb"><img src="/cenadrop/micros/artistico_aquarela.png" alt="Aquarela" loading="lazy"><div class="micro-thumb-label">Aquarela</div></div>
-        <div class="micro-thumb"><img src="/cenadrop/micros/artistico_memoria.png" alt="Memória Afetiva" loading="lazy"><div class="micro-thumb-label">Memória Afetiva</div></div>
-        <div class="micro-thumb"><img src="/cenadrop/micros/artistico_surrealismo.png" alt="Surrealismo" loading="lazy"><div class="micro-thumb-label">Surrealismo</div></div>
-      </div>
-    </div>
-    <!-- Fantasy -->
-    <div class="macro-group reveal">
-      <div class="macro-label">🧙 Fantasy</div>
-      <div class="micros-grid">
-        <div class="micro-thumb"><img src="/cenadrop/micros/fantasy_epica.png" alt="Épica" loading="lazy"><div class="micro-thumb-label">Épica</div></div>
-        <div class="micro-thumb"><img src="/cenadrop/micros/fantasy_feerica.png" alt="Feérica" loading="lazy"><div class="micro-thumb-label">Feérica</div></div>
-        <div class="micro-thumb"><img src="/cenadrop/micros/fantasy_sombria.png" alt="Sombria" loading="lazy"><div class="micro-thumb-label">Sombria</div></div>
-      </div>
-    </div>
-    <!-- Educativo -->
-    <div class="macro-group reveal">
-      <div class="macro-label">✏️ Educativo</div>
-      <div class="micros-grid">
-        <div class="micro-thumb"><img src="/cenadrop/micros/educativo_whiteboard.png" alt="Quadro Branco" loading="lazy"><div class="micro-thumb-label">Quadro Branco</div></div>
-        <div class="micro-thumb"><img src="/cenadrop/micros/educativo_animado.png" alt="Animado Didático" loading="lazy"><div class="micro-thumb-label">Animado Didático</div></div>
-        <div class="micro-thumb"><img src="/cenadrop/micros/educativo_palito.png" alt="Palito / Motion" loading="lazy"><div class="micro-thumb-label">Palito / Motion</div></div>
-      </div>
-    </div>
-    <!-- Pop / Viral -->
-    <div class="macro-group reveal">
-      <div class="macro-label">⚡ Pop / Viral</div>
-      <div class="micros-grid">
-        <div class="micro-thumb"><img src="/cenadrop/micros/pop_viral.png" alt="Viral" loading="lazy"><div class="micro-thumb-label">Viral</div></div>
-        <div class="micro-thumb"><img src="/cenadrop/micros/pop_hq.png" alt="HQ / Quadrinhos" loading="lazy"><div class="micro-thumb-label">HQ / Quadrinhos</div></div>
-        <div class="micro-thumb"><img src="/cenadrop/micros/pop_artilustrado.png" alt="Arte Ilustrada" loading="lazy"><div class="micro-thumb-label">Arte Ilustrada</div></div>
-      </div>
-    </div>
-    <!-- Tech / Info Visual -->
-    <div class="macro-group reveal">
-      <div class="macro-label">🧠 Tech / Info Visual</div>
-      <div class="micros-grid">
-        <div class="micro-thumb"><img src="/cenadrop/micros/tech_minimalista.png" alt="Minimalista" loading="lazy"><div class="micro-thumb-label">Minimalista</div></div>
-        <div class="micro-thumb"><img src="/cenadrop/micros/tech_infografico.png" alt="Infográfico" loading="lazy"><div class="micro-thumb-label">Infográfico</div></div>
-        <div class="micro-thumb"><img src="/cenadrop/micros/tech_isometrico.png" alt="Isométrico" loading="lazy"><div class="micro-thumb-label">Isométrico</div></div>
-      </div>
-    </div>
-    <!-- Terror / Horror -->
-    <div class="macro-group reveal">
-      <div class="macro-label">🧟 Terror / Horror</div>
-      <div class="micros-grid">
-        <div class="micro-thumb"><img src="/cenadrop/micros/terror_analogico.png" alt="Analógico" loading="lazy"><div class="micro-thumb-label">Analógico</div></div>
-        <div class="micro-thumb"><img src="/cenadrop/micros/terror_psicologico.png" alt="Psicológico" loading="lazy"><div class="micro-thumb-label">Psicológico</div></div>
-        <div class="micro-thumb"><img src="/cenadrop/micros/terror_teatro.png" alt="Teatro do Absurdo" loading="lazy"><div class="micro-thumb-label">Teatro do Absurdo</div></div>
-      </div>
-    </div>
-    <!-- Analógico / Retrô -->
-    <div class="macro-group reveal">
-      <div class="macro-label">📼 Analógico / Retrô</div>
-      <div class="micros-grid">
-        <div class="micro-thumb"><img src="/cenadrop/micros/retro_vhs.png" alt="VHS" loading="lazy"><div class="micro-thumb-label">VHS</div></div>
-        <div class="micro-thumb"><img src="/cenadrop/micros/retro_granulado.png" alt="Filme Granulado" loading="lazy"><div class="micro-thumb-label">Filme Granulado</div></div>
-        <div class="micro-thumb"><img src="/cenadrop/micros/retro_pelicula.png" alt="Película Clássica" loading="lazy"><div class="micro-thumb-label">Película Clássica</div></div>
-        <div class="micro-thumb"><img src="/cenadrop/micros/retro_broadcast.png" alt="Broadcast Retrô" loading="lazy"><div class="micro-thumb-label">Broadcast Retrô</div></div>
-      </div>
-    </div>
-    <!-- Cartoon 3D -->
-    <div class="macro-group reveal">
-      <div class="macro-label">🧊 Cartoon 3D</div>
-      <div class="micros-grid">
-        <div class="micro-thumb"><img src="/cenadrop/micros/cartoon3d_pixar.png" alt="Pixar-like" loading="lazy"><div class="micro-thumb-label">Pixar-like</div></div>
-        <div class="micro-thumb"><img src="/cenadrop/micros/cartoon3d_premium.png" alt="Premium 3D" loading="lazy"><div class="micro-thumb-label">Premium 3D</div></div>
-        <div class="micro-thumb"><img src="/cenadrop/micros/cartoon3d_animated.png" alt="Animated Series" loading="lazy"><div class="micro-thumb-label">Animated Series</div></div>
-      </div>
+    <!-- fileira 2 ← esquerda (17 thumbs × 2 para loop) -->
+    <div class="marquee-track go-left">
+      <div class="mq-thumb"><img src="/cenadrop/micros/educativo_palito.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/pop_viral.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/pop_hq.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/pop_artilustrado.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/tech_minimalista.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/tech_infografico.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/tech_isometrico.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/terror_analogico.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/terror_psicologico.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/terror_teatro.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/retro_vhs.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/retro_granulado.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/retro_pelicula.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/retro_broadcast.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/cartoon3d_pixar.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/cartoon3d_premium.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/cartoon3d_animated.png" loading="lazy" alt=""></div>
+      <!-- duplicata para loop -->
+      <div class="mq-thumb"><img src="/cenadrop/micros/educativo_palito.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/pop_viral.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/pop_hq.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/pop_artilustrado.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/tech_minimalista.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/tech_infografico.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/tech_isometrico.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/terror_analogico.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/terror_psicologico.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/terror_teatro.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/retro_vhs.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/retro_granulado.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/retro_pelicula.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/retro_broadcast.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/cartoon3d_pixar.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/cartoon3d_premium.png" loading="lazy" alt=""></div>
+      <div class="mq-thumb"><img src="/cenadrop/micros/cartoon3d_animated.png" loading="lazy" alt=""></div>
     </div>
   </div>
 </section>
