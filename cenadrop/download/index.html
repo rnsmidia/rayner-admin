@@ -3,253 +3,298 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CenaDrop Flow — Download</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<title>CenaDrop Flow — Download v7.6</title>
+<link rel="icon" href="/cenadrop/icon128.png">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg:      #080810;
-  --surface: #0f0f1c;
-  --card:    #13131f;
-  --border:  #1e1e30;
-  --border2: #2a2a40;
+  --surface: #0d0d1a;
+  --card:    #111120;
+  --border:  #1e1e35;
+  --border2: #2a2a45;
   --accent:  #7c6fff;
-  --accent2: #ff6f91;
+  --accent2: #a78bfa;
+  --teal:    #00d4aa;
+  --teal2:   #00f5c4;
   --green:   #4ade80;
   --yellow:  #fbbf24;
-  --text:    #e8e8f0;
-  --muted:   #555570;
+  --pink:    #ff6f91;
+  --text:    #e8e8f4;
+  --muted:   #6b6b8a;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Space Grotesk',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+a{color:inherit;text-decoration:none;}
+
+/* ── CANVAS ── */
+#particles-canvas{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.6;}
+
+/* ── GRID BG ── */
+.grid-bg{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(124,111,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(124,111,255,.03) 1px,transparent 1px);
+  background-size:60px 60px;}
+
+/* ── AMBIENT ORBS ── */
+.ambient-orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.a-orb{position:absolute;border-radius:50%;filter:blur(70px);}
+.a1{width:600px;height:400px;top:-10%;left:-10%;background:radial-gradient(ellipse,rgba(124,111,255,.1),transparent 70%);animation:orbdrift 22s ease-in-out infinite;}
+.a2{width:500px;height:500px;bottom:0%;right:-8%;background:radial-gradient(ellipse,rgba(0,212,170,.07),transparent 70%);animation:orbdrift 28s ease-in-out infinite reverse;}
+@keyframes orbdrift{0%,100%{transform:translate(0,0);}50%{transform:translate(30px,-30px);}}
+
+/* ── WRAPPER ── */
+.page{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 24px;}
+
+/* ── LOGO ── */
+.logo-wrap{margin-bottom:28px;display:flex;justify-content:center;}
+.logo-box{
+  width:80px;height:80px;border-radius:20px;overflow:hidden;
+  box-shadow:0 0 0 1px rgba(124,111,255,.25),0 0 40px rgba(124,111,255,.2);
+  animation:logopulse 4s ease-in-out infinite;
+}
+.logo-box img{width:100%;height:100%;object-fit:cover;display:block;}
+@keyframes logopulse{0%,100%{box-shadow:0 0 0 1px rgba(124,111,255,.25),0 0 30px rgba(124,111,255,.15);}50%{box-shadow:0 0 0 1px rgba(124,111,255,.4),0 0 50px rgba(124,111,255,.3);}}
+
+/* ── HERO ── */
+.hero{text-align:center;max-width:560px;width:100%;}
+.version-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(124,111,255,.08);border:1px solid rgba(124,111,255,.2);
+  border-radius:100px;padding:6px 18px;
+  font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--accent2);margin-bottom:24px;
+}
+.pulse-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 0 0 rgba(74,222,128,.4);animation:pulsedot 2s infinite;}
+@keyframes pulsedot{0%{box-shadow:0 0 0 0 rgba(74,222,128,.4);}70%{box-shadow:0 0 0 8px rgba(74,222,128,0);}100%{box-shadow:0 0 0 0 rgba(74,222,128,0);}}
+.hero h1{font-size:clamp(32px,5vw,52px);font-weight:700;letter-spacing:-1.5px;line-height:1.05;margin-bottom:12px;}
+.hero h1 .hl{background:linear-gradient(135deg,var(--accent),var(--accent2),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero-sub{font-size:15px;color:var(--muted);line-height:1.7;margin-bottom:36px;max-width:440px;margin-left:auto;margin-right:auto;}
+
+/* ── DOWNLOAD BUTTON ── */
+.btn-download{
+  display:inline-flex;align-items:center;gap:10px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;font-weight:700;font-size:17px;
+  padding:18px 40px;border-radius:14px;
+  box-shadow:0 4px 30px rgba(124,111,255,.4);
+  transition:transform .2s,box-shadow .2s;
+  letter-spacing:.1px;
+  position:relative;overflow:hidden;
+}
+.btn-download::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);transform:translateX(-100%);transition:transform .5s;}
+.btn-download:hover{transform:translateY(-3px);box-shadow:0 10px 40px rgba(124,111,255,.55);}
+.btn-download:hover::after{transform:translateX(100%);}
+.btn-download:active{transform:translateY(0);}
+.btn-icon{font-size:20px;}
+
+/* ── TRUST ROW ── */
+.trust-row{
+  display:flex;gap:0;
+  background:var(--card);border:1px solid var(--border2);border-radius:14px;
+  margin-top:32px;overflow:hidden;
+  width:100%;max-width:560px;
+}
+.trust-item{
+  flex:1;padding:14px 16px;text-align:center;
+  border-right:1px solid var(--border);
+}
+.trust-item:last-child{border-right:none;}
+.trust-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-bottom:4px;}
+.trust-val{font-size:13px;font-weight:700;color:var(--text);}
+.trust-val.green{color:var(--green);}
+.trust-val.accent{color:var(--accent2);}
+
+/* ── DIVIDER ── */
+.divider{width:100%;max-width:560px;height:1px;margin:52px 0 44px;background:linear-gradient(90deg,transparent,rgba(124,111,255,.3),transparent);}
+
+/* ── INSTALL SECTION ── */
+.install-section{width:100%;max-width:560px;}
+.install-title{font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-family:'JetBrains Mono',monospace;text-align:center;margin-bottom:24px;}
+.steps{display:flex;flex-direction:column;gap:12px;}
+.step-card{
+  display:flex;gap:16px;align-items:flex-start;
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:20px 22px;
+  transition:border-color .25s,background .25s;
+}
+.step-card:hover{border-color:rgba(124,111,255,.3);background:rgba(124,111,255,.02);}
+.step-num{
+  width:36px;height:36px;border-radius:10px;flex-shrink:0;
+  background:rgba(124,111,255,.1);border:1px solid rgba(124,111,255,.2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--accent2);
+}
+.step-body{}
+.step-body strong{display:block;font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.step-body span{font-size:13px;color:var(--muted);line-height:1.6;}
+.step-body code{
+  font-family:'JetBrains Mono',monospace;font-size:12px;
+  background:rgba(124,111,255,.08);border:1px solid rgba(124,111,255,.15);
+  border-radius:5px;padding:1px 7px;color:var(--accent2);
+}
+.step-body .tag-teal{
+  font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;
+  background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.18);
+  border-radius:5px;padding:1px 7px;color:var(--teal);
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+/* ── FOOTER ── */
+.footer{
+  margin-top:48px;text-align:center;font-size:12px;color:var(--muted);line-height:1.8;
+  width:100%;max-width:560px;
+}
+.footer a{color:var(--accent2);}
+.footer a:hover{text-decoration:underline;}
+.footer-brand{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(124,111,255,.35);margin-top:12px;}
 
-body {
-  font-family: 'Syne', sans-serif;
-  background: #05050e;
-  color: var(--text);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  justify-content: center;
-  padding: 48px 7% 48px 24px;
-  gap: 24px;
+@media(max-width:520px){
+  .trust-row{flex-direction:column;}
+  .trust-item{border-right:none;border-bottom:1px solid var(--border);}
+  .trust-item:last-child{border-bottom:none;}
+  .hero h1{letter-spacing:-.8px;}
 }
-
-body::before {
-  content: '';
-  position: fixed; inset: 0; pointer-events: none; z-index: 0;
-  background-image: url('/cenadrop/CAPAproduto1280x720png.png');
-  background-size: cover;
-  background-position: center left;
-  opacity: 0.30;
-}
-
-.card {
-  background: var(--card);
-  border: 1px solid var(--border2);
-  border-radius: 24px;
-  padding: 48px 40px;
-  max-width: 480px;
-  width: 100%;
-  text-align: center;
-  position: relative;
-  z-index: 1;
-  box-shadow:
-    0 0 0 1px rgba(124,111,255,0.18),
-    0 0 40px rgba(124,111,255,0.18),
-    0 0 100px rgba(124,111,255,0.08),
-    0 32px 80px rgba(0,0,0,0.10);
-}
-
-.logo-box {
-  width: 88px; height: 88px; border-radius: 22px;
-  overflow: hidden;
-  margin: 0 auto 24px;
-  box-shadow: 0 0 0 1px rgba(124,111,255,0.2), 0 0 40px rgba(124,111,255,0.15);
-}
-.logo-box img {
-  width: 100%; height: 100%; object-fit: cover; display: block;
-}
-
-h1 {
-  font-size: 32px; font-weight: 800; letter-spacing: -0.5px;
-  margin-bottom: 6px;
-}
-h1 .a { color: var(--accent); }
-
-.version-badge {
-  display: inline-block;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px; font-weight: 700; letter-spacing: 2px;
-  color: var(--yellow);
-  background: rgba(251,191,36,0.07);
-  border: 1px solid rgba(251,191,36,0.2);
-  border-radius: 20px;
-  padding: 4px 14px;
-  margin-bottom: 20px;
-}
-
-.desc {
-  font-size: 14px; color: var(--muted);
-  line-height: 1.7; margin-bottom: 32px;
-}
-
-.btn-download {
-  display: flex; align-items: center; justify-content: center; gap: 10px;
-  width: 100%;
-  background: linear-gradient(135deg, var(--accent), #9f7aea);
-  color: #fff;
-  border: none; border-radius: 14px;
-  padding: 16px 24px;
-  font-family: 'Syne', sans-serif;
-  font-size: 16px; font-weight: 800;
-  cursor: pointer; text-decoration: none;
-  transition: all .2s;
-  box-shadow: 0 4px 24px rgba(124,111,255,0.35);
-  letter-spacing: 0.3px;
-}
-.btn-download:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(124,111,255,0.5);
-}
-.btn-download:active { transform: translateY(0); }
-
-.btn-icon { font-size: 18px; }
-
-.divider {
-  height: 1px; margin: 28px 0;
-  background: linear-gradient(90deg, transparent, var(--border2), transparent);
-}
-
-.info-row {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 8px 0;
-  font-size: 12px; color: var(--muted);
-  border-bottom: 1px solid var(--border);
-}
-.info-row:last-child { border-bottom: none; }
-.info-label { font-weight: 600; }
-.info-val {
-  font-family: 'JetBrains Mono', monospace;
-  color: var(--text); font-size: 11px;
-}
-.info-val.green { color: var(--green); }
-.info-val.accent { color: var(--accent); }
-
-.steps-mini {
-  margin-top: 28px; text-align: left;
-}
-.steps-mini-title {
-  font-size: 10px; font-weight: 700; letter-spacing: 2px;
-  text-transform: uppercase; color: var(--muted);
-  margin-bottom: 14px; text-align: center;
-}
-.step-mini {
-  display: flex; gap: 12px; align-items: flex-start;
-  padding: 8px 0; border-bottom: 1px solid var(--border);
-  font-size: 12px; color: var(--muted); line-height: 1.5;
-}
-.step-mini:last-child { border-bottom: none; }
-.step-mini-num {
-  width: 20px; height: 20px; border-radius: 6px; flex-shrink: 0;
-  background: rgba(124,111,255,0.1); border: 1px solid rgba(124,111,255,0.2);
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'JetBrains Mono', monospace; font-size: 10px;
-  font-weight: 700; color: var(--accent);
-}
-
-.footer-note {
-  margin-top: 28px; font-size: 11px; color: var(--muted);
-  line-height: 1.6;
-}
-.footer-note a {
-  color: var(--accent); text-decoration: none;
-}
-.footer-note a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
 
-<div class="card" style="position:relative; z-index:1;">
+<canvas id="particles-canvas"></canvas>
+<div class="grid-bg"></div>
+<div class="ambient-orbs" aria-hidden="true">
+  <div class="a-orb a1"></div>
+  <div class="a-orb a2"></div>
+</div>
 
-  <div class="logo-box"><img src="/cenadrop/icon128.png" alt="CenaDrop"></div>
+<div class="page">
 
-  <h1>CenaDrop <span class="a">Flow</span></h1>
-  <div class="version-badge">7.6 — 25/05/2026</div>
+  <!-- LOGO -->
+  <div class="logo-wrap">
+    <div class="logo-box"><img src="/cenadrop/icon128.png" alt="CenaDrop"></div>
+  </div>
 
-  <p class="desc">
-    Automatize o envio de cenas e o download de vídeos no Google Flow.<br>
-    Instale em segundos — sem Chrome Web Store.
-  </p>
+  <!-- HERO -->
+  <div class="hero">
+    <div class="version-badge"><span class="pulse-dot"></span> v7.6 · 25/05/2026 · Disponível</div>
+    <h1>CenaDrop <span class="hl">Flow</span></h1>
+    <p class="hero-sub">Automatize o envio de cenas e a geração de imagens no Google Flow — sem tocar no teclado.</p>
+    <a class="btn-download" href="/cenadrop/download/cenadrop-latest.zip" download="CenaDrop-Flow-v7.6.zip">
+      <span class="btn-icon">⬇</span> Baixar CenaDrop Flow v7.6
+    </a>
+  </div>
 
-  <a class="btn-download" href="/cenadrop/download/cenadrop-latest.zip" download="CenaDrop-Flow-v7.6.zip">
-    <span class="btn-icon">⬇</span>
-    Baixar CenaDrop Flow v7.6
-  </a>
+  <!-- TRUST ROW -->
+  <div class="trust-row">
+    <div class="trust-item">
+      <div class="trust-label">Versão</div>
+      <div class="trust-val accent">7.6</div>
+    </div>
+    <div class="trust-item">
+      <div class="trust-label">Plataforma</div>
+      <div class="trust-val">Google Chrome</div>
+    </div>
+    <div class="trust-item">
+      <div class="trust-label">Compatível com</div>
+      <div class="trust-val">Google Flow</div>
+    </div>
+    <div class="trust-item">
+      <div class="trust-label">Status</div>
+      <div class="trust-val green">● Disponível</div>
+    </div>
+  </div>
 
   <div class="divider"></div>
 
-  <div>
-    <div class="info-row">
-      <span class="info-label">Versão</span>
-      <span class="info-val accent">7.6</span>
-    </div>
-    <div class="info-row">
-      <span class="info-label">Compatibilidade</span>
-      <span class="info-val">Google Chrome</span>
-    </div>
-    <div class="info-row">
-      <span class="info-label">Plataforma</span>
-      <span class="info-val">Google Flow (labs.google)</span>
-    </div>
-    <div class="info-row">
-      <span class="info-label">Status</span>
-      <span class="info-val green">● Disponível</span>
+  <!-- INSTALL STEPS -->
+  <div class="install-section">
+    <div class="install-title">Como instalar</div>
+    <div class="steps">
+
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Baixe e descompacte o arquivo</strong>
+          <span>Clique no botão acima para baixar o <code>.zip</code>. Extraia em uma pasta permanente — não mova depois de instalar.</span>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>Abra o gerenciador de extensões</strong>
+          <span>No Chrome, acesse <code>chrome://extensions</code> e ative o <code>Modo Desenvolvedor</code> no canto superior direito.</span>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>Carregue a pasta extraída</strong>
+          <span>Clique em <code>Carregar sem compactação</code> e selecione a pasta que você extraiu no passo 1.</span>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Fixe e ative sua licença</strong>
+          <span>Fixe o CenaDrop na barra do Chrome, abra a extensão e insira sua licença para liberar o acesso completo. <span class="tag-teal">Pronto</span></span>
+        </div>
+      </div>
+
     </div>
   </div>
 
-  <div class="steps-mini">
-    <div class="steps-mini-title">Como instalar</div>
-    <div class="step-mini">
-      <div class="step-mini-num">1</div>
-      <div>Baixe e descompacte o ZIP em uma pasta permanente no seu computador</div>
-    </div>
-    <div class="step-mini">
-      <div class="step-mini-num">2</div>
-      <div>Abra <strong style="color:var(--text)">chrome://extensions</strong> e ative o Modo Desenvolvedor</div>
-    </div>
-    <div class="step-mini">
-      <div class="step-mini-num">3</div>
-      <div>Clique em <strong style="color:var(--text)">Carregar sem compactação</strong> e selecione a pasta extraída</div>
-    </div>
-    <div class="step-mini">
-      <div class="step-mini-num">4</div>
-      <div>Fixe a extensão na barra e ative sua licença</div>
-    </div>
+  <!-- FOOTER -->
+  <div class="footer">
+    Dúvidas? Fale com a gente pelo email
+    <a href="mailto:contato@cenadrop.com.br">contato@cenadrop.com.br</a>
+    <div class="footer-brand">© 2026 CenaDrop · cenadrop.com.br · Crie mais. Clique menos.</div>
   </div>
 
-  <p class="footer-note">
-    Dúvidas? Entre em contato pelo email
-    <a href="mailto:contato@cenadrop.com.br">contato@cenadrop.com.br</a><br>
-    © 2025 CenaDrop — cenadrop.com.br
-  </p>
-
 </div>
 
-<div style="
-  display: flex; flex-direction: column; align-items: center; gap: 8px;
-  position: relative; z-index: 1;
-">
-  <div style="
-    width: 32px; height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(124,111,255,0.4), transparent);
-  "></div>
-  <span style="
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px; font-weight: 600; letter-spacing: 3px;
-    color: rgba(124,111,255,0.45); text-transform: uppercase;
-  ">Crie mais. Clique menos.</span>
-</div>
+<script>
+(function(){
+  const canvas = document.getElementById('particles-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H;
+  function resize(){ W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
+  resize();
+  window.addEventListener('resize', resize, {passive:true});
 
+  const PCOLS = ['rgba(124,111,255,','rgba(167,139,250,','rgba(0,212,170,'];
+  const pts = Array.from({length:45}, ()=>({
+    x:Math.random()*3000, y:Math.random()*3000,
+    r:Math.random()*1.5+.3,
+    vx:(Math.random()-.5)*.1, vy:(Math.random()-.5)*.1,
+    c:PCOLS[Math.floor(Math.random()*PCOLS.length)],
+    a:Math.random()*.4+.1
+  }));
+
+  let last=0; const INTERVAL=1000/30;
+  function draw(now){
+    requestAnimationFrame(draw);
+    if(now-last<INTERVAL) return;
+    last=now;
+    ctx.clearRect(0,0,W,H);
+    pts.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0)p.x=W; if(p.x>W)p.x=0;
+      if(p.y<0)p.y=H; if(p.y>H)p.y=0;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=p.c+p.a+')';
+      ctx.fill();
+    });
+  }
+  requestAnimationFrame(draw);
+})();
+</script>
 </body>
 </html>
