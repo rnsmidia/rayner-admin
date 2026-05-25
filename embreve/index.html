@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Narrativa IA — Em Breve</title>
-<meta name="description" content="Transforme qualquer ideia em histórias cinematográficas completas com inteligência artificial.">
+<meta name="description" content="Crie roteiro, descrição SEO e thumbnail para seu canal do YouTube com inteligência artificial.">
 <meta property="og:title" content="Narrativa IA — Em Breve">
-<meta property="og:description" content="A plataforma que gera roteiros, prompts visuais e CSVs prontos para vídeo com IA.">
+<meta property="og:description" content="A plataforma que gera roteiro, descrição SEO e thumbnail para o YouTube com IA — em minutos.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800;900&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -262,6 +262,19 @@ body {
 .feat-title { font-size:14px; font-weight:700; margin-bottom:7px; }
 .feat-desc { font-size:12.5px; color:var(--muted); line-height:1.68; }
 
+/* ── VIDEO DEMO ── */
+.video-section { position:relative; z-index:1; padding:80px 24px; }
+.video-inner { max-width:900px; margin:0 auto; text-align:center; }
+.video-wrap {
+  position:relative; width:100%; aspect-ratio:16/9;
+  border-radius:20px; overflow:hidden;
+  border:1px solid rgba(98,20,255,.22);
+  box-shadow:0 32px 90px rgba(0,0,0,.65), 0 0 0 1px rgba(98,20,255,.12), 0 0 60px rgba(98,20,255,.08);
+  background:#000;
+}
+.video-wrap iframe { position:absolute; inset:0; width:100%; height:100%; border:none; }
+@media (max-width:768px) { .video-section { padding:60px 20px; } }
+
 /* ── WAITLIST ── */
 .waitlist-section { position:relative; z-index:1; padding:80px 24px 120px; }
 .waitlist-inner { max-width:620px; margin:0 auto; text-align:center; }
@@ -376,7 +389,7 @@ body {
 
   <div class="hero-eyebrow">
     <div class="hero-eyebrow-dot"></div>
-    Plataforma de IA Cinematográfica
+    Plataforma de Conteúdo para YouTube
   </div>
 
   <div class="logo-wrap">
@@ -385,18 +398,19 @@ body {
   </div>
 
   <h1 class="hero-title">
-    <span class="hero-title-gradient">Histórias cinematográficas.</span><br>
-    Geradas por IA.
+    <span class="hero-title-gradient">Roteiro. Descrição. Thumbnail.</span><br>
+    Gerados por IA.
   </h1>
 
   <p class="hero-sub">
-    Transforme qualquer ideia em <strong>roteiros, prompts visuais e CSVs</strong> prontos para gerar vídeos com IA — em minutos.
+    Transforme qualquer nicho em <strong>roteiros, descrições SEO e thumbnails</strong> prontos para publicar no YouTube — em minutos.
   </p>
 
   <div class="rotator-wrap">
     <span class="rotator-label">Gera automaticamente</span>
     <span class="rotator-word" id="rotatorWord">roteiros completos</span>
   </div>
+
 
   <div class="hero-form">
     <input type="email" class="hero-input" id="heroEmailInput" placeholder="seu@email.com">
@@ -411,29 +425,46 @@ body {
   </div>
 </section>
 
+<!-- ── VIDEO DEMO ── -->
+<section class="video-section">
+  <div class="video-inner">
+    <div class="section-label" style="justify-content:center">Veja em ação</div>
+    <h2 class="section-title" style="margin-bottom:12px">O Narrativa IA funcionando na prática</h2>
+    <p class="section-sub" style="margin:0 auto 40px">Do canal configurado ao roteiro, descrição e thumbnail — gerados em minutos com inteligência artificial.</p>
+    <div class="video-wrap">
+      <iframe
+        src="https://www.youtube.com/embed/K3BiOah2Zls?rel=0&modestbranding=1&color=white"
+        title="Narrativa IA — Demonstração"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen>
+      </iframe>
+    </div>
+  </div>
+</section>
+
 <div class="section-divider"><div class="section-divider-line"></div></div>
 
 <!-- ── SCENE PREVIEW ── -->
 <section class="section">
   <div class="section-inner">
     <div class="section-label">Prévia do produto</div>
-    <h2 class="section-title">Cada cena, cinematograficamente descrita</h2>
-    <p class="section-sub">O Narrativa IA gera cenas ricas e detalhadas — prontas para carregar no CenaDrop Flow e gerar vídeos no Veo3.</p>
+    <h2 class="section-title">Do título à publicação — tudo gerado</h2>
+    <p class="section-sub">Configure seu canal uma vez. Para cada vídeo, a IA gera roteiro, descrição SEO e prompt de thumbnail — prontos para publicar.</p>
 
     <div class="scene-cards">
 
       <div class="scene-card">
         <div class="scene-card-head">
-          <span class="scene-num">Cena 03</span>
-          <span class="scene-style-badge">🎬 Cinematic</span>
+          <span class="scene-num">Etapa 01</span>
+          <span class="scene-style-badge">✍️ Roteiro</span>
         </div>
         <div class="scene-body">
-          <p class="scene-subject">Detetive examina fotografia antiga sob luz fraca de abajur. Chuva bate na janela embaçada. Expressão tensa, cigarro nos lábios.</p>
+          <p class="scene-subject">Abertura impactante com gancho direto ao problema. Desenvolvimento em 3 blocos com histórias reais. Encerramento com CTA claro para inscrição.</p>
           <div class="scene-tags">
-            <span class="scene-tag">noir</span>
-            <span class="scene-tag">noite</span>
-            <span class="scene-tag">close-up</span>
-            <span class="scene-tag">câmera lenta</span>
+            <span class="scene-tag">gancho</span>
+            <span class="scene-tag">desenvolvimento</span>
+            <span class="scene-tag">CTA</span>
+            <span class="scene-tag">retenção</span>
           </div>
         </div>
         <div class="scene-card-foot">
@@ -444,16 +475,16 @@ body {
 
       <div class="scene-card">
         <div class="scene-card-head">
-          <span class="scene-num">Cena 07</span>
-          <span class="scene-style-badge">🧙 Fantasy</span>
+          <span class="scene-num">Etapa 02</span>
+          <span class="scene-style-badge">🔍 Descrição SEO</span>
         </div>
         <div class="scene-body">
-          <p class="scene-subject">Personagem atravessa floresta densa iluminada por bioluminescência azul-esverdeada. Névoa rasteira. Criaturas mágicas ao redor.</p>
+          <p class="scene-subject">📌 Neste vídeo você vai descobrir como... Descrição otimizada com palavras-chave, links, hashtags relevantes e chamada para ação.</p>
           <div class="scene-tags">
-            <span class="scene-tag">magia</span>
-            <span class="scene-tag">wide shot</span>
-            <span class="scene-tag">épico</span>
-            <span class="scene-tag">slow motion</span>
+            <span class="scene-tag">palavras-chave</span>
+            <span class="scene-tag">hashtags</span>
+            <span class="scene-tag">CTA</span>
+            <span class="scene-tag">SEO</span>
           </div>
         </div>
         <div class="scene-card-foot">
@@ -464,16 +495,15 @@ body {
 
       <div class="scene-card">
         <div class="scene-card-head">
-          <span class="scene-num">Cena 12</span>
-          <span class="scene-style-badge">🧠 Tech</span>
+          <span class="scene-num">Etapa 03</span>
+          <span class="scene-style-badge">🖼️ Thumbnail</span>
         </div>
         <div class="scene-body">
-          <p class="scene-subject">Megacidade futurista vista de drone ao amanhecer. Arranha-céus com hologramas pulsando. Névoa entre prédios e tráfego aéreo.</p>
+          <p class="scene-subject">Fundo escuro com gradiente roxo, rosto expressivo em destaque, texto em amarelo neon com fonte bold. Alta legibilidade em mobile.</p>
           <div class="scene-tags">
-            <span class="scene-tag">sci-fi</span>
-            <span class="scene-tag">aéreo</span>
-            <span class="scene-tag">golden hour</span>
-            <span class="scene-tag">4k</span>
+            <span class="scene-tag">expressão forte</span>
+            <span class="scene-tag">texto impactante</span>
+            <span class="scene-tag">contraste alto</span>
           </div>
         </div>
         <div class="scene-card-foot">
@@ -492,26 +522,26 @@ body {
 <section class="section">
   <div class="section-inner">
     <div class="section-label">Como funciona</div>
-    <h2 class="section-title">Do roteiro ao vídeo em 3 passos</h2>
-    <p class="section-sub">Cole qualquer texto, configure o estilo e deixe a IA transformar sua ideia em cenas prontas para gerar vídeo.</p>
+    <h2 class="section-title">Do canal ao YouTube em 3 passos</h2>
+    <p class="section-sub">Configure seu canal uma vez e o Narrativa IA gera todo o conteúdo necessário para publicar cada vídeo.</p>
 
     <div class="steps-wrap">
       <div class="step">
-        <div class="step-icon-wrap">✍️</div>
-        <div class="step-title">Cole seu roteiro</div>
-        <p class="step-desc">Qualquer texto serve — ideia bruta, sinopse ou roteiro completo. O Narrativa IA interpreta e estrutura o conteúdo automaticamente.</p>
+        <div class="step-icon-wrap">📺</div>
+        <div class="step-title">Configure o canal</div>
+        <p class="step-desc">Defina nicho, público-alvo, idioma e estilo de conteúdo do canal — uma configuração que serve para todos os vídeos futuros.</p>
       </div>
       <div class="step-connector">→</div>
       <div class="step">
         <div class="step-icon-wrap">⚡</div>
-        <div class="step-title">IA gera as cenas</div>
-        <p class="step-desc">Cada cena recebe descrição visual, movimento de câmera, estilo cinematográfico e narração embutida — em múltiplos estilos.</p>
+        <div class="step-title">IA gera o conteúdo</div>
+        <p class="step-desc">Com um título em mente, a IA cria o roteiro completo, a descrição otimizada para SEO e o prompt da thumbnail — automaticamente.</p>
       </div>
       <div class="step-connector">→</div>
       <div class="step">
         <div class="step-icon-wrap">🚀</div>
-        <div class="step-title">Exporte e gere vídeo</div>
-        <p class="step-desc">Baixe o CSV e carregue direto no CenaDrop Flow. O Flow cuida do resto — enviando cada cena ao Veo3 automaticamente.</p>
+        <div class="step-title">Exporte e publique</div>
+        <p class="step-desc">Copie título, descrição e thumbnail direto para o YouTube. Tudo formatado, otimizado e pronto para upload.</p>
       </div>
     </div>
   </div>
@@ -524,38 +554,38 @@ body {
   <div class="section-inner">
     <div class="section-label">Recursos</div>
     <h2 class="section-title">Tudo que você precisa para criar em escala</h2>
-    <p class="section-sub">Desenvolvido para criadores que usam IA para produzir vídeos em volume sem abrir mão da qualidade visual.</p>
+    <p class="section-sub">Desenvolvido para criadores que querem produzir conteúdo de qualidade no YouTube sem gastar horas em cada vídeo.</p>
 
     <div class="features-grid">
       <div class="feat-card">
-        <span class="feat-icon">🎬</span>
-        <div class="feat-title">11 Estilos Visuais</div>
-        <p class="feat-desc">Cinematic, Anime, Fantasy, Horror, Retrô e mais — cada estilo com prompts calibrados para máxima qualidade no Veo3.</p>
+        <span class="feat-icon">📺</span>
+        <div class="feat-title">Múltiplos Canais</div>
+        <p class="feat-desc">Crie e gerencie vários canais com configurações, nichos e estilos independentes — sem cruzar dados entre projetos.</p>
       </div>
       <div class="feat-card">
-        <span class="feat-icon">🎙️</span>
-        <div class="feat-title">Narração Embutida</div>
-        <p class="feat-desc">Cada cena inclui texto de narração integrado ao prompt visual — resultado mais coeso, imersivo e cinematográfico.</p>
+        <span class="feat-icon">✍️</span>
+        <div class="feat-title">Roteiro com IA</div>
+        <p class="feat-desc">Roteiros completos gerados com gancho, desenvolvimento e CTA — otimizados para retenção e engajamento no YouTube.</p>
       </div>
       <div class="feat-card">
-        <span class="feat-icon">📄</span>
-        <div class="feat-title">Export CSV Direto</div>
-        <p class="feat-desc">Arquivo no formato exato do CenaDrop Flow, pronto para carregar e iniciar o envio automático de todas as cenas.</p>
+        <span class="feat-icon">🔍</span>
+        <div class="feat-title">Descrição SEO</div>
+        <p class="feat-desc">Descrições com palavras-chave, hashtags e chamada para ação geradas automaticamente para cada vídeo.</p>
       </div>
       <div class="feat-card">
-        <span class="feat-icon">🌍</span>
-        <div class="feat-title">Multi-idioma</div>
-        <p class="feat-desc">Gere cenas em Português, Inglês ou Espanhol. Ideal para canais internacionais e estratégias multi-mercado.</p>
+        <span class="feat-icon">🖼️</span>
+        <div class="feat-title">Thumbnail IA</div>
+        <p class="feat-desc">Prompt visual gerado para criar thumbnails chamativas alinhadas ao tema e ao público do canal.</p>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">📤</span>
+        <div class="feat-title">Export para YouTube</div>
+        <p class="feat-desc">Exporte título e descrição prontos para copiar direto no painel do YouTube — sem reformatar nada.</p>
       </div>
       <div class="feat-card">
         <span class="feat-icon">📊</span>
-        <div class="feat-title">Análise de Trends</div>
-        <p class="feat-desc">Identifique temas e estilos em alta no YouTube para alinhar sua produção com o que está performando agora.</p>
-      </div>
-      <div class="feat-card">
-        <span class="feat-icon">⚡</span>
-        <div class="feat-title">Geração Rápida</div>
-        <p class="feat-desc">De 5 a 150 cenas geradas em segundos. Escale sua produção sem escalar o tempo investido por vídeo.</p>
+        <div class="feat-title">Pipeline Completo</div>
+        <p class="feat-desc">Acompanhe cada etapa do vídeo: roteiro → descrição → thumbnail → publicado. Nenhum vídeo fica para trás.</p>
       </div>
     </div>
   </div>
@@ -611,7 +641,7 @@ body {
 
 // Word rotator
 (function() {
-  const words = ['roteiros completos', 'prompts para Veo3', 'CSVs para CenaDrop', 'personagens únicos', '11 estilos visuais', 'narração embutida'];
+  const words = ['roteiros completos', 'descrições SEO', 'thumbnails incríveis', 'títulos virais', 'múltiplos canais', 'pipeline completo'];
   let i = 0;
   const el = document.getElementById('rotatorWord');
   if (!el) return;

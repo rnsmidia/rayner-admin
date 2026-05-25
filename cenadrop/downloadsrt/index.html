@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CenaDrop SRT — Download</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #080810;
+  --surface: #0f0f1c;
+  --card:    #13131f;
+  --border:  #1e1e30;
+  --border2: #2a2a40;
+  --accent:  #7c6fff;
+  --accent2: #a78bfa;
+  --accent3: #ff6f91;
+  --green:   #4ade80;
+  --yellow:  #fbbf24;
+  --text:    #e8e8f0;
+  --muted:   #555570;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Syne', sans-serif;
+  background: #05050e;
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 48px 7% 48px 24px;
+  gap: 24px;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image: url('/cenadrop/CAPAproduto1280x720png.png');
+  background-size: cover;
+  background-position: center left;
+  opacity: 0.22;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: 24px;
+  padding: 48px 40px;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  box-shadow:
+    0 0 0 1px rgba(124,111,255,0.18),
+    0 0 40px rgba(124,111,255,0.18),
+    0 0 100px rgba(124,111,255,0.08),
+    0 32px 80px rgba(0,0,0,0.10);
+}
+
+.logo-box {
+  width: 80px; height: 80px; border-radius: 20px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 38px;
+  margin: 0 auto 24px;
+  box-shadow: 0 0 0 1px rgba(124,111,255,0.25), 0 0 40px rgba(124,111,255,0.2);
+}
+
+h1 {
+  font-size: 32px; font-weight: 800; letter-spacing: -0.5px;
+  margin-bottom: 6px;
+}
+h1 .a { color: var(--accent2); }
+
+.version-badge {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 700; letter-spacing: 2px;
+  color: var(--yellow);
+  background: rgba(251,191,36,0.07);
+  border: 1px solid rgba(251,191,36,0.2);
+  border-radius: 20px;
+  padding: 4px 14px;
+  margin-bottom: 20px;
+}
+
+.desc {
+  font-size: 14px; color: var(--muted);
+  line-height: 1.7; margin-bottom: 32px;
+}
+
+.btn-download {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff;
+  border: none; border-radius: 14px;
+  padding: 16px 24px;
+  font-family: 'Syne', sans-serif;
+  font-size: 16px; font-weight: 800;
+  cursor: pointer; text-decoration: none;
+  transition: all .2s;
+  box-shadow: 0 4px 24px rgba(124,111,255,0.35);
+  letter-spacing: 0.3px;
+}
+.btn-download:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(124,111,255,0.5);
+}
+.btn-download:active { transform: translateY(0); }
+
+.btn-icon { font-size: 18px; }
+
+.divider {
+  height: 1px; margin: 28px 0;
+  background: linear-gradient(90deg, transparent, var(--border2), transparent);
+}
+
+.info-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 0;
+  font-size: 12px; color: var(--muted);
+  border-bottom: 1px solid var(--border);
+}
+.info-row:last-child { border-bottom: none; }
+.info-label { font-weight: 600; }
+.info-val {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text); font-size: 11px;
+}
+.info-val.green  { color: var(--green); }
+.info-val.accent { color: var(--accent2); }
+
+.steps-mini {
+  margin-top: 28px; text-align: left;
+}
+.steps-mini-title {
+  font-size: 10px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--muted);
+  margin-bottom: 14px; text-align: center;
+}
+.step-mini {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 8px 0; border-bottom: 1px solid var(--border);
+  font-size: 12px; color: var(--muted); line-height: 1.5;
+}
+.step-mini:last-child { border-bottom: none; }
+.step-mini-num {
+  width: 20px; height: 20px; border-radius: 6px; flex-shrink: 0;
+  background: rgba(124,111,255,0.1); border: 1px solid rgba(124,111,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  font-weight: 700; color: var(--accent2);
+}
+
+.promo-bar {
+  margin-top: 28px;
+  background: linear-gradient(135deg, rgba(124,111,255,.08), rgba(167,139,250,.05));
+  border: 1px solid rgba(124,111,255,.2);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px;
+  text-decoration: none;
+  transition: all .2s;
+}
+.promo-bar:hover {
+  border-color: rgba(124,111,255,.4);
+  background: linear-gradient(135deg, rgba(124,111,255,.12), rgba(167,139,250,.07));
+}
+.promo-bar-icon {
+  width: 34px; height: 34px; border-radius: 9px; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+.promo-bar-text { flex: 1; text-align: left; }
+.promo-bar-title {
+  font-size: 12px; font-weight: 700; color: var(--text);
+  line-height: 1;
+}
+.promo-bar-title span { color: var(--accent2); }
+.promo-bar-sub {
+  font-size: 11px; color: var(--muted); margin-top: 3px; line-height: 1.4;
+}
+.promo-bar-arrow {
+  font-size: 14px; color: var(--accent2); flex-shrink: 0;
+}
+
+.footer-note {
+  margin-top: 28px; font-size: 11px; color: var(--muted);
+  line-height: 1.6;
+}
+.footer-note a {
+  color: var(--accent); text-decoration: none;
+}
+.footer-note a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="card">
+
+  <div class="logo-box">⚡</div>
+
+  <h1>CenaDrop <span class="a">SRT</span></h1>
+  <div class="version-badge">v1.0 — Grátis</div>
+
+  <p class="desc">
+    Converta seu roteiro em legendas SRT compatíveis com CapCut<br>em segundos — direto do navegador.
+  </p>
+
+  <a class="btn-download" href="/cenadrop/downloadsrt/cenadrop-srt-latest.zip" download="CenaDrop-SRT-v1.0.zip">
+    <span class="btn-icon">⬇</span>
+    Baixar CenaDrop SRT — Grátis
+  </a>
+
+  <div class="divider"></div>
+
+  <div>
+    <div class="info-row">
+      <span class="info-label">Versão</span>
+      <span class="info-val accent">1.0</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Compatibilidade</span>
+      <span class="info-val">Google Chrome</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Formato de saída</span>
+      <span class="info-val">.srt — compatível CapCut</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Licença</span>
+      <span class="info-val green">● Gratuito</span>
+    </div>
+  </div>
+
+  <div class="steps-mini">
+    <div class="steps-mini-title">Como instalar</div>
+    <div class="step-mini">
+      <div class="step-mini-num">1</div>
+      <div>Baixe e descompacte o ZIP em uma pasta permanente no seu computador</div>
+    </div>
+    <div class="step-mini">
+      <div class="step-mini-num">2</div>
+      <div>Abra <strong style="color:var(--text)">chrome://extensions</strong> e ative o Modo Desenvolvedor</div>
+    </div>
+    <div class="step-mini">
+      <div class="step-mini-num">3</div>
+      <div>Clique em <strong style="color:var(--text)">Carregar sem compactação</strong> e selecione a pasta extraída</div>
+    </div>
+    <div class="step-mini">
+      <div class="step-mini-num">4</div>
+      <div>Fixe a extensão na barra do Chrome e comece a converter</div>
+    </div>
+  </div>
+
+  <!-- PROMO — CenaDrop Flow -->
+  <a class="promo-bar" href="https://cenadrop.com.br/vendas" target="_blank">
+    <div class="promo-bar-icon">⚡</div>
+    <div class="promo-bar-text">
+      <div class="promo-bar-title">Conheça o CenaDrop <span>Flow</span></div>
+      <div class="promo-bar-sub">Automatize vídeos no Google Veo3 com 1 clique</div>
+    </div>
+    <div class="promo-bar-arrow">→</div>
+  </a>
+
+  <p class="footer-note">
+    Dúvidas? Fale com a gente em
+    <a href="mailto:contato@cenadrop.com.br">contato@cenadrop.com.br</a><br>
+    © 2025 CenaDrop — <a href="https://cenadrop.com.br">cenadrop.com.br</a>
+  </p>
+
+</div>
+
+<div style="
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  position: relative; z-index: 1;
+">
+  <div style="
+    width: 32px; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(124,111,255,0.4), transparent);
+  "></div>
+  <span style="
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 600; letter-spacing: 3px;
+    color: rgba(124,111,255,0.45); text-transform: uppercase;
+  ">Crie mais. Clique menos.</span>
+</div>
+
+</body>
+</html>
