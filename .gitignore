@@ -1,6 +1,8 @@
 .vercel
-.env*.local
+.env*
 **/*.mp4
 **/*.mov
 **/*.avi
 **/*.mkv
+**/*.zip
+.DS_Store
