@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meta-Prompts · Rayner Nascimento</title>
+<meta property="og:title" content="Meta-Prompts · Rayner Nascimento" />
+<meta property="og:description" content="Os prompts usados ao vivo no CenaDrop. Copie e use agora." />
+<meta property="og:image" content="https://raynern.com.br/meta-prompts/og-image.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:url" content="https://raynern.com.br/meta-prompts" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://raynern.com.br/meta-prompts/og-image.jpg" />
+<link rel="icon" href="/cenadrop/icon128.png">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080810;--surface:#0c0c1a;--card:#10101f;--card2:#131325;
+  --border:#1a1a30;--border2:#252540;
+  --accent:#7c6fff;--accent2:#a78bfa;
+  --teal:#00d4aa;--teal2:#00f5c4;
+  --green:#4ade80;--yellow:#fbbf24;--pink:#f472b6;
+  --text:#eaeaf8;--muted:#7070a0;--dim:#3a3a60;
+  --hh:66px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);
+  font-family:'Space Grotesk',sans-serif;font-size:15px;}
+a{color:inherit;text-decoration:none;}
+button{font-family:'Space Grotesk',sans-serif;}
+
+/* ── BACKGROUND ── */
+.grid-bg{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(124,111,255,.028) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(124,111,255,.028) 1px,transparent 1px);
+  background-size:64px 64px;}
+
+.ambient-orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.a-orb{position:absolute;border-radius:50%;filter:blur(90px);}
+.a1{width:800px;height:600px;top:-20%;left:-15%;
+  background:radial-gradient(ellipse,rgba(124,111,255,.08),transparent 70%);
+  animation:orbdrift 26s ease-in-out infinite;}
+.a2{width:600px;height:600px;bottom:-10%;right:-10%;
+  background:radial-gradient(ellipse,rgba(0,212,170,.055),transparent 70%);
+  animation:orbdrift 32s ease-in-out infinite reverse;}
+.a3{width:400px;height:400px;top:40%;left:35%;
+  background:radial-gradient(ellipse,rgba(167,139,250,.04),transparent 70%);
+  animation:orbdrift 20s ease-in-out infinite 4s;}
+@keyframes orbdrift{0%,100%{transform:translate(0,0)}50%{transform:translate(28px,-28px)}}
+
+/* ── HEADER ── */
+.header{
+  position:fixed;top:0;left:0;right:0;z-index:200;height:var(--hh);
+  display:flex;align-items:center;gap:16px;padding:0 24px;
+  background:rgba(8,8,16,.88);border-bottom:1px solid rgba(124,111,255,.12);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+}
+
+.logo{display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.logo-icon{
+  width:40px;height:40px;border-radius:11px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 60%,var(--teal) 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:#fff;
+  box-shadow:0 0 0 1px rgba(124,111,255,.3),0 0 28px rgba(124,111,255,.3);
+}
+.logo-text{display:flex;flex-direction:column;gap:1px;}
+.logo-name{
+  font-size:15px;font-weight:700;letter-spacing:-.2px;
+  background:linear-gradient(120deg,#e8e8f8,var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.logo-sub{font-size:11px;color:var(--muted);letter-spacing:.02em;}
+
+.header-right{display:flex;align-items:center;gap:12px;margin-left:auto;}
+.header-count{
+  display:flex;align-items:center;gap:7px;
+  padding:5px 14px;border-radius:100px;
+  background:rgba(124,111,255,.07);border:1px solid rgba(124,111,255,.18);
+  font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--accent2);
+}
+.hc-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);
+  box-shadow:0 0 0 0 rgba(0,212,170,.4);animation:pulsedot 2.5s infinite;}
+@keyframes pulsedot{0%{box-shadow:0 0 0 0 rgba(0,212,170,.4)}70%{box-shadow:0 0 0 8px rgba(0,212,170,0)}100%{box-shadow:0 0 0 0 rgba(0,212,170,0)}}
+
+.search-wrap{position:relative;width:340px;}
+.search-wrap svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;}
+#search-input{
+  width:100%;padding:10px 18px 10px 40px;
+  background:var(--card2);border:1px solid var(--border2);border-radius:11px;
+  color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:14px;
+  outline:none;transition:border-color .2s,box-shadow .2s;
+}
+#search-input:focus{border-color:rgba(124,111,255,.45);box-shadow:0 0 0 3px rgba(124,111,255,.08);}
+#search-input::placeholder{color:var(--muted);}
+
+/* ── LAYOUT ── */
+.layout{
+  position:relative;z-index:1;
+  display:grid;grid-template-columns:272px 1fr;
+  height:calc(100vh - var(--hh));margin-top:var(--hh);
+}
+@media(min-width:861px){
+  .header{height:var(--hh);}
+}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  background:rgba(12,12,26,.95);border-right:1px solid var(--border);
+  overflow-y:auto;display:flex;flex-direction:column;
+  backdrop-filter:blur(8px);
+}
+.sidebar::-webkit-scrollbar{width:3px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+.sb-section{
+  padding:20px 16px 10px;
+  font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--muted);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.sb-count{
+  background:rgba(124,111,255,.1);border:1px solid rgba(124,111,255,.22);
+  border-radius:100px;padding:2px 10px;font-size:10px;font-weight:700;color:var(--accent2);
+}
+
+.class-list{padding:0 10px 6px;flex:1;}
+
+.class-item{
+  position:relative;display:flex;gap:11px;align-items:flex-start;
+  padding:13px 12px;border-radius:12px;cursor:pointer;
+  border:1px solid transparent;margin-bottom:3px;
+  transition:background .14s,border-color .14s;
+  overflow:hidden;
+}
+.class-item::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:linear-gradient(180deg,var(--accent),var(--accent2));
+  border-radius:0 2px 2px 0;opacity:0;transition:opacity .2s;
+}
+.class-item:hover{background:rgba(124,111,255,.05);border-color:rgba(124,111,255,.14);}
+.class-item.active{background:rgba(124,111,255,.09);border-color:rgba(124,111,255,.28);}
+.class-item.active::before{opacity:1;}
+
+.cls-num{
+  flex-shrink:0;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;
+  color:var(--dim);line-height:1;padding-top:3px;min-width:22px;
+}
+.class-item.active .cls-num{color:var(--accent2);}
+
+.cls-info{min-width:0;flex:1;}
+.cls-date-line{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:4px;letter-spacing:.04em;}
+.cls-title{font-size:13px;font-weight:600;color:var(--text);line-height:1.45;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.class-item.active .cls-title{color:#fff;}
+.cls-meta{font-size:11px;color:var(--dim);margin-top:5px;display:flex;align-items:center;gap:5px;}
+.cls-pip{width:3px;height:3px;border-radius:50%;background:var(--dim);}
+
+.new-badge{
+  flex-shrink:0;padding:2px 7px;border-radius:100px;
+  font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.08em;
+  background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.25);color:var(--teal);
+  animation:newglow 3s ease-in-out infinite;
+}
+@keyframes newglow{0%,100%{opacity:1}50%{opacity:.6}}
+
+.sidebar-divider{height:1px;background:var(--border);margin:8px 16px;}
+
+.tags-wrap-outer{padding:0 10px 20px;}
+.tags-wrap{display:flex;flex-wrap:wrap;gap:5px;padding:0 6px;}
+.tag-filter{
+  padding:4px 11px;border-radius:100px;cursor:pointer;
+  font-size:11px;font-weight:600;border:1px solid transparent;
+  transition:opacity .15s,transform .1s;
+}
+.tag-filter:hover{opacity:.75;transform:scale(.97);}
+.tag-filter.active{box-shadow:0 0 0 2px rgba(255,255,255,.15);}
+
+/* ── MAIN ── */
+.main{overflow-y:auto;display:flex;flex-direction:column;position:relative;}
+.main::-webkit-scrollbar{width:6px;}
+.main::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+
+/* loader */
+.loader{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:var(--muted);font-size:14px;}
+.loader-ring{width:44px;height:44px;border-radius:50%;border:2px solid var(--border2);border-top-color:var(--accent);animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* empty */
+.empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(--muted);padding:48px;text-align:center;}
+.empty-icon{font-size:60px;}
+.empty-state p{font-size:15px;line-height:1.8;max-width:320px;}
+
+/* content fade in */
+#content{display:none;}
+.content-inner{animation:fadeIn .28s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── CLASS BANNER ── */
+.class-banner{
+  position:relative;padding:52px 60px 40px;
+  border-bottom:1px solid var(--border);overflow:hidden;flex-shrink:0;
+}
+.class-banner::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(135deg,rgba(124,111,255,.07) 0%,transparent 55%),
+             linear-gradient(225deg,rgba(0,212,170,.04) 0%,transparent 55%);
+}
+.banner-ghost{
+  position:absolute;right:40px;bottom:-12px;
+  font-size:180px;font-weight:700;line-height:1;letter-spacing:-6px;
+  font-family:'JetBrains Mono',monospace;
+  background:linear-gradient(135deg,rgba(124,111,255,.07),rgba(0,212,170,.04));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  pointer-events:none;user-select:none;
+}
+.banner-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;margin-bottom:14px;
+  padding:5px 14px;border-radius:100px;
+  background:rgba(124,111,255,.08);border:1px solid rgba(124,111,255,.2);
+  font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--accent2);
+}
+.banner-eyebrow-dot{width:5px;height:5px;border-radius:50%;background:var(--teal);}
+.banner-title{
+  font-size:26px;font-weight:700;letter-spacing:-.4px;line-height:1.3;
+  margin-bottom:12px;max-width:640px;
+}
+.banner-desc{font-size:14px;color:var(--muted);line-height:1.8;max-width:580px;margin-bottom:22px;}
+.banner-pills{display:flex;gap:10px;flex-wrap:wrap;}
+.banner-pill{
+  display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:100px;
+  font-size:12px;font-weight:600;color:var(--muted);
+  background:rgba(255,255,255,.03);border:1px solid var(--border2);
+}
+.banner-pill svg{opacity:.6;}
+
+/* ── PROMPTS SECTION ── */
+.prompts-area{padding:36px 60px 60px;}
+.prompts-label{
+  display:flex;align-items:center;gap:10px;margin-bottom:28px;
+  font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--muted);
+}
+.prompts-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.prompts-stack{display:flex;flex-direction:column;gap:28px;}
+
+/* search results */
+.search-header{padding:36px 60px 0;font-size:14px;color:var(--muted);flex-shrink:0;}
+.search-header strong{color:var(--text);}
+.sg-label{
+  display:flex;align-items:center;gap:10px;margin-bottom:18px;
+  font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;
+  letter-spacing:.15em;text-transform:uppercase;color:var(--muted);
+}
+.sg-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.sg-group{margin-bottom:36px;}
+
+/* ── PROMPT CARD ── */
+.prompt-card{
+  background:var(--card);border:1px solid var(--border);border-radius:20px;
+  overflow:hidden;transition:border-color .25s,box-shadow .25s;
+}
+.prompt-card:hover{
+  border-color:rgba(124,111,255,.22);
+  box-shadow:0 0 0 1px rgba(124,111,255,.06),0 8px 40px rgba(0,0,0,.4);
+}
+
+/* card top accent line */
+.prompt-card-accent{height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--teal));opacity:.7;}
+
+.prompt-head{padding:24px 28px 18px;}
+
+.prompt-name-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;}
+.prompt-icon-wrap{
+  flex-shrink:0;width:44px;height:44px;border-radius:12px;
+  background:linear-gradient(135deg,rgba(124,111,255,.15),rgba(0,212,170,.08));
+  border:1px solid rgba(124,111,255,.2);
+  display:flex;align-items:center;justify-content:center;font-size:20px;
+}
+.prompt-name{font-size:18px;font-weight:700;line-height:1.3;flex:1;}
+.prompt-tags{display:flex;flex-wrap:wrap;gap:6px;}
+.ptag{
+  padding:3px 11px;border-radius:100px;
+  font-size:11px;font-weight:600;border:1px solid transparent;cursor:pointer;
+  transition:opacity .15s;letter-spacing:.02em;
+}
+.ptag:hover{opacity:.75;}
+
+/* ── HOW TO USE ── */
+.how-block{
+  margin:0 28px 20px;border-radius:14px;overflow:hidden;
+  border:1px solid rgba(124,111,255,.15);
+  background:rgba(124,111,255,.04);
+}
+.how-header{
+  display:flex;align-items:center;gap:8px;
+  padding:12px 18px;border-bottom:1px solid rgba(124,111,255,.1);
+  font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;
+  letter-spacing:.15em;text-transform:uppercase;color:var(--accent2);
+}
+.how-body{padding:18px 20px 20px;display:flex;flex-direction:column;gap:0;}
+
+.how-intro{
+  font-size:14px;color:var(--text);line-height:1.8;
+  margin-bottom:16px;padding-bottom:16px;
+  border-bottom:1px solid rgba(124,111,255,.08);
+}
+
+.step-row{display:flex;align-items:flex-start;gap:14px;padding:8px 0;}
+.step-left{display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
+.step-circle{
+  width:28px;height:28px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#fff;
+  box-shadow:0 0 12px rgba(124,111,255,.3);
+}
+.step-line{width:2px;flex:1;min-height:12px;background:rgba(124,111,255,.15);border-radius:1px;margin-top:4px;}
+.step-row:last-child .step-line{display:none;}
+.step-text{font-size:14px;color:var(--text);line-height:1.65;padding-top:4px;}
+.step-sub{font-size:12px;color:var(--muted);margin-top:3px;font-style:italic;}
+
+/* IA badges */
+.ia-row{
+  display:flex;align-items:center;gap:8px;padding:0 28px 20px;flex-wrap:wrap;
+}
+.ia-label{font-size:12px;color:var(--muted);font-weight:500;}
+.ia-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 13px;border-radius:100px;
+  font-size:12px;font-weight:700;letter-spacing:.02em;
+  border:1px solid transparent;transition:opacity .15s;
+}
+.ia-badge:hover{opacity:.8;}
+.ia-chatgpt{background:rgba(16,163,127,.08);border-color:rgba(16,163,127,.22);color:#10a37f;}
+.ia-gemini{background:rgba(66,133,244,.08);border-color:rgba(66,133,244,.22);color:#4285f4;}
+
+/* ── PROMPT TEXT BLOCK ── */
+.prompt-block{margin:0 28px;border-radius:14px;overflow:hidden;border:1px solid var(--border2);}
+.prompt-block-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:11px 18px;background:rgba(0,0,0,.35);border-bottom:1px solid var(--border);
+}
+.pblock-label{
+  display:flex;align-items:center;gap:8px;
+  font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+}
+.terminal-dots{display:flex;gap:5px;}
+.td{width:9px;height:9px;border-radius:50%;}
+.td1{background:#f87171;opacity:.6;} .td2{background:var(--yellow);opacity:.6;} .td3{background:var(--green);opacity:.6;}
+
+.btn-toggle{
+  display:flex;align-items:center;gap:5px;padding:4px 12px;border-radius:7px;border:1px solid var(--border2);
+  background:transparent;color:var(--muted);font-family:'JetBrains Mono',monospace;
+  font-size:10px;font-weight:600;cursor:pointer;transition:all .15s;
+}
+.btn-toggle:hover{border-color:rgba(124,111,255,.3);color:var(--accent2);}
+
+.prompt-text{
+  padding:18px 22px;
+  font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.9;
+  color:rgba(234,234,248,.85);white-space:pre-wrap;word-break:break-word;
+  background:rgba(0,0,0,.2);
+  max-height:200px;overflow-y:auto;transition:max-height .3s ease;
+}
+.prompt-text.expanded{max-height:420px;}
+.prompt-text::-webkit-scrollbar{width:3px;}
+.prompt-text::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+/* ── COPY BUTTON ── */
+.copy-wrap{padding:20px 28px 28px;}
+.btn-copy{
+  width:100%;padding:17px 24px;border-radius:14px;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 60%,rgba(0,212,170,.7) 100%);
+  color:#fff;font-size:16px;font-weight:700;letter-spacing:.1px;
+  box-shadow:0 4px 28px rgba(124,111,255,.4);
+  transition:transform .15s,box-shadow .15s;
+  position:relative;overflow:hidden;
+}
+.btn-copy::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.15) 50%,transparent 100%);
+  transform:translateX(-100%);animation:shimmer 2.8s ease-in-out infinite;
+}
+@keyframes shimmer{0%{transform:translateX(-100%)}60%{transform:translateX(140%)}100%{transform:translateX(140%)}}
+.btn-copy:hover{transform:translateY(-2px);box-shadow:0 8px 36px rgba(124,111,255,.55);}
+.btn-copy:active{transform:translateY(0);}
+.btn-copy.copied{
+  background:linear-gradient(135deg,#166534,var(--green));
+  box-shadow:0 4px 28px rgba(74,222,128,.35);
+}
+.btn-copy.copied::before{display:none;}
+.copy-icon{font-size:19px;position:relative;z-index:1;}
+.copy-label{position:relative;z-index:1;}
+
+/* ── MOBILE ── */
+@media(max-width:860px){
+  :root{--hh:56px;}
+  html,body{overflow:auto;}
+
+  /* Header */
+  .header{padding:0 16px;gap:10px;flex-wrap:wrap;height:auto;min-height:var(--hh);}
+  .logo-sub{display:none;}
+  .logo-name{font-size:14px;}
+  .logo-icon{width:34px;height:34px;font-size:16px;}
+  .header-right{width:100%;margin-left:0;padding:0 0 10px;}
+  .search-wrap{width:100%;}
+  .header-count{display:none !important;}
+  #search-input{font-size:14px;}
+
+  /* Layout */
+  .layout{grid-template-columns:1fr;height:auto;margin-top:0;padding-top:var(--hh);}
+
+  /* Sidebar horizontal scroll */
+  .sidebar{
+    height:auto;max-height:none;
+    border-right:none;border-bottom:1px solid var(--border);
+    backdrop-filter:none;overflow:hidden;
+  }
+  .sb-section{padding:14px 16px 8px;}
+  .class-list{
+    display:flex;flex-direction:row;overflow-x:auto;
+    padding:0 12px 12px;gap:8px;
+    scrollbar-width:none;
+  }
+  .class-list::-webkit-scrollbar{display:none;}
+  .class-item{
+    min-width:180px;max-width:200px;flex-shrink:0;
+    margin-bottom:0;border:1px solid var(--border);
+    background:var(--card2);
+  }
+  .sidebar-divider,.tags-wrap-outer{display:none;}
+
+  /* Main */
+  .main{min-height:50vh;}
+
+  /* Banner */
+  .class-banner{padding:24px 18px 20px;}
+  .banner-title{font-size:19px;}
+  .banner-ghost{display:none;}
+  .banner-desc{font-size:13px;}
+  .banner-pills{gap:8px;}
+  .banner-pill{font-size:11px;padding:5px 11px;}
+
+  /* Prompts */
+  .prompts-area{padding:20px 14px 48px;}
+  .prompts-label{font-size:9px;}
+  .prompts-stack{gap:20px;}
+  .search-header{padding:20px 14px 0;}
+
+  /* Cards */
+  .prompt-card{border-radius:16px;}
+  .prompt-head{padding:16px 16px 12px;}
+  .prompt-name{font-size:16px;}
+  .how-block{margin:0 16px 16px;}
+  .how-intro{font-size:13px;}
+  .step-text{font-size:13px;}
+  .ia-row{padding:0 16px 14px;gap:6px;}
+  .prompt-block{margin:0 16px;}
+  .prompt-text{font-size:11.5px;padding:14px 16px;}
+  .copy-wrap{padding:14px 16px 20px;}
+  .btn-copy{font-size:15px;padding:15px 20px;}
+  .prompt-block-header{padding:10px 14px;}
+}
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+<div class="ambient-orbs" aria-hidden="true">
+  <div class="a-orb a1"></div>
+  <div class="a-orb a2"></div>
+  <div class="a-orb a3"></div>
+</div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="logo">
+    <div class="logo-icon">M</div>
+    <div class="logo-text">
+      <div class="logo-name">Meta-Prompts</div>
+      <div class="logo-sub">por Rayner Nascimento</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="header-count" id="header-count" style="display:none">
+      <div class="hc-dot"></div>
+      <span id="hc-text">0 prompts</span>
+    </div>
+    <div class="search-wrap">
+      <svg width="15" height="15" viewBox="0 0 20 20" fill="none">
+        <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M15 15l-2.5-2.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <input id="search-input" type="search" placeholder="Buscar prompts..." autocomplete="off">
+    </div>
+  </div>
+</header>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-section">
+      <span>Aulas</span>
+      <span class="sb-count" id="class-count">0</span>
+    </div>
+    <div class="class-list" id="class-list"></div>
+    <div class="sidebar-divider"></div>
+    <div class="sb-section" id="tags-label" style="display:none"><span>Tags</span></div>
+    <div class="tags-wrap-outer">
+      <div class="tags-wrap" id="tags-wrap"></div>
+    </div>
+  </aside>
+
+  <main class="main" id="main">
+    <div class="loader" id="loader">
+      <div class="loader-ring"></div>
+      <span>Carregando...</span>
+    </div>
+    <div id="content"></div>
+    <div class="empty-state" id="empty-state" style="display:none">
+      <div class="empty-icon">🔍</div>
+      <p>Nenhum resultado.<br>Tente outra palavra.</p>
+    </div>
+  </main>
+</div>
+
+<script>
+'use strict';
+
+let ALL=[], activeId=null, activeTag=null;
+const NOW = Date.now();
+
+// ── TAG COLORS ───────────────────────────────────────────────
+const TC=[
+  ['rgba(124,111,255,.1)','rgba(124,111,255,.3)','#a78bfa'],
+  ['rgba(0,212,170,.08)','rgba(0,212,170,.25)','#00d4aa'],
+  ['rgba(251,191,36,.08)','rgba(251,191,36,.25)','#fbbf24'],
+  ['rgba(244,114,182,.08)','rgba(244,114,182,.25)','#f472b6'],
+  ['rgba(74,222,128,.08)','rgba(74,222,128,.25)','#4ade80'],
+  ['rgba(56,189,248,.08)','rgba(56,189,248,.25)','#38bdf8'],
+];
+function tIdx(t){let h=0;for(const c of t)h=(h*31+c.charCodeAt(0))&0xffffffff;return Math.abs(h)%TC.length;}
+function tCss(t){const[bg,bd,cl]=TC[tIdx(t)];return `background:${bg};border-color:${bd};color:${cl}`;}
+
+// ── UTILS ────────────────────────────────────────────────────
+function esc(s){return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function escA(s){return esc(s).replace(/'/g,'&#39;');}
+
+function fmtFull(d){return new Date(d+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});}
+function fmtShort(d){
+  const dt=new Date(d+'T12:00:00');
+  return String(dt.getDate()).padStart(2,'0')+' '+dt.toLocaleDateString('pt-BR',{month:'short'}).replace('.','');
+}
+function isNew(d){return (NOW - new Date(d+'T12:00:00').getTime()) < 7*24*60*60*1000;}
+function ghostTxt(d){return d.slice(5).replace('-','');}
+
+// ── DESCRIPTION PARSER ───────────────────────────────────────
+function parseDesc(raw){
+  const lines=raw.split('\n');
+  let intro='', steps=[];
+  let inSteps=false;
+  for(const l of lines){
+    const t=l.trim();
+    if(!t) continue;
+    if(t.startsWith('→')){inSteps=true; steps.push(t.slice(1).trim());}
+    else if(!inSteps) intro+=(intro?'\n':'')+t;
+  }
+  return {intro, steps};
+}
+
+function renderHowBlock(desc){
+  const {intro,steps}=parseDesc(desc);
+  const introHtml=intro?`<div class="how-intro">${esc(intro).replace(/\n/g,'<br>')}</div>`:'';
+  const stepsHtml=steps.map((s,i)=>`
+    <div class="step-row">
+      <div class="step-left">
+        <div class="step-circle">${i+1}</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-text">${esc(s)}</div>
+    </div>`).join('');
+  return `
+    <div class="how-block">
+      <div class="how-header">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M8 7v5M8 5h.01" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        Como usar
+      </div>
+      <div class="how-body">${introHtml}${stepsHtml}</div>
+    </div>`;
+}
+
+function renderIARow(tags){
+  const hasGPT=(tags||[]).includes('chatgpt');
+  const hasGem=(tags||[]).includes('gemini');
+  if(!hasGPT&&!hasGem) return '';
+  return `<div class="ia-row">
+    <span class="ia-label">Use em:</span>
+    ${hasGPT?`<span class="ia-badge ia-chatgpt">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M22.28 9.28a5.99 5.99 0 00-5.07-8.28A6 6 0 006.6 4.08a6 6 0 00-4.87 6.64 6 6 0 001.6 11.38 6 6 0 005.72 1.65A6 6 0 0014.73 24a5.99 5.99 0 005.72-4.16 6 6 0 001.83-10.56zM14.73 22.5a4.5 4.5 0 01-2.88-1.03l.14-.08 4.79-2.77a.79.79 0 00.4-.69v-6.77l2.03 1.17a.07.07 0 01.04.05v5.6a4.51 4.51 0 01-4.52 4.52zm-9.72-4.14a4.5 4.5 0 01-.54-3.02l.14.09 4.79 2.77a.79.79 0 00.8 0l5.85-3.38v2.33a.08.08 0 01-.03.06L11.1 20.07a4.51 4.51 0 01-6.09-1.71zm-1.26-9.9a4.49 4.49 0 012.34-1.98l-.01.16v5.53a.78.78 0 00.4.69l5.84 3.38-2.02 1.17a.07.07 0 01-.07 0L5.5 14.22a4.51 4.51 0 01-.75-5.76zm16.62 3.86l-5.85-3.38 2.03-1.17a.07.07 0 01.07 0l4.99 2.88a4.5 4.5 0 01-.7 8.12v-5.7a.78.78 0 00-.54-.75zm2.02-3.03l-.14-.09-4.78-2.78a.79.79 0 00-.8 0L10.82 10.8V8.47a.07.07 0 01.03-.06l4.99-2.88a4.5 4.5 0 016.55 4.66zm-12.68 4.17l-2.02-1.17a.08.08 0 01-.04-.06V6.64a4.5 4.5 0 017.37-3.46l-.14.08-4.79 2.77a.79.79 0 00-.4.69v6.77l.02-.01zm1.1-2.36l2.6-1.5 2.6 1.5v3l-2.6 1.5-2.6-1.5V11.1z"/></svg>
+      ChatGPT</span>`:''}
+    ${hasGem?`<span class="ia-badge ia-gemini">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 2c5.523 0 10 4.477 10 10S17.523 22 12 22 2 17.523 2 12 6.477 2 12 2zm0 3.5c-3.59 0-6.5 2.91-6.5 6.5s2.91 6.5 6.5 6.5 6.5-2.91 6.5-6.5S15.59 5.5 12 5.5z"/></svg>
+      Gemini</span>`:''}
+  </div>`;
+}
+
+// ── RENDER CARD ──────────────────────────────────────────────
+const PROMPT_ICONS=['🎭','🎨','🎙️','⚡','🔧','🎬','✨','🖼️','🎯','💡'];
+function pickIcon(name){let h=0;for(const c of name)h=(h*31+c.charCodeAt(0))&0xffffffff;return PROMPT_ICONS[Math.abs(h)%PROMPT_ICONS.length];}
+
+function renderCard(p){
+  const visibleTags=(p.tags||[]).filter(t=>!['chatgpt','gemini'].includes(t));
+  const uid='p'+Math.random().toString(36).slice(2,8);
+  return `
+  <div class="prompt-card">
+    <div class="prompt-card-accent"></div>
+    <div class="prompt-head">
+      <div class="prompt-name-row">
+        <div class="prompt-icon-wrap">${pickIcon(p.name)}</div>
+        <div style="flex:1;min-width:0">
+          <div class="prompt-name">${esc(p.name)}</div>
+          ${visibleTags.length?`<div class="prompt-tags" style="margin-top:8px">${visibleTags.map(t=>`<span class="ptag" style="${tCss(t)}" onclick="filterTag('${escA(t)}')">#${esc(t)}</span>`).join('')}</div>`:''}
+        </div>
+      </div>
+    </div>
+
+    ${renderHowBlock(p.description)}
+    ${renderIARow(p.tags)}
+
+    <div class="prompt-block">
+      <div class="prompt-block-header">
+        <div class="pblock-label">
+          <div class="terminal-dots"><div class="td td1"></div><div class="td td2"></div><div class="td td3"></div></div>
+          Texto do Prompt
+        </div>
+        <button class="btn-toggle" onclick="toggleExpand('${uid}',this)">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 4l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Ver tudo
+        </button>
+      </div>
+      <pre class="prompt-text" id="${uid}">${esc(p.prompt_text)}</pre>
+    </div>
+
+    <div class="copy-wrap">
+      <button class="btn-copy" data-text="${escA(p.prompt_text)}" onclick="doCopy(this)">
+        <span class="copy-icon">📋</span>
+        <span class="copy-label">Copiar Prompt Completo</span>
+      </button>
+    </div>
+  </div>`;
+}
+
+// ── TOGGLE EXPAND ────────────────────────────────────────────
+function toggleExpand(uid,btn){
+  const el=document.getElementById(uid);
+  const exp=el.classList.toggle('expanded');
+  btn.innerHTML=exp
+    ?`<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 6l3-3 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Recolher`
+    :`<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 4l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Ver tudo`;
+}
+
+// ── COPY ─────────────────────────────────────────────────────
+async function doCopy(btn){
+  try{
+    await navigator.clipboard.writeText(btn.dataset.text);
+    btn.classList.add('copied');
+    btn.innerHTML='<span class="copy-icon">✅</span><span class="copy-label">Prompt Copiado!</span>';
+    setTimeout(()=>{
+      btn.classList.remove('copied');
+      btn.innerHTML='<span class="copy-icon">📋</span><span class="copy-label">Copiar Prompt Completo</span>';
+    },2600);
+  }catch(e){console.error(e);}
+}
+
+// ── SIDEBAR ──────────────────────────────────────────────────
+function renderSidebar(){
+  const total=ALL.reduce((s,c)=>s+(c.meta_prompts||[]).length,0);
+  document.getElementById('class-count').textContent=ALL.length;
+  const hc=document.getElementById('header-count');
+  hc.style.display='flex';
+  document.getElementById('hc-text').textContent=`${total} prompt${total!==1?'s':''}`;
+
+  document.getElementById('class-list').innerHTML=ALL.map((c,i)=>{
+    const n=String(ALL.length-i).padStart(2,'0');
+    const fresh=isNew(c.class_date);
+    const cnt=(c.meta_prompts||[]).length;
+    return `<div class="class-item" data-id="${esc(c.id)}" onclick="showClass('${escA(c.id)}')">
+      <div class="cls-num">${n}</div>
+      <div class="cls-info">
+        <div class="cls-date-line">${fmtShort(c.class_date)}</div>
+        <div class="cls-title">${esc(c.title)}</div>
+        <div class="cls-meta">
+          <span>⚡ ${cnt} prompt${cnt!==1?'s':''}</span>
+          ${fresh?'<div class="cls-pip"></div><span style="color:var(--teal);font-size:10px;font-weight:700">NOVO</span>':''}
+        </div>
+      </div>
+      ${fresh?'<div class="new-badge">NEW</div>':''}
+    </div>`;
+  }).join('');
+
+  const allTags=[...new Set(ALL.flatMap(c=>(c.meta_prompts||[]).flatMap(p=>p.tags||[])))].sort();
+  const lbl=document.getElementById('tags-label');
+  const wrap=document.getElementById('tags-wrap');
+  if(allTags.length){
+    lbl.style.display='flex';
+    wrap.innerHTML=allTags.map(t=>`<span class="tag-filter" style="${tCss(t)}" data-tag="${escA(t)}" onclick="filterTag('${escA(t)}')">#${esc(t)}</span>`).join('');
+  }
+}
+
+function setSideActive(id){document.querySelectorAll('.class-item').forEach(el=>el.classList.toggle('active',el.dataset.id===id));}
+function setTagActive(t){document.querySelectorAll('.tag-filter').forEach(el=>el.classList.toggle('active',el.dataset.tag===t));}
+
+// ── SHOW CLASS ───────────────────────────────────────────────
+function showClass(id){
+  activeId=id; activeTag=null;
+  document.getElementById('search-input').value='';
+  setTagActive(null); setSideActive(id); location.hash=id;
+
+  const cls=ALL.find(c=>c.id===id); if(!cls) return;
+  const prompts=[...(cls.meta_prompts||[])].sort((a,b)=>a.order_index-b.order_index);
+
+  showMain(`<div class="content-inner">
+    <div class="class-banner">
+      <div class="banner-ghost">${ghostTxt(cls.class_date)}</div>
+      <div class="banner-eyebrow"><div class="banner-eyebrow-dot"></div>${fmtFull(cls.class_date)}</div>
+      <h1 class="banner-title">${esc(cls.title)}</h1>
+      ${cls.description?`<p class="banner-desc">${esc(cls.description)}</p>`:''}
+      <div class="banner-pills">
+        <div class="banner-pill">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 2L9.8 5.7l4.2.6-3 3 .7 4.2L8 11.5l-3.7 2-.7-4.2-3-3 4.2-.6z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+          ${prompts.length} prompt${prompts.length!==1?'s':''}
+        </div>
+        <div class="banner-pill">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3"/><path d="M8 5v3.5l2 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          Acesso livre
+        </div>
+      </div>
+    </div>
+    <div class="prompts-area">
+      <div class="prompts-label">Prompts desta aula</div>
+      <div class="prompts-stack">${prompts.map(renderCard).join('')}</div>
+    </div>
+  </div>`);
+}
+
+// ── FILTER TAG ───────────────────────────────────────────────
+function filterTag(tag){
+  if(activeTag===tag){activeTag=null;setTagActive(null);showClass(activeId||ALL[0]?.id);return;}
+  activeTag=tag;document.getElementById('search-input').value='';
+  setTagActive(tag);setSideActive(null);
+
+  const res=[];
+  for(const c of ALL)for(const p of c.meta_prompts||[])if((p.tags||[]).includes(tag))res.push({...p,_c:c});
+  if(!res.length){showEmpty();return;}
+
+  const byC={};
+  for(const p of res){if(!byC[p.class_id])byC[p.class_id]={c:p._c,ps:[]};byC[p.class_id].ps.push(p);}
+
+  showMain(`<div class="content-inner">
+    <div class="search-header" style="padding-bottom:0">
+      <strong>${res.length} prompt${res.length!==1?'s':''}</strong> com a tag <span style="color:var(--accent2)">#${esc(tag)}</span>
+    </div>
+    <div class="prompts-area" style="padding-top:24px">
+      ${Object.values(byC).map(({c,ps})=>`
+        <div class="sg-group">
+          <div class="sg-label">${fmtShort(c.class_date)} · ${esc(c.title)}</div>
+          <div class="prompts-stack">${ps.map(renderCard).join('')}</div>
+        </div>`).join('')}
+    </div>
+  </div>`);
+}
+
+// ── SEARCH ───────────────────────────────────────────────────
+document.getElementById('search-input').addEventListener('input',function(){
+  const q=this.value.trim().toLowerCase();
+  if(!q){activeTag=null;setTagActive(null);showClass(activeId||ALL[0]?.id);return;}
+  setSideActive(null);setTagActive(null);activeTag=null;
+
+  const res=[];
+  for(const c of ALL)for(const p of c.meta_prompts||[]){
+    if(p.name.toLowerCase().includes(q)||p.description.toLowerCase().includes(q)||
+       p.prompt_text.toLowerCase().includes(q)||(p.tags||[]).some(t=>t.includes(q)))
+      res.push({...p,_c:c});
+  }
+  if(!res.length){showEmpty();return;}
+
+  const byC={};
+  for(const p of res){if(!byC[p.class_id])byC[p.class_id]={c:p._c,ps:[]};byC[p.class_id].ps.push(p);}
+
+  showMain(`<div class="content-inner">
+    <div class="search-header">
+      <strong>${res.length} resultado${res.length!==1?'s':''}</strong> para "${esc(this.value.trim())}"
+    </div>
+    <div class="prompts-area" style="padding-top:24px">
+      ${Object.values(byC).map(({c,ps})=>`
+        <div class="sg-group">
+          <div class="sg-label">${fmtShort(c.class_date)} · ${esc(c.title)}</div>
+          <div class="prompts-stack">${ps.map(renderCard).join('')}</div>
+        </div>`).join('')}
+    </div>
+  </div>`);
+});
+
+// ── HELPERS ──────────────────────────────────────────────────
+function showMain(html){
+  document.getElementById('loader').style.display='none';
+  document.getElementById('empty-state').style.display='none';
+  const el=document.getElementById('content');
+  el.innerHTML=html;el.style.display='flex';el.style.flexDirection='column';
+  document.getElementById('main').scrollTop=0;
+}
+function showEmpty(){
+  document.getElementById('loader').style.display='none';
+  document.getElementById('content').style.display='none';
+  document.getElementById('empty-state').style.display='flex';
+}
+
+// ── INIT ─────────────────────────────────────────────────────
+(async function(){
+  try{
+    const r=await fetch('/api/meta-prompts');
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    ALL=await r.json();
+    renderSidebar();
+    const hash=location.hash.slice(1);
+    const target=hash?ALL.find(c=>c.id===hash):ALL[0];
+    if(target) showClass(target.id);
+    else if(!ALL.length){
+      showMain(`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:var(--muted);padding:60px;text-align:center">
+        <div style="font-size:64px">📚</div>
+        <p style="font-size:18px;font-weight:700;color:var(--text)">Nenhuma aula ainda.</p>
+        <p style="font-size:14px;line-height:1.8;max-width:340px">Os prompts de cada aula aparecerão aqui logo após a transmissão.</p>
+      </div>`);
+    }
+  }catch(e){
+    showMain(`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--muted);padding:60px">
+      <div style="font-size:48px">⚠️</div>
+      <p style="font-size:15px">Erro ao carregar: ${esc(e.message)}</p>
+    </div>`);
+  }
+})();
+
+window.addEventListener('hashchange',()=>{
+  const id=location.hash.slice(1);
+  const cls=ALL.find(c=>c.id===id);
+  if(cls&&cls.id!==activeId) showClass(cls.id);
+});
+</script>
+</body>
+</html>

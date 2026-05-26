@@ -41,6 +41,10 @@
     { "source": "/academyelite",                        "destination": "/academyelite/index.html" },
     { "source": "/academyelite/",                       "destination": "/academyelite/index.html" },
     { "source": "/academyelite/lista-prioritaria",      "destination": "/academyelite/lista-prioritaria.html" },
-    { "source": "/academyelite/lista-prioritaria/",     "destination": "/academyelite/lista-prioritaria.html" }
+    { "source": "/academyelite/lista-prioritaria/",     "destination": "/academyelite/lista-prioritaria.html" },
+    { "source": "/meta-prompts",  "destination": "/meta-prompts/index.html" },
+    { "source": "/meta-prompts/", "destination": "/meta-prompts/index.html" },
+    { "source": "/elitedarkacademy",  "destination": "/academyelite/vendas.html" },
+    { "source": "/elitedarkacademy/", "destination": "/academyelite/vendas.html" }
   ]
 }

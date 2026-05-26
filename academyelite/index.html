@@ -953,16 +953,105 @@ footer {
 ────────────────────────────────────────── */
 @media (max-width: 768px) {
   .features-grid { grid-template-columns: 1fr; }
-  .sobre-grid { grid-template-columns: 1fr; gap: 48px; }
-  .sobre-photo-wrap { max-width: 320px; margin: 0 auto; }
   .depo-grid { grid-template-columns: 1fr 1fr; }
   .form-card { padding: 40px 24px; }
-  .sobre-stats { gap: 24px; }
+
+  /* ── HERO mobile ── */
+  .hero {
+    flex-direction: column;
+    min-height: auto;
+    align-items: stretch;
+  }
+  .hero-image-panel {
+    position: relative;
+    width: 100%;
+    height: 52vw;
+    min-height: 240px;
+    max-height: 340px;
+  }
+  .hero-image-panel img {
+    object-position: center 15%;
+  }
+  .hero-image-panel::after {
+    background: linear-gradient(
+      180deg,
+      transparent 30%,
+      rgba(0,0,0,.55) 65%,
+      rgba(0,0,0,1) 95%
+    );
+  }
+  .hero-content {
+    position: relative;
+    margin-left: 0;
+    width: 100%;
+    padding: 32px 24px 56px;
+    background: var(--black);
+    align-items: flex-start;
+    text-align: left;
+  }
+  .hero-content::after { display: none; }
+  h1.hero-headline { font-size: clamp(30px, 8vw, 48px); }
+  .hero-sub { font-size: 15px; }
+  .btn-gold, .btn-gold-outline { width: 100%; justify-content: center; padding: 16px 24px; }
+  .hero-logo img { height: 72px !important; }
+  .hero-badge { font-size: 10px; padding: 6px 14px; }
+
+  /* ── SOBRE mobile ── */
+  .sobre-split {
+    flex-direction: column;
+    min-height: auto;
+  }
+  .sobre-img-panel {
+    position: relative;
+    width: 100%;
+    height: 55vw;
+    min-height: 220px;
+    max-height: 320px;
+  }
+  .sobre-img-panel::after {
+    background: linear-gradient(
+      180deg,
+      transparent 40%,
+      rgba(0,0,0,.7) 75%,
+      rgba(0,0,0,1) 95%
+    );
+  }
+  .sobre-text-panel {
+    margin-left: 0;
+    width: 100%;
+    padding: 32px 24px 56px;
+    background: var(--black);
+  }
+  .sobre-stats {
+    flex-wrap: wrap;
+    gap: 0;
+    margin-top: 32px;
+  }
+  .sobre-stat {
+    flex: 0 0 50%;
+    padding: 14px 12px;
+    border-right: none;
+    border-bottom: 1px solid rgba(201,162,39,.15);
+  }
+  .sobre-stat:nth-child(odd) { border-right: 1px solid rgba(201,162,39,.15); }
+  .sobre-stat:last-child { border-bottom: none; }
+  .sobre-stat-num { font-size: 30px; }
+
+  /* ── URGENCY mobile ── */
+  .urgency-strip { padding: 36px 24px; }
+  .urgency-text { font-size: clamp(18px, 5vw, 28px); }
+
+  /* ── FINAL CTA mobile ── */
+  .final-cta { padding: 72px 0 56px; }
+  .final-cta-copy { font-size: 15px; }
 }
 
 @media (max-width: 480px) {
   .depo-grid { grid-template-columns: 1fr; }
-  .hero { padding: 60px 20px 80px; }
+  .hero-image-panel { height: 60vw; max-height: 280px; }
+  .sobre-img-panel { height: 60vw; }
+  .sobre-stat { flex: 0 0 100%; border-right: none !important; }
+  .ann-bar { font-size: 11px; padding: 10px 16px; }
 }
 </style>
 </head>
@@ -1004,10 +1093,10 @@ footer {
     <div class="hero-divider" style="margin:24px 0;"></div>
 
     <p class="hero-sub" style="text-align:left;margin:0 0 10px;">
-      É sobre entrar na operação do <strong>Marcos de Castro</strong> de forma VIP.
-      Você terá acesso extremamente limitado direto à minha estrutura,
-      estratégias, ferramentas e encontros pessoais para construir canais
-      fortes, escaláveis e monetizáveis.
+      É sobre entrar no mundo de <strong>Marcos de Castro</strong>
+      como parte de um círculo seleto. Bastidores reais, as ferramentas
+      que ele usa, pesquisas em andamento — e proximidade direta com
+      quem constrói canais de verdade.
     </p>
 
     <p class="hero-farewell" style="text-align:left;margin-bottom:36px;">
@@ -1247,9 +1336,14 @@ footer {
       <div class="hero-divider" style="margin: 32px auto;"></div>
 
       <p class="final-cta-copy fade-up fade-up-d2">
-        Se você quer continuar sozinho, tudo bem.<br>
-        Mas se quer entrar em um ambiente <strong>premium, estratégico e com acompanhamento real</strong>…<br>
-        essa será sua oportunidade.
+        Não há cronograma obrigatório. Não há fórmulas de acompanhamento.<br><br>
+        O que existe é algo mais raro: <strong>acesso ao mundo real de criação do Marcos — do jeito que ele realmente é.</strong>
+        As ferramentas que ele usa. As pesquisas que ele faz antes de publicar.
+        Os bastidores dos próprios vídeos do Marcos sendo produzidos.
+        Discussões reais com pessoas que pensam no mesmo nível.<br><br>
+        Você não entra como aluno. Entra como parte de um <strong>círculo seleto</strong>
+        que acompanha de perto como <strong>Marcos de Castro</strong> constrói — e tem
+        proximidade direta com ele de vez em quando.
       </p>
 
       <a href="#form" class="btn-gold fade-up fade-up-d3">
