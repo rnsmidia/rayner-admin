@@ -5,7 +5,7 @@
  */
 
 const { createClient } = require('@supabase/supabase-js');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
 const WELCOME_CHANNEL = '1508898202294816778';
 
@@ -62,19 +62,10 @@ module.exports = async function handler(req, res) {
       used:          false,
     });
 
-    // Envia e-mail com o convite
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: parseInt(process.env.SMTP_PORT || '465'),
-      secure: true,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    });
-
-    await transporter.sendMail({
-      from: `"Elite Dark Academy" <${process.env.SMTP_USER}>`,
+    // Envia e-mail com o convite via Resend
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    await resend.emails.send({
+      from: 'Elite Dark Academy <noreply@raynern.com.br>',
       to:   email,
       subject: '👑 Seu acesso ao Elite Dark Academy está pronto',
       html: `
