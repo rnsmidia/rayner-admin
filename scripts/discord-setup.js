@@ -41,8 +41,8 @@ const READONLY_CHANNELS = ['boas-vindas', 'regras', 'agenda', 'nos-bastidores'];
 
 // Mensagem inicial de cada canal
 const MENSAGENS = {
-  'boas-vindas': `👑 **Bem-vindo ao Elite Dark Academy.**\n\nVocê agora faz parte de um círculo seleto.\n\nAqui você acompanha de perto como Marcos de Castro constrói — bastidores reais, ferramentas, pesquisas e encontros ao vivo.\n\n_Este canal é somente leitura. Use o **#💬geral** para interagir._`,
-  'regras': `📋 **Regras do Elite Dark Academy**\n\n**1.** Respeito acima de tudo — com Marcos, com os outros membros e com o espaço.\n**2.** Sem spam, sem links não solicitados, sem autopublicidade.\n**3.** Dúvidas e conversas no **#💬geral**.\n**4.** Conteúdo compartilhado aqui é exclusivo — não reproduza fora do servidor.\n**5.** Membros que desrespeitarem as regras serão removidos sem aviso prévio.\n\n_Ao permanecer no servidor você concorda com estas regras._`,
+  'boas-vindas': `👑 **Bem-vindo ao Elite Dark Academy!**\n\nFico feliz em te ver aqui. Você acabou de entrar em um espaço exclusivo onde acompanha de perto o dia a dia de Marcos de Castro — bastidores reais, ferramentas, pesquisas e encontros ao vivo.\n\n📌 **Para começar:**\n→ Apresente-se no canal **#💬 geral**\n→ Veja a agenda dos próximos encontros em **#📅 agenda**\n→ Explore os bastidores em **#🎬 nos-bastidores**\n\nQualquer dúvida, é só chamar no **#💬 geral**. Estamos aqui!\n\n_Este canal é somente leitura._`,
+  'regras': `📋 **Regras do Elite Dark Academy**\n\nEste é um espaço de respeito, aprendizado e troca. Para que todos se sintam bem aqui, pedimos atenção a alguns pontos:\n\n**1. Respeite todos os membros** — trate as pessoas como gostaria de ser tratado.\n**2. Sem divulgação de outros produtos ou serviços** — este espaço é exclusivo para nossa comunidade.\n**3. Dúvidas e conversas** — use o canal **#💬 geral**.\n**4. O conteúdo aqui é exclusivo** — por favor, não compartilhe fora do servidor.\n\nAo permanecer no servidor você concorda com estas regras.\nEm caso de dúvida sobre as regras, fale com a equipe no **#💬 geral**. 😊`,
 };
 
 async function main() {

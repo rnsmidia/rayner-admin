@@ -33,8 +33,13 @@ client.on('guildMemberAdd', async (member) => {
     const channel = member.guild.channels.cache.get(WELCOME_CHANNEL);
     if (channel) {
       await channel.send(
-        `👑 **${member.displayName}** acaba de entrar no círculo.\n` +
-        `Bem-vindo ao **Elite Dark Academy**. Explore os canais e aproveite.`
+        `👑 Bem-vindo ao **Elite Dark Academy**, **${member.displayName}**!\n\n` +
+        `Fico feliz em te ver aqui. Você acabou de entrar em um espaço exclusivo onde acompanha de perto o dia a dia de Marcos de Castro — bastidores reais, ferramentas, pesquisas e encontros ao vivo.\n\n` +
+        `📌 **Para começar:**\n` +
+        `→ Apresente-se no canal **#💬 geral**\n` +
+        `→ Veja a agenda dos próximos encontros em **#📅 agenda**\n` +
+        `→ Explore os bastidores em **#🎬 nos-bastidores**\n\n` +
+        `Qualquer dúvida, é só chamar no **#💬 geral**. Estamos aqui!`
       );
     }
 
@@ -42,10 +47,13 @@ client.on('guildMemberAdd', async (member) => {
     try {
       await member.send(
         `Olá, **${member.displayName}**! 👑\n\n` +
-        `Seu acesso ao **Elite Dark Academy** está confirmado.\n\n` +
-        `Você agora faz parte de um círculo seleto. ` +
-        `Explore os canais, acompanhe os bastidores e participe dos encontros ao vivo.\n\n` +
-        `Qualquer dúvida, estamos nos canais.`
+        `Seu acesso ao **Elite Dark Academy** está confirmado. Seja muito bem-vindo!\n\n` +
+        `Aqui estão os primeiros passos:\n\n` +
+        `1️⃣ Abra o servidor pelo Discord (pode ser pelo celular ou computador)\n` +
+        `2️⃣ Vá no canal **#💬 geral** e se apresente para a comunidade\n` +
+        `3️⃣ Confira o canal **#📅 agenda** para não perder nenhum encontro ao vivo\n\n` +
+        `Se tiver qualquer dificuldade para navegar, escreva no **#💬 geral** que te ajudamos.\n\n` +
+        `Até breve! 🙌`
       );
     } catch (_) {
       // DM desativada pelo aluno — sem problema
