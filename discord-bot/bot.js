@@ -1,24 +1,43 @@
 /**
  * EDA Bot — Elite Dark Academy
- * Atribui cargo "Membro Elite" automaticamente quando aluno entra no servidor.
- * Roda 24/7 no Railway.
+ * - Atribui cargo "Membro Elite" quando aluno entra
+ * - Rastreia qual invite foi usado → salva discord_user_id no Supabase
+ * - Remove cargo quando Hotmart notifica cancelamento/reembolso
  */
 
 const { Client, GatewayIntentBits } = require('discord.js');
+const { createClient } = require('@supabase/supabase-js');
 
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildInvites,
   ],
 });
 
-const GUILD_ID          = '1508895864540626986';
-const ROLE_ID           = '1508900115459477535';
-const WELCOME_CHANNEL   = '1508898202294816778';
+const GUILD_ID        = '1508895864540626986';
+const ROLE_ID         = '1508900115459477535';
+const WELCOME_CHANNEL = '1508898202294816778';
 
-client.once('ready', () => {
+// Cache local de uses por invite code
+let inviteCache = new Map();
+
+function supabase() {
+  return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+}
+
+client.once('ready', async () => {
   console.log(`✅ EDA Bot online: ${client.user.tag}`);
+  // Carrega todos os invites existentes no cache
+  try {
+    const guild   = client.guilds.cache.get(GUILD_ID);
+    const invites = await guild.invites.fetch();
+    inviteCache   = new Map(invites.map(inv => [inv.code, inv.uses]));
+    console.log(`📋 Cache de invites carregado: ${inviteCache.size} invites`);
+  } catch (err) {
+    console.error('❌ Erro ao carregar cache de invites:', err.message);
+  }
 });
 
 client.on('guildMemberAdd', async (member) => {
@@ -28,6 +47,31 @@ client.on('guildMemberAdd', async (member) => {
     // Atribui o cargo Membro Elite
     await member.roles.add(ROLE_ID);
     console.log(`✅ Cargo atribuído: ${member.user.username}`);
+
+    // Descobre qual invite foi usado comparando cache anterior com o atual
+    try {
+      const newInvites = await member.guild.invites.fetch();
+      const usedInvite = newInvites.find(inv => {
+        const cached = inviteCache.get(inv.code) ?? 0;
+        return inv.uses > cached;
+      });
+
+      if (usedInvite) {
+        // Atualiza cache
+        inviteCache.set(usedInvite.code, usedInvite.uses);
+        // Salva discord_user_id no Supabase para possível revogação futura
+        await supabase()
+          .from('discord_invites')
+          .update({ discord_user_id: member.user.id })
+          .eq('invite_code', usedInvite.code);
+        console.log(`🔗 Invite ${usedInvite.code} vinculado ao usuário ${member.user.id}`);
+      } else {
+        // Atualiza cache mesmo sem match
+        newInvites.forEach(inv => inviteCache.set(inv.code, inv.uses));
+      }
+    } catch (invErr) {
+      console.error('⚠️ Erro ao rastrear invite:', invErr.message);
+    }
 
     // Mensagem de boas-vindas no canal
     const channel = member.guild.channels.cache.get(WELCOME_CHANNEL);
@@ -43,7 +87,7 @@ client.on('guildMemberAdd', async (member) => {
       );
     }
 
-    // DM de boas-vindas para o aluno
+    // DM de boas-vindas
     try {
       await member.send(
         `Olá, **${member.displayName}**! 👑\n\n` +
