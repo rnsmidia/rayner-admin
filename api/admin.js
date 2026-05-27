@@ -646,12 +646,14 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({ ok: true, count });
   }
 
-  // EMAIL TEMPLATES — retorna manifest
+  // EMAIL TEMPLATES — retorna manifest (filtrado por product se informado)
   if (action === 'email-templates') {
     try {
       const manifestPath = path.join(process.cwd(), 'emails', 'manifest.json');
       const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-      return res.status(200).json({ ok: true, templates: manifest });
+      const product = body.product;
+      const filtered = product ? manifest.filter(t => t.product === product) : manifest;
+      return res.status(200).json({ ok: true, templates: filtered });
     } catch (e) {
       return res.status(500).json({ error: 'Erro ao ler manifest: ' + e.message });
     }
@@ -727,6 +729,66 @@ module.exports = async function handler(req, res) {
     }
 
     return res.status(200).json({ ok: true, sent, failed, skipped, total: licenses.length, errors });
+  }
+
+  // BLAST NARRATIVA — contagem de destinatários
+  if (action === 'blast-narrativa-count') {
+    const { recipients = 'all' } = body;
+    let query = supabase.from('narrativa_users').select('email, active', { count: 'exact' }).not('email', 'is', null);
+    if (recipients === 'active')   query = query.eq('active', true);
+    if (recipients === 'inactive') query = query.eq('active', false);
+    const { count, error } = await query;
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ ok: true, count });
+  }
+
+  // BLAST NARRATIVA — disparo em massa para usuários do Narrativa IA
+  if (action === 'blast-narrativa') {
+    const { template: templateId, recipients = 'active', testEmail } = body;
+    if (!templateId) return res.status(400).json({ error: 'template obrigatório' });
+
+    let query = supabase.from('narrativa_users').select('email, name, active').not('email', 'is', null);
+    if (recipients === 'active')   query = query.eq('active', true);
+    if (recipients === 'inactive') query = query.eq('active', false);
+    const { data: users, error } = await query;
+    if (error) return res.status(500).json({ error: error.message });
+
+    let HTML, tpl;
+    try {
+      const manifestPath = path.join(process.cwd(), 'emails', 'manifest.json');
+      const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+      tpl = manifest.find(t => t.id === templateId);
+      if (!tpl) return res.status(404).json({ error: 'Template não encontrado' });
+      HTML = fs.readFileSync(path.join(process.cwd(), 'emails', `${templateId}.html`), 'utf8');
+    } catch (e) {
+      return res.status(500).json({ error: 'Erro ao carregar template: ' + e.message });
+    }
+
+    const targets = testEmail ? [{ email: testEmail, name: 'Teste' }] : users;
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    let sent = 0, failed = 0, skipped = 0;
+
+    for (const u of targets) {
+      if (!u.email || !u.email.includes('@')) { skipped++; continue; }
+      try {
+        await resend.emails.send({ from: tpl.from, to: u.email, subject: tpl.subject, html: HTML });
+        sent++;
+        await new Promise(r => setTimeout(r, 120));
+      } catch (err) {
+        failed++;
+      }
+    }
+    return res.status(200).json({ ok: true, sent, failed, skipped, total: targets.length });
+  }
+
+  // NARRATIVA — redefinir senha (admin redefine sem enviar email)
+  if (action === 'narrativa-reset-password') {
+    const { id, password } = body;
+    if (!id || !password) return res.status(400).json({ error: 'id e password obrigatórios' });
+    const password_hash = hashNarrativaPassword(password);
+    const { error } = await supabase.from('narrativa_users').update({ password_hash }).eq('id', id);
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ ok: true });
   }
 
   return res.status(400).json({ error: 'Ação desconhecida' });

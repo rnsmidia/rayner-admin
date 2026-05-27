@@ -1,6 +1,7 @@
 [
   {
     "id": "cenadrop-v76-aulao",
+    "product": "cenadrop",
     "label": "Aulão ao Vivo — v7.6",
     "subject": "Seu personagem muda de rosto em cada cena? ⚡ Aula ao vivo HOJE 20h",
     "from": "CenaDrop <contato@cenadrop.com.br>",
@@ -9,6 +10,7 @@
   },
   {
     "id": "cenadrop-v73-update",
+    "product": "cenadrop",
     "label": "Novidades CenaDrop v7.3",
     "subject": "CenaDrop v7.3 chegou — veja o que mudou",
     "from": "CenaDrop <contato@cenadrop.com.br>",
