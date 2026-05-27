@@ -670,6 +670,119 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
 .mon-link:hover { border-color: var(--accent); color: var(--accent); }
 
 /* ════════════════════════════════════
+   OVERVIEW
+════════════════════════════════════ */
+.ov-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px; margin-bottom: 24px;
+}
+.ov-prod-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px; padding: 18px;
+  box-shadow: var(--shadow-sm);
+}
+.ov-prod-title {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 700;
+  color: var(--text); margin-bottom: 12px;
+}
+.ov-prod-title span { font-size: 16px; }
+.ov-stat-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.ov-stat-label { font-size: 11px; color: var(--muted); }
+.ov-stat-val { font-size: 14px; font-weight: 700; }
+.ov-go { margin-top: 12px; width: 100%; padding: 7px; border-radius: 7px; border: 1px solid var(--border); background: var(--subtle); color: var(--text2); font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; transition: all .18s; }
+.ov-go:hover { border-color: var(--accent); color: var(--accent); }
+.ov-last-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 18px;
+  box-shadow: var(--shadow-sm); margin-bottom: 20px;
+}
+.ov-last-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 14px; }
+.ov-last-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 0; border-bottom: 1px solid var(--border);
+}
+.ov-last-row:last-child { border-bottom: none; }
+.ov-last-av { width: 28px; height: 28px; border-radius: 7px; background: var(--accent-s); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--accent); flex-shrink: 0; }
+.ov-last-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.ov-last-email { font-size: 11px; color: var(--muted); }
+.ov-last-meta { margin-left: auto; text-align: right; font-size: 11px; color: var(--muted); white-space: nowrap; }
+.mon-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+.mon-badge-inline {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;
+}
+.mon-badge-inline.ok { background: var(--green-s); color: var(--green); border: 1px solid rgba(40,199,111,.2); }
+.mon-badge-inline.warn { background: var(--yellow-s); color: var(--yellow); border: 1px solid rgba(255,159,67,.2); }
+
+/* ── PERIOD SELECTOR ────────────────────── */
+.period-btn { }
+.period-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* ── BULK BAR ───────────────────────────── */
+#bulk-bar {
+  display: none;
+  align-items: center; gap: 10px;
+  background: var(--accent-s);
+  border: 1px solid rgba(124,58,237,.2);
+  border-radius: 9px; padding: 9px 14px;
+  margin-bottom: 12px; flex-wrap: wrap;
+}
+#bulk-bar.show { display: flex; }
+#bulk-bar .bulk-info { font-size: 13px; font-weight: 600; color: var(--accent); }
+#bulk-bar .bulk-sep { color: var(--border); }
+
+/* ── SORTABLE HEADERS ───────────────────── */
+thead th.sortable { cursor: pointer; user-select: none; white-space: nowrap; }
+thead th.sortable:hover { color: var(--accent); }
+.sort-icon { margin-left: 4px; color: var(--muted); font-size: 10px; }
+
+/* ── CLOCK ──────────────────────────────── */
+#topbar-clock {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; font-weight: 600;
+  color: var(--text2);
+  background: var(--subtle);
+  border: 1px solid var(--border);
+  border-radius: 7px; padding: 4px 10px;
+  margin-right: 8px;
+}
+
+/* ── BLAST ──────────────────────────────── */
+.blast-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 24px;
+  box-shadow: var(--shadow-sm);
+}
+.blast-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+.blast-card .blast-sub { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+.btn-blast {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--accent); color: #fff;
+  border: none; border-radius: 10px;
+  padding: 13px 24px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: all .2s;
+}
+.btn-blast:hover { background: var(--accent-h); box-shadow: 0 4px 16px rgba(124,58,237,.3); }
+.btn-blast:disabled { opacity: .5; cursor: not-allowed; }
+.blast-result {
+  margin-top: 14px; padding: 12px 16px; border-radius: 9px;
+  font-size: 13px; font-weight: 600; display: none;
+}
+.blast-result.show { display: block; }
+.blast-result.ok { background: var(--green-s); color: var(--green); border: 1px solid rgba(40,199,111,.2); }
+.blast-result.error { background: var(--red-s); color: var(--red); border: 1px solid rgba(234,84,85,.2); }
+
+/* ── CHECKBOX ───────────────────────────── */
+input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; cursor: pointer; }
+td.cb-col { width: 36px; }
+th.cb-col { width: 36px; }
+
+/* ════════════════════════════════════
    RESPONSIVE
 ════════════════════════════════════ */
 /* ════════════════════════════════════
@@ -804,7 +917,13 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
       </div>
 
       <div class="sb-nav">
-        <div class="sb-section-label">Produtos</div>
+        <div class="sb-section-label" style="margin-bottom:8px">Visão Geral</div>
+        <button class="prod-btn" id="btn-overview" onclick="switchProduct('overview')">
+          <div class="prod-icon">🏠</div>
+          <div><div class="prod-name">Overview</div><div class="prod-tag">Todos os produtos</div></div>
+        </button>
+
+        <div class="sb-section-label" style="margin-top:10px">Produtos</div>
 
         <!-- CenaDrop -->
         <button class="prod-btn active" id="btn-cenadrop" onclick="switchProduct('cenadrop')">
@@ -818,6 +937,7 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
           <button class="sn-btn active" data-sec="dashboard" onclick="switchSection('cenadrop','dashboard')">📊 Dashboard</button>
           <button class="sn-btn" data-sec="licenses"  onclick="switchSection('cenadrop','licenses')">🔑 Licenças <span class="sn-count" id="cnt-lic">0</span></button>
           <button class="sn-btn" data-sec="students"  onclick="switchSection('cenadrop','students')">🎓 Alunos Hotmart <span class="sn-count" id="cnt-hot">0</span></button>
+          <button class="sn-btn" data-sec="blast"     onclick="switchSection('cenadrop','blast')">📣 Blast Email</button>
         </div>
 
         <!-- Narrativa IA -->
@@ -846,7 +966,6 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
           <button class="sn-btn" data-sec="buyers" onclick="switchSection('nexus','buyers')">🛒 Compradores <span class="sn-count" id="cnt-nxbuyers">0</span></button>
           <button class="sn-btn" data-sec="clicks" onclick="switchSection('nexus','clicks');loadNexusClicks()">📈 Cliques <span class="sn-count" id="cnt-nxclicks">—</span></button>
         </div>
-      </div>
 
         <!-- Elite Dark Academy -->
         <button class="prod-btn" id="btn-academy" onclick="switchProduct('academy')">
@@ -861,6 +980,15 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
           <button class="sn-btn" data-sec="funnel" onclick="switchSection('academy','funnel');loadAcademyFunnel()">📊 Funil</button>
         </div>
 
+        <!-- Links Hub -->
+        <button class="prod-btn" id="btn-links" onclick="switchProduct('links')" style="margin-top:6px">
+          <div class="prod-icon">🔗</div>
+          <div>
+            <div class="prod-name">Links Hub</div>
+            <div class="prod-tag">Domínios & URLs</div>
+          </div>
+        </button>
+
         <!-- Monitor -->
         <div class="sb-section-label" style="margin-top:10px">Sistema</div>
         <button class="prod-btn" id="btn-monitor" onclick="switchProduct('monitor')">
@@ -873,6 +1001,8 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
         <div id="subnav-monitor" class="subnav" style="display:none">
           <button class="sn-btn" data-sec="usage" onclick="switchSection('monitor','usage')">📊 Uso dos Serviços</button>
         </div>
+
+      </div><!-- /sb-nav -->
 
       <div class="sb-footer">
         <div class="user-row">
@@ -894,7 +1024,67 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
           <span class="bc-sep">/</span>
           <span class="bc-sec" id="bc-sec">Dashboard</span>
         </div>
-        <span class="badge-live">● Live</span>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span id="topbar-clock">--:--</span>
+          <span class="badge-live">● Live</span>
+        </div>
+      </div>
+
+      <!-- ── OVERVIEW ── -->
+      <div class="prod-panel" id="panel-overview">
+        <div class="sec-panel active" id="overview-main" style="padding:24px">
+
+          <!-- Cards de produtos -->
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:14px">Produtos</div>
+          <div class="ov-grid" id="ov-products-grid">
+            <!-- CenaDrop -->
+            <div class="ov-prod-card">
+              <div class="ov-prod-title"><span>🎬</span> CenaDrop</div>
+              <div class="ov-stat-row"><span class="ov-stat-label">Total</span><span class="ov-stat-val purple" id="ov-cd-total">—</span></div>
+              <div class="ov-stat-row"><span class="ov-stat-label">Ativas</span><span class="ov-stat-val green" id="ov-cd-active">—</span></div>
+              <div class="ov-stat-row"><span class="ov-stat-label">Inativas</span><span class="ov-stat-val red" id="ov-cd-inactive">—</span></div>
+              <button class="ov-go" onclick="switchProduct('cenadrop')">→ Gerenciar</button>
+            </div>
+            <!-- Narrativa IA -->
+            <div class="ov-prod-card">
+              <div class="ov-prod-title"><span>✨</span> Narrativa IA</div>
+              <div class="ov-stat-row"><span class="ov-stat-label">Total</span><span class="ov-stat-val purple" id="ov-na-total">—</span></div>
+              <div class="ov-stat-row"><span class="ov-stat-label">Ativos</span><span class="ov-stat-val green" id="ov-na-active">—</span></div>
+              <button class="ov-go" onclick="switchProduct('narrativa')">→ Gerenciar</button>
+            </div>
+            <!-- Nexus Saúde -->
+            <div class="ov-prod-card">
+              <div class="ov-prod-title"><span>💚</span> Nexus Saúde</div>
+              <div class="ov-stat-row"><span class="ov-stat-label">Total</span><span class="ov-stat-val purple" id="ov-nx-total">—</span></div>
+              <div class="ov-stat-row"><span class="ov-stat-label">Ativos</span><span class="ov-stat-val green" id="ov-nx-active">—</span></div>
+              <div class="ov-stat-row"><span class="ov-stat-label">Cancelados</span><span class="ov-stat-val red" id="ov-nx-inactive">—</span></div>
+              <button class="ov-go" onclick="switchProduct('nexus')">→ Gerenciar</button>
+            </div>
+            <!-- Elite Dark -->
+            <div class="ov-prod-card">
+              <div class="ov-prod-title"><span>🏆</span> Elite Dark</div>
+              <div class="ov-stat-row"><span class="ov-stat-label">Total Lista VIP</span><span class="ov-stat-val purple" id="ov-acy-total">—</span></div>
+              <button class="ov-go" onclick="switchProduct('academy')">→ Gerenciar</button>
+            </div>
+          </div>
+
+          <!-- Últimas licenças CenaDrop -->
+          <div class="ov-last-card">
+            <div class="ov-last-title">Últimas licenças CenaDrop</div>
+            <div id="ov-last-licenses"><div style="color:var(--muted);font-size:13px">Carregando...</div></div>
+          </div>
+
+          <!-- Monitor rápido -->
+          <div class="ov-last-card">
+            <div class="ov-last-title" style="margin-bottom:10px">Monitor rápido</div>
+            <div class="mon-badges" id="ov-mon-badges">
+              <span class="mon-badge-inline ok" id="ov-mon-sb">⚡ Supabase</span>
+              <span class="mon-badge-inline ok" id="ov-mon-vc">▲ Vercel</span>
+              <span class="mon-badge-inline ok" id="ov-mon-rs">✉ Resend</span>
+            </div>
+          </div>
+
+        </div>
       </div>
 
       <!-- ── CENADROP ── -->
@@ -902,6 +1092,13 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
 
         <!-- Dashboard -->
         <div class="sec-panel active" id="cenadrop-dashboard">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+            <span style="font-size:13px;color:var(--muted);font-weight:600">Período:</span>
+            <button class="btn-sm period-btn active" id="period-all"    onclick="setPeriod('all')">Todos</button>
+            <button class="btn-sm period-btn"        id="period-30d"   onclick="setPeriod('30d')">30 dias</button>
+            <button class="btn-sm period-btn"        id="period-7d"    onclick="setPeriod('7d')">7 dias</button>
+            <button class="btn-sm period-btn"        id="period-today" onclick="setPeriod('today')">Hoje</button>
+          </div>
           <div class="stats-grid">
             <div class="stat-card">
               <div class="stat-icon-wrap purple">📦</div>
@@ -955,15 +1152,29 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
             <button class="btn-sm accent" onclick="openCreateModal()">+ Nova Chave</button>
             <button class="btn-sm" onclick="loadAll()">↻</button>
           </div>
+          <!-- Bulk bar -->
+          <div id="bulk-bar">
+            <span class="bulk-info" id="bulk-count">0 selecionados</span>
+            <span class="bulk-sep">|</span>
+            <button class="btn-sm" style="color:var(--green);border-color:rgba(40,199,111,.3)" onclick="bulkActivate()">🔓 Ativar</button>
+            <button class="btn-sm" style="color:var(--red);border-color:rgba(234,84,85,.3)"   onclick="bulkDeactivate()">🔒 Desativar</button>
+            <button class="btn-sm accent" onclick="exportLicensesCSV()">⬇ Exportar CSV</button>
+          </div>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Chave</th><th>Nome / Email</th><th>Status</th><th>Origem</th><th>Data</th><th>Ações</th>
+                  <th class="cb-col"><input type="checkbox" id="chk-all" onchange="toggleSelectAll()" /></th>
+                  <th class="sortable" onclick="sortLicenses('key')">Chave <span class="sort-icon" id="si-key"></span></th>
+                  <th class="sortable" onclick="sortLicenses('name')">Nome / Email <span class="sort-icon" id="si-name"></span></th>
+                  <th class="sortable" onclick="sortLicenses('status')">Status <span class="sort-icon" id="si-status"></span></th>
+                  <th class="sortable" onclick="sortLicenses('source')">Origem <span class="sort-icon" id="si-source"></span></th>
+                  <th class="sortable" onclick="sortLicenses('created_at')">Data <span class="sort-icon" id="si-created_at">▼</span></th>
+                  <th>Ações</th>
                 </tr>
               </thead>
               <tbody id="lic-tbody">
-                <tr><td colspan="6"><div class="loading">Carregando...</div></td></tr>
+                <tr><td colspan="7"><div class="loading">Carregando...</div></td></tr>
               </tbody>
             </table>
           </div>
@@ -988,6 +1199,29 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
                 <tr><td colspan="8"><div class="loading">Carregando...</div></td></tr>
               </tbody>
             </table>
+          </div>
+        </div>
+
+        <!-- Blast Email -->
+        <div class="sec-panel" id="cenadrop-blast">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:24px">
+            <div class="stat-card">
+              <div class="stat-icon-wrap purple">📧</div>
+              <div><div class="stat-label">Usuários com email</div><div class="stat-val purple" id="blast-email-count">—</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap yellow">📅</div>
+              <div><div class="stat-label">Último disparo</div><div class="stat-val" style="font-size:16px;color:var(--text2)" id="blast-last-sent">—</div></div>
+            </div>
+          </div>
+          <div class="blast-card">
+            <h3>📣 Blast Email</h3>
+            <p class="blast-sub">Dispara email para todos os usuários com email cadastrado no banco de dados CenaDrop.</p>
+            <button class="btn-blast" id="blast-btn" onclick="doBlastemail()">
+              <span id="blast-btn-icon">📣</span>
+              <span id="blast-btn-text">Disparar Email v7.6 para Todos</span>
+            </button>
+            <div class="blast-result" id="blast-result"></div>
           </div>
         </div>
 
@@ -1277,6 +1511,502 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
 
       </div>
 
+      <!-- ══════════════════════════════════════════
+           LINKS HUB PANEL
+      ══════════════════════════════════════════ -->
+      <div class="prod-panel" id="panel-links">
+        <div class="sec-panel active" id="links-main">
+
+          <style>
+          /* ── Links Hub ── */
+          .lh-header {
+            display:flex;align-items:center;justify-content:space-between;
+            margin-bottom:22px;flex-wrap:wrap;gap:12px;
+          }
+          .lh-header-left h2 { font-size:16px;font-weight:700;color:var(--text);margin-bottom:2px; }
+          .lh-header-left p  { font-size:12px;color:var(--muted); }
+          .lh-search {
+            padding:8px 13px;border:1.5px solid var(--border);border-radius:8px;
+            font-size:13px;outline:none;width:210px;background:var(--surface);
+            color:var(--text);transition:border-color .15s;
+          }
+          .lh-search:focus { border-color:var(--accent); }
+
+          .lh-section { margin-bottom:20px; }
+          .lh-section[data-hidden="true"] { display:none; }
+
+          .lh-section-hd {
+            display:flex;align-items:center;gap:8px;
+            margin-bottom:8px;cursor:pointer;user-select:none;
+          }
+          .lh-section-hd-bar {
+            width:3px;border-radius:2px;height:16px;flex-shrink:0;
+          }
+          .lh-section-hd-title {
+            font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+            color:var(--text2);flex:1;
+          }
+          .lh-section-hd-count {
+            font-size:10px;font-weight:600;padding:1px 8px;border-radius:10px;
+            background:var(--subtle);color:var(--muted);
+          }
+          .lh-section-hd-chevron { font-size:10px;color:var(--muted);transition:transform .2s; }
+          .lh-section.collapsed .lh-section-hd-chevron { transform:rotate(-90deg); }
+          .lh-section.collapsed .lh-list { display:none; }
+
+          .lh-list {
+            background:var(--surface);border:1px solid var(--border);
+            border-radius:10px;overflow:hidden;
+          }
+          .lh-row {
+            display:flex;align-items:center;gap:12px;
+            padding:9px 14px;border-bottom:1px solid var(--border);
+            transition:background .12s;position:relative;
+          }
+          .lh-row:last-child { border-bottom:none; }
+          .lh-row:hover { background:var(--subtle); }
+          .lh-row[data-hidden="true"] { display:none; }
+
+          .lh-dot {
+            width:7px;height:7px;border-radius:50%;flex-shrink:0;
+            background:var(--lh-color, var(--accent));
+          }
+          .lh-row-name {
+            font-size:13px;font-weight:600;color:var(--text);
+            white-space:nowrap;width:180px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;
+          }
+          .lh-row-desc {
+            font-size:12px;color:var(--muted);flex:1;
+            white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+          }
+          .lh-badge {
+            font-size:10px;font-weight:600;padding:2px 8px;border-radius:5px;
+            white-space:nowrap;flex-shrink:0;
+            background:var(--subtle);color:var(--muted);
+          }
+          .lh-badge.checkout { background:rgba(40,199,111,.1);color:#28c76f; }
+          .lh-badge.redirect { background:rgba(255,159,67,.12);color:#ff9f43; }
+          .lh-badge.social   { background:rgba(59,130,246,.1);color:#3b82f6; }
+          .lh-badge.external { background:rgba(234,84,85,.1);color:#ea5455; }
+          .lh-badge.prod     { background:rgba(124,58,237,.1);color:var(--accent); }
+
+          .lh-acts { display:flex;gap:4px;flex-shrink:0; }
+          .lh-acts button {
+            width:28px;height:28px;border:1px solid var(--border);border-radius:6px;
+            background:transparent;color:var(--text2);cursor:pointer;font-size:13px;
+            transition:all .12s;display:flex;align-items:center;justify-content:center;
+            flex-shrink:0;
+          }
+          .lh-acts button:hover { background:var(--accent-s);color:var(--accent);border-color:var(--accent); }
+          </style>
+
+          <div class="lh-header">
+            <div class="lh-header-left">
+              <h2>Links Hub</h2>
+              <p id="lh-total-count">Carregando...</p>
+            </div>
+            <input class="lh-search" id="links-search" type="text"
+              placeholder="🔍  Filtrar..." oninput="filterLinks(this.value)">
+          </div>
+
+          <div id="links-container">
+
+            <!-- ── DOMÍNIOS PRÓPRIOS ── -->
+            <div class="lh-section" id="lhs-dominios">
+              <div class="lh-section-hd" onclick="toggleLhSection('lhs-dominios')">
+                <div class="lh-section-hd-bar" style="background:#7c3aed"></div>
+                <span class="lh-section-hd-title">🌐 Domínios Próprios</span>
+                <span class="lh-section-hd-count">4</span>
+                <span class="lh-section-hd-chevron">▼</span>
+              </div>
+              <div class="lh-list" style="--lh-color:#7c3aed">
+                <div class="lh-row lh-item" data-search="raynern.com.br admin servidor principal vercel">
+                  <div class="lh-dot"></div>
+                  <div class="lh-row-name">raynern.com.br</div>
+                  <div class="lh-row-desc">Servidor principal — admin, CenaDrop, meta-prompts, Academy</div>
+                  <span class="lh-badge prod">Principal</span>
+                  <div class="lh-acts">
+                    <button onclick="window.open('https://raynern.com.br','_blank')" title="Abrir">↗</button>
+                    <button onclick="copyLink('https://raynern.com.br',this)" title="Copiar">⎘</button>
+                  </div>
+                </div>
+                <div class="lh-row lh-item" data-search="cenadrop.com.br vendas dominio produto">
+                  <div class="lh-dot"></div>
+                  <div class="lh-row-name">cenadrop.com.br</div>
+                  <div class="lh-row-desc">Domínio CenaDrop — redireciona automaticamente para /vendas</div>
+                  <span class="lh-badge prod">CenaDrop</span>
+                  <div class="lh-acts">
+                    <button onclick="window.open('https://cenadrop.com.br','_blank')" title="Abrir">↗</button>
+                    <button onclick="copyLink('https://cenadrop.com.br',this)" title="Copiar">⎘</button>
+                  </div>
+                </div>
+                <div class="lh-row lh-item" data-search="narrativaia.com.br narrativa ia studio vercel">
+                  <div class="lh-dot"></div>
+                  <div class="lh-row-name">narrativaia.com.br</div>
+                  <div class="lh-row-desc">Studio Narrativa IA — app de roteiro com IA (Vercel)</div>
+                  <span class="lh-badge prod">Narrativa IA</span>
+                  <div class="lh-acts">
+                    <button onclick="window.open('https://narrativaia.com.br','_blank')" title="Abrir">↗</button>
+                    <button onclick="copyLink('https://narrativaia.com.br',this)" title="Copiar">⎘</button>
+                  </div>
+                </div>
+                <div class="lh-row lh-item" data-search="nxsaude.app.br protocolo 45 jejum saude vercel">
+                  <div class="lh-dot"></div>
+                  <div class="lh-row-name">nxsaude.app.br</div>
+                  <div class="lh-row-desc">Plataforma NX Saúde — Protocolo 45+ / Guia Prático Jejum</div>
+                  <span class="lh-badge prod">NX Saúde</span>
+                  <div class="lh-acts">
+                    <button onclick="window.open('https://nxsaude.app.br','_blank')" title="Abrir">↗</button>
+                    <button onclick="copyLink('https://nxsaude.app.br',this)" title="Copiar">⎘</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── CENADROP FLOW ── -->
+            <div class="lh-section" id="lhs-cenadrop">
+              <div class="lh-section-hd" onclick="toggleLhSection('lhs-cenadrop')">
+                <div class="lh-section-hd-bar" style="background:#14b8a6"></div>
+                <span class="lh-section-hd-title">🎬 CenaDrop Flow</span>
+                <span class="lh-section-hd-count">5</span>
+                <span class="lh-section-hd-chevron">▼</span>
+              </div>
+              <div class="lh-list" style="--lh-color:#14b8a6">
+                <div class="lh-row lh-item" data-search="cenadrop vendas pagina venda cenadrop.com.br">
+                  <div class="lh-dot"></div>
+                  <div class="lh-row-name">Página de Vendas</div>
+                  <div class="lh-row-desc">Página de vendas principal — cenadrop.com.br/vendas</div>
+                  <span class="lh-badge checkout">Vendas</span>
+                  <div class="lh-acts">
+                    <button onclick="window.open('https://cenadrop.com.br/vendas','_blank')" title="Abrir">↗</button>
+                    <button onclick="copyLink('https://cenadrop.com.br/vendas',this)" title="Copiar">⎘</button>
+                  </div>
+                </div>
+                <div class="lh-row lh-item" data-search="hotmart checkout pagamento compra cenadrop">
+                  <div class="lh-dot"></div>
+                  <div class="lh-row-name">Checkout Hotmart</div>
+                  <div class="lh-row-desc">Link de compra direto — oferta padrão Hotmart</div>
+                  <span class="lh-badge checkout">Pagamento</span>
+                  <div class="lh-acts">
+                    <button onclick="window.open('https://pay.hotmart.com/N105550523I?off=h52a6id8','_blank')" title="Abrir">↗</button>
+                    <button onclick="copyLink('https://pay.hotmart.com/N105550523I?off=h52a6id8',this)" title="Copiar">⎘</button>
+                  </div>
+                </div>
+                <div class="lh-row lh-item" data-search="cenadrop download extensao chrome zip">
+                  <div class="lh-dot"></div>
+                  <div class="lh-row-name">Download Extensão</div>
+                  <div class="lh-row-desc">Página de download do CenaDrop Flow (.zip)</div>
+                  <span class="lh-badge">Download</span>
+                  <div class="lh-acts">
+                    <button onclick="window.open('https://cenadrop.com.br/download','_blank')" title="Abrir">↗</button>
+                    <button onclick="copyLink('https://cenadrop.com.br/download',this)" title="Copiar">⎘</button>
+                  </div>
+                </div>
+                <div class="lh-row lh-item" data-search="cenadrop download srt legendas">
+                  <div class="lh-dot"></div>
+                  <div class="lh-row-name">Download SRT</div>
+                  <div class="lh-row-desc">Página de download — versão SRT / legendas</div>
+                  <span class="lh-badge">Download</span>
+                  <div class="lh-acts">
+                    <button onclick="window.open('https://cenadrop.com.br/downloadsrt','_blank')" title="Abrir">↗</button>
+                    <button onclick="copyLink('https://cenadrop.com.br/downloadsrt',this)" title="Copiar">⎘</button>
+                  </div>
+                </div>
+                <div class="lh-row lh-item" data-search="cenadrop manual documentacao tutorial">
+                  <div class="lh-dot"></div>
+                  <div class="lh-row-name">Manual do Usuário</div>
+                  <div class="lh-row-desc">Manual completo de uso do CenaDrop Flow</div>
+                  <span class="lh-badge">Doc</span>
+                  <div class="lh-acts">
+                    <button onclick="window.open('https://cenadrop.com.br/manual','_blank')" title="Abrir">↗</button>
+                    <button onclick="copyLink('https://cenadrop.com.br/manual',this)" title="Copiar">⎘</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── ELITE DARK ACADEMY ── -->
+            <div class="lh-section" id="lhs-academy">
+              <div class="lh-section-hd" onclick="toggleLhSection('lhs-academy')">
+                <div class="lh-section-hd-bar" style="background:#f59e0b"></div>
+                <span class="lh-section-hd-title">🏆 Elite Dark Academy</span>
+                <span class="lh-section-hd-count">5</span>
+                <span class="lh-section-hd-chevron">▼</span>
+              </div>
+              <div class="lh-list" style="--lh-color:#f59e0b">
+                <div class="lh-row lh-item" data-search="academy elite waitlist espera lista inscricao">
+                  <div class="lh-dot"></div>
+                  <div class="lh-row-name">Lista de Espera</div>
+                  <div class="lh-row-desc">Inscrição na lista VIP — raynern.com.br/academyelite</div>
+                  <span class="lh-badge checkout">Waitlist</span>
+                  <div class="lh-acts">
+                    <button onclick="window.open('https://raynern.com.br/academyelite','_blank')" title="Abrir">↗</button>
+                    <button onclick="copyLink('https://raynern.com.br/academyelite',this)" title="Copiar">⎘</button>
+                  </div>
+                </div>
+                <div class="lh-row lh-item" data-search="academy elite vendas dark elitedarkacademy pagina">
+                  <div class="lh-dot"></div>
+                  <div class="lh-row-name">Vendas Elite</div>
+                  <div class="lh-row-desc">Página de vendas — URL curta /elitedarkacademy</div>
+                  <span class="lh-badge checkout">Vendas</span>
+                  <div class="lh-acts">
+                    <button onclick="window.open('https://raynern.com.br/elitedarkacademy','_blank')" title="Abrir">↗</button>
+                    <button onclick="copyLink('https://raynern.com.br/elitedarkacademy',this)" title="Copiar">⎘</button>
+                  </div>
+                </div>
+                <div class="lh-row lh-item" data-search="academy lista prioritaria selecionados vip confirmacao">
+                  <div class="lh-dot"></div>
+                  <div class="lh-row-name">Lista Prioritária</div>
+                  <div class="lh-row-desc">Confirmação para inscritos selecionados</div>
+                  <span class="lh-badge">VIP</span>
+                  <div class="lh-acts">
+                    <button onclick="window.open('https://raynern.com.br/academyelite/lista-prioritaria','_blank')" title="Abrir">↗</button>
+                    <button onclick="copyLink('https://raynern.com.br/academyelite/lista-prioritaria',this)" title="Copiar">⎘</button>
+                  </div>
+                </div>
+                <div class="lh-row lh-item" data-search="elite status badge ranking membro">
+                  <div class="lh-dot"></div>
+                  <div class="lh-row-name">Elite Status</div>
+                  <div class="lh-row-desc">Página de status/badge para membros</div>
+                  <span class="lh-badge">Status</span>
+                  <div class="lh-acts">
+                    <button onclick="window.open('https://raynern.com.br/elite-status','_blank')" title="Abrir">↗</button>
+                    <button onclick="copyLink('https://raynern.com.br/elite-status',this)" title="Copiar">⎘</button>
+                  </div>
+                </div>
+                <div class="lh-row lh-item" data-search="whatsapp grupo academy elite vip alunos">
+                  <div class="lh-dot"></div>
+                  <div class="lh-row-name">WhatsApp Academy VIP</div>
+                  <div class="lh-row-desc">Grupo WhatsApp dos alunos VIP da Elite Dark Academy</div>
+                  <span class="lh-badge social">Social</span>
+                  <div class="lh-acts">
+                    <button onclick="window.open('https://chat.whatsapp.com/IcnFbVkXwNbG1VTXqxPulm','_blank')" title="Abrir">↗</button>
+                    <button onclick="copyLink('https://chat.whatsapp.com/IcnFbVkXwNbG1VTXqxPulm',this)" title="Copiar">⎘</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── NX SAÚDE ── -->
+            <div class="lh-section" id="lhs-nxsaude">
+              <div class="lh-section-hd" onclick="toggleLhSection('lhs-nxsaude')">
+                <div class="lh-section-hd-bar" style="background:#28c76f"></div>
+                <span class="lh-section-hd-title">💊 NX Saúde / Protocolo 45+</span>
+                <span class="lh-section-hd-count">4</span>
+                <span class="lh-section-hd-chevron">▼</span>
+              </div>
+              <div class="lh-list" style="--lh-color:#28c76f">
+                <div class="lh-row lh-item" data-search="nxsaude plataforma protocolo 45 app saude area">
+                  <div class="lh-dot"></div>
+                  <div class="lh-row-name">Plataforma NX Saúde</div>
+                  <div class="lh-row-desc">Área do produto Protocolo 45+</div>
+                  <span class="lh-badge prod">App</span>
+                  <div class="lh-acts">
+                    <button onclick="window.open('https://nxsaude.app.br','_blank')" title="Abrir">↗</button>
+                    <button onclick="copyLink('https://nxsaude.app.br',this)" title="Copiar">⎘</button>
+                  </div>
+                </div>
+                <div class="lh-row lh-item" data-search="nxsaude vendas protocolo 45 jejum pagina venda">
+                  <div class="lh-dot"></div>
+                  <div class="lh-row-name">Página de Vendas</div>
+                  <div class="lh-row-desc">nxsaude.app.br/vendas?v=01 — tracking ativo</div>
+                  <span class="lh-badge checkout">Vendas</span>
+                  <div class="lh-acts">
+                    <button onclick="window.open('https://nxsaude.app.br/vendas?v=01','_blank')" title="Abrir">↗</button>
+                    <button onclick="copyLink('https://nxsaude.app.br/vendas?v=01',this)" title="Copiar">⎘</button>
+                  </div>
+                </div>
+                <div class="lh-row lh-item" data-search="hotmart checkout pagamento protocolo 45 jejum nxsaude compra">
+                  <div class="lh-dot"></div>
+                  <div class="lh-row-name">Checkout Hotmart</div>
+                  <div class="lh-row-desc">Link de compra — Guia Prático / Protocolo 45+</div>
+                  <span class="lh-badge checkout">Pagamento</span>
+                  <div class="lh-acts">
+                    <button onclick="window.open('https://pay.hotmart.com/G105708344B?bid=1778037345580','_blank')" title="Abrir">↗</button>
+                    <button onclick="copyLink('https://pay.hotmart.com/G105708344B?bid=1778037345580',this)" title="Copiar">⎘</button>
+                  </div>
+                </div>
+                <div class="lh-row lh-item" data-search="whatsapp grupo nxsaude comunidade saude">
+                  <div class="lh-dot"></div>
+                  <div class="lh-row-name">WhatsApp NX Saúde</div>
+                  <div class="lh-row-desc">Grupo WhatsApp da comunidade Protocolo 45+</div>
+                  <span class="lh-badge social">Social</span>
+                  <div class="lh-acts">
+                    <button onclick="window.open('https://chat.whatsapp.com/CtNvcyiWxT6FGS6iv0fmi0','_blank')" title="Abrir">↗</button>
+                    <button onclick="copyLink('https://chat.whatsapp.com/CtNvcyiWxT6FGS6iv0fmi0',this)" title="Copiar">⎘</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── NARRATIVA IA ── -->
+            <div class="lh-section" id="lhs-narrativa">
+              <div class="lh-section-hd" onclick="toggleLhSection('lhs-narrativa')">
+                <div class="lh-section-hd-bar" style="background:#3b82f6"></div>
+                <span class="lh-section-hd-title">🤖 Narrativa IA</span>
+                <span class="lh-section-hd-count">2</span>
+                <span class="lh-section-hd-chevron">▼</span>
+              </div>
+              <div class="lh-list" style="--lh-color:#3b82f6">
+                <div class="lh-row lh-item" data-search="narrativa ia studio app roteiro cenadrop supabase">
+                  <div class="lh-dot"></div>
+                  <div class="lh-row-name">Studio Narrativa IA</div>
+                  <div class="lh-row-desc">App de roteiro com IA — narrativaia.com.br</div>
+                  <span class="lh-badge prod">App</span>
+                  <div class="lh-acts">
+                    <button onclick="window.open('https://narrativaia.com.br','_blank')" title="Abrir">↗</button>
+                    <button onclick="copyLink('https://narrativaia.com.br',this)" title="Copiar">⎘</button>
+                  </div>
+                </div>
+
+                <div class="lh-row lh-item" data-search="narrativa ia embreve em breve lancamento aguarde">
+                  <div class="lh-dot"></div>
+                  <div class="lh-row-name">Em Breve</div>
+                  <div class="lh-row-desc">Página de espera para funcionalidades da Narrativa IA</div>
+                  <span class="lh-badge">Placeholder</span>
+                  <div class="lh-acts">
+                    <button onclick="window.open('https://narrativaia.com.br/embreve','_blank')" title="Abrir">↗</button>
+                    <button onclick="copyLink('https://narrativaia.com.br/embreve',this)" title="Copiar">⎘</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── SISTEMA ── -->
+            <div class="lh-section" id="lhs-sistema">
+              <div class="lh-section-hd" onclick="toggleLhSection('lhs-sistema')">
+                <div class="lh-section-hd-bar" style="background:#a5a3ae"></div>
+                <span class="lh-section-hd-title">⚙️ Sistema & Infraestrutura</span>
+                <span class="lh-section-hd-count">3</span>
+                <span class="lh-section-hd-chevron">▼</span>
+              </div>
+              <div class="lh-list" style="--lh-color:#a5a3ae">
+                <div class="lh-row lh-item" data-search="admin painel administrativo crm dashboard">
+                  <div class="lh-dot"></div>
+                  <div class="lh-row-name">Painel Admin</div>
+                  <div class="lh-row-desc">Este painel — CRM, licenças, monitor</div>
+                  <span class="lh-badge">Sistema</span>
+                  <div class="lh-acts">
+                    <button onclick="window.open('https://raynern.com.br/admin','_blank')" title="Abrir">↗</button>
+                    <button onclick="copyLink('https://raynern.com.br/admin',this)" title="Copiar">⎘</button>
+                  </div>
+                </div>
+
+                <div class="lh-row lh-item" data-search="iris dashboard youtube analytics local dev 3002">
+                  <div class="lh-dot"></div>
+                  <div class="lh-row-name">Íris Dashboard</div>
+                  <div class="lh-row-desc">YouTube analytics — roda local na porta 3002</div>
+                  <span class="lh-badge">Dev Local</span>
+                  <div class="lh-acts">
+                    <button onclick="window.open('http://localhost:3002','_blank')" title="Abrir">↗</button>
+                    <button onclick="copyLink('http://localhost:3002',this)" title="Copiar">⎘</button>
+                  </div>
+                </div>
+                <div class="lh-row lh-item" data-search="meta prompts prompts biblioteca aula raynern">
+                  <div class="lh-dot"></div>
+                  <div class="lh-row-name">Meta-Prompts</div>
+                  <div class="lh-row-desc">Biblioteca pública de prompts das aulas — compartilhável com alunos</div>
+                  <span class="lh-badge prod">Biblioteca</span>
+                  <div class="lh-acts">
+                    <button onclick="window.open('https://raynern.com.br/meta-prompts','_blank')" title="Abrir">↗</button>
+                    <button onclick="copyLink('https://raynern.com.br/meta-prompts',this)" title="Copiar">⎘</button>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- ── FERRAMENTAS EXTERNAS ── -->
+            <div class="lh-section" id="lhs-ferramentas">
+              <div class="lh-section-hd" onclick="toggleLhSection('lhs-ferramentas')">
+                <div class="lh-section-hd-bar" style="background:#ea5455"></div>
+                <span class="lh-section-hd-title">🛠️ Ferramentas Externas</span>
+                <span class="lh-section-hd-count">6</span>
+                <span class="lh-section-hd-chevron">▼</span>
+              </div>
+              <div class="lh-list" style="--lh-color:#ea5455">
+                <div class="lh-row lh-item" data-search="supabase banco dados database dashboard licencas">
+                  <div class="lh-dot"></div>
+                  <div class="lh-row-name">Supabase</div>
+                  <div class="lh-row-desc">Banco de dados — licenças, usuários, waitlist</div>
+                  <span class="lh-badge external">Infra</span>
+                  <div class="lh-acts">
+                    <button onclick="window.open('https://app.supabase.com','_blank')" title="Abrir">↗</button>
+                    <button onclick="copyLink('https://app.supabase.com',this)" title="Copiar">⎘</button>
+                  </div>
+                </div>
+                <div class="lh-row lh-item" data-search="vercel deploy hosting projetos dashboard rayner">
+                  <div class="lh-dot"></div>
+                  <div class="lh-row-name">Vercel</div>
+                  <div class="lh-row-desc">Hospedagem — 4 projetos ativos</div>
+                  <span class="lh-badge external">Deploy</span>
+                  <div class="lh-acts">
+                    <button onclick="window.open('https://vercel.com/dashboard','_blank')" title="Abrir">↗</button>
+                    <button onclick="copyLink('https://vercel.com/dashboard',this)" title="Copiar">⎘</button>
+                  </div>
+                </div>
+                <div class="lh-row lh-item" data-search="resend email marketing disparos transacional">
+                  <div class="lh-dot"></div>
+                  <div class="lh-row-name">Resend</div>
+                  <div class="lh-row-desc">Envio de e-mails — transacionais e disparos em massa</div>
+                  <span class="lh-badge external">Email</span>
+                  <div class="lh-acts">
+                    <button onclick="window.open('https://resend.com/overview','_blank')" title="Abrir">↗</button>
+                    <button onclick="copyLink('https://resend.com/overview',this)" title="Copiar">⎘</button>
+                  </div>
+                </div>
+                <div class="lh-row lh-item" data-search="hotmart plataforma vendas cursos produtos alunos">
+                  <div class="lh-dot"></div>
+                  <div class="lh-row-name">Hotmart</div>
+                  <div class="lh-row-desc">Plataforma de vendas e gestão de alunos</div>
+                  <span class="lh-badge external">Vendas</span>
+                  <div class="lh-acts">
+                    <button onclick="window.open('https://app.hotmart.com','_blank')" title="Abrir">↗</button>
+                    <button onclick="copyLink('https://app.hotmart.com',this)" title="Copiar">⎘</button>
+                  </div>
+                </div>
+                <div class="lh-row lh-item" data-search="google cloud console youtube api oauth credenciais iris">
+                  <div class="lh-dot"></div>
+                  <div class="lh-row-name">Google Cloud</div>
+                  <div class="lh-row-desc">YouTube Data API v3, OAuth — Íris Dashboard</div>
+                  <span class="lh-badge external">APIs</span>
+                  <div class="lh-acts">
+                    <button onclick="window.open('https://console.cloud.google.com','_blank')" title="Abrir">↗</button>
+                    <button onclick="copyLink('https://console.cloud.google.com',this)" title="Copiar">⎘</button>
+                  </div>
+                </div>
+                <div class="lh-row lh-item" data-search="github repositorio codigo source billing">
+                  <div class="lh-dot"></div>
+                  <div class="lh-row-name">GitHub</div>
+                  <div class="lh-row-desc">Repositórios de código-fonte dos projetos</div>
+                  <span class="lh-badge external">Código</span>
+                  <div class="lh-acts">
+                    <button onclick="window.open('https://github.com','_blank')" title="Abrir">↗</button>
+                    <button onclick="copyLink('https://github.com',this)" title="Copiar">⎘</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── COMUNIDADE ── -->
+            <div class="lh-section" id="lhs-social">
+              <div class="lh-section-hd" onclick="toggleLhSection('lhs-social')">
+                <div class="lh-section-hd-bar" style="background:#25d366"></div>
+                <span class="lh-section-hd-title">💬 Comunidade & Social</span>
+                <span class="lh-section-hd-count">0</span>
+                <span class="lh-section-hd-chevron">▼</span>
+              </div>
+              <div class="lh-list" style="--lh-color:#25d366">
+                <div class="lh-row" style="justify-content:center;padding:14px;color:var(--muted);font-size:12px;font-style:italic">
+                  Links de grupos em breve...
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /links-container -->
+        </div>
+      </div><!-- /panel-links -->
+
       <div class="prod-panel" id="panel-monitor">
         <div class="sec-panel active" id="monitor-usage">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
@@ -1399,6 +2129,9 @@ const API = '/api/admin';
 let TOKEN = '', allLicenses = [], modalMode = 'create', editingKey = '';
 let curProd = 'cenadrop', curSec = { cenadrop: 'dashboard', academy: 'waitlist' };
 let allAcademyWaitlist = [];
+let activePeriod = 'all';
+let licSort = { col: 'created_at', dir: 'desc' };
+let selectedKeys = new Set();
 
 // ── AUTH ──────────────────────────────────────
 function doLogin() {
@@ -1463,19 +2196,20 @@ function switchProduct(prod) {
   document.getElementById(`btn-${prod}`).classList.add('active');
   document.querySelectorAll('.prod-panel').forEach(p => p.classList.remove('active'));
   document.getElementById(`panel-${prod}`).classList.add('active');
-  document.getElementById('subnav-cenadrop').style.display  = prod === 'cenadrop'  ? 'block' : 'none';
-  document.getElementById('subnav-narrativa').style.display = prod === 'narrativa' ? 'block' : 'none';
-  document.getElementById('subnav-nexus').style.display     = prod === 'nexus'     ? 'block' : 'none';
-  document.getElementById('subnav-monitor').style.display   = prod === 'monitor'   ? 'block' : 'none';
-  document.getElementById('subnav-academy').style.display   = prod === 'academy'   ? 'block' : 'none';
-  const prodLabels = { cenadrop: 'CenaDrop', narrativa: 'Narrativa IA', nexus: 'Nexus Saúde', monitor: 'Sistema', academy: 'Elite Dark Academy' };
+  ['cenadrop','narrativa','nexus','monitor','academy'].forEach(p => {
+    const el = document.getElementById('subnav-' + p);
+    if (el) el.style.display = prod === p ? 'block' : 'none';
+  });
+  const prodLabels = { overview:'Overview', cenadrop: 'CenaDrop', narrativa: 'Narrativa IA', nexus: 'Nexus Saúde', monitor: 'Sistema', academy: 'Elite Dark Academy', links: 'Links Hub' };
   document.getElementById('bc-prod').textContent = prodLabels[prod] || prod;
-  const labels = { dashboard:'Dashboard', licenses:'Licenças', students:'Alunos Hotmart', users:'Usuários', buyers:'Compradores', usage:'Monitor de Uso' };
+  const labels = { dashboard:'Dashboard', licenses:'Licenças', students:'Alunos Hotmart', users:'Usuários', buyers:'Compradores', usage:'Monitor de Uso', blast:'Blast Email', main:'Todos os Links' };
   document.getElementById('bc-sec').textContent = labels[curSec[prod] || 'dashboard'] || '—';
+  if (prod === 'overview')  { document.getElementById('bc-sec').textContent = 'Visão Geral'; loadOverview(); }
   if (prod === 'narrativa') { switchSection('narrativa', curSec['narrativa'] || 'dashboard'); loadNarrativaUsers(); }
   if (prod === 'nexus')     { switchSection('nexus',     curSec['nexus']     || 'dashboard'); loadNexusData(); loadNexusDashClicks(); }
   if (prod === 'monitor')   { switchSection('monitor',   'usage'); loadMonitor(); }
   if (prod === 'academy')   { switchSection('academy',   'waitlist'); loadAcademyWaitlist(); }
+  if (prod === 'links')     { document.getElementById('bc-sec').textContent = 'Todos os Links'; }
 }
 
 function switchSection(prod, sec) {
@@ -1509,8 +2243,16 @@ async function loadAll() {
     const hot = allLicenses.filter(l => (l.source||'').startsWith('hotmart'));
     document.getElementById('cnt-lic').textContent = allLicenses.length;
     document.getElementById('cnt-hot').textContent = hot.length;
-    renderLicenses(allLicenses);
+    updatePeriodStats();
     renderStudents(hot);
+    // Blast count
+    const withEmail = allLicenses.filter(l => l.email && l.email.trim()).length;
+    const blastEl = document.getElementById('blast-email-count');
+    if (blastEl) blastEl.textContent = withEmail;
+    // Blast last sent
+    const lastBlast = localStorage.getItem('last_blast');
+    const blastLastEl = document.getElementById('blast-last-sent');
+    if (blastLastEl) blastLastEl.textContent = lastBlast ? new Date(lastBlast).toLocaleString('pt-BR') : '—';
   }
 }
 
@@ -1521,9 +2263,10 @@ const fmtDate  = iso => iso ? new Date(iso).toLocaleDateString('pt-BR', {day:'2-
 // ── RENDER LICENÇAS ───────────────────────────
 function renderLicenses(list) {
   const tb = document.getElementById('lic-tbody');
-  if (!list.length) { tb.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="icon">🔑</div><p>Nenhuma licença encontrada.</p></div></td></tr>`; return; }
+  if (!list.length) { tb.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="icon">🔑</div><p>Nenhuma licença encontrada.</p></div></td></tr>`; return; }
   tb.innerHTML = list.map(l => `
     <tr>
+      <td class="cb-col"><input type="checkbox" ${selectedKeys.has(l.key)?'checked':''} onchange="toggleSelectKey('${l.key}')" /></td>
       <td><span class="key-mono" onclick="copyKey('${l.key}')">${l.key}</span></td>
       <td>
         <div style="font-weight:600">${l.name || '<span style="color:var(--muted)">—</span>'}</div>
@@ -1540,6 +2283,7 @@ function renderLicenses(list) {
         <button class="btn-icon danger" onclick="deleteKey('${l.key}')">🗑️</button>
       </div></td>
     </tr>`).join('');
+  renderBulkBar();
 }
 
 // ── RENDER ALUNOS ─────────────────────────────
@@ -1567,10 +2311,48 @@ function renderStudents(list) {
 function filterLicenses() {
   const q = document.getElementById('search-lic').value.toLowerCase();
   const s = document.getElementById('filter-source').value;
-  renderLicenses(allLicenses.filter(l =>
+  let list = applyPeriodFilter(allLicenses);
+  list = list.filter(l =>
     (!s || l.source === s) &&
     ((l.key||'').toLowerCase().includes(q) || (l.email||'').toLowerCase().includes(q) || (l.name||'').toLowerCase().includes(q))
-  ));
+  );
+  renderLicenses(sortList(list));
+}
+
+function applyPeriodFilter(list) {
+  if (activePeriod === 'all') return list;
+  const now = Date.now();
+  const cutMap = { '30d': 30*86400000, '7d': 7*86400000, 'today': 86400000 };
+  const cut = now - (cutMap[activePeriod] || 0);
+  return list.filter(l => l.created_at && new Date(l.created_at).getTime() >= cut);
+}
+
+function sortList(list) {
+  const { col, dir } = licSort;
+  return [...list].sort((a, b) => {
+    let va = a[col] || '', vb = b[col] || '';
+    if (col === 'created_at') { va = new Date(va).getTime(); vb = new Date(vb).getTime(); }
+    else { va = String(va).toLowerCase(); vb = String(vb).toLowerCase(); }
+    if (va < vb) return dir === 'asc' ? -1 : 1;
+    if (va > vb) return dir === 'asc' ? 1 : -1;
+    return 0;
+  });
+}
+
+function sortLicenses(col) {
+  if (licSort.col === col) licSort.dir = licSort.dir === 'asc' ? 'desc' : 'asc';
+  else { licSort.col = col; licSort.dir = 'asc'; }
+  updateSortIcons();
+  filterLicenses();
+}
+
+function updateSortIcons() {
+  ['key','name','status','source','created_at'].forEach(c => {
+    const el = document.getElementById('si-' + c);
+    if (!el) return;
+    if (licSort.col === c) el.textContent = licSort.dir === 'asc' ? '▲' : '▼';
+    else el.textContent = '';
+  });
 }
 
 function filterStudents() {
@@ -1579,6 +2361,213 @@ function filterStudents() {
     (l.source||'').startsWith('hotmart') &&
     ((l.name||'').toLowerCase().includes(q) || (l.email||'').toLowerCase().includes(q) || (l.phone||'').toLowerCase().includes(q))
   ));
+}
+
+// ── PERIOD FILTER ─────────────────────────────
+function setPeriod(p) {
+  activePeriod = p;
+  ['all','30d','7d','today'].forEach(k => {
+    const el = document.getElementById('period-' + k);
+    if (el) el.classList.toggle('active', k === p);
+  });
+  updatePeriodStats();
+}
+
+function updatePeriodStats() {
+  const list = applyPeriodFilter(allLicenses);
+  const hot = list.filter(l => (l.source||'').startsWith('hotmart'));
+  document.getElementById('s-total').textContent      = list.length;
+  document.getElementById('s-active').textContent     = list.filter(l => l.status === 'active').length;
+  document.getElementById('s-inactive').textContent   = list.filter(l => l.status !== 'active').length;
+  document.getElementById('s-hotmart').textContent    = hot.length;
+  document.getElementById('s-hotmart-rn').textContent = list.filter(l => l.source === 'hotmart-RN').length;
+  document.getElementById('s-hotmart-mc').textContent = list.filter(l => l.source === 'hotmart-MC').length;
+  document.getElementById('s-manual').textContent     = list.filter(l => (l.source||'manual') === 'manual').length;
+  renderLicenses(sortList(list));
+}
+
+// ── BULK ACTIONS ──────────────────────────────
+function toggleSelectAll() {
+  const chk = document.getElementById('chk-all');
+  const displayed = getDisplayedLicenses();
+  if (chk.checked) displayed.forEach(l => selectedKeys.add(l.key));
+  else displayed.forEach(l => selectedKeys.delete(l.key));
+  filterLicenses();
+}
+
+function toggleSelectKey(key) {
+  if (selectedKeys.has(key)) selectedKeys.delete(key);
+  else selectedKeys.add(key);
+  renderBulkBar();
+}
+
+function renderBulkBar() {
+  const bar = document.getElementById('bulk-bar');
+  if (!bar) return;
+  if (selectedKeys.size > 0) {
+    bar.classList.add('show');
+    document.getElementById('bulk-count').textContent = selectedKeys.size + ' selecionados';
+  } else {
+    bar.classList.remove('show');
+  }
+  const chkAll = document.getElementById('chk-all');
+  if (chkAll) {
+    const displayed = getDisplayedLicenses();
+    chkAll.checked = displayed.length > 0 && displayed.every(l => selectedKeys.has(l.key));
+    chkAll.indeterminate = displayed.some(l => selectedKeys.has(l.key)) && !chkAll.checked;
+  }
+}
+
+function getDisplayedLicenses() {
+  const q = (document.getElementById('search-lic')?.value || '').toLowerCase();
+  const s = document.getElementById('filter-source')?.value || '';
+  let list = applyPeriodFilter(allLicenses);
+  return list.filter(l =>
+    (!s || l.source === s) &&
+    ((l.key||'').toLowerCase().includes(q) || (l.email||'').toLowerCase().includes(q) || (l.name||'').toLowerCase().includes(q))
+  );
+}
+
+async function bulkActivate() {
+  if (!selectedKeys.size) return;
+  if (!confirm(`Ativar ${selectedKeys.size} licença(s)?`)) return;
+  for (const key of selectedKeys) {
+    const l = allLicenses.find(x => x.key === key);
+    if (l && l.status !== 'active') await apiCall('toggle', { key });
+  }
+  selectedKeys.clear();
+  toast(`🔓 Licenças ativadas`, 'success');
+  loadAll();
+}
+
+async function bulkDeactivate() {
+  if (!selectedKeys.size) return;
+  if (!confirm(`Desativar ${selectedKeys.size} licença(s)?`)) return;
+  for (const key of selectedKeys) {
+    const l = allLicenses.find(x => x.key === key);
+    if (l && l.status === 'active') await apiCall('toggle', { key });
+  }
+  selectedKeys.clear();
+  toast(`🔒 Licenças desativadas`, 'success');
+  loadAll();
+}
+
+function exportLicensesCSV() {
+  const keys = selectedKeys.size > 0 ? selectedKeys : null;
+  const list = keys ? allLicenses.filter(l => keys.has(l.key)) : getDisplayedLicenses();
+  if (!list.length) { toast('Nenhum dado para exportar.'); return; }
+  const rows = [['Chave','Nome','Email','Telefone','Status','Origem','Data']];
+  list.forEach(l => rows.push([
+    l.key, l.name||'', l.email||'', l.phone||'',
+    l.status === 'active' ? 'Ativa' : 'Inativa',
+    srcLabel(l.source), fmtDate(l.created_at)
+  ]));
+  const csv = rows.map(r => r.map(v => '"' + String(v).replace(/"/g,'""') + '"').join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent('﻿' + csv);
+  a.download = 'cenadrop-licenses-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  toast('⬇ CSV exportado!', 'success');
+}
+
+// ── BLAST EMAIL ───────────────────────────────
+async function doBlastemail() {
+  const btn = document.getElementById('blast-btn');
+  const res = document.getElementById('blast-result');
+  if (!confirm('Disparar email para todos os usuários com email cadastrado?')) return;
+  btn.disabled = true;
+  document.getElementById('blast-btn-icon').textContent = '⏳';
+  document.getElementById('blast-btn-text').textContent = 'Disparando...';
+  res.className = 'blast-result';
+  try {
+    const d = await apiCall('blast-cenadrop');
+    const ts = new Date().toISOString();
+    localStorage.setItem('last_blast', ts);
+    document.getElementById('blast-last-sent').textContent = new Date(ts).toLocaleString('pt-BR');
+    if (d.ok || d.sent !== undefined) {
+      res.className = 'blast-result show ok';
+      res.textContent = `Enviados: ${d.sent||0} | Falhas: ${d.failed||0} | Pulados: ${d.skipped||0}`;
+      toast('📣 Blast enviado!', 'success');
+    } else {
+      res.className = 'blast-result show error';
+      res.textContent = 'Erro: ' + (d.error || 'Falha ao disparar');
+    }
+  } catch(e) {
+    res.className = 'blast-result show error';
+    res.textContent = 'Erro de conexão.';
+  }
+  btn.disabled = false;
+  document.getElementById('blast-btn-icon').textContent = '📣';
+  document.getElementById('blast-btn-text').textContent = 'Disparar Email v7.6 para Todos';
+}
+
+// ── OVERVIEW ─────────────────────────────────
+async function loadOverview() {
+  try {
+    const [sd, nsd, nxsd, acysd] = await Promise.all([
+      apiCall('stats'),
+      apiCall('narrativa-stats'),
+      apiCall('nexus-stats'),
+      apiCall('academy-stats'),
+    ]);
+    // CenaDrop
+    if (sd.total !== undefined) {
+      document.getElementById('ov-cd-total').textContent   = sd.total;
+      document.getElementById('ov-cd-active').textContent  = sd.active;
+      document.getElementById('ov-cd-inactive').textContent= sd.inactive;
+    }
+    // Narrativa IA
+    if (nsd.total !== undefined) {
+      document.getElementById('ov-na-total').textContent  = nsd.total;
+      document.getElementById('ov-na-active').textContent = nsd.active;
+    }
+    // Nexus Saúde
+    if (nxsd.total !== undefined) {
+      document.getElementById('ov-nx-total').textContent   = nxsd.total;
+      document.getElementById('ov-nx-active').textContent  = nxsd.active;
+      document.getElementById('ov-nx-inactive').textContent= nxsd.inactive;
+    }
+    // Academy
+    if (acysd.total !== undefined) {
+      document.getElementById('ov-acy-total').textContent = acysd.total;
+    } else if (allAcademyWaitlist.length) {
+      document.getElementById('ov-acy-total').textContent = allAcademyWaitlist.length;
+    }
+  } catch(e) {}
+
+  // Últimas 5 licenças CenaDrop
+  const lastEl = document.getElementById('ov-last-licenses');
+  if (allLicenses.length) {
+    const last5 = [...allLicenses].sort((a,b) => new Date(b.created_at)-new Date(a.created_at)).slice(0,5);
+    lastEl.innerHTML = last5.map(l => `
+      <div class="ov-last-row">
+        <div class="ov-last-av">${(l.name||'?')[0].toUpperCase()}</div>
+        <div>
+          <div class="ov-last-name">${l.name||'—'}</div>
+          <div class="ov-last-email">${l.email||'Sem email'}</div>
+        </div>
+        <div class="ov-last-meta">
+          <div>${fmtDate(l.created_at)}</div>
+          <div>${srcLabel(l.source)}</div>
+        </div>
+      </div>`).join('');
+  } else {
+    lastEl.innerHTML = '<div style="color:var(--muted);font-size:13px">Carregue CenaDrop primeiro.</div>';
+  }
+
+  // Monitor badges
+  try {
+    const mon = await apiCall('monitor');
+    const sbOk = mon.supabase ? (mon.supabase.estimatedMB / mon.supabase.limits?.storageMB * 100) < 80 : true;
+    const vcOk = mon.vercel ? (mon.vercel.deployments / mon.vercel.deploymentsLimit * 100) < 80 : true;
+    const rsOk = mon.resend ? (mon.resend.emailsMonth / mon.resend.limits?.monthly * 100) < 80 : true;
+    const el_sb = document.getElementById('ov-mon-sb');
+    const el_vc = document.getElementById('ov-mon-vc');
+    const el_rs = document.getElementById('ov-mon-rs');
+    if (el_sb) { el_sb.className = 'mon-badge-inline ' + (sbOk?'ok':'warn'); el_sb.textContent = '⚡ Supabase ' + (sbOk?'OK':'Atenção'); }
+    if (el_vc) { el_vc.className = 'mon-badge-inline ' + (vcOk?'ok':'warn'); el_vc.textContent = '▲ Vercel ' + (vcOk?'OK':'Atenção'); }
+    if (el_rs) { el_rs.className = 'mon-badge-inline ' + (rsOk?'ok':'warn'); el_rs.textContent = '✉ Resend ' + (rsOk?'OK':'Atenção'); }
+  } catch(e) {}
 }
 
 // ── MODAL ─────────────────────────────────────
@@ -2237,6 +3226,53 @@ function exportAcademyCSV() {
   a.download = 'academy-elite-waitlist-' + new Date().toISOString().slice(0,10) + '.csv';
   a.click();
 }
+
+// ── LINKS HUB ─────────────────────────────────
+(function initLhCount() {
+  const el = document.getElementById('lh-total-count');
+  if (!el) return;
+  const total = document.querySelectorAll('#links-container .lh-item').length;
+  el.textContent = total + ' links catalogados no ecossistema';
+})();
+
+function toggleLhSection(id) {
+  document.getElementById(id)?.classList.toggle('collapsed');
+}
+
+function filterLinks(q) {
+  const term = q.toLowerCase().trim();
+  document.querySelectorAll('#links-container .lh-item').forEach(el => {
+    const hay = (el.dataset.search || '') + ' ' + el.textContent.toLowerCase();
+    el.dataset.hidden = (!term || hay.includes(term)) ? 'false' : 'true';
+  });
+  document.querySelectorAll('#links-container .lh-section').forEach(sec => {
+    const visible = [...sec.querySelectorAll('.lh-item')].some(el => el.dataset.hidden !== 'true');
+    sec.dataset.hidden = visible ? 'false' : 'true';
+    if (term) sec.classList.remove('collapsed');
+  });
+}
+
+function copyLink(url, btn) {
+  navigator.clipboard.writeText(url).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copiado';
+    btn.style.background = 'rgba(40,199,111,.15)';
+    btn.style.color = '#28c76f';
+    setTimeout(() => { btn.textContent = orig; btn.style.background = ''; btn.style.color = ''; }, 1500);
+  });
+}
+
+// ── CLOCK ─────────────────────────────────────
+function updateClock() {
+  const el = document.getElementById('topbar-clock');
+  if (!el) return;
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  el.textContent = h + ':' + m;
+}
+updateClock();
+setInterval(updateClock, 60000);
 </script>
 </body>
 </html>

@@ -63,8 +63,8 @@ const HTML = `<!DOCTYPE html>
           </tr>
         </table>
         <div style="margin-top:28px;">
-          <a href="#LINK_DO_ZOOM" style="display:inline-block; background:linear-gradient(135deg, #7c6fff 0%, #c084fc 100%); color:#ffffff; font-size:16px; font-weight:800; padding:16px 40px; border-radius:12px; letter-spacing:0.3px; font-family:Arial,sans-serif; box-shadow:0 4px 24px rgba(124,111,255,0.4);">
-            &#128276; Entrar na Aula &#8212; Link no Grupo
+          <a href="https://us06web.zoom.us/j/85296629420" style="display:inline-block; background:linear-gradient(135deg, #7c6fff 0%, #c084fc 100%); color:#ffffff; font-size:16px; font-weight:800; padding:16px 40px; border-radius:12px; letter-spacing:0.3px; font-family:Arial,sans-serif; box-shadow:0 4px 24px rgba(124,111,255,0.4);">
+            &#128276; Entrar na Aula ao Vivo
           </a>
         </div>
         <p style="font-size:12px; color:#4a4a6a; margin:12px 0 0; font-family:Arial,sans-serif;">O link est&#225; fixado no grupo do WhatsApp / Telegram</p>

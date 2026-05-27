@@ -1,7 +1,5 @@
 {
   "redirects": [
-    { "source": "/narrativa-ia",  "destination": "https://narrativaia.com.br", "permanent": false },
-    { "source": "/narrativa-ia/", "destination": "https://narrativaia.com.br", "permanent": false },
     {
       "source": "/",
       "has": [{ "type": "host", "value": "cenadrop.com.br" }],
@@ -13,31 +11,67 @@
       "has": [{ "type": "host", "value": "www.cenadrop.com.br" }],
       "destination": "/vendas",
       "permanent": false
+    },
+    {
+      "source": "/cenadrop/download",
+      "has": [{ "type": "host", "value": "raynern.com.br" }],
+      "destination": "https://cenadrop.com.br/download",
+      "permanent": true
+    },
+    {
+      "source": "/cenadrop/download/",
+      "has": [{ "type": "host", "value": "raynern.com.br" }],
+      "destination": "https://cenadrop.com.br/download",
+      "permanent": true
+    },
+    {
+      "source": "/cenadrop/downloadsrt",
+      "has": [{ "type": "host", "value": "raynern.com.br" }],
+      "destination": "https://cenadrop.com.br/downloadsrt",
+      "permanent": true
+    },
+    {
+      "source": "/cenadrop/downloadsrt/",
+      "has": [{ "type": "host", "value": "raynern.com.br" }],
+      "destination": "https://cenadrop.com.br/downloadsrt",
+      "permanent": true
+    },
+    {
+      "source": "/cenadrop/manual",
+      "has": [{ "type": "host", "value": "raynern.com.br" }],
+      "destination": "https://cenadrop.com.br/manual",
+      "permanent": true
+    },
+    {
+      "source": "/cenadrop/manual/",
+      "has": [{ "type": "host", "value": "raynern.com.br" }],
+      "destination": "https://cenadrop.com.br/manual",
+      "permanent": true
+    },
+    {
+      "source": "/cenadrop/apresentacao",
+      "has": [{ "type": "host", "value": "raynern.com.br" }],
+      "destination": "https://cenadrop.com.br",
+      "permanent": true
+    },
+    {
+      "source": "/cenadrop/apresentacao/",
+      "has": [{ "type": "host", "value": "raynern.com.br" }],
+      "destination": "https://cenadrop.com.br",
+      "permanent": true
     }
   ],
   "rewrites": [
     { "source": "/admin",                  "destination": "/admin/index.html" },
     { "source": "/admin/",                 "destination": "/admin/index.html" },
-    { "source": "/cenadrop/download",      "destination": "/cenadrop/download/index.html" },
-    { "source": "/cenadrop/download/",     "destination": "/cenadrop/download/index.html" },
-    { "source": "/cenadrop/manual",        "destination": "/cenadrop/manual/index.html" },
-    { "source": "/cenadrop/manual/",       "destination": "/cenadrop/manual/index.html" },
-    { "source": "/cenadrop/apresentacao",  "destination": "/cenadrop/apresentacao/index.html" },
-    { "source": "/cenadrop/apresentacao/", "destination": "/cenadrop/apresentacao/index.html" },
-    { "source": "/embreve",                "destination": "/embreve/index.html" },
-    { "source": "/embreve/",               "destination": "/embreve/index.html" },
     { "source": "/vendas",                 "destination": "/vendas.html" },
     { "source": "/vendas/",                "destination": "/vendas.html" },
-    { "source": "/cenadrop/downloadsrt",    "destination": "/cenadrop/downloadsrt/index.html" },
-    { "source": "/cenadrop/downloadsrt/",  "destination": "/cenadrop/downloadsrt/index.html" },
     { "source": "/download",               "destination": "/cenadrop/download/index.html" },
     { "source": "/download/",              "destination": "/cenadrop/download/index.html" },
     { "source": "/downloadsrt",            "destination": "/cenadrop/downloadsrt/index.html" },
     { "source": "/downloadsrt/",           "destination": "/cenadrop/downloadsrt/index.html" },
     { "source": "/manual",                 "destination": "/cenadrop/manual/index.html" },
     { "source": "/manual/",                "destination": "/cenadrop/manual/index.html" },
-    { "source": "/stratark",               "destination": "/stratark/index.html" },
-    { "source": "/stratark/",              "destination": "/stratark/index.html" },
     { "source": "/academyelite",                        "destination": "/academyelite/index.html" },
     { "source": "/academyelite/",                       "destination": "/academyelite/index.html" },
     { "source": "/academyelite/lista-prioritaria",      "destination": "/academyelite/lista-prioritaria.html" },
