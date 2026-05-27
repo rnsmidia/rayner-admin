@@ -12,241 +12,60 @@
       color: #e0e0e0;
       font-family: 'Segoe UI', system-ui, sans-serif;
       min-height: 100vh;
-      padding: 40px 20px 80px;
+      padding: 36px 20px 60px;
     }
 
-    .container { max-width: 780px; margin: 0 auto; }
+    .container { max-width: 900px; margin: 0 auto; }
 
     header {
       display: flex;
       align-items: center;
       gap: 18px;
-      margin-bottom: 36px;
-      padding-bottom: 28px;
+      margin-bottom: 24px;
+      padding-bottom: 22px;
       border-bottom: 1px solid rgba(201,162,39,0.2);
     }
 
-    header img { height: 52px; }
+    header img { height: 46px; }
 
     header h1 {
-      font-size: 20px;
+      font-size: 19px;
       font-weight: 600;
       color: #fff;
       letter-spacing: 0.04em;
     }
 
     header p {
-      font-size: 13px;
+      font-size: 12px;
       color: rgba(255,255,255,0.35);
       margin-top: 3px;
     }
 
     .badge-data {
       margin-left: auto;
-      font-size: 12px;
+      font-size: 11px;
       color: rgba(255,255,255,0.3);
       text-align: right;
     }
 
     /* Countdown */
-    .countdown-bar {
-      background: linear-gradient(135deg, #111 0%, #1a1500 100%);
-      border: 1px solid rgba(201,162,39,0.3);
-      border-radius: 12px;
-      padding: 20px 24px;
-      margin-bottom: 36px;
-      display: flex;
-      align-items: center;
-      gap: 24px;
-    }
-
-    .countdown-label {
-      font-size: 11px;
-      color: rgba(255,255,255,0.35);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    .timeline {
-      display: flex;
-      gap: 0;
-      flex: 1;
-    }
-
-    .tl-item {
-      flex: 1;
-      text-align: center;
-      position: relative;
-    }
-
-    .tl-item::after {
-      content: '';
-      position: absolute;
-      top: 10px;
-      right: -50%;
-      width: 100%;
-      height: 1px;
-      background: rgba(201,162,39,0.2);
-      z-index: 0;
-    }
-
-    .tl-item:last-child::after { display: none; }
-
-    .tl-dot {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      margin: 0 auto 8px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .tl-dot.ok    { background: #C9A227; }
-    .tl-dot.hoje  { background: #C9A227; box-shadow: 0 0 10px rgba(201,162,39,0.6); }
-    .tl-dot.next  { background: #1a1500; border: 2px solid rgba(201,162,39,0.4); }
-
-    .tl-data {
-      font-size: 11px;
-      font-weight: 700;
-      color: #C9A227;
-    }
-
-    .tl-nome {
-      font-size: 10px;
-      color: rgba(255,255,255,0.4);
-      margin-top: 2px;
-    }
-
-    /* Resumo */
-    .resumo {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 40px;
-    }
-
-    .resumo-card {
-      background: #111;
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 10px;
-      padding: 18px 20px;
-      text-align: center;
-    }
-
-    .resumo-card .num {
-      font-size: 32px;
-      font-weight: 700;
-      line-height: 1;
-    }
-
-    .resumo-card .label {
-      font-size: 11px;
-      color: rgba(255,255,255,0.4);
-      margin-top: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-
-    .num.verde   { color: #4CAF50; }
-    .num.amarelo { color: #C9A227; }
-    .num.vermelho{ color: #e05555; }
-
-    /* Seções */
-    .secao { margin-bottom: 40px; }
-
-    .secao-titulo {
-      font-size: 11px;
-      font-weight: 600;
-      color: rgba(255,255,255,0.3);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 14px;
-    }
-
-    /* Itens */
-    .item {
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-      padding: 14px 18px;
-      background: #111;
-      border: 1px solid rgba(255,255,255,0.05);
-      border-radius: 8px;
-      margin-bottom: 8px;
-      transition: border-color 0.2s;
-    }
-
-    .item:hover { border-color: rgba(201,162,39,0.2); }
-
-    .status-icon {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      font-size: 12px;
-      margin-top: 1px;
-    }
-
-    .icon-ok   { background: rgba(76,175,80,0.15);   color: #4CAF50; border: 1.5px solid #4CAF50; }
-    .icon-wait { background: rgba(201,162,39,0.12);  color: #C9A227; border: 1.5px solid #C9A227; }
-    .icon-open { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.2); border: 1.5px solid rgba(255,255,255,0.12); }
-    .icon-alert{ background: rgba(224,85,85,0.12);   color: #e05555; border: 1.5px solid #e05555; }
-
-    .item-body { flex: 1; }
-
-    .item-titulo {
-      font-size: 14px;
-      font-weight: 500;
-      color: #e8e8e8;
-      line-height: 1.4;
-    }
-
-    .item-detalhe {
-      font-size: 12px;
-      color: rgba(255,255,255,0.35);
-      margin-top: 3px;
-      line-height: 1.5;
-    }
-
-    .tag {
-      display: inline-block;
-      font-size: 10px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      padding: 3px 8px;
-      border-radius: 20px;
-      margin-left: auto;
-      flex-shrink: 0;
-      align-self: center;
-    }
-
-    .tag-ok    { background: rgba(76,175,80,0.12);   color: #4CAF50; }
-    .tag-wait  { background: rgba(201,162,39,0.12);  color: #C9A227; }
-    .tag-open  { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.3); }
-    .tag-alert { background: rgba(224,85,85,0.12);   color: #e05555; }
-
-    /* Countdown */
     .countdown-wrap {
       background: linear-gradient(135deg, #0f0f00 0%, #111 100%);
       border: 1px solid rgba(201,162,39,0.35);
-      border-radius: 14px;
-      padding: 24px 28px 20px;
-      margin-bottom: 20px;
+      border-radius: 12px;
+      padding: 18px 22px 16px;
+      margin-bottom: 16px;
     }
 
     .countdown-top {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 20px;
+      margin-bottom: 14px;
     }
 
     .countdown-label {
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 700;
       color: rgba(201,162,39,0.7);
       letter-spacing: 0.1em;
@@ -254,11 +73,11 @@
     }
 
     .countdown-status {
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.07em;
-      padding: 4px 12px;
+      padding: 3px 10px;
       border-radius: 20px;
     }
 
@@ -269,15 +88,15 @@
     .countdown-digits {
       display: flex;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 24px;
+      gap: 6px;
+      margin-bottom: 16px;
     }
 
     .digit-block { text-align: center; }
 
     .digit {
       display: block;
-      font-size: 48px;
+      font-size: 38px;
       font-weight: 800;
       color: #C9A227;
       line-height: 1;
@@ -287,38 +106,35 @@
 
     .digit-label {
       display: block;
-      font-size: 10px;
+      font-size: 9px;
       color: rgba(255,255,255,0.3);
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      margin-top: 4px;
+      margin-top: 3px;
     }
 
     .digit-sep {
-      font-size: 36px;
+      font-size: 26px;
       font-weight: 300;
       color: rgba(201,162,39,0.3);
-      margin-bottom: 18px;
+      margin-bottom: 14px;
     }
-
-    /* Barra de saúde */
-    .saude-wrap { }
 
     .saude-row {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 6px;
+      margin-bottom: 5px;
     }
 
     .saude-label {
-      font-size: 11px;
+      font-size: 10px;
       color: rgba(255,255,255,0.35);
       text-transform: uppercase;
       letter-spacing: 0.06em;
     }
 
     .saude-bar-bg {
-      height: 8px;
+      height: 6px;
       background: rgba(255,255,255,0.06);
       border-radius: 99px;
       position: relative;
@@ -343,16 +159,13 @@
       transition: width 1s ease;
     }
 
-    .saude-hint {
-      font-size: 11px;
-      color: rgba(255,255,255,0.25);
-    }
+    .saude-hint { font-size: 10px; color: rgba(255,255,255,0.25); }
 
     /* Timeline */
     .timeline-bar {
       display: flex;
       align-items: center;
-      margin-bottom: 32px;
+      margin-bottom: 20px;
       padding: 0 8px;
     }
 
@@ -363,37 +176,243 @@
       height: 1px;
       background: rgba(201,162,39,0.2);
       margin: 0 8px;
-      margin-bottom: 22px;
+      margin-bottom: 20px;
     }
 
     .tl-dot {
-      width: 18px;
-      height: 18px;
+      width: 14px;
+      height: 14px;
       border-radius: 50%;
-      margin: 0 auto 8px;
+      margin: 0 auto 6px;
     }
 
-    .tl-dot.hoje  { background: #C9A227; box-shadow: 0 0 8px rgba(201,162,39,0.5); }
+    .tl-dot.hoje  { background: #C9A227; box-shadow: 0 0 7px rgba(201,162,39,0.5); }
     .tl-dot.next  { background: #1a1500; border: 2px solid rgba(201,162,39,0.35); }
     .tl-dot.fire  { background: #1a1500; border: 2px solid rgba(201,162,39,0.6); }
 
-    .tl-data { font-size: 11px; font-weight: 700; color: #C9A227; }
-    .tl-nome { font-size: 10px; color: rgba(255,255,255,0.35); margin-top: 2px; }
+    .tl-data { font-size: 10px; font-weight: 700; color: #C9A227; }
+    .tl-nome { font-size: 9px; color: rgba(255,255,255,0.35); margin-top: 2px; }
+
+    /* Resumo */
+    .resumo {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .resumo-card {
+      background: #111;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 9px;
+      padding: 12px 14px;
+      text-align: center;
+    }
+
+    .resumo-card .num {
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .resumo-card .label {
+      font-size: 9px;
+      color: rgba(255,255,255,0.4);
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .num.verde   { color: #4CAF50; }
+    .num.amarelo { color: #C9A227; }
+    .num.vermelho{ color: #e05555; }
+
+    /* Filter bar */
+    .filter-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 5px 11px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: transparent;
+      color: rgba(255,255,255,0.4);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .filter-btn:hover { border-color: rgba(255,255,255,0.2); color: rgba(255,255,255,0.7); }
+    .filter-btn.active { background: rgba(201,162,39,0.12); border-color: rgba(201,162,39,0.4); color: #C9A227; }
+
+    .filter-sep {
+      width: 1px;
+      height: 14px;
+      background: rgba(255,255,255,0.08);
+      margin: 0 2px;
+    }
+
+    .ctrl-btn {
+      font-size: 10px;
+      color: rgba(255,255,255,0.25);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px 6px;
+      border-radius: 4px;
+      transition: color 0.15s;
+      white-space: nowrap;
+    }
+
+    .ctrl-btn:hover { color: rgba(255,255,255,0.6); }
+    .ctrl-ml { margin-left: auto; }
+
+    /* Seções */
+    .secao { margin-bottom: 6px; }
+
+    .secao-titulo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 10px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 9px 14px;
+      background: #0e0e0e;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 8px;
+      cursor: pointer;
+      user-select: none;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .secao-titulo:hover { border-color: rgba(201,162,39,0.25); color: rgba(255,255,255,0.75); }
+
+    .secao-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    .secao-arrow {
+      margin-left: auto;
+      font-size: 9px;
+      color: rgba(255,255,255,0.2);
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+
+    .secao-arrow.collapsed { transform: rotate(-90deg); }
+
+    /* Items grid */
+    .items-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 5px;
+      padding: 5px 0 14px;
+    }
+
+    .items-grid.collapsed { display: none; }
+
+    /* Itens */
+    .item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 13px;
+      background: #111;
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 7px;
+      transition: border-color 0.2s;
+    }
+
+    .item:hover { border-color: rgba(201,162,39,0.2); }
+    .item.hidden { display: none !important; }
+
+    .status-icon {
+      width: 19px;
+      height: 19px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 10px;
+      margin-top: 1px;
+    }
+
+    .icon-ok   { background: rgba(76,175,80,0.15);   color: #4CAF50; border: 1.5px solid #4CAF50; }
+    .icon-wait { background: rgba(201,162,39,0.12);  color: #C9A227; border: 1.5px solid #C9A227; }
+    .icon-open { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.2); border: 1.5px solid rgba(255,255,255,0.12); }
+    .icon-alert{ background: rgba(224,85,85,0.12);   color: #e05555; border: 1.5px solid #e05555; }
+
+    .item-body { flex: 1; min-width: 0; }
+
+    .item-titulo {
+      font-size: 12px;
+      font-weight: 500;
+      color: #e8e8e8;
+      line-height: 1.4;
+    }
+
+    .item-detalhe {
+      font-size: 10px;
+      color: rgba(255,255,255,0.3);
+      margin-top: 2px;
+      line-height: 1.5;
+    }
+
+    .tag {
+      display: inline-block;
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 2px 6px;
+      border-radius: 20px;
+      margin-left: 6px;
+      flex-shrink: 0;
+      align-self: flex-start;
+      margin-top: 1px;
+      white-space: nowrap;
+    }
+
+    .tag-ok    { background: rgba(76,175,80,0.12);   color: #4CAF50; }
+    .tag-wait  { background: rgba(201,162,39,0.12);  color: #C9A227; }
+    .tag-open  { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.3); }
+    .tag-alert { background: rgba(224,85,85,0.12);   color: #e05555; }
 
     footer {
-      margin-top: 60px;
+      margin-top: 36px;
       text-align: center;
-      font-size: 12px;
+      font-size: 11px;
       color: rgba(255,255,255,0.15);
     }
 
-    @media (max-width: 600px) {
-      .resumo { gap: 8px; }
-      .resumo-card { padding: 14px 10px; }
-      .resumo-card .num { font-size: 24px; }
+    @media (max-width: 640px) {
+      .items-grid { grid-template-columns: 1fr; gap: 4px; }
+      .resumo { gap: 6px; }
+      .resumo-card { padding: 10px 8px; }
+      .resumo-card .num { font-size: 20px; }
       header { flex-wrap: wrap; }
       .badge-data { width: 100%; text-align: left; margin-left: 0; }
-      .countdown-bar { flex-direction: column; gap: 16px; }
+      .digit { font-size: 28px; }
+      .ctrl-ml { margin-left: 0; }
     }
   </style>
 </head>
@@ -407,7 +426,7 @@
       <p>Painel interno de lançamento</p>
     </div>
     <div class="badge-data">
-      Atualizado em<br>28 mai. 2026 · manhã
+      Atualizado em<br>27 mai. 2026 · tarde
     </div>
   </header>
 
@@ -426,8 +445,6 @@
       <div class="digit-sep">:</div>
       <div class="digit-block"><span class="digit" id="cd-s">--</span><span class="digit-label">seg</span></div>
     </div>
-
-    <!-- Barra de saúde -->
     <div class="saude-wrap">
       <div class="saude-row">
         <span class="saude-label">Progresso das tarefas</span>
@@ -437,7 +454,7 @@
         <div class="saude-bar-fill" id="saudeFill"></div>
         <div class="saude-bar-tempo" id="saudeTempo" title="Tempo decorrido"></div>
       </div>
-      <div class="saude-row" style="margin-top:6px">
+      <div class="saude-row" style="margin-top:4px">
         <span class="saude-hint" id="saudeHint">calculando...</span>
         <span class="saude-hint" id="tempoDecorrido"></span>
       </div>
@@ -468,434 +485,445 @@
   <!-- Resumo -->
   <div class="resumo">
     <div class="resumo-card">
-      <div class="num verde">6</div>
+      <div class="num verde" id="count-ok">9</div>
       <div class="label">Concluído</div>
     </div>
     <div class="resumo-card">
-      <div class="num amarelo">2</div>
+      <div class="num amarelo" id="count-wait">14</div>
       <div class="label">Aguardando</div>
     </div>
     <div class="resumo-card">
-      <div class="num vermelho">19</div>
+      <div class="num vermelho" id="count-open">18</div>
       <div class="label">Pendente</div>
     </div>
   </div>
 
+  <!-- Filter bar -->
+  <div class="filter-row">
+    <button class="filter-btn active" onclick="filterItems('all', this)">Todos</button>
+    <button class="filter-btn" onclick="filterItems('icon-open', this)">Pendentes</button>
+    <button class="filter-btn" onclick="filterItems('icon-alert', this)">Decisões</button>
+    <button class="filter-btn" onclick="filterItems('icon-wait', this)">Aguardando</button>
+    <button class="filter-btn" onclick="filterItems('icon-ok', this)">Feitos</button>
+    <div class="filter-sep"></div>
+    <button class="ctrl-btn ctrl-ml" onclick="expandAll()">↓ Expandir tudo</button>
+    <button class="ctrl-btn" onclick="collapseAll()">↑ Colapsar tudo</button>
+  </div>
+
   <!-- PRODUTO & CHECKOUT -->
   <div class="secao">
-    <div class="secao-titulo">Produto & Checkout</div>
-
-    <div class="item">
-      <div class="status-icon icon-alert">!</div>
-      <div class="item-body">
-        <div class="item-titulo">Definir tempo de acesso — Rayner + Marcos</div>
-        <div class="item-detalhe">Opção A: tudo por 12 meses · Opção B: encontros ao vivo por 3 meses + ferramentas (CenaDrop + Narrativa) por 12 meses para justificar o plano anual</div>
-      </div>
-      <span class="tag tag-alert">Decisão pendente</span>
+    <div class="secao-titulo" onclick="toggleSection(this)">
+      <span>Produto & Checkout</span>
+      <span class="secao-badge">0/6</span>
+      <span class="secao-arrow">▼</span>
     </div>
-
-    <div class="item">
-      <div class="status-icon icon-open"></div>
-      <div class="item-body">
-        <div class="item-titulo">Criar produto no Hotmart</div>
-        <div class="item-detalhe">R$2.997 à vista ou 12x R$309,96 · Garantia 7 dias · Acesso 12 meses</div>
+    <div class="items-grid">
+      <div class="item">
+        <div class="status-icon icon-alert">!</div>
+        <div class="item-body">
+          <div class="item-titulo">Definir tempo de acesso — Rayner + Marcos</div>
+          <div class="item-detalhe">Opção A: tudo 12 meses · Opção B: encontros 3 meses + ferramentas 12 meses para justificar plano anual</div>
+        </div>
+        <span class="tag tag-alert">Decisão</span>
       </div>
-      <span class="tag tag-open">Pendente</span>
-    </div>
-
-    <div class="item">
-      <div class="status-icon icon-open"></div>
-      <div class="item-body">
-        <div class="item-titulo">Checkout personalizado</div>
-        <div class="item-detalhe">Identidade visual gold/dark alinhada ao Elite</div>
+      <div class="item">
+        <div class="status-icon icon-open"></div>
+        <div class="item-body">
+          <div class="item-titulo">Criar produto no Hotmart</div>
+          <div class="item-detalhe">R$2.997 à vista ou 12x · Garantia 7 dias · Acesso 12 meses</div>
+        </div>
+        <span class="tag tag-open">Pendente</span>
       </div>
-      <span class="tag tag-open">Pendente</span>
-    </div>
-
-    <div class="item">
-      <div class="status-icon icon-ok">✓</div>
-      <div class="item-body">
-        <div class="item-titulo">Revisar lista de espera — promessas corrigidas</div>
-        <div class="item-detalhe">Mentoria removida · CenaDrop + Narrativa nomeados · Gemini Ultra como requisito · análises em grupo · disclaimer nos depoimentos</div>
+      <div class="item">
+        <div class="status-icon icon-open"></div>
+        <div class="item-body">
+          <div class="item-titulo">Checkout personalizado</div>
+          <div class="item-detalhe">Identidade visual gold/dark alinhada ao Elite</div>
+        </div>
+        <span class="tag tag-open">Pendente</span>
       </div>
-      <span class="tag tag-ok">Feito</span>
-    </div>
-
-    <div class="item">
-      <div class="status-icon icon-ok">✓</div>
-      <div class="item-body">
-        <div class="item-titulo">Revisar página de vendas — aplicar mesmas correções</div>
-        <div class="item-detalhe">CenaDrop Flow + Narrativa IA nomeados · "acesso em até 24h" · disclaimer depoimentos adicionado · linguagem harmonizada</div>
+      <div class="item">
+        <div class="status-icon icon-ok">✓</div>
+        <div class="item-body">
+          <div class="item-titulo">Revisar lista de espera</div>
+          <div class="item-detalhe">Promessas corrigidas · mentoria removida · CenaDrop + Narrativa nomeados · disclaimer depoimentos</div>
+        </div>
+        <span class="tag tag-ok">Feito</span>
       </div>
-      <span class="tag tag-ok">Feito</span>
-    </div>
-
-    <div class="item">
-      <div class="status-icon icon-ok">✓</div>
-      <div class="item-body">
-        <div class="item-titulo">Política de reembolso e termos do produto</div>
-        <div class="item-detalhe">Publicado em raynern.com.br/academyelite/termos · 7 dias via Hotmart · o que inclui e o que não inclui definido · link no rodapé da vendas</div>
+      <div class="item">
+        <div class="status-icon icon-ok">✓</div>
+        <div class="item-body">
+          <div class="item-titulo">Revisar página de vendas</div>
+          <div class="item-detalhe">Mesmas correções · "acesso em até 24h" · linguagem harmonizada</div>
+        </div>
+        <span class="tag tag-ok">Feito</span>
       </div>
-      <span class="tag tag-ok">Feito</span>
+      <div class="item">
+        <div class="status-icon icon-ok">✓</div>
+        <div class="item-body">
+          <div class="item-titulo">Política de reembolso e termos</div>
+          <div class="item-detalhe">raynern.com.br/academyelite/termos · 7 dias via Hotmart · link no rodapé da vendas</div>
+        </div>
+        <span class="tag tag-ok">Feito</span>
+      </div>
     </div>
-
   </div>
 
   <!-- AUTOMAÇÃO DE ACESSOS -->
   <div class="secao">
-    <div class="secao-titulo">Automação de Acessos (compra → entrega)</div>
-
-    <div class="item">
-      <div class="status-icon icon-ok">✓</div>
-      <div class="item-body">
-        <div class="item-titulo">Discord — convite único por email</div>
-        <div class="item-detalhe">Webhook Hotmart → convite gerado → email enviado via Resend · endpoint pronto</div>
-      </div>
-      <span class="tag tag-ok">Feito</span>
+    <div class="secao-titulo" onclick="toggleSection(this)">
+      <span>Automação de Acessos</span>
+      <span class="secao-badge">0/6</span>
+      <span class="secao-arrow">▼</span>
     </div>
-
-    <div class="item">
-      <div class="status-icon icon-ok">✓</div>
-      <div class="item-body">
-        <div class="item-titulo">Discord — bot atribui cargo automaticamente</div>
-        <div class="item-detalhe">Bot EDA no Railway · aluno entra → cargo Membro Elite atribuído na hora</div>
+    <div class="items-grid">
+      <div class="item">
+        <div class="status-icon icon-ok">✓</div>
+        <div class="item-body">
+          <div class="item-titulo">Discord — convite único por email</div>
+          <div class="item-detalhe">Webhook → convite gerado → email via Resend · endpoint pronto</div>
+        </div>
+        <span class="tag tag-ok">Feito</span>
       </div>
-      <span class="tag tag-ok">Feito</span>
-    </div>
-
-    <div class="item">
-      <div class="status-icon icon-wait">⏳</div>
-      <div class="item-body">
-        <div class="item-titulo">Configurar webhook no Hotmart</div>
-        <div class="item-detalhe">URL: raynern.com.br/api/discord-invite · aguardando criação do produto</div>
+      <div class="item">
+        <div class="status-icon icon-ok">✓</div>
+        <div class="item-body">
+          <div class="item-titulo">Discord — bot atribui cargo automaticamente</div>
+          <div class="item-detalhe">Bot EDA no Railway · aluno entra → cargo Membro Elite na hora</div>
+        </div>
+        <span class="tag tag-ok">Feito</span>
       </div>
-      <span class="tag tag-wait">Aguardando produto</span>
-    </div>
-
-    <div class="item">
-      <div class="status-icon icon-wait">⏳</div>
-      <div class="item-body">
-        <div class="item-titulo">CenaDrop — chave de licença no email de boas-vindas</div>
-        <div class="item-detalhe">Conectar webhook do Elite ao sistema de geração de chave já existente · aguardando produto no Hotmart</div>
+      <div class="item">
+        <div class="status-icon icon-wait">⏳</div>
+        <div class="item-body">
+          <div class="item-titulo">Configurar webhook no Hotmart</div>
+          <div class="item-detalhe">URL: raynern.com.br/api/discord-invite · aguardando produto</div>
+        </div>
+        <span class="tag tag-wait">Aguardando produto</span>
       </div>
-      <span class="tag tag-wait">Aguardando produto</span>
-    </div>
-
-    <div class="item">
-      <div class="status-icon icon-open"></div>
-      <div class="item-body">
-        <div class="item-titulo">Narrativa — provisionar acesso</div>
-        <div class="item-detalhe">Manual por enquanto (email + senha) · automatizar quando sistema de auth estiver pronto</div>
+      <div class="item">
+        <div class="status-icon icon-wait">⏳</div>
+        <div class="item-body">
+          <div class="item-titulo">CenaDrop — chave no email de boas-vindas</div>
+          <div class="item-detalhe">Conectar webhook ao sistema de chave existente · aguardando produto</div>
+        </div>
+        <span class="tag tag-wait">Aguardando produto</span>
       </div>
-      <span class="tag tag-open">Manual por ora</span>
-    </div>
-
-    <div class="item">
-      <div class="status-icon icon-open"></div>
-      <div class="item-body">
-        <div class="item-titulo">Inserir link do Hotmart na página de vendas</div>
-        <div class="item-detalhe">Botão de compra ainda com href="#" — trocar após criar produto</div>
+      <div class="item">
+        <div class="status-icon icon-ok">✓</div>
+        <div class="item-body">
+          <div class="item-titulo">Narrativa — provisionar acesso</div>
+          <div class="item-detalhe">Via admin → + Novo Usuário · email automático com credenciais · por plano</div>
+        </div>
+        <span class="tag tag-ok">Feito</span>
       </div>
-      <span class="tag tag-open">Pendente</span>
+      <div class="item">
+        <div class="status-icon icon-open"></div>
+        <div class="item-body">
+          <div class="item-titulo">Inserir link do Hotmart na página de vendas</div>
+          <div class="item-detalhe">Botão com href="#" — trocar após criar produto</div>
+        </div>
+        <span class="tag tag-open">Pendente</span>
+      </div>
     </div>
-
   </div>
 
   <!-- TÉCNICO -->
   <div class="secao">
-    <div class="secao-titulo">Técnico & Produto</div>
-
-    <div class="item">
-      <div class="status-icon icon-ok">✓</div>
-      <div class="item-body">
-        <div class="item-titulo">Página de vendas</div>
-        <div class="item-detalhe">raynern.com.br/elitedarkacademy — mobile responsivo</div>
-      </div>
-      <span class="tag tag-ok">Feito</span>
+    <div class="secao-titulo" onclick="toggleSection(this)">
+      <span>Técnico & Produto</span>
+      <span class="secao-badge">0/3</span>
+      <span class="secao-arrow">▼</span>
     </div>
-
-    <div class="item">
-      <div class="status-icon icon-open"></div>
-      <div class="item-body">
-        <div class="item-titulo">Área de membros</div>
-        <div class="item-detalhe">Definir plataforma, estruturar módulos e jornada do aluno</div>
+    <div class="items-grid">
+      <div class="item">
+        <div class="status-icon icon-ok">✓</div>
+        <div class="item-body">
+          <div class="item-titulo">Página de vendas</div>
+          <div class="item-detalhe">raynern.com.br/elitedarkacademy — mobile responsivo</div>
+        </div>
+        <span class="tag tag-ok">Feito</span>
       </div>
-      <span class="tag tag-open">Pendente</span>
-    </div>
-
-    <div class="item">
-      <div class="status-icon icon-open"></div>
-      <div class="item-body">
-        <div class="item-titulo">Testar fluxo completo de ponta a ponta</div>
-        <div class="item-detalhe">Compra de teste → email com convite + chave CenaDrop → Discord → área de membros</div>
+      <div class="item">
+        <div class="status-icon icon-open"></div>
+        <div class="item-body">
+          <div class="item-titulo">Área de membros</div>
+          <div class="item-detalhe">Definir plataforma, estruturar módulos e jornada do aluno</div>
+        </div>
+        <span class="tag tag-open">Pendente</span>
       </div>
-      <span class="tag tag-open">Pendente</span>
+      <div class="item">
+        <div class="status-icon icon-open"></div>
+        <div class="item-body">
+          <div class="item-titulo">Testar fluxo completo de ponta a ponta</div>
+          <div class="item-detalhe">Compra → email + chave CenaDrop → Discord → área de membros</div>
+        </div>
+        <span class="tag tag-open">Pendente</span>
+      </div>
     </div>
-
   </div>
 
   <!-- CONTEÚDO -->
   <div class="secao">
-    <div class="secao-titulo">Conteúdo</div>
-
-    <div class="item">
-      <div class="status-icon icon-open"></div>
-      <div class="item-body">
-        <div class="item-titulo">Migrar aulas do CenaDrop para área do Elite</div>
-        <div class="item-detalhe">Organizar em módulo próprio, verificar nomes, ordem e descrições</div>
-      </div>
-      <span class="tag tag-open">Pendente</span>
+    <div class="secao-titulo" onclick="toggleSection(this)">
+      <span>Conteúdo</span>
+      <span class="secao-badge">0/3</span>
+      <span class="secao-arrow">▼</span>
     </div>
-
-    <div class="item">
-      <div class="status-icon icon-open"></div>
-      <div class="item-body">
-        <div class="item-titulo">Gravar aulas do Narrativa (4 aulas)</div>
-        <div class="item-detalhe">Aula 1 Boas-vindas · Aula 2 Estratégia · Aula 3 Prática · Aula 4 Exemplo completo</div>
+    <div class="items-grid">
+      <div class="item">
+        <div class="status-icon icon-open"></div>
+        <div class="item-body">
+          <div class="item-titulo">Migrar aulas do CenaDrop para área do Elite</div>
+          <div class="item-detalhe">Módulo próprio · verificar nomes, ordem e descrições</div>
+        </div>
+        <span class="tag tag-open">Pendente</span>
       </div>
-      <span class="tag tag-open">Pendente</span>
-    </div>
-
-    <div class="item">
-      <div class="status-icon icon-open"></div>
-      <div class="item-body">
-        <div class="item-titulo">Gravar vídeo de boas-vindas</div>
-        <div class="item-detalhe">Rayner + Marcos, no escritório — simples e institucional</div>
+      <div class="item">
+        <div class="status-icon icon-open"></div>
+        <div class="item-body">
+          <div class="item-titulo">Gravar aulas do Narrativa (4 aulas)</div>
+          <div class="item-detalhe">Boas-vindas · Estratégia · Prática · Exemplo completo</div>
+        </div>
+        <span class="tag tag-open">Pendente</span>
       </div>
-      <span class="tag tag-open">Pendente</span>
+      <div class="item">
+        <div class="status-icon icon-open"></div>
+        <div class="item-body">
+          <div class="item-titulo">Gravar vídeo de boas-vindas</div>
+          <div class="item-detalhe">Rayner + Marcos, no escritório — simples e institucional</div>
+        </div>
+        <span class="tag tag-open">Pendente</span>
+      </div>
     </div>
-
   </div>
 
-  <!-- NARRATIVA IA -->
+  <!-- NARRATIVA IA — PRODUTO -->
   <div class="secao">
-    <div class="secao-titulo">Narrativa IA — Produto</div>
-
-    <div class="item">
-      <div class="status-icon icon-open"></div>
-      <div class="item-body">
-        <div class="item-titulo">Criar produto no Hotmart</div>
-        <div class="item-detalhe">Definir preço, garantia, prazo de acesso e configurar produto na plataforma</div>
-      </div>
-      <span class="tag tag-open">Pendente</span>
+    <div class="secao-titulo" onclick="toggleSection(this)">
+      <span>Narrativa IA — Produto</span>
+      <span class="secao-badge">0/2</span>
+      <span class="secao-arrow">▼</span>
     </div>
-
-    <div class="item">
-      <div class="status-icon icon-ok">✓</div>
-      <div class="item-body">
-        <div class="item-titulo">Página de vendas</div>
-        <div class="item-detalhe">narrativaia.com.br/vendas — hero, pipeline, features, preço, FAQ · no ar</div>
+    <div class="items-grid">
+      <div class="item">
+        <div class="status-icon icon-open"></div>
+        <div class="item-body">
+          <div class="item-titulo">Criar produto no Hotmart</div>
+          <div class="item-detalhe">Definir preço, garantia, prazo e configurar na plataforma</div>
+        </div>
+        <span class="tag tag-open">Pendente</span>
       </div>
-      <span class="tag tag-ok">Feito</span>
+      <div class="item">
+        <div class="status-icon icon-ok">✓</div>
+        <div class="item-body">
+          <div class="item-titulo">Página de vendas</div>
+          <div class="item-detalhe">narrativaia.com.br/vendas — hero, pipeline, features, FAQ · no ar</div>
+        </div>
+        <span class="tag tag-ok">Feito</span>
+      </div>
     </div>
-
   </div>
 
   <!-- NARRATIVA IA — SISTEMA DE ACESSO -->
   <div class="secao">
-    <div class="secao-titulo">Narrativa IA — Sistema de Acesso</div>
-
-    <div class="item">
-      <div class="status-icon icon-ok">✓</div>
-      <div class="item-body">
-        <div class="item-titulo">Base de autenticação (login + cookie HMAC)</div>
-        <div class="item-detalhe">Login por email/senha, token HMAC-SHA256, cookie httpOnly 7 dias, middleware de proteção de rotas — já funcional</div>
-      </div>
-      <span class="tag tag-ok">Feito</span>
+    <div class="secao-titulo" onclick="toggleSection(this)">
+      <span>Narrativa IA — Sistema de Acesso</span>
+      <span class="secao-badge">0/6</span>
+      <span class="secao-arrow">▼</span>
     </div>
-
-    <div class="item">
-      <div class="status-icon icon-open"></div>
-      <div class="item-body">
-        <div class="item-titulo">Webhook Hotmart → criar usuário automaticamente</div>
-        <div class="item-detalhe">Compra aprovada → endpoint cria conta em narrativa_users + gera senha aleatória + envia email com credenciais</div>
+    <div class="items-grid">
+      <div class="item">
+        <div class="status-icon icon-ok">✓</div>
+        <div class="item-body">
+          <div class="item-titulo">Base de autenticação (login + cookie HMAC)</div>
+          <div class="item-detalhe">Token HMAC-SHA256 · cookie httpOnly 7 dias · middleware de rotas</div>
+        </div>
+        <span class="tag tag-ok">Feito</span>
       </div>
-      <span class="tag tag-open">Pendente</span>
-    </div>
-
-    <div class="item">
-      <div class="status-icon icon-open"></div>
-      <div class="item-body">
-        <div class="item-titulo">Email de boas-vindas com credenciais de acesso</div>
-        <div class="item-detalhe">Template HTML do Narrativa IA com email, senha gerada e link para narrativaia.com.br — disparado automaticamente na compra</div>
+      <div class="item">
+        <div class="status-icon icon-wait">⏳</div>
+        <div class="item-body">
+          <div class="item-titulo">Webhook Hotmart → criar usuário automaticamente</div>
+          <div class="item-detalhe">Endpoint /api/narrativa-access deployado · aguardando produto + HOTTOK no Vercel</div>
+        </div>
+        <span class="tag tag-wait">Aguardando produto</span>
       </div>
-      <span class="tag tag-open">Pendente</span>
-    </div>
-
-    <div class="item">
-      <div class="status-icon icon-open"></div>
-      <div class="item-body">
-        <div class="item-titulo">Recuperação de senha pelo usuário</div>
-        <div class="item-detalhe">Tela "esqueci minha senha" → envia email com link de redefinição · usuário não depende do suporte para resetar</div>
+      <div class="item">
+        <div class="status-icon icon-ok">✓</div>
+        <div class="item-body">
+          <div class="item-titulo">Email de boas-vindas com credenciais</div>
+          <div class="item-detalhe">Template table-based · placeholders substituídos com dados reais do banco · integrado ao blast Narrativa para teste</div>
+        </div>
+        <span class="tag tag-ok">Feito</span>
       </div>
-      <span class="tag tag-open">Pendente</span>
-    </div>
-
-    <div class="item">
-      <div class="status-icon icon-open"></div>
-      <div class="item-body">
-        <div class="item-titulo">Área de perfil — trocar senha</div>
-        <div class="item-detalhe">Tela simples dentro do app para o aluno redefinir a própria senha quando quiser</div>
+      <div class="item">
+        <div class="status-icon icon-open"></div>
+        <div class="item-body">
+          <div class="item-titulo">Recuperação de senha pelo usuário</div>
+          <div class="item-detalhe">"Esqueci minha senha" → email com link · sem depender do suporte</div>
+        </div>
+        <span class="tag tag-open">Pendente</span>
       </div>
-      <span class="tag tag-open">Pendente</span>
-    </div>
-
-    <div class="item">
-      <div class="status-icon icon-open"></div>
-      <div class="item-body">
-        <div class="item-titulo">Testar fluxo completo — compra → acesso</div>
-        <div class="item-detalhe">Compra de teste na Hotmart → email com credenciais → login no Narrativa IA → sessão ativa</div>
+      <div class="item">
+        <div class="status-icon icon-open"></div>
+        <div class="item-body">
+          <div class="item-titulo">Área de perfil — trocar senha</div>
+          <div class="item-detalhe">Tela simples no app para o aluno redefinir a própria senha</div>
+        </div>
+        <span class="tag tag-open">Pendente</span>
       </div>
-      <span class="tag tag-open">Pendente</span>
+      <div class="item">
+        <div class="status-icon icon-open"></div>
+        <div class="item-body">
+          <div class="item-titulo">Testar fluxo completo — compra → acesso</div>
+          <div class="item-detalhe">Compra Hotmart → email credenciais → login Narrativa → sessão ativa</div>
+        </div>
+        <span class="tag tag-open">Pendente</span>
+      </div>
     </div>
-
   </div>
 
-  <!-- LISTA DE INCLUSOS -->
+  <!-- LISTA DE INCLUSOS — inicia colapsada -->
   <div class="secao">
-    <div class="secao-titulo">Lista de Inclusos — Revisão do Marcos</div>
-
-    <div class="item">
-      <div class="status-icon icon-wait">⏳</div>
-      <div class="item-body">
-        <div class="item-titulo">Mentoria 3 Meses (em grupo)</div>
-        <div class="item-detalhe">Acompanhamento em grupo durante 3 meses · R$1.997</div>
-      </div>
-      <span class="tag tag-wait">Revisar</span>
+    <div class="secao-titulo" onclick="toggleSection(this)">
+      <span>Lista de Inclusos — Revisão do Marcos</span>
+      <span class="secao-badge">0/12</span>
+      <span class="secao-arrow collapsed">▼</span>
     </div>
-
-    <div class="item">
-      <div class="status-icon icon-wait">⏳</div>
-      <div class="item-body">
-        <div class="item-titulo">Aulas ao Vivo (em grupo)</div>
-        <div class="item-detalhe">Aulas ao vivo conduzidas em grupo · R$997</div>
+    <div class="items-grid collapsed">
+      <div class="item">
+        <div class="status-icon icon-wait">⏳</div>
+        <div class="item-body">
+          <div class="item-titulo">Mentoria 3 Meses (em grupo)</div>
+          <div class="item-detalhe">Acompanhamento em grupo · R$1.997</div>
+        </div>
+        <span class="tag tag-wait">Revisar</span>
       </div>
-      <span class="tag tag-wait">Revisar</span>
-    </div>
-
-    <div class="item">
-      <div class="status-icon icon-wait">⏳</div>
-      <div class="item-body">
-        <div class="item-titulo">CenaDrop Flow</div>
-        <div class="item-detalhe">Acesso à extensão CenaDrop Flow · R$197</div>
+      <div class="item">
+        <div class="status-icon icon-wait">⏳</div>
+        <div class="item-body">
+          <div class="item-titulo">Aulas ao Vivo (em grupo)</div>
+          <div class="item-detalhe">Aulas ao vivo em grupo · R$997</div>
+        </div>
+        <span class="tag tag-wait">Revisar</span>
       </div>
-      <span class="tag tag-wait">Revisar</span>
-    </div>
-
-    <div class="item">
-      <div class="status-icon icon-wait">⏳</div>
-      <div class="item-body">
-        <div class="item-titulo">Narrativa IA — 1 ano</div>
-        <div class="item-detalhe">Acesso ao Narrativa IA por 12 meses · R$1.097</div>
+      <div class="item">
+        <div class="status-icon icon-wait">⏳</div>
+        <div class="item-body">
+          <div class="item-titulo">CenaDrop Flow</div>
+          <div class="item-detalhe">Acesso à extensão · R$197</div>
+        </div>
+        <span class="tag tag-wait">Revisar</span>
       </div>
-      <span class="tag tag-wait">Revisar</span>
-    </div>
-
-    <div class="item">
-      <div class="status-icon icon-wait">⏳</div>
-      <div class="item-body">
-        <div class="item-titulo">Análise Estratégica ao Vivo (em grupo)</div>
-        <div class="item-detalhe">Sessões de análise estratégica conduzidas em grupo · R$997</div>
+      <div class="item">
+        <div class="status-icon icon-wait">⏳</div>
+        <div class="item-body">
+          <div class="item-titulo">Narrativa IA — 1 ano</div>
+          <div class="item-detalhe">Acesso por 12 meses · R$1.097</div>
+        </div>
+        <span class="tag tag-wait">Revisar</span>
       </div>
-      <span class="tag tag-wait">Revisar</span>
-    </div>
-
-    <div class="item">
-      <div class="status-icon icon-wait">⏳</div>
-      <div class="item-body">
-        <div class="item-titulo">Cursos do Marcos (existentes)</div>
-        <div class="item-detalhe">Acesso aos cursos já existentes do Marcos · R$697</div>
+      <div class="item">
+        <div class="status-icon icon-wait">⏳</div>
+        <div class="item-body">
+          <div class="item-titulo">Análise Estratégica ao Vivo (em grupo)</div>
+          <div class="item-detalhe">Sessões estratégicas em grupo · R$997</div>
+        </div>
+        <span class="tag tag-wait">Revisar</span>
       </div>
-      <span class="tag tag-wait">Revisar</span>
-    </div>
-
-    <div class="item">
-      <div class="status-icon icon-wait">⏳</div>
-      <div class="item-body">
-        <div class="item-titulo">Do Zero ao Canal no Ar</div>
-        <div class="item-detalhe">Ciclo completo: pesquisa de nicho, criação do canal (BR e gringa), estoque de 5 vídeos e publicação · R$697</div>
+      <div class="item">
+        <div class="status-icon icon-wait">⏳</div>
+        <div class="item-body">
+          <div class="item-titulo">Cursos do Marcos (existentes)</div>
+          <div class="item-detalhe">Acesso aos cursos já existentes · R$697</div>
+        </div>
+        <span class="tag tag-wait">Revisar</span>
       </div>
-      <span class="tag tag-wait">Revisar</span>
-    </div>
-
-    <div class="item">
-      <div class="status-icon icon-wait">⏳</div>
-      <div class="item-body">
-        <div class="item-titulo">Biblioteca de Prompts IA</div>
-        <div class="item-detalhe">Coleção de prompts para criação de conteúdo · R$297</div>
+      <div class="item">
+        <div class="status-icon icon-wait">⏳</div>
+        <div class="item-body">
+          <div class="item-titulo">Do Zero ao Canal no Ar</div>
+          <div class="item-detalhe">Nicho → canal BR/gringa → 5 vídeos publicados · R$697</div>
+        </div>
+        <span class="tag tag-wait">Revisar</span>
       </div>
-      <span class="tag tag-wait">Revisar</span>
-    </div>
-
-    <div class="item">
-      <div class="status-icon icon-wait">⏳</div>
-      <div class="item-body">
-        <div class="item-titulo">Templates de Thumbnails</div>
-        <div class="item-detalhe">Pacote de templates prontos para thumbnails · R$197</div>
+      <div class="item">
+        <div class="status-icon icon-wait">⏳</div>
+        <div class="item-body">
+          <div class="item-titulo">Biblioteca de Prompts IA</div>
+          <div class="item-detalhe">Coleção de prompts para criação de conteúdo · R$297</div>
+        </div>
+        <span class="tag tag-wait">Revisar</span>
       </div>
-      <span class="tag tag-wait">Revisar</span>
-    </div>
-
-    <div class="item">
-      <div class="status-icon icon-wait">⏳</div>
-      <div class="item-body">
-        <div class="item-titulo">Estruturas de Títulos</div>
-        <div class="item-detalhe">Banco de estruturas e fórmulas de títulos · R$197</div>
+      <div class="item">
+        <div class="status-icon icon-wait">⏳</div>
+        <div class="item-body">
+          <div class="item-titulo">Templates de Thumbnails</div>
+          <div class="item-detalhe">Pacote de templates prontos · R$197</div>
+        </div>
+        <span class="tag tag-wait">Revisar</span>
       </div>
-      <span class="tag tag-wait">Revisar</span>
-    </div>
-
-    <div class="item">
-      <div class="status-icon icon-wait">⏳</div>
-      <div class="item-body">
-        <div class="item-titulo">Banco de Ideias Virais</div>
-        <div class="item-detalhe">Entregável nos encontros ao vivo — ideias de temas e formatos com potencial viral · R$297</div>
+      <div class="item">
+        <div class="status-icon icon-wait">⏳</div>
+        <div class="item-body">
+          <div class="item-titulo">Estruturas de Títulos</div>
+          <div class="item-detalhe">Banco de estruturas e fórmulas · R$197</div>
+        </div>
+        <span class="tag tag-wait">Revisar</span>
       </div>
-      <span class="tag tag-wait">Revisar</span>
-    </div>
-
-    <div class="item">
-      <div class="status-icon icon-wait">⏳</div>
-      <div class="item-body">
-        <div class="item-titulo">Aula Canais Internacionais</div>
-        <div class="item-detalhe">Dentro dos cursos do Marcos + entregável ao vivo — estratégia para canais na gringa · R$327</div>
+      <div class="item">
+        <div class="status-icon icon-wait">⏳</div>
+        <div class="item-body">
+          <div class="item-titulo">Banco de Ideias Virais</div>
+          <div class="item-detalhe">Ideias com potencial viral · entregável ao vivo · R$297</div>
+        </div>
+        <span class="tag tag-wait">Revisar</span>
       </div>
-      <span class="tag tag-wait">Revisar</span>
+      <div class="item">
+        <div class="status-icon icon-wait">⏳</div>
+        <div class="item-body">
+          <div class="item-titulo">Aula Canais Internacionais</div>
+          <div class="item-detalhe">Estratégia para canais na gringa · cursos Marcos + entregável · R$327</div>
+        </div>
+        <span class="tag tag-wait">Revisar</span>
+      </div>
     </div>
-
   </div>
 
   <!-- DIVULGAÇÃO -->
   <div class="secao">
-    <div class="secao-titulo">Divulgação</div>
-
-    <div class="item">
-      <div class="status-icon icon-open"></div>
-      <div class="item-body">
-        <div class="item-titulo">Criar artes de divulgação</div>
-        <div class="item-detalhe">Stories e posts para pré-lançamento (27/05, 28/05) e dia oficial (29/05)</div>
-      </div>
-      <span class="tag tag-open">Pendente</span>
+    <div class="secao-titulo" onclick="toggleSection(this)">
+      <span>Divulgação</span>
+      <span class="secao-badge">0/3</span>
+      <span class="secao-arrow">▼</span>
     </div>
-
-    <div class="item">
-      <div class="status-icon icon-open"></div>
-      <div class="item-body">
-        <div class="item-titulo">Preparar roteiro de anúncio</div>
-        <div class="item-detalhe">O que postar, quando e em qual ordem nos 3 dias de abertura</div>
+    <div class="items-grid">
+      <div class="item">
+        <div class="status-icon icon-open"></div>
+        <div class="item-body">
+          <div class="item-titulo">Criar artes de divulgação</div>
+          <div class="item-detalhe">Stories e posts · pré-lançamento (27/05, 28/05) e oficial (29/05)</div>
+        </div>
+        <span class="tag tag-open">Pendente</span>
       </div>
-      <span class="tag tag-open">Pendente</span>
-    </div>
-
-    <div class="item">
-      <div class="status-icon icon-open"></div>
-      <div class="item-body">
-        <div class="item-titulo">Acionar lista de espera</div>
-        <div class="item-detalhe">Comunicar os inscritos em academyelite antes da abertura geral</div>
+      <div class="item">
+        <div class="status-icon icon-open"></div>
+        <div class="item-body">
+          <div class="item-titulo">Preparar roteiro de anúncio</div>
+          <div class="item-detalhe">O que postar, quando e em qual ordem nos 3 dias</div>
+        </div>
+        <span class="tag tag-open">Pendente</span>
       </div>
-      <span class="tag tag-open">Pendente</span>
+      <div class="item">
+        <div class="status-icon icon-open"></div>
+        <div class="item-body">
+          <div class="item-titulo">Acionar lista de espera</div>
+          <div class="item-detalhe">Comunicar inscritos em academyelite antes da abertura geral</div>
+        </div>
+        <span class="tag tag-open">Pendente</span>
+      </div>
     </div>
-
   </div>
 
 </div>
@@ -905,11 +933,10 @@
 </div>
 
 <script>
-  // Configuração
-  const LAUNCH     = new Date('2026-05-29T20:00:00-03:00'); // 29/05 às 20h BRT
-  const START      = new Date('2026-05-20T00:00:00-03:00'); // início do projeto
-  const TOTAL      = 27; // total de tarefas
-  const CONCLUIDAS = 6;  // tarefas concluídas — atualizar manualmente
+  const LAUNCH     = new Date('2026-05-29T20:00:00-03:00');
+  const START      = new Date('2026-05-20T00:00:00-03:00');
+  const TOTAL      = 41;
+  const CONCLUIDAS = 9;
 
   function pad(n) { return String(n).padStart(2, '0'); }
 
@@ -918,10 +945,7 @@
     const diff = LAUNCH - now;
 
     if (diff <= 0) {
-      document.getElementById('cd-d').textContent = '00';
-      document.getElementById('cd-h').textContent = '00';
-      document.getElementById('cd-m').textContent = '00';
-      document.getElementById('cd-s').textContent = '00';
+      ['cd-d','cd-h','cd-m','cd-s'].forEach(id => document.getElementById(id).textContent = '00');
       document.getElementById('statusBadge').textContent = '🚀 Lançado!';
       document.getElementById('statusBadge').className = 'countdown-status status-ok';
       return;
@@ -937,18 +961,12 @@
     document.getElementById('cd-m').textContent = pad(m);
     document.getElementById('cd-s').textContent = pad(s);
 
-    // Progresso de tempo (0 a 100%)
-    const totalSpan  = LAUNCH - START;
-    const elapsed    = now - START;
-    const tempoPct   = Math.min(100, Math.max(0, (elapsed / totalSpan) * 100));
+    const totalSpan = LAUNCH - START;
+    const elapsed   = now - START;
+    const tempoPct  = Math.min(100, Math.max(0, (elapsed / totalSpan) * 100));
+    const tarefaPct = (CONCLUIDAS / TOTAL) * 100;
+    const delta     = tarefaPct - tempoPct;
 
-    // Progresso de tarefas (0 a 100%)
-    const tarefaPct  = (CONCLUIDAS / TOTAL) * 100;
-
-    // Delta: tarefas vs tempo — positivo = adiantado, negativo = atrasado
-    const delta = tarefaPct - tempoPct;
-
-    // Badge de status
     const badge = document.getElementById('statusBadge');
     const fill  = document.getElementById('saudeFill');
     const hint  = document.getElementById('saudeHint');
@@ -973,21 +991,75 @@
       hint.style.color  = '#e05555';
     }
 
-    // Barras
     fill.style.width  = tarefaPct.toFixed(1) + '%';
     document.getElementById('saudeTempo').style.width = tempoPct.toFixed(1) + '%';
     document.getElementById('saudePct').textContent   = Math.round(tarefaPct) + '% concluído';
 
-    // Tempo decorrido
     const hRestantes = Math.floor(diff / 3600000);
     document.getElementById('tempoDecorrido').textContent =
-      hRestantes > 48
-        ? `${d}d ${h}h restantes`
-        : `${hRestantes}h restantes`;
+      hRestantes > 48 ? `${d}d ${h}h restantes` : `${hRestantes}h restantes`;
+  }
+
+  function toggleSection(header) {
+    const grid  = header.nextElementSibling;
+    const arrow = header.querySelector('.secao-arrow');
+    const now   = grid.classList.toggle('collapsed');
+    arrow.classList.toggle('collapsed', now);
+  }
+
+  function filterItems(cls, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    document.querySelectorAll('.item').forEach(item => {
+      if (cls === 'all') {
+        item.classList.remove('hidden');
+      } else {
+        item.classList.toggle('hidden', !item.querySelector('.' + cls));
+      }
+    });
+
+    document.querySelectorAll('.secao').forEach(sec => {
+      const grid    = sec.querySelector('.items-grid');
+      if (!grid) return;
+      const visible = Array.from(grid.querySelectorAll('.item')).filter(i => !i.classList.contains('hidden')).length;
+      sec.style.display = visible === 0 ? 'none' : '';
+      if (visible > 0 && grid.classList.contains('collapsed')) {
+        grid.classList.remove('collapsed');
+        const arrow = sec.querySelector('.secao-arrow');
+        if (arrow) arrow.classList.remove('collapsed');
+      }
+    });
+  }
+
+  function expandAll() {
+    document.querySelectorAll('.items-grid').forEach(g => g.classList.remove('collapsed'));
+    document.querySelectorAll('.secao-arrow').forEach(a => a.classList.remove('collapsed'));
+  }
+
+  function collapseAll() {
+    document.querySelectorAll('.items-grid').forEach(g => g.classList.add('collapsed'));
+    document.querySelectorAll('.secao-arrow').forEach(a => a.classList.add('collapsed'));
+  }
+
+  function updateBadges() {
+    document.querySelectorAll('.secao').forEach(sec => {
+      const items = sec.querySelectorAll('.item');
+      const done  = sec.querySelectorAll('.icon-ok').length;
+      const badge = sec.querySelector('.secao-badge');
+      if (!badge || !items.length) return;
+      badge.textContent = `${done}/${items.length}`;
+      if (done === items.length && items.length > 0) {
+        badge.style.cssText = 'background:rgba(76,175,80,0.15);color:#4CAF50;';
+      } else if (done > 0) {
+        badge.style.cssText = 'background:rgba(201,162,39,0.12);color:#C9A227;';
+      }
+    });
   }
 
   tick();
   setInterval(tick, 1000);
+  updateBadges();
 </script>
 
 </body>
