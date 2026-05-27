@@ -777,6 +777,75 @@ thead th.sortable:hover { color: var(--accent); }
 .blast-result.ok { background: var(--green-s); color: var(--green); border: 1px solid rgba(40,199,111,.2); }
 .blast-result.error { background: var(--red-s); color: var(--red); border: 1px solid rgba(234,84,85,.2); }
 
+/* ── EMAIL TEMPLATE CARDS ──────────────── */
+.email-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap: 14px; margin-bottom: 24px; }
+.email-card {
+  background: var(--card); border: 2px solid var(--border);
+  border-radius: 12px; padding: 18px; cursor: pointer;
+  transition: border-color .15s, box-shadow .15s;
+  position: relative;
+}
+.email-card:hover { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(124,58,237,.1); }
+.email-card.selected { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(124,58,237,.15); }
+.email-card-tag {
+  display: inline-block; font-size: 10px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  padding: 3px 9px; border-radius: 20px; margin-bottom: 10px;
+  background: rgba(124,58,237,.12); color: var(--accent);
+}
+.email-card-tag.ao-vivo { background: rgba(234,84,85,.12); color: var(--red); }
+.email-card-tag.update  { background: rgba(40,199,111,.12); color: var(--green); }
+.email-card h4 { font-size: 14px; font-weight: 700; color: var(--text); margin: 0 0 4px; }
+.email-card p  { font-size: 12px; color: var(--muted); margin: 0 0 12px; line-height: 1.5; }
+.email-card-subject { font-size: 11px; color: var(--text2); background: var(--bg); border-radius: 6px; padding: 6px 10px; word-break: break-word; }
+.email-card-actions { display: flex; gap: 8px; margin-top: 12px; }
+.btn-preview {
+  flex: 1; font-size: 12px; font-weight: 600; padding: 7px 12px;
+  border: 1px solid var(--border); border-radius: 8px;
+  background: transparent; color: var(--text2); cursor: pointer;
+  font-family: 'Inter', sans-serif; transition: background .15s;
+}
+.btn-preview:hover { background: var(--hover); }
+.email-card-check {
+  position: absolute; top: 14px; right: 14px;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--accent); display: none;
+  align-items: center; justify-content: center;
+  font-size: 11px; color: #fff;
+}
+.email-card.selected .email-card-check { display: flex; }
+
+/* ── RECIPIENT FILTER ──────────────────── */
+.recipient-filter { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+.recipient-filter label { font-size: 13px; font-weight: 600; color: var(--text2); }
+.btn-filter {
+  font-size: 13px; font-weight: 600; padding: 8px 18px;
+  border: 1px solid var(--border); border-radius: 20px;
+  background: transparent; color: var(--text2); cursor: pointer;
+  font-family: 'Inter', sans-serif; transition: all .15s;
+}
+.btn-filter.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn-filter:hover:not(.active) { background: var(--hover); }
+.recipient-count { font-size: 12px; color: var(--muted); margin-left: 4px; }
+
+/* ── TEST EMAIL ────────────────────────── */
+.test-email-row { display: flex; gap: 8px; margin-bottom: 20px; }
+.test-email-row input {
+  flex: 1; font-size: 13px; padding: 9px 14px;
+  border: 1px solid var(--border); border-radius: 9px;
+  background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif;
+  outline: none; transition: border-color .15s;
+}
+.test-email-row input:focus { border-color: var(--accent); }
+.btn-test {
+  font-size: 13px; font-weight: 600; padding: 9px 18px;
+  border: 1px solid var(--accent); border-radius: 9px;
+  background: transparent; color: var(--accent); cursor: pointer;
+  font-family: 'Inter', sans-serif; transition: all .15s; white-space: nowrap;
+}
+.btn-test:hover { background: rgba(124,58,237,.08); }
+.btn-test:disabled { opacity: .5; cursor: not-allowed; }
+
 /* ── CHECKBOX ───────────────────────────── */
 input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; cursor: pointer; }
 td.cb-col { width: 36px; }
@@ -937,7 +1006,7 @@ th.cb-col { width: 36px; }
           <button class="sn-btn active" data-sec="dashboard" onclick="switchSection('cenadrop','dashboard')">📊 Dashboard</button>
           <button class="sn-btn" data-sec="licenses"  onclick="switchSection('cenadrop','licenses')">🔑 Licenças <span class="sn-count" id="cnt-lic">0</span></button>
           <button class="sn-btn" data-sec="students"  onclick="switchSection('cenadrop','students')">🎓 Alunos Hotmart <span class="sn-count" id="cnt-hot">0</span></button>
-          <button class="sn-btn" data-sec="blast"     onclick="switchSection('cenadrop','blast')">📣 Blast Email</button>
+          <button class="sn-btn" data-sec="blast"     onclick="switchSection('cenadrop','blast');loadBlastTemplates();setBlastFilter('all')">📣 Blast Email</button>
         </div>
 
         <!-- Narrativa IA -->
@@ -1214,12 +1283,39 @@ th.cb-col { width: 36px; }
               <div><div class="stat-label">Último disparo</div><div class="stat-val" style="font-size:16px;color:var(--text2)" id="blast-last-sent">—</div></div>
             </div>
           </div>
+
+          <!-- Template selection -->
+          <div class="blast-card" style="margin-bottom:16px">
+            <h3 style="margin-bottom:4px">📧 Escolha o template</h3>
+            <p class="blast-sub">Selecione qual email será disparado.</p>
+            <div class="email-grid" id="blast-template-grid">
+              <div style="color:var(--muted);font-size:13px">Carregando templates...</div>
+            </div>
+          </div>
+
+          <!-- Recipients filter -->
+          <div class="blast-card" style="margin-bottom:16px">
+            <h3 style="margin-bottom:4px">👥 Destinatários</h3>
+            <p class="blast-sub">Filtre quem vai receber o disparo.</p>
+            <div class="recipient-filter">
+              <button class="btn-filter" id="filter-active" onclick="setBlastFilter('active')">Ativos</button>
+              <button class="btn-filter active" id="filter-all" onclick="setBlastFilter('all')">Todos</button>
+              <button class="btn-filter" id="filter-inactive" onclick="setBlastFilter('inactive')">Inativos</button>
+              <span class="recipient-count" id="blast-recipient-count"></span>
+            </div>
+          </div>
+
+          <!-- Test + Send -->
           <div class="blast-card">
-            <h3>📣 Blast Email</h3>
-            <p class="blast-sub">Dispara email para todos os usuários com email cadastrado no banco de dados CenaDrop.</p>
+            <h3 style="margin-bottom:4px">🚀 Disparar</h3>
+            <p class="blast-sub" style="margin-bottom:16px">Envie um teste antes de disparar para todos.</p>
+            <div class="test-email-row">
+              <input type="email" id="blast-test-email" placeholder="email@teste.com (envio de teste)" />
+              <button class="btn-test" id="blast-test-btn" onclick="doBlastTest()">Enviar teste</button>
+            </div>
             <button class="btn-blast" id="blast-btn" onclick="doBlastemail()">
               <span id="blast-btn-icon">📣</span>
-              <span id="blast-btn-text">Disparar Email v7.6 para Todos</span>
+              <span id="blast-btn-text">Disparar para Todos</span>
             </button>
             <div class="blast-result" id="blast-result"></div>
           </div>
@@ -1518,90 +1614,84 @@ th.cb-col { width: 36px; }
         <div class="sec-panel active" id="links-main">
 
           <style>
-          /* ── Links Hub ── */
+          /* ── Links Hub v3 — cards + acordeão ── */
           .lh-header {
             display:flex;align-items:center;justify-content:space-between;
-            margin-bottom:22px;flex-wrap:wrap;gap:12px;
+            margin-bottom:20px;flex-wrap:wrap;gap:12px;
           }
-          .lh-header-left h2 { font-size:16px;font-weight:700;color:var(--text);margin-bottom:2px; }
-          .lh-header-left p  { font-size:12px;color:var(--muted); }
+          .lh-header h2 { font-size:16px;font-weight:700;color:var(--text);margin-bottom:2px; }
+          .lh-header p  { font-size:12px;color:var(--muted); }
           .lh-search {
             padding:8px 13px;border:1.5px solid var(--border);border-radius:8px;
-            font-size:13px;outline:none;width:210px;background:var(--surface);
+            font-size:13px;outline:none;width:200px;background:var(--surface);
             color:var(--text);transition:border-color .15s;
           }
           .lh-search:focus { border-color:var(--accent); }
 
-          .lh-section { margin-bottom:20px; }
-          .lh-section[data-hidden="true"] { display:none; }
+          /* Acordeão */
+          .lh-acc { border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px; }
+          .lh-acc[data-hidden="true"] { display:none; }
 
-          .lh-section-hd {
-            display:flex;align-items:center;gap:8px;
-            margin-bottom:8px;cursor:pointer;user-select:none;
+          .lh-acc-hd {
+            display:flex;align-items:center;gap:10px;padding:13px 16px;
+            background:var(--surface);cursor:pointer;user-select:none;
+            transition:background .12s;
           }
-          .lh-section-hd-bar {
-            width:3px;border-radius:2px;height:16px;flex-shrink:0;
-          }
-          .lh-section-hd-title {
-            font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
-            color:var(--text2);flex:1;
-          }
-          .lh-section-hd-count {
-            font-size:10px;font-weight:600;padding:1px 8px;border-radius:10px;
+          .lh-acc-hd:hover { background:var(--subtle); }
+
+          .lh-acc-bar { width:4px;height:18px;border-radius:2px;flex-shrink:0; }
+          .lh-acc-title { font-size:13px;font-weight:700;color:var(--text);flex:1; }
+          .lh-acc-count {
+            font-size:11px;font-weight:600;padding:2px 9px;border-radius:10px;
             background:var(--subtle);color:var(--muted);
           }
-          .lh-section-hd-chevron { font-size:10px;color:var(--muted);transition:transform .2s; }
-          .lh-section.collapsed .lh-section-hd-chevron { transform:rotate(-90deg); }
-          .lh-section.collapsed .lh-list { display:none; }
+          .lh-acc-chevron { font-size:11px;color:var(--muted);transition:transform .2s; }
+          .lh-acc.open .lh-acc-chevron { transform:rotate(180deg); }
 
-          .lh-list {
-            background:var(--surface);border:1px solid var(--border);
-            border-radius:10px;overflow:hidden;
+          /* Grid de cards */
+          .lh-cards {
+            display:none;padding:12px;
+            border-top:1px solid var(--border);background:var(--bg);
+            grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;
           }
-          .lh-row {
-            display:flex;align-items:center;gap:12px;
-            padding:9px 14px;border-bottom:1px solid var(--border);
-            transition:background .12s;position:relative;
-          }
-          .lh-row:last-child { border-bottom:none; }
-          .lh-row:hover { background:var(--subtle); }
-          .lh-row[data-hidden="true"] { display:none; }
+          .lh-acc.open .lh-cards { display:grid; }
 
-          .lh-dot {
-            width:7px;height:7px;border-radius:50%;flex-shrink:0;
-            background:var(--lh-color, var(--accent));
+          .lh-card {
+            background:var(--surface);border:1px solid var(--border);border-radius:10px;
+            border-top:3px solid var(--lh-color,var(--accent));
+            padding:12px 13px;display:flex;flex-direction:column;gap:6px;
+            transition:box-shadow .15s,border-color .15s;
           }
-          .lh-row-name {
-            font-size:13px;font-weight:600;color:var(--text);
-            white-space:nowrap;width:180px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;
-          }
-          .lh-row-desc {
-            font-size:12px;color:var(--muted);flex:1;
-            white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-          }
+          .lh-card:hover { box-shadow:var(--shadow);border-color:var(--lh-color,var(--accent)); }
+          .lh-card[data-hidden="true"] { display:none; }
+
+          .lh-card-name { font-size:13px;font-weight:700;color:var(--text);line-height:1.3; }
+          .lh-card-desc { font-size:11px;color:var(--muted);line-height:1.4;flex:1; }
+
+          .lh-card-footer { display:flex;align-items:center;justify-content:space-between;margin-top:2px; }
           .lh-badge {
-            font-size:10px;font-weight:600;padding:2px 8px;border-radius:5px;
-            white-space:nowrap;flex-shrink:0;
-            background:var(--subtle);color:var(--muted);
+            font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;
+            background:var(--subtle);color:var(--muted);white-space:nowrap;
           }
           .lh-badge.checkout { background:rgba(40,199,111,.1);color:#28c76f; }
-          .lh-badge.redirect { background:rgba(255,159,67,.12);color:#ff9f43; }
           .lh-badge.social   { background:rgba(59,130,246,.1);color:#3b82f6; }
           .lh-badge.external { background:rgba(234,84,85,.1);color:#ea5455; }
           .lh-badge.prod     { background:rgba(124,58,237,.1);color:var(--accent); }
 
-          .lh-acts { display:flex;gap:4px;flex-shrink:0; }
-          .lh-acts button {
-            width:28px;height:28px;border:1px solid var(--border);border-radius:6px;
-            background:transparent;color:var(--text2);cursor:pointer;font-size:13px;
-            transition:all .12s;display:flex;align-items:center;justify-content:center;
-            flex-shrink:0;
+          .lh-card-acts { display:flex;gap:4px; }
+          .lh-card-acts button {
+            width:26px;height:26px;border:1px solid var(--border);border-radius:6px;
+            background:transparent;color:var(--text2);cursor:pointer;font-size:12px;
+            display:flex;align-items:center;justify-content:center;transition:all .12s;
           }
-          .lh-acts button:hover { background:var(--accent-s);color:var(--accent);border-color:var(--accent); }
+          .lh-card-acts button:hover { background:var(--accent-s);color:var(--accent);border-color:var(--accent); }
+
+          /* Placeholder vazio */
+          .lh-empty { padding:20px;text-align:center;color:var(--muted);font-size:12px;font-style:italic; }
           </style>
 
           <div class="lh-header">
-            <div class="lh-header-left">
+            <div>
               <h2>Links Hub</h2>
               <p id="lh-total-count">Carregando...</p>
             </div>
@@ -1612,394 +1702,418 @@ th.cb-col { width: 36px; }
           <div id="links-container">
 
             <!-- ── DOMÍNIOS PRÓPRIOS ── -->
-            <div class="lh-section" id="lhs-dominios">
-              <div class="lh-section-hd" onclick="toggleLhSection('lhs-dominios')">
-                <div class="lh-section-hd-bar" style="background:#7c3aed"></div>
-                <span class="lh-section-hd-title">🌐 Domínios Próprios</span>
-                <span class="lh-section-hd-count">4</span>
-                <span class="lh-section-hd-chevron">▼</span>
+            <div class="lh-acc" id="lhs-dominios">
+              <div class="lh-acc-hd" onclick="openLhSection('lhs-dominios')">
+                <div class="lh-acc-bar" style="background:#7c3aed"></div>
+                <span class="lh-acc-title">🌐 Domínios Próprios</span>
+                <span class="lh-acc-count">4</span>
+                <span class="lh-acc-chevron">▾</span>
               </div>
-              <div class="lh-list" style="--lh-color:#7c3aed">
-                <div class="lh-row lh-item" data-search="raynern.com.br admin servidor principal vercel">
-                  <div class="lh-dot"></div>
-                  <div class="lh-row-name">raynern.com.br</div>
-                  <div class="lh-row-desc">Servidor principal — admin, CenaDrop, meta-prompts, Academy</div>
-                  <span class="lh-badge prod">Principal</span>
-                  <div class="lh-acts">
-                    <button onclick="window.open('https://raynern.com.br','_blank')" title="Abrir">↗</button>
-                    <button onclick="copyLink('https://raynern.com.br',this)" title="Copiar">⎘</button>
+              <div class="lh-cards" style="--lh-color:#7c3aed">
+                <div class="lh-card lh-item" data-search="raynern.com.br admin servidor principal vercel">
+                  <div class="lh-card-name">raynern.com.br</div>
+                  <div class="lh-card-desc">Servidor principal — admin, CenaDrop, meta-prompts, Academy</div>
+                  <div class="lh-card-footer">
+                    <span class="lh-badge prod">Principal</span>
+                    <div class="lh-card-acts">
+                      <button onclick="window.open('https://raynern.com.br','_blank')" title="Abrir">↗</button>
+                      <button onclick="copyLink('https://raynern.com.br',this)" title="Copiar">⎘</button>
+                    </div>
                   </div>
                 </div>
-                <div class="lh-row lh-item" data-search="cenadrop.com.br vendas dominio produto">
-                  <div class="lh-dot"></div>
-                  <div class="lh-row-name">cenadrop.com.br</div>
-                  <div class="lh-row-desc">Domínio CenaDrop — redireciona automaticamente para /vendas</div>
-                  <span class="lh-badge prod">CenaDrop</span>
-                  <div class="lh-acts">
-                    <button onclick="window.open('https://cenadrop.com.br','_blank')" title="Abrir">↗</button>
-                    <button onclick="copyLink('https://cenadrop.com.br',this)" title="Copiar">⎘</button>
+                <div class="lh-card lh-item" data-search="cenadrop.com.br vendas dominio produto">
+                  <div class="lh-card-name">cenadrop.com.br</div>
+                  <div class="lh-card-desc">Domínio oficial CenaDrop — redireciona para /vendas</div>
+                  <div class="lh-card-footer">
+                    <span class="lh-badge prod">CenaDrop</span>
+                    <div class="lh-card-acts">
+                      <button onclick="window.open('https://cenadrop.com.br','_blank')" title="Abrir">↗</button>
+                      <button onclick="copyLink('https://cenadrop.com.br',this)" title="Copiar">⎘</button>
+                    </div>
                   </div>
                 </div>
-                <div class="lh-row lh-item" data-search="narrativaia.com.br narrativa ia studio vercel">
-                  <div class="lh-dot"></div>
-                  <div class="lh-row-name">narrativaia.com.br</div>
-                  <div class="lh-row-desc">Studio Narrativa IA — app de roteiro com IA (Vercel)</div>
-                  <span class="lh-badge prod">Narrativa IA</span>
-                  <div class="lh-acts">
-                    <button onclick="window.open('https://narrativaia.com.br','_blank')" title="Abrir">↗</button>
-                    <button onclick="copyLink('https://narrativaia.com.br',this)" title="Copiar">⎘</button>
+                <div class="lh-card lh-item" data-search="narrativaia.com.br narrativa ia studio vercel">
+                  <div class="lh-card-name">narrativaia.com.br</div>
+                  <div class="lh-card-desc">Studio Narrativa IA — app de roteiro com IA</div>
+                  <div class="lh-card-footer">
+                    <span class="lh-badge prod">Narrativa IA</span>
+                    <div class="lh-card-acts">
+                      <button onclick="window.open('https://narrativaia.com.br','_blank')" title="Abrir">↗</button>
+                      <button onclick="copyLink('https://narrativaia.com.br',this)" title="Copiar">⎘</button>
+                    </div>
                   </div>
                 </div>
-                <div class="lh-row lh-item" data-search="nxsaude.app.br protocolo 45 jejum saude vercel">
-                  <div class="lh-dot"></div>
-                  <div class="lh-row-name">nxsaude.app.br</div>
-                  <div class="lh-row-desc">Plataforma NX Saúde — Protocolo 45+ / Guia Prático Jejum</div>
-                  <span class="lh-badge prod">NX Saúde</span>
-                  <div class="lh-acts">
-                    <button onclick="window.open('https://nxsaude.app.br','_blank')" title="Abrir">↗</button>
-                    <button onclick="copyLink('https://nxsaude.app.br',this)" title="Copiar">⎘</button>
+                <div class="lh-card lh-item" data-search="nxsaude.app.br protocolo 45 jejum saude vercel">
+                  <div class="lh-card-name">nxsaude.app.br</div>
+                  <div class="lh-card-desc">Plataforma NX Saúde — Protocolo 45+ / Guia Prático Jejum</div>
+                  <div class="lh-card-footer">
+                    <span class="lh-badge prod">NX Saúde</span>
+                    <div class="lh-card-acts">
+                      <button onclick="window.open('https://nxsaude.app.br','_blank')" title="Abrir">↗</button>
+                      <button onclick="copyLink('https://nxsaude.app.br',this)" title="Copiar">⎘</button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
             <!-- ── CENADROP FLOW ── -->
-            <div class="lh-section" id="lhs-cenadrop">
-              <div class="lh-section-hd" onclick="toggleLhSection('lhs-cenadrop')">
-                <div class="lh-section-hd-bar" style="background:#14b8a6"></div>
-                <span class="lh-section-hd-title">🎬 CenaDrop Flow</span>
-                <span class="lh-section-hd-count">5</span>
-                <span class="lh-section-hd-chevron">▼</span>
+            <div class="lh-acc" id="lhs-cenadrop">
+              <div class="lh-acc-hd" onclick="openLhSection('lhs-cenadrop')">
+                <div class="lh-acc-bar" style="background:#14b8a6"></div>
+                <span class="lh-acc-title">🎬 CenaDrop Flow</span>
+                <span class="lh-acc-count">5</span>
+                <span class="lh-acc-chevron">▾</span>
               </div>
-              <div class="lh-list" style="--lh-color:#14b8a6">
-                <div class="lh-row lh-item" data-search="cenadrop vendas pagina venda cenadrop.com.br">
-                  <div class="lh-dot"></div>
-                  <div class="lh-row-name">Página de Vendas</div>
-                  <div class="lh-row-desc">Página de vendas principal — cenadrop.com.br/vendas</div>
-                  <span class="lh-badge checkout">Vendas</span>
-                  <div class="lh-acts">
-                    <button onclick="window.open('https://cenadrop.com.br/vendas','_blank')" title="Abrir">↗</button>
-                    <button onclick="copyLink('https://cenadrop.com.br/vendas',this)" title="Copiar">⎘</button>
+              <div class="lh-cards" style="--lh-color:#14b8a6">
+                <div class="lh-card lh-item" data-search="cenadrop vendas pagina venda cenadrop.com.br">
+                  <div class="lh-card-name">Página de Vendas</div>
+                  <div class="lh-card-desc">Página de vendas principal do CenaDrop</div>
+                  <div class="lh-card-footer">
+                    <span class="lh-badge checkout">Vendas</span>
+                    <div class="lh-card-acts">
+                      <button onclick="window.open('https://cenadrop.com.br/vendas','_blank')" title="Abrir">↗</button>
+                      <button onclick="copyLink('https://cenadrop.com.br/vendas',this)" title="Copiar">⎘</button>
+                    </div>
                   </div>
                 </div>
-                <div class="lh-row lh-item" data-search="hotmart checkout pagamento compra cenadrop">
-                  <div class="lh-dot"></div>
-                  <div class="lh-row-name">Checkout Hotmart</div>
-                  <div class="lh-row-desc">Link de compra direto — oferta padrão Hotmart</div>
-                  <span class="lh-badge checkout">Pagamento</span>
-                  <div class="lh-acts">
-                    <button onclick="window.open('https://pay.hotmart.com/N105550523I?off=h52a6id8','_blank')" title="Abrir">↗</button>
-                    <button onclick="copyLink('https://pay.hotmart.com/N105550523I?off=h52a6id8',this)" title="Copiar">⎘</button>
+                <div class="lh-card lh-item" data-search="hotmart checkout pagamento compra cenadrop">
+                  <div class="lh-card-name">Checkout Hotmart</div>
+                  <div class="lh-card-desc">Link de compra direto — oferta padrão</div>
+                  <div class="lh-card-footer">
+                    <span class="lh-badge checkout">Pagamento</span>
+                    <div class="lh-card-acts">
+                      <button onclick="window.open('https://pay.hotmart.com/N105550523I?off=h52a6id8','_blank')" title="Abrir">↗</button>
+                      <button onclick="copyLink('https://pay.hotmart.com/N105550523I?off=h52a6id8',this)" title="Copiar">⎘</button>
+                    </div>
                   </div>
                 </div>
-                <div class="lh-row lh-item" data-search="cenadrop download extensao chrome zip">
-                  <div class="lh-dot"></div>
-                  <div class="lh-row-name">Download Extensão</div>
-                  <div class="lh-row-desc">Página de download do CenaDrop Flow (.zip)</div>
-                  <span class="lh-badge">Download</span>
-                  <div class="lh-acts">
-                    <button onclick="window.open('https://cenadrop.com.br/download','_blank')" title="Abrir">↗</button>
-                    <button onclick="copyLink('https://cenadrop.com.br/download',this)" title="Copiar">⎘</button>
+                <div class="lh-card lh-item" data-search="cenadrop download extensao chrome zip">
+                  <div class="lh-card-name">Download Extensão</div>
+                  <div class="lh-card-desc">Download do CenaDrop Flow (.zip)</div>
+                  <div class="lh-card-footer">
+                    <span class="lh-badge">Download</span>
+                    <div class="lh-card-acts">
+                      <button onclick="window.open('https://cenadrop.com.br/download','_blank')" title="Abrir">↗</button>
+                      <button onclick="copyLink('https://cenadrop.com.br/download',this)" title="Copiar">⎘</button>
+                    </div>
                   </div>
                 </div>
-                <div class="lh-row lh-item" data-search="cenadrop download srt legendas">
-                  <div class="lh-dot"></div>
-                  <div class="lh-row-name">Download SRT</div>
-                  <div class="lh-row-desc">Página de download — versão SRT / legendas</div>
-                  <span class="lh-badge">Download</span>
-                  <div class="lh-acts">
-                    <button onclick="window.open('https://cenadrop.com.br/downloadsrt','_blank')" title="Abrir">↗</button>
-                    <button onclick="copyLink('https://cenadrop.com.br/downloadsrt',this)" title="Copiar">⎘</button>
+                <div class="lh-card lh-item" data-search="cenadrop download srt legendas">
+                  <div class="lh-card-name">Download SRT</div>
+                  <div class="lh-card-desc">Versão SRT / legendas</div>
+                  <div class="lh-card-footer">
+                    <span class="lh-badge">Download</span>
+                    <div class="lh-card-acts">
+                      <button onclick="window.open('https://cenadrop.com.br/downloadsrt','_blank')" title="Abrir">↗</button>
+                      <button onclick="copyLink('https://cenadrop.com.br/downloadsrt',this)" title="Copiar">⎘</button>
+                    </div>
                   </div>
                 </div>
-                <div class="lh-row lh-item" data-search="cenadrop manual documentacao tutorial">
-                  <div class="lh-dot"></div>
-                  <div class="lh-row-name">Manual do Usuário</div>
-                  <div class="lh-row-desc">Manual completo de uso do CenaDrop Flow</div>
-                  <span class="lh-badge">Doc</span>
-                  <div class="lh-acts">
-                    <button onclick="window.open('https://cenadrop.com.br/manual','_blank')" title="Abrir">↗</button>
-                    <button onclick="copyLink('https://cenadrop.com.br/manual',this)" title="Copiar">⎘</button>
+                <div class="lh-card lh-item" data-search="cenadrop manual documentacao tutorial">
+                  <div class="lh-card-name">Manual do Usuário</div>
+                  <div class="lh-card-desc">Manual completo de uso do CenaDrop Flow</div>
+                  <div class="lh-card-footer">
+                    <span class="lh-badge">Doc</span>
+                    <div class="lh-card-acts">
+                      <button onclick="window.open('https://cenadrop.com.br/manual','_blank')" title="Abrir">↗</button>
+                      <button onclick="copyLink('https://cenadrop.com.br/manual',this)" title="Copiar">⎘</button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
             <!-- ── ELITE DARK ACADEMY ── -->
-            <div class="lh-section" id="lhs-academy">
-              <div class="lh-section-hd" onclick="toggleLhSection('lhs-academy')">
-                <div class="lh-section-hd-bar" style="background:#f59e0b"></div>
-                <span class="lh-section-hd-title">🏆 Elite Dark Academy</span>
-                <span class="lh-section-hd-count">5</span>
-                <span class="lh-section-hd-chevron">▼</span>
+            <div class="lh-acc" id="lhs-academy">
+              <div class="lh-acc-hd" onclick="openLhSection('lhs-academy')">
+                <div class="lh-acc-bar" style="background:#f59e0b"></div>
+                <span class="lh-acc-title">🏆 Elite Dark Academy</span>
+                <span class="lh-acc-count">5</span>
+                <span class="lh-acc-chevron">▾</span>
               </div>
-              <div class="lh-list" style="--lh-color:#f59e0b">
-                <div class="lh-row lh-item" data-search="academy elite waitlist espera lista inscricao">
-                  <div class="lh-dot"></div>
-                  <div class="lh-row-name">Lista de Espera</div>
-                  <div class="lh-row-desc">Inscrição na lista VIP — raynern.com.br/academyelite</div>
-                  <span class="lh-badge checkout">Waitlist</span>
-                  <div class="lh-acts">
-                    <button onclick="window.open('https://raynern.com.br/academyelite','_blank')" title="Abrir">↗</button>
-                    <button onclick="copyLink('https://raynern.com.br/academyelite',this)" title="Copiar">⎘</button>
+              <div class="lh-cards" style="--lh-color:#f59e0b">
+                <div class="lh-card lh-item" data-search="academy elite waitlist espera lista inscricao">
+                  <div class="lh-card-name">Lista de Espera</div>
+                  <div class="lh-card-desc">Inscrição na lista VIP</div>
+                  <div class="lh-card-footer">
+                    <span class="lh-badge checkout">Waitlist</span>
+                    <div class="lh-card-acts">
+                      <button onclick="window.open('https://raynern.com.br/academyelite','_blank')" title="Abrir">↗</button>
+                      <button onclick="copyLink('https://raynern.com.br/academyelite',this)" title="Copiar">⎘</button>
+                    </div>
                   </div>
                 </div>
-                <div class="lh-row lh-item" data-search="academy elite vendas dark elitedarkacademy pagina">
-                  <div class="lh-dot"></div>
-                  <div class="lh-row-name">Vendas Elite</div>
-                  <div class="lh-row-desc">Página de vendas — URL curta /elitedarkacademy</div>
-                  <span class="lh-badge checkout">Vendas</span>
-                  <div class="lh-acts">
-                    <button onclick="window.open('https://raynern.com.br/elitedarkacademy','_blank')" title="Abrir">↗</button>
-                    <button onclick="copyLink('https://raynern.com.br/elitedarkacademy',this)" title="Copiar">⎘</button>
+                <div class="lh-card lh-item" data-search="academy elite vendas dark elitedarkacademy">
+                  <div class="lh-card-name">Vendas Elite</div>
+                  <div class="lh-card-desc">Página de vendas da Academy</div>
+                  <div class="lh-card-footer">
+                    <span class="lh-badge checkout">Vendas</span>
+                    <div class="lh-card-acts">
+                      <button onclick="window.open('https://raynern.com.br/elitedarkacademy','_blank')" title="Abrir">↗</button>
+                      <button onclick="copyLink('https://raynern.com.br/elitedarkacademy',this)" title="Copiar">⎘</button>
+                    </div>
                   </div>
                 </div>
-                <div class="lh-row lh-item" data-search="academy lista prioritaria selecionados vip confirmacao">
-                  <div class="lh-dot"></div>
-                  <div class="lh-row-name">Lista Prioritária</div>
-                  <div class="lh-row-desc">Confirmação para inscritos selecionados</div>
-                  <span class="lh-badge">VIP</span>
-                  <div class="lh-acts">
-                    <button onclick="window.open('https://raynern.com.br/academyelite/lista-prioritaria','_blank')" title="Abrir">↗</button>
-                    <button onclick="copyLink('https://raynern.com.br/academyelite/lista-prioritaria',this)" title="Copiar">⎘</button>
+                <div class="lh-card lh-item" data-search="academy lista prioritaria selecionados vip">
+                  <div class="lh-card-name">Lista Prioritária</div>
+                  <div class="lh-card-desc">Confirmação para inscritos selecionados</div>
+                  <div class="lh-card-footer">
+                    <span class="lh-badge">VIP</span>
+                    <div class="lh-card-acts">
+                      <button onclick="window.open('https://raynern.com.br/academyelite/lista-prioritaria','_blank')" title="Abrir">↗</button>
+                      <button onclick="copyLink('https://raynern.com.br/academyelite/lista-prioritaria',this)" title="Copiar">⎘</button>
+                    </div>
                   </div>
                 </div>
-                <div class="lh-row lh-item" data-search="elite status badge ranking membro">
-                  <div class="lh-dot"></div>
-                  <div class="lh-row-name">Elite Status</div>
-                  <div class="lh-row-desc">Página de status/badge para membros</div>
-                  <span class="lh-badge">Status</span>
-                  <div class="lh-acts">
-                    <button onclick="window.open('https://raynern.com.br/elite-status','_blank')" title="Abrir">↗</button>
-                    <button onclick="copyLink('https://raynern.com.br/elite-status',this)" title="Copiar">⎘</button>
+                <div class="lh-card lh-item" data-search="elite status badge ranking membro">
+                  <div class="lh-card-name">Elite Status</div>
+                  <div class="lh-card-desc">Página de status para membros</div>
+                  <div class="lh-card-footer">
+                    <span class="lh-badge">Status</span>
+                    <div class="lh-card-acts">
+                      <button onclick="window.open('https://raynern.com.br/elite-status','_blank')" title="Abrir">↗</button>
+                      <button onclick="copyLink('https://raynern.com.br/elite-status',this)" title="Copiar">⎘</button>
+                    </div>
                   </div>
                 </div>
-                <div class="lh-row lh-item" data-search="whatsapp grupo academy elite vip alunos">
-                  <div class="lh-dot"></div>
-                  <div class="lh-row-name">WhatsApp Academy VIP</div>
-                  <div class="lh-row-desc">Grupo WhatsApp dos alunos VIP da Elite Dark Academy</div>
-                  <span class="lh-badge social">Social</span>
-                  <div class="lh-acts">
-                    <button onclick="window.open('https://chat.whatsapp.com/IcnFbVkXwNbG1VTXqxPulm','_blank')" title="Abrir">↗</button>
-                    <button onclick="copyLink('https://chat.whatsapp.com/IcnFbVkXwNbG1VTXqxPulm',this)" title="Copiar">⎘</button>
+                <div class="lh-card lh-item" data-search="whatsapp grupo academy elite vip alunos">
+                  <div class="lh-card-name">WhatsApp VIP</div>
+                  <div class="lh-card-desc">Grupo WhatsApp dos alunos VIP</div>
+                  <div class="lh-card-footer">
+                    <span class="lh-badge social">Social</span>
+                    <div class="lh-card-acts">
+                      <button onclick="window.open('https://chat.whatsapp.com/IcnFbVkXwNbG1VTXqxPulm','_blank')" title="Abrir">↗</button>
+                      <button onclick="copyLink('https://chat.whatsapp.com/IcnFbVkXwNbG1VTXqxPulm',this)" title="Copiar">⎘</button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
             <!-- ── NX SAÚDE ── -->
-            <div class="lh-section" id="lhs-nxsaude">
-              <div class="lh-section-hd" onclick="toggleLhSection('lhs-nxsaude')">
-                <div class="lh-section-hd-bar" style="background:#28c76f"></div>
-                <span class="lh-section-hd-title">💊 NX Saúde / Protocolo 45+</span>
-                <span class="lh-section-hd-count">4</span>
-                <span class="lh-section-hd-chevron">▼</span>
+            <div class="lh-acc" id="lhs-nxsaude">
+              <div class="lh-acc-hd" onclick="openLhSection('lhs-nxsaude')">
+                <div class="lh-acc-bar" style="background:#28c76f"></div>
+                <span class="lh-acc-title">💊 NX Saúde / Protocolo 45+</span>
+                <span class="lh-acc-count">4</span>
+                <span class="lh-acc-chevron">▾</span>
               </div>
-              <div class="lh-list" style="--lh-color:#28c76f">
-                <div class="lh-row lh-item" data-search="nxsaude plataforma protocolo 45 app saude area">
-                  <div class="lh-dot"></div>
-                  <div class="lh-row-name">Plataforma NX Saúde</div>
-                  <div class="lh-row-desc">Área do produto Protocolo 45+</div>
-                  <span class="lh-badge prod">App</span>
-                  <div class="lh-acts">
-                    <button onclick="window.open('https://nxsaude.app.br','_blank')" title="Abrir">↗</button>
-                    <button onclick="copyLink('https://nxsaude.app.br',this)" title="Copiar">⎘</button>
+              <div class="lh-cards" style="--lh-color:#28c76f">
+                <div class="lh-card lh-item" data-search="nxsaude plataforma protocolo 45 app saude area">
+                  <div class="lh-card-name">Plataforma NX Saúde</div>
+                  <div class="lh-card-desc">Área do produto Protocolo 45+</div>
+                  <div class="lh-card-footer">
+                    <span class="lh-badge prod">App</span>
+                    <div class="lh-card-acts">
+                      <button onclick="window.open('https://nxsaude.app.br','_blank')" title="Abrir">↗</button>
+                      <button onclick="copyLink('https://nxsaude.app.br',this)" title="Copiar">⎘</button>
+                    </div>
                   </div>
                 </div>
-                <div class="lh-row lh-item" data-search="nxsaude vendas protocolo 45 jejum pagina venda">
-                  <div class="lh-dot"></div>
-                  <div class="lh-row-name">Página de Vendas</div>
-                  <div class="lh-row-desc">nxsaude.app.br/vendas?v=01 — tracking ativo</div>
-                  <span class="lh-badge checkout">Vendas</span>
-                  <div class="lh-acts">
-                    <button onclick="window.open('https://nxsaude.app.br/vendas?v=01','_blank')" title="Abrir">↗</button>
-                    <button onclick="copyLink('https://nxsaude.app.br/vendas?v=01',this)" title="Copiar">⎘</button>
+                <div class="lh-card lh-item" data-search="nxsaude vendas protocolo 45 jejum pagina">
+                  <div class="lh-card-name">Página de Vendas</div>
+                  <div class="lh-card-desc">nxsaude.app.br/vendas — tracking ativo</div>
+                  <div class="lh-card-footer">
+                    <span class="lh-badge checkout">Vendas</span>
+                    <div class="lh-card-acts">
+                      <button onclick="window.open('https://nxsaude.app.br/vendas?v=01','_blank')" title="Abrir">↗</button>
+                      <button onclick="copyLink('https://nxsaude.app.br/vendas?v=01',this)" title="Copiar">⎘</button>
+                    </div>
                   </div>
                 </div>
-                <div class="lh-row lh-item" data-search="hotmart checkout pagamento protocolo 45 jejum nxsaude compra">
-                  <div class="lh-dot"></div>
-                  <div class="lh-row-name">Checkout Hotmart</div>
-                  <div class="lh-row-desc">Link de compra — Guia Prático / Protocolo 45+</div>
-                  <span class="lh-badge checkout">Pagamento</span>
-                  <div class="lh-acts">
-                    <button onclick="window.open('https://pay.hotmart.com/G105708344B?bid=1778037345580','_blank')" title="Abrir">↗</button>
-                    <button onclick="copyLink('https://pay.hotmart.com/G105708344B?bid=1778037345580',this)" title="Copiar">⎘</button>
+                <div class="lh-card lh-item" data-search="hotmart checkout pagamento protocolo 45 nxsaude">
+                  <div class="lh-card-name">Checkout Hotmart</div>
+                  <div class="lh-card-desc">Link de compra — Protocolo 45+</div>
+                  <div class="lh-card-footer">
+                    <span class="lh-badge checkout">Pagamento</span>
+                    <div class="lh-card-acts">
+                      <button onclick="window.open('https://pay.hotmart.com/G105708344B?bid=1778037345580','_blank')" title="Abrir">↗</button>
+                      <button onclick="copyLink('https://pay.hotmart.com/G105708344B?bid=1778037345580',this)" title="Copiar">⎘</button>
+                    </div>
                   </div>
                 </div>
-                <div class="lh-row lh-item" data-search="whatsapp grupo nxsaude comunidade saude">
-                  <div class="lh-dot"></div>
-                  <div class="lh-row-name">WhatsApp NX Saúde</div>
-                  <div class="lh-row-desc">Grupo WhatsApp da comunidade Protocolo 45+</div>
-                  <span class="lh-badge social">Social</span>
-                  <div class="lh-acts">
-                    <button onclick="window.open('https://chat.whatsapp.com/CtNvcyiWxT6FGS6iv0fmi0','_blank')" title="Abrir">↗</button>
-                    <button onclick="copyLink('https://chat.whatsapp.com/CtNvcyiWxT6FGS6iv0fmi0',this)" title="Copiar">⎘</button>
+                <div class="lh-card lh-item" data-search="whatsapp grupo nxsaude comunidade saude">
+                  <div class="lh-card-name">WhatsApp NX Saúde</div>
+                  <div class="lh-card-desc">Grupo da comunidade Protocolo 45+</div>
+                  <div class="lh-card-footer">
+                    <span class="lh-badge social">Social</span>
+                    <div class="lh-card-acts">
+                      <button onclick="window.open('https://chat.whatsapp.com/CtNvcyiWxT6FGS6iv0fmi0','_blank')" title="Abrir">↗</button>
+                      <button onclick="copyLink('https://chat.whatsapp.com/CtNvcyiWxT6FGS6iv0fmi0',this)" title="Copiar">⎘</button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
             <!-- ── NARRATIVA IA ── -->
-            <div class="lh-section" id="lhs-narrativa">
-              <div class="lh-section-hd" onclick="toggleLhSection('lhs-narrativa')">
-                <div class="lh-section-hd-bar" style="background:#3b82f6"></div>
-                <span class="lh-section-hd-title">🤖 Narrativa IA</span>
-                <span class="lh-section-hd-count">2</span>
-                <span class="lh-section-hd-chevron">▼</span>
+            <div class="lh-acc" id="lhs-narrativa">
+              <div class="lh-acc-hd" onclick="openLhSection('lhs-narrativa')">
+                <div class="lh-acc-bar" style="background:#3b82f6"></div>
+                <span class="lh-acc-title">🤖 Narrativa IA</span>
+                <span class="lh-acc-count">2</span>
+                <span class="lh-acc-chevron">▾</span>
               </div>
-              <div class="lh-list" style="--lh-color:#3b82f6">
-                <div class="lh-row lh-item" data-search="narrativa ia studio app roteiro cenadrop supabase">
-                  <div class="lh-dot"></div>
-                  <div class="lh-row-name">Studio Narrativa IA</div>
-                  <div class="lh-row-desc">App de roteiro com IA — narrativaia.com.br</div>
-                  <span class="lh-badge prod">App</span>
-                  <div class="lh-acts">
-                    <button onclick="window.open('https://narrativaia.com.br','_blank')" title="Abrir">↗</button>
-                    <button onclick="copyLink('https://narrativaia.com.br',this)" title="Copiar">⎘</button>
+              <div class="lh-cards" style="--lh-color:#3b82f6">
+                <div class="lh-card lh-item" data-search="narrativa ia studio app roteiro supabase">
+                  <div class="lh-card-name">Studio Narrativa IA</div>
+                  <div class="lh-card-desc">App de geração de roteiros com IA</div>
+                  <div class="lh-card-footer">
+                    <span class="lh-badge prod">App</span>
+                    <div class="lh-card-acts">
+                      <button onclick="window.open('https://narrativaia.com.br','_blank')" title="Abrir">↗</button>
+                      <button onclick="copyLink('https://narrativaia.com.br',this)" title="Copiar">⎘</button>
+                    </div>
                   </div>
                 </div>
-
-                <div class="lh-row lh-item" data-search="narrativa ia embreve em breve lancamento aguarde">
-                  <div class="lh-dot"></div>
-                  <div class="lh-row-name">Em Breve</div>
-                  <div class="lh-row-desc">Página de espera para funcionalidades da Narrativa IA</div>
-                  <span class="lh-badge">Placeholder</span>
-                  <div class="lh-acts">
-                    <button onclick="window.open('https://narrativaia.com.br/embreve','_blank')" title="Abrir">↗</button>
-                    <button onclick="copyLink('https://narrativaia.com.br/embreve',this)" title="Copiar">⎘</button>
+                <div class="lh-card lh-item" data-search="narrativa ia embreve em breve lancamento">
+                  <div class="lh-card-name">Em Breve</div>
+                  <div class="lh-card-desc">Página de espera da Narrativa IA</div>
+                  <div class="lh-card-footer">
+                    <span class="lh-badge">Placeholder</span>
+                    <div class="lh-card-acts">
+                      <button onclick="window.open('https://narrativaia.com.br/embreve','_blank')" title="Abrir">↗</button>
+                      <button onclick="copyLink('https://narrativaia.com.br/embreve',this)" title="Copiar">⎘</button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
             <!-- ── SISTEMA ── -->
-            <div class="lh-section" id="lhs-sistema">
-              <div class="lh-section-hd" onclick="toggleLhSection('lhs-sistema')">
-                <div class="lh-section-hd-bar" style="background:#a5a3ae"></div>
-                <span class="lh-section-hd-title">⚙️ Sistema & Infraestrutura</span>
-                <span class="lh-section-hd-count">3</span>
-                <span class="lh-section-hd-chevron">▼</span>
+            <div class="lh-acc" id="lhs-sistema">
+              <div class="lh-acc-hd" onclick="openLhSection('lhs-sistema')">
+                <div class="lh-acc-bar" style="background:#a5a3ae"></div>
+                <span class="lh-acc-title">⚙️ Sistema & Infraestrutura</span>
+                <span class="lh-acc-count">3</span>
+                <span class="lh-acc-chevron">▾</span>
               </div>
-              <div class="lh-list" style="--lh-color:#a5a3ae">
-                <div class="lh-row lh-item" data-search="admin painel administrativo crm dashboard">
-                  <div class="lh-dot"></div>
-                  <div class="lh-row-name">Painel Admin</div>
-                  <div class="lh-row-desc">Este painel — CRM, licenças, monitor</div>
-                  <span class="lh-badge">Sistema</span>
-                  <div class="lh-acts">
-                    <button onclick="window.open('https://raynern.com.br/admin','_blank')" title="Abrir">↗</button>
-                    <button onclick="copyLink('https://raynern.com.br/admin',this)" title="Copiar">⎘</button>
+              <div class="lh-cards" style="--lh-color:#a5a3ae">
+                <div class="lh-card lh-item" data-search="admin painel administrativo crm dashboard">
+                  <div class="lh-card-name">Painel Admin</div>
+                  <div class="lh-card-desc">CRM, licenças, monitor de uso</div>
+                  <div class="lh-card-footer">
+                    <span class="lh-badge">Sistema</span>
+                    <div class="lh-card-acts">
+                      <button onclick="window.open('https://raynern.com.br/admin','_blank')" title="Abrir">↗</button>
+                      <button onclick="copyLink('https://raynern.com.br/admin',this)" title="Copiar">⎘</button>
+                    </div>
                   </div>
                 </div>
-
-                <div class="lh-row lh-item" data-search="iris dashboard youtube analytics local dev 3002">
-                  <div class="lh-dot"></div>
-                  <div class="lh-row-name">Íris Dashboard</div>
-                  <div class="lh-row-desc">YouTube analytics — roda local na porta 3002</div>
-                  <span class="lh-badge">Dev Local</span>
-                  <div class="lh-acts">
-                    <button onclick="window.open('http://localhost:3002','_blank')" title="Abrir">↗</button>
-                    <button onclick="copyLink('http://localhost:3002',this)" title="Copiar">⎘</button>
+                <div class="lh-card lh-item" data-search="iris dashboard youtube analytics local dev 3002">
+                  <div class="lh-card-name">Íris Dashboard</div>
+                  <div class="lh-card-desc">YouTube analytics — porta 3002 local</div>
+                  <div class="lh-card-footer">
+                    <span class="lh-badge">Dev Local</span>
+                    <div class="lh-card-acts">
+                      <button onclick="window.open('http://localhost:3002','_blank')" title="Abrir">↗</button>
+                      <button onclick="copyLink('http://localhost:3002',this)" title="Copiar">⎘</button>
+                    </div>
                   </div>
                 </div>
-                <div class="lh-row lh-item" data-search="meta prompts prompts biblioteca aula raynern">
-                  <div class="lh-dot"></div>
-                  <div class="lh-row-name">Meta-Prompts</div>
-                  <div class="lh-row-desc">Biblioteca pública de prompts das aulas — compartilhável com alunos</div>
-                  <span class="lh-badge prod">Biblioteca</span>
-                  <div class="lh-acts">
-                    <button onclick="window.open('https://raynern.com.br/meta-prompts','_blank')" title="Abrir">↗</button>
-                    <button onclick="copyLink('https://raynern.com.br/meta-prompts',this)" title="Copiar">⎘</button>
+                <div class="lh-card lh-item" data-search="meta prompts biblioteca aula raynern prompts">
+                  <div class="lh-card-name">Meta-Prompts</div>
+                  <div class="lh-card-desc">Biblioteca pública de prompts das aulas</div>
+                  <div class="lh-card-footer">
+                    <span class="lh-badge prod">Biblioteca</span>
+                    <div class="lh-card-acts">
+                      <button onclick="window.open('https://raynern.com.br/meta-prompts','_blank')" title="Abrir">↗</button>
+                      <button onclick="copyLink('https://raynern.com.br/meta-prompts',this)" title="Copiar">⎘</button>
+                    </div>
                   </div>
                 </div>
-
               </div>
             </div>
 
             <!-- ── FERRAMENTAS EXTERNAS ── -->
-            <div class="lh-section" id="lhs-ferramentas">
-              <div class="lh-section-hd" onclick="toggleLhSection('lhs-ferramentas')">
-                <div class="lh-section-hd-bar" style="background:#ea5455"></div>
-                <span class="lh-section-hd-title">🛠️ Ferramentas Externas</span>
-                <span class="lh-section-hd-count">6</span>
-                <span class="lh-section-hd-chevron">▼</span>
+            <div class="lh-acc" id="lhs-ferramentas">
+              <div class="lh-acc-hd" onclick="openLhSection('lhs-ferramentas')">
+                <div class="lh-acc-bar" style="background:#ea5455"></div>
+                <span class="lh-acc-title">🛠️ Ferramentas Externas</span>
+                <span class="lh-acc-count">6</span>
+                <span class="lh-acc-chevron">▾</span>
               </div>
-              <div class="lh-list" style="--lh-color:#ea5455">
-                <div class="lh-row lh-item" data-search="supabase banco dados database dashboard licencas">
-                  <div class="lh-dot"></div>
-                  <div class="lh-row-name">Supabase</div>
-                  <div class="lh-row-desc">Banco de dados — licenças, usuários, waitlist</div>
-                  <span class="lh-badge external">Infra</span>
-                  <div class="lh-acts">
-                    <button onclick="window.open('https://app.supabase.com','_blank')" title="Abrir">↗</button>
-                    <button onclick="copyLink('https://app.supabase.com',this)" title="Copiar">⎘</button>
+              <div class="lh-cards" style="--lh-color:#ea5455">
+                <div class="lh-card lh-item" data-search="supabase banco dados database licencas">
+                  <div class="lh-card-name">Supabase</div>
+                  <div class="lh-card-desc">Banco de dados — licenças, usuários, waitlist</div>
+                  <div class="lh-card-footer">
+                    <span class="lh-badge external">Infra</span>
+                    <div class="lh-card-acts">
+                      <button onclick="window.open('https://app.supabase.com','_blank')" title="Abrir">↗</button>
+                      <button onclick="copyLink('https://app.supabase.com',this)" title="Copiar">⎘</button>
+                    </div>
                   </div>
                 </div>
-                <div class="lh-row lh-item" data-search="vercel deploy hosting projetos dashboard rayner">
-                  <div class="lh-dot"></div>
-                  <div class="lh-row-name">Vercel</div>
-                  <div class="lh-row-desc">Hospedagem — 4 projetos ativos</div>
-                  <span class="lh-badge external">Deploy</span>
-                  <div class="lh-acts">
-                    <button onclick="window.open('https://vercel.com/dashboard','_blank')" title="Abrir">↗</button>
-                    <button onclick="copyLink('https://vercel.com/dashboard',this)" title="Copiar">⎘</button>
+                <div class="lh-card lh-item" data-search="vercel deploy hosting projetos dashboard">
+                  <div class="lh-card-name">Vercel</div>
+                  <div class="lh-card-desc">Hospedagem — 4 projetos ativos</div>
+                  <div class="lh-card-footer">
+                    <span class="lh-badge external">Deploy</span>
+                    <div class="lh-card-acts">
+                      <button onclick="window.open('https://vercel.com/dashboard','_blank')" title="Abrir">↗</button>
+                      <button onclick="copyLink('https://vercel.com/dashboard',this)" title="Copiar">⎘</button>
+                    </div>
                   </div>
                 </div>
-                <div class="lh-row lh-item" data-search="resend email marketing disparos transacional">
-                  <div class="lh-dot"></div>
-                  <div class="lh-row-name">Resend</div>
-                  <div class="lh-row-desc">Envio de e-mails — transacionais e disparos em massa</div>
-                  <span class="lh-badge external">Email</span>
-                  <div class="lh-acts">
-                    <button onclick="window.open('https://resend.com/overview','_blank')" title="Abrir">↗</button>
-                    <button onclick="copyLink('https://resend.com/overview',this)" title="Copiar">⎘</button>
+                <div class="lh-card lh-item" data-search="resend email marketing disparos">
+                  <div class="lh-card-name">Resend</div>
+                  <div class="lh-card-desc">E-mails transacionais e disparos em massa</div>
+                  <div class="lh-card-footer">
+                    <span class="lh-badge external">Email</span>
+                    <div class="lh-card-acts">
+                      <button onclick="window.open('https://resend.com/overview','_blank')" title="Abrir">↗</button>
+                      <button onclick="copyLink('https://resend.com/overview',this)" title="Copiar">⎘</button>
+                    </div>
                   </div>
                 </div>
-                <div class="lh-row lh-item" data-search="hotmart plataforma vendas cursos produtos alunos">
-                  <div class="lh-dot"></div>
-                  <div class="lh-row-name">Hotmart</div>
-                  <div class="lh-row-desc">Plataforma de vendas e gestão de alunos</div>
-                  <span class="lh-badge external">Vendas</span>
-                  <div class="lh-acts">
-                    <button onclick="window.open('https://app.hotmart.com','_blank')" title="Abrir">↗</button>
-                    <button onclick="copyLink('https://app.hotmart.com',this)" title="Copiar">⎘</button>
+                <div class="lh-card lh-item" data-search="hotmart plataforma vendas cursos alunos">
+                  <div class="lh-card-name">Hotmart</div>
+                  <div class="lh-card-desc">Vendas e gestão de alunos</div>
+                  <div class="lh-card-footer">
+                    <span class="lh-badge external">Vendas</span>
+                    <div class="lh-card-acts">
+                      <button onclick="window.open('https://app.hotmart.com','_blank')" title="Abrir">↗</button>
+                      <button onclick="copyLink('https://app.hotmart.com',this)" title="Copiar">⎘</button>
+                    </div>
                   </div>
                 </div>
-                <div class="lh-row lh-item" data-search="google cloud console youtube api oauth credenciais iris">
-                  <div class="lh-dot"></div>
-                  <div class="lh-row-name">Google Cloud</div>
-                  <div class="lh-row-desc">YouTube Data API v3, OAuth — Íris Dashboard</div>
-                  <span class="lh-badge external">APIs</span>
-                  <div class="lh-acts">
-                    <button onclick="window.open('https://console.cloud.google.com','_blank')" title="Abrir">↗</button>
-                    <button onclick="copyLink('https://console.cloud.google.com',this)" title="Copiar">⎘</button>
+                <div class="lh-card lh-item" data-search="google cloud console youtube api oauth iris">
+                  <div class="lh-card-name">Google Cloud</div>
+                  <div class="lh-card-desc">YouTube API v3 e OAuth — Íris Dashboard</div>
+                  <div class="lh-card-footer">
+                    <span class="lh-badge external">APIs</span>
+                    <div class="lh-card-acts">
+                      <button onclick="window.open('https://console.cloud.google.com','_blank')" title="Abrir">↗</button>
+                      <button onclick="copyLink('https://console.cloud.google.com',this)" title="Copiar">⎘</button>
+                    </div>
                   </div>
                 </div>
-                <div class="lh-row lh-item" data-search="github repositorio codigo source billing">
-                  <div class="lh-dot"></div>
-                  <div class="lh-row-name">GitHub</div>
-                  <div class="lh-row-desc">Repositórios de código-fonte dos projetos</div>
-                  <span class="lh-badge external">Código</span>
-                  <div class="lh-acts">
-                    <button onclick="window.open('https://github.com','_blank')" title="Abrir">↗</button>
-                    <button onclick="copyLink('https://github.com',this)" title="Copiar">⎘</button>
+                <div class="lh-card lh-item" data-search="github repositorio codigo source">
+                  <div class="lh-card-name">GitHub</div>
+                  <div class="lh-card-desc">Repositórios de código-fonte</div>
+                  <div class="lh-card-footer">
+                    <span class="lh-badge external">Código</span>
+                    <div class="lh-card-acts">
+                      <button onclick="window.open('https://github.com','_blank')" title="Abrir">↗</button>
+                      <button onclick="copyLink('https://github.com',this)" title="Copiar">⎘</button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
             <!-- ── COMUNIDADE ── -->
-            <div class="lh-section" id="lhs-social">
-              <div class="lh-section-hd" onclick="toggleLhSection('lhs-social')">
-                <div class="lh-section-hd-bar" style="background:#25d366"></div>
-                <span class="lh-section-hd-title">💬 Comunidade & Social</span>
-                <span class="lh-section-hd-count">0</span>
-                <span class="lh-section-hd-chevron">▼</span>
+            <div class="lh-acc" id="lhs-social">
+              <div class="lh-acc-hd" onclick="openLhSection('lhs-social')">
+                <div class="lh-acc-bar" style="background:#25d366"></div>
+                <span class="lh-acc-title">💬 Comunidade & Social</span>
+                <span class="lh-acc-count">0</span>
+                <span class="lh-acc-chevron">▾</span>
               </div>
-              <div class="lh-list" style="--lh-color:#25d366">
-                <div class="lh-row" style="justify-content:center;padding:14px;color:var(--muted);font-size:12px;font-style:italic">
-                  Links de grupos em breve...
-                </div>
+              <div class="lh-cards" style="--lh-color:#25d366">
+                <div class="lh-empty">Links de grupos em breve...</div>
               </div>
             </div>
 
@@ -2471,22 +2585,102 @@ function exportLicensesCSV() {
 }
 
 // ── BLAST EMAIL ───────────────────────────────
+// ── BLAST EMAIL ──────────────────────────────────────────────────────────────
+let blastSelectedTemplate = null;
+let blastRecipients = 'all';
+
+async function loadBlastTemplates() {
+  const grid = document.getElementById('blast-template-grid');
+  if (!grid) return;
+  try {
+    const d = await apiCall('email-templates');
+    if (!d.templates || !d.templates.length) {
+      grid.innerHTML = '<div style="color:var(--muted);font-size:13px">Nenhum template encontrado.</div>';
+      return;
+    }
+    grid.innerHTML = d.templates.map(t => `
+      <div class="email-card" id="tpl-${t.id}" onclick="selectBlastTemplate('${t.id}')">
+        <div class="email-card-check">✓</div>
+        <span class="email-card-tag ${t.tag}">${t.tag}</span>
+        <h4>${t.label}</h4>
+        <p>${t.description}</p>
+        <div class="email-card-subject">${t.subject}</div>
+        <div class="email-card-actions">
+          <button class="btn-preview" onclick="event.stopPropagation(); window.open('/emails/${t.id}.html','_blank')">👁 Preview</button>
+        </div>
+      </div>
+    `).join('');
+    // auto-select first
+    selectBlastTemplate(d.templates[0].id);
+  } catch(e) {
+    grid.innerHTML = '<div style="color:var(--red);font-size:13px">Erro ao carregar templates.</div>';
+  }
+}
+
+function selectBlastTemplate(id) {
+  blastSelectedTemplate = id;
+  document.querySelectorAll('.email-card').forEach(c => c.classList.remove('selected'));
+  const card = document.getElementById('tpl-' + id);
+  if (card) card.classList.add('selected');
+}
+
+async function setBlastFilter(filter) {
+  blastRecipients = filter;
+  ['all','active','inactive'].forEach(f => {
+    const btn = document.getElementById('filter-' + f);
+    if (btn) btn.classList.toggle('active', f === filter);
+  });
+  // update button text
+  const labels = { all: 'Todos', active: 'Ativos', inactive: 'Inativos' };
+  document.getElementById('blast-btn-text').textContent = `Disparar para ${labels[filter]}`;
+  // fetch count
+  const countEl = document.getElementById('blast-recipient-count');
+  if (countEl) countEl.textContent = '...';
+  try {
+    const d = await apiCall('blast-count', { recipients: filter });
+    if (countEl) countEl.textContent = `${d.count || 0} destinatários`;
+  } catch(e) {
+    if (countEl) countEl.textContent = '';
+  }
+}
+
+async function doBlastTest() {
+  const emailInput = document.getElementById('blast-test-email');
+  const btn = document.getElementById('blast-test-btn');
+  const testEmail = emailInput?.value?.trim();
+  if (!testEmail || !testEmail.includes('@')) { toast('Insira um email válido para teste', 'error'); return; }
+  if (!blastSelectedTemplate) { toast('Selecione um template', 'error'); return; }
+  btn.disabled = true;
+  btn.textContent = '⏳ Enviando...';
+  try {
+    const d = await apiCall('blast-test', { template: blastSelectedTemplate, testEmail });
+    if (d.ok) toast(`✅ Teste enviado para ${testEmail}`, 'success');
+    else toast('Erro: ' + (d.error || 'Falha'), 'error');
+  } catch(e) {
+    toast('Erro de conexão', 'error');
+  }
+  btn.disabled = false;
+  btn.textContent = 'Enviar teste';
+}
+
 async function doBlastemail() {
+  if (!blastSelectedTemplate) { toast('Selecione um template primeiro', 'error'); return; }
+  const labels = { all: 'todos os usuários', active: 'usuários ativos', inactive: 'usuários inativos' };
+  if (!confirm(`Disparar "${blastSelectedTemplate}" para ${labels[blastRecipients]}?`)) return;
   const btn = document.getElementById('blast-btn');
   const res = document.getElementById('blast-result');
-  if (!confirm('Disparar email para todos os usuários com email cadastrado?')) return;
   btn.disabled = true;
   document.getElementById('blast-btn-icon').textContent = '⏳';
   document.getElementById('blast-btn-text').textContent = 'Disparando...';
   res.className = 'blast-result';
   try {
-    const d = await apiCall('blast-cenadrop');
+    const d = await apiCall('blast-cenadrop', { template: blastSelectedTemplate, recipients: blastRecipients });
     const ts = new Date().toISOString();
     localStorage.setItem('last_blast', ts);
     document.getElementById('blast-last-sent').textContent = new Date(ts).toLocaleString('pt-BR');
     if (d.ok || d.sent !== undefined) {
       res.className = 'blast-result show ok';
-      res.textContent = `Enviados: ${d.sent||0} | Falhas: ${d.failed||0} | Pulados: ${d.skipped||0}`;
+      res.textContent = `Enviados: ${d.sent||0} | Falhas: ${d.failed||0} | Pulados: ${d.skipped||0} | Total: ${d.total||0}`;
       toast('📣 Blast enviado!', 'success');
     } else {
       res.className = 'blast-result show error';
@@ -2498,7 +2692,8 @@ async function doBlastemail() {
   }
   btn.disabled = false;
   document.getElementById('blast-btn-icon').textContent = '📣';
-  document.getElementById('blast-btn-text').textContent = 'Disparar Email v7.6 para Todos';
+  const filterLabels = { all: 'Todos', active: 'Ativos', inactive: 'Inativos' };
+  document.getElementById('blast-btn-text').textContent = `Disparar para ${filterLabels[blastRecipients]}`;
 }
 
 // ── OVERVIEW ─────────────────────────────────
@@ -3235,8 +3430,13 @@ function exportAcademyCSV() {
   el.textContent = total + ' links catalogados no ecossistema';
 })();
 
-function toggleLhSection(id) {
-  document.getElementById(id)?.classList.toggle('collapsed');
+function openLhSection(id) {
+  const all = document.querySelectorAll('#links-container .lh-acc');
+  const target = document.getElementById(id);
+  if (!target) return;
+  const isOpen = target.classList.contains('open');
+  all.forEach(el => el.classList.remove('open'));
+  if (!isOpen) target.classList.add('open');
 }
 
 function filterLinks(q) {
@@ -3245,10 +3445,11 @@ function filterLinks(q) {
     const hay = (el.dataset.search || '') + ' ' + el.textContent.toLowerCase();
     el.dataset.hidden = (!term || hay.includes(term)) ? 'false' : 'true';
   });
-  document.querySelectorAll('#links-container .lh-section').forEach(sec => {
+  document.querySelectorAll('#links-container .lh-acc').forEach(sec => {
     const visible = [...sec.querySelectorAll('.lh-item')].some(el => el.dataset.hidden !== 'true');
     sec.dataset.hidden = visible ? 'false' : 'true';
-    if (term) sec.classList.remove('collapsed');
+    if (term && visible) sec.classList.add('open');
+    if (!term) sec.classList.remove('open');
   });
 }
 
