@@ -1043,9 +1043,15 @@
   }
 
   function updateBadges() {
+    let totalOk = 0, totalWait = 0, totalOpen = 0;
     document.querySelectorAll('.secao').forEach(sec => {
       const items = sec.querySelectorAll('.item');
       const done  = sec.querySelectorAll('.icon-ok').length;
+      const wait  = sec.querySelectorAll('.icon-wait').length;
+      const open  = sec.querySelectorAll('.icon-open').length;
+      totalOk   += done;
+      totalWait += wait;
+      totalOpen += open;
       const badge = sec.querySelector('.secao-badge');
       if (!badge || !items.length) return;
       badge.textContent = `${done}/${items.length}`;
@@ -1055,6 +1061,12 @@
         badge.style.cssText = 'background:rgba(201,162,39,0.12);color:#C9A227;';
       }
     });
+    const okEl   = document.getElementById('count-ok');
+    const waitEl = document.getElementById('count-wait');
+    const openEl = document.getElementById('count-open');
+    if (okEl)   okEl.textContent   = totalOk;
+    if (waitEl) waitEl.textContent = totalWait;
+    if (openEl) openEl.textContent = totalOpen;
   }
 
   tick();
