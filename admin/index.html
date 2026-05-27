@@ -810,10 +810,12 @@ thead th.sortable:hover { color: var(--accent); }
 .email-card-preview {
   border-top: 1px solid var(--border);
   height: 420px; overflow: hidden; background: #fff;
+  position: relative;
 }
 .email-card-preview iframe {
-  width: 100%; height: 100%; border: none;
+  width: 600px; border: none;
   transform-origin: top left;
+  position: absolute; top: 0; left: 0;
 }
 
 /* ── RECIPIENT FILTER ──────────────────── */
@@ -2617,9 +2619,21 @@ async function loadBlastTemplates() {
     `).join('');
     // auto-select first
     selectBlastTemplate(d.templates[0].id);
+    // scale previews to fit card width
+    requestAnimationFrame(scaleEmailPreviews);
   } catch(e) {
     grid.innerHTML = '<div style="color:var(--red);font-size:13px">Erro ao carregar templates.</div>';
   }
+}
+
+function scaleEmailPreviews() {
+  document.querySelectorAll('.email-card-preview').forEach(container => {
+    const iframe = container.querySelector('iframe');
+    if (!iframe) return;
+    const scale = container.offsetWidth / 600;
+    iframe.style.transform = `scale(${scale})`;
+    iframe.style.height = Math.ceil(420 / scale) + 'px';
+  });
 }
 
 function selectBlastTemplate(id) {
