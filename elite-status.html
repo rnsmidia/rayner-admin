@@ -407,7 +407,7 @@
       <p>Painel interno de lançamento</p>
     </div>
     <div class="badge-data">
-      Atualizado em<br>27 mai. 2026
+      Atualizado em<br>27 mai. 2026 · 18h
     </div>
   </header>
 
@@ -468,7 +468,7 @@
   <!-- Resumo -->
   <div class="resumo">
     <div class="resumo-card">
-      <div class="num verde">2</div>
+      <div class="num verde">4</div>
       <div class="label">Concluído</div>
     </div>
     <div class="resumo-card">
@@ -476,7 +476,7 @@
       <div class="label">Aguardando</div>
     </div>
     <div class="resumo-card">
-      <div class="num vermelho">9</div>
+      <div class="num vermelho">10</div>
       <div class="label">Pendente</div>
     </div>
   </div>
@@ -504,12 +504,21 @@
     </div>
 
     <div class="item">
-      <div class="status-icon icon-alert">!</div>
+      <div class="status-icon icon-ok">✓</div>
       <div class="item-body">
-        <div class="item-titulo">Revisar páginas — consistência de promessas</div>
-        <div class="item-detalhe">Ajustar menção ao Gemini Ultra (requisito do aluno, não entrega do Elite) · Confirmar CenaDrop + Narrativa como inclusas</div>
+        <div class="item-titulo">Revisar lista de espera — promessas corrigidas</div>
+        <div class="item-detalhe">Mentoria removida · CenaDrop + Narrativa nomeados · Gemini Ultra como requisito · análises em grupo · disclaimer nos depoimentos</div>
       </div>
-      <span class="tag tag-alert">Urgente</span>
+      <span class="tag tag-ok">Feito</span>
+    </div>
+
+    <div class="item">
+      <div class="status-icon icon-open"></div>
+      <div class="item-body">
+        <div class="item-titulo">Revisar página de vendas — aplicar mesmas correções</div>
+        <div class="item-detalhe">Harmonizar linguagem com lista de espera · "acesso em até 24h" · nomear ferramentas · disclaimer depoimentos</div>
+      </div>
+      <span class="tag tag-open">Pendente</span>
     </div>
 
     <div class="item">
@@ -692,8 +701,8 @@
   // Configuração
   const LAUNCH     = new Date('2026-05-29T20:00:00-03:00'); // 29/05 às 20h BRT
   const START      = new Date('2026-05-20T00:00:00-03:00'); // início do projeto
-  const TOTAL      = 14; // total de tarefas
-  const CONCLUIDAS = 2;  // tarefas concluídas — atualizar manualmente
+  const TOTAL      = 17; // total de tarefas
+  const CONCLUIDAS = 4;  // tarefas concluídas — atualizar manualmente
 
   function pad(n) { return String(n).padStart(2, '0'); }
 
