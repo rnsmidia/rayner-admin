@@ -656,7 +656,7 @@ module.exports = async function handler(req, res) {
       const htmlPath = path.join(process.cwd(), 'emails', `${templateId}.html`);
       const HTML = fs.readFileSync(htmlPath, 'utf8');
       const resend = new Resend(process.env.RESEND_API_KEY);
-      await resend.emails.send({ from: tpl.from, to: testEmail, subject: `[TESTE] ${tpl.subject}`, html: HTML });
+      await resend.emails.send({ from: tpl.from, to: testEmail, subject: tpl.subject, html: HTML });
       return res.status(200).json({ ok: true, sent: 1 });
     } catch (e) {
       return res.status(500).json({ error: e.message });
