@@ -36,6 +36,8 @@
     { "source": "/elite-status/", "destination": "/elite-status.html" },
     { "source": "/api/narrativa-access",       "destination": "/api/narrativa-access.js" },
     { "source": "/academyelite/termos",         "destination": "/academyelite/termos.html" },
-    { "source": "/academyelite/termos/",        "destination": "/academyelite/termos.html" }
+    { "source": "/academyelite/termos/",        "destination": "/academyelite/termos.html" },
+    { "source": "/narrativa-ia/checkout-banner",  "destination": "/narrativa-ia/checkout-banner.html" },
+    { "source": "/narrativa-ia/checkout-banner/", "destination": "/narrativa-ia/checkout-banner.html" }
   ]
 }
