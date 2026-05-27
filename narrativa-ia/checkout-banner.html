@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Narrativa IA — Banner Checkout Hotmart (1200×300)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #111;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    font-family: Arial, sans-serif;
+    gap: 16px;
+  }
+  .info {
+    color: rgba(255,255,255,0.4);
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* ── BANNER ── exatamente 1200×300 */
+  .banner {
+    width: 1200px;
+    height: 300px;
+    position: relative;
+    overflow: hidden;
+    background: #06060f;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 72px;
+  }
+
+  /* Glow de fundo */
+  .banner::before {
+    content: '';
+    position: absolute;
+    top: -80px; left: -80px;
+    width: 500px; height: 500px;
+    background: radial-gradient(ellipse, rgba(98,52,226,.45) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .banner::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; right: 120px;
+    width: 380px; height: 380px;
+    background: radial-gradient(ellipse, rgba(65,105,255,.25) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  /* Linha decorativa topo */
+  .top-line {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent 0%, #6234e2 30%, #9b7fff 50%, #4169ff 70%, transparent 100%);
+  }
+
+  /* Lado esquerdo */
+  .left {
+    position: relative;
+    z-index: 1;
+  }
+  .logo {
+    font-size: 13px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .logo span { color: #9b7fff; }
+
+  .headline {
+    font-size: 38px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.1;
+    letter-spacing: -0.5px;
+    margin-bottom: 14px;
+  }
+  .headline span {
+    background: linear-gradient(135deg, #9b7fff, #4169ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .sub {
+    font-size: 15px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 0.2px;
+  }
+
+  /* Lado direito */
+  .right {
+    position: relative;
+    z-index: 1;
+    text-align: right;
+  }
+
+  .preco-de {
+    font-size: 13px;
+    color: rgba(255,255,255,0.3);
+    text-decoration: line-through;
+    margin-bottom: 2px;
+  }
+  .preco-por {
+    font-size: 48px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1;
+    letter-spacing: -1px;
+  }
+  .preco-por sup {
+    font-size: 22px;
+    font-weight: 700;
+    vertical-align: super;
+    letter-spacing: 0;
+  }
+  .preco-parcel {
+    font-size: 13px;
+    color: rgba(155,127,255,.8);
+    margin-top: 4px;
+  }
+  .preco-tipo {
+    font-size: 11px;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 6px;
+  }
+
+  .garantia {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(76,175,80,.1);
+    border: 1px solid rgba(76,175,80,.25);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 11px;
+    color: #4CAF50;
+    letter-spacing: 0.5px;
+    margin-top: 14px;
+  }
+</style>
+</head>
+<body>
+
+<div class="info">Preview — Banner Checkout Hotmart · 1200 × 300 px</div>
+
+<div class="banner">
+  <div class="top-line"></div>
+
+  <div class="left">
+    <div class="logo">NARRATIVA <span>IA</span></div>
+    <div class="headline">Crie roteiros com IA.<br><span>Publique todo dia.</span></div>
+    <div class="sub">Geração inteligente de roteiros para YouTube</div>
+  </div>
+
+  <div class="right">
+    <div class="preco-de">R$ 1.497</div>
+    <div class="preco-por"><sup>R$</sup> 1.097</div>
+    <div class="preco-parcel">ou 12x de R$ 109,90</div>
+    <div class="preco-tipo">Assinatura anual</div>
+    <div class="garantia">✓ &nbsp;Garantia de 7 dias</div>
+  </div>
+</div>
+
+<div class="info">Para exportar: Print Screen ou F12 → Screenshot no Chrome DevTools</div>
+
+</body>
+</html>
