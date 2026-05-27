@@ -21,7 +21,7 @@
       display: flex;
       align-items: center;
       gap: 18px;
-      margin-bottom: 48px;
+      margin-bottom: 36px;
       padding-bottom: 28px;
       border-bottom: 1px solid rgba(201,162,39,0.2);
     }
@@ -48,12 +48,81 @@
       text-align: right;
     }
 
+    /* Countdown */
+    .countdown-bar {
+      background: linear-gradient(135deg, #111 0%, #1a1500 100%);
+      border: 1px solid rgba(201,162,39,0.3);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 36px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .countdown-label {
+      font-size: 11px;
+      color: rgba(255,255,255,0.35);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .timeline {
+      display: flex;
+      gap: 0;
+      flex: 1;
+    }
+
+    .tl-item {
+      flex: 1;
+      text-align: center;
+      position: relative;
+    }
+
+    .tl-item::after {
+      content: '';
+      position: absolute;
+      top: 10px;
+      right: -50%;
+      width: 100%;
+      height: 1px;
+      background: rgba(201,162,39,0.2);
+      z-index: 0;
+    }
+
+    .tl-item:last-child::after { display: none; }
+
+    .tl-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      margin: 0 auto 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .tl-dot.ok    { background: #C9A227; }
+    .tl-dot.hoje  { background: #C9A227; box-shadow: 0 0 10px rgba(201,162,39,0.6); }
+    .tl-dot.next  { background: #1a1500; border: 2px solid rgba(201,162,39,0.4); }
+
+    .tl-data {
+      font-size: 11px;
+      font-weight: 700;
+      color: #C9A227;
+    }
+
+    .tl-nome {
+      font-size: 10px;
+      color: rgba(255,255,255,0.4);
+      margin-top: 2px;
+    }
+
     /* Resumo */
     .resumo {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 12px;
-      margin-bottom: 48px;
+      margin-bottom: 40px;
     }
 
     .resumo-card {
@@ -78,9 +147,9 @@
       letter-spacing: 0.06em;
     }
 
-    .num.verde { color: #4CAF50; }
+    .num.verde   { color: #4CAF50; }
     .num.amarelo { color: #C9A227; }
-    .num.vermelho { color: #e05555; }
+    .num.vermelho{ color: #e05555; }
 
     /* Seções */
     .secao { margin-bottom: 40px; }
@@ -121,9 +190,10 @@
       margin-top: 1px;
     }
 
-    .icon-ok    { background: rgba(76,175,80,0.15);  color: #4CAF50; border: 1.5px solid #4CAF50; }
-    .icon-wait  { background: rgba(201,162,39,0.12); color: #C9A227; border: 1.5px solid #C9A227; }
-    .icon-open  { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.2); border: 1.5px solid rgba(255,255,255,0.12); }
+    .icon-ok   { background: rgba(76,175,80,0.15);   color: #4CAF50; border: 1.5px solid #4CAF50; }
+    .icon-wait { background: rgba(201,162,39,0.12);  color: #C9A227; border: 1.5px solid #C9A227; }
+    .icon-open { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.2); border: 1.5px solid rgba(255,255,255,0.12); }
+    .icon-alert{ background: rgba(224,85,85,0.12);   color: #e05555; border: 1.5px solid #e05555; }
 
     .item-body { flex: 1; }
 
@@ -154,9 +224,10 @@
       align-self: center;
     }
 
-    .tag-ok    { background: rgba(76,175,80,0.12);  color: #4CAF50; }
-    .tag-wait  { background: rgba(201,162,39,0.12); color: #C9A227; }
+    .tag-ok    { background: rgba(76,175,80,0.12);   color: #4CAF50; }
+    .tag-wait  { background: rgba(201,162,39,0.12);  color: #C9A227; }
     .tag-open  { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.3); }
+    .tag-alert { background: rgba(224,85,85,0.12);   color: #e05555; }
 
     footer {
       margin-top: 60px;
@@ -166,11 +237,12 @@
     }
 
     @media (max-width: 600px) {
-      .resumo { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .resumo { gap: 8px; }
       .resumo-card { padding: 14px 10px; }
       .resumo-card .num { font-size: 24px; }
       header { flex-wrap: wrap; }
       .badge-data { width: 100%; text-align: left; margin-left: 0; }
+      .countdown-bar { flex-direction: column; gap: 16px; }
     }
   </style>
 </head>
@@ -188,6 +260,28 @@
     </div>
   </header>
 
+  <!-- Timeline -->
+  <div class="countdown-bar">
+    <div class="countdown-label">Calendário<br>de abertura</div>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot hoje"></div>
+        <div class="tl-data">27/05</div>
+        <div class="tl-nome">Pré-lançamento 1</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot next"></div>
+        <div class="tl-data">28/05</div>
+        <div class="tl-nome">Pré-lançamento 2</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot next"></div>
+        <div class="tl-data">29/05</div>
+        <div class="tl-nome">🔥 Lançamento oficial</div>
+      </div>
+    </div>
+  </div>
+
   <!-- Resumo -->
   <div class="resumo">
     <div class="resumo-card">
@@ -195,18 +289,120 @@
       <div class="label">Concluído</div>
     </div>
     <div class="resumo-card">
-      <div class="num amarelo">2</div>
+      <div class="num amarelo">3</div>
       <div class="label">Aguardando</div>
     </div>
     <div class="resumo-card">
-      <div class="num vermelho">6</div>
+      <div class="num vermelho">9</div>
       <div class="label">Pendente</div>
     </div>
   </div>
 
+  <!-- PRODUTO & CHECKOUT -->
+  <div class="secao">
+    <div class="secao-titulo">Produto & Checkout</div>
+
+    <div class="item">
+      <div class="status-icon icon-open"></div>
+      <div class="item-body">
+        <div class="item-titulo">Criar produto no Hotmart</div>
+        <div class="item-detalhe">R$2.997 à vista ou 12x R$309,96 · Garantia 7 dias · Acesso 12 meses</div>
+      </div>
+      <span class="tag tag-open">Pendente</span>
+    </div>
+
+    <div class="item">
+      <div class="status-icon icon-open"></div>
+      <div class="item-body">
+        <div class="item-titulo">Checkout personalizado</div>
+        <div class="item-detalhe">Identidade visual gold/dark alinhada ao Elite</div>
+      </div>
+      <span class="tag tag-open">Pendente</span>
+    </div>
+
+    <div class="item">
+      <div class="status-icon icon-alert">!</div>
+      <div class="item-body">
+        <div class="item-titulo">Revisar páginas — consistência de promessas</div>
+        <div class="item-detalhe">Ajustar menção ao Gemini Ultra (requisito do aluno, não entrega do Elite) · Confirmar CenaDrop + Narrativa como inclusas</div>
+      </div>
+      <span class="tag tag-alert">Urgente</span>
+    </div>
+
+    <div class="item">
+      <div class="status-icon icon-open"></div>
+      <div class="item-body">
+        <div class="item-titulo">Política de reembolso e termos do produto</div>
+        <div class="item-detalhe">Definir regras claras para evitar brechas de reclamação</div>
+      </div>
+      <span class="tag tag-open">Pendente</span>
+    </div>
+
+  </div>
+
+  <!-- AUTOMAÇÃO DE ACESSOS -->
+  <div class="secao">
+    <div class="secao-titulo">Automação de Acessos (compra → entrega)</div>
+
+    <div class="item">
+      <div class="status-icon icon-ok">✓</div>
+      <div class="item-body">
+        <div class="item-titulo">Discord — convite único por email</div>
+        <div class="item-detalhe">Webhook Hotmart → convite gerado → email enviado via Resend · endpoint pronto</div>
+      </div>
+      <span class="tag tag-ok">Feito</span>
+    </div>
+
+    <div class="item">
+      <div class="status-icon icon-ok">✓</div>
+      <div class="item-body">
+        <div class="item-titulo">Discord — bot atribui cargo automaticamente</div>
+        <div class="item-detalhe">Bot EDA no Railway · aluno entra → cargo Membro Elite atribuído na hora</div>
+      </div>
+      <span class="tag tag-ok">Feito</span>
+    </div>
+
+    <div class="item">
+      <div class="status-icon icon-wait">⏳</div>
+      <div class="item-body">
+        <div class="item-titulo">Configurar webhook no Hotmart</div>
+        <div class="item-detalhe">URL: raynern.com.br/api/discord-invite · aguardando criação do produto</div>
+      </div>
+      <span class="tag tag-wait">Aguardando produto</span>
+    </div>
+
+    <div class="item">
+      <div class="status-icon icon-wait">⏳</div>
+      <div class="item-body">
+        <div class="item-titulo">CenaDrop — chave de licença no email de boas-vindas</div>
+        <div class="item-detalhe">Conectar webhook do Elite ao sistema de geração de chave já existente · aguardando produto no Hotmart</div>
+      </div>
+      <span class="tag tag-wait">Aguardando produto</span>
+    </div>
+
+    <div class="item">
+      <div class="status-icon icon-open"></div>
+      <div class="item-body">
+        <div class="item-titulo">Narrativa — provisionar acesso</div>
+        <div class="item-detalhe">Manual por enquanto (email + senha) · automatizar quando sistema de auth estiver pronto</div>
+      </div>
+      <span class="tag tag-open">Manual por ora</span>
+    </div>
+
+    <div class="item">
+      <div class="status-icon icon-open"></div>
+      <div class="item-body">
+        <div class="item-titulo">Inserir link do Hotmart na página de vendas</div>
+        <div class="item-detalhe">Botão de compra ainda com href="#" — trocar após criar produto</div>
+      </div>
+      <span class="tag tag-open">Pendente</span>
+    </div>
+
+  </div>
+
   <!-- TÉCNICO -->
   <div class="secao">
-    <div class="secao-titulo">Técnico</div>
+    <div class="secao-titulo">Técnico & Produto</div>
 
     <div class="item">
       <div class="status-icon icon-ok">✓</div>
@@ -218,37 +414,10 @@
     </div>
 
     <div class="item">
-      <div class="status-icon icon-ok">✓</div>
-      <div class="item-body">
-        <div class="item-titulo">Discord — servidor e bot</div>
-        <div class="item-detalhe">Bot EDA no Railway, cargos automáticos, canais configurados</div>
-      </div>
-      <span class="tag tag-ok">Feito</span>
-    </div>
-
-    <div class="item">
-      <div class="status-icon icon-wait">⏳</div>
-      <div class="item-body">
-        <div class="item-titulo">Link do Hotmart na página de vendas</div>
-        <div class="item-detalhe">Botão de compra com href="#" — trocar pelo link real após criar produto</div>
-      </div>
-      <span class="tag tag-wait">Aguardando</span>
-    </div>
-
-    <div class="item">
-      <div class="status-icon icon-wait">⏳</div>
-      <div class="item-body">
-        <div class="item-titulo">Webhook Hotmart → convite Discord por email</div>
-        <div class="item-detalhe">Endpoint pronto (api/discord-invite.js) — configurar no Hotmart após criar produto</div>
-      </div>
-      <span class="tag tag-wait">Aguardando</span>
-    </div>
-
-    <div class="item">
       <div class="status-icon icon-open"></div>
       <div class="item-body">
-        <div class="item-titulo">Criar produto no Hotmart + checkout personalizado</div>
-        <div class="item-detalhe">Identidade visual gold/dark, link pronto para divulgação</div>
+        <div class="item-titulo">Área de membros</div>
+        <div class="item-detalhe">Definir plataforma, estruturar módulos e jornada do aluno</div>
       </div>
       <span class="tag tag-open">Pendente</span>
     </div>
@@ -256,8 +425,8 @@
     <div class="item">
       <div class="status-icon icon-open"></div>
       <div class="item-body">
-        <div class="item-titulo">Área de membros</div>
-        <div class="item-detalhe">Definir plataforma, estruturar módulos e jornada do aluno</div>
+        <div class="item-titulo">Testar fluxo completo de ponta a ponta</div>
+        <div class="item-detalhe">Compra de teste → email com convite + chave CenaDrop → Discord → área de membros</div>
       </div>
       <span class="tag tag-open">Pendente</span>
     </div>
@@ -297,9 +466,42 @@
 
   </div>
 
+  <!-- DIVULGAÇÃO -->
+  <div class="secao">
+    <div class="secao-titulo">Divulgação</div>
+
+    <div class="item">
+      <div class="status-icon icon-open"></div>
+      <div class="item-body">
+        <div class="item-titulo">Criar artes de divulgação</div>
+        <div class="item-detalhe">Stories e posts para pré-lançamento (27/05, 28/05) e dia oficial (29/05)</div>
+      </div>
+      <span class="tag tag-open">Pendente</span>
+    </div>
+
+    <div class="item">
+      <div class="status-icon icon-open"></div>
+      <div class="item-body">
+        <div class="item-titulo">Preparar roteiro de anúncio</div>
+        <div class="item-detalhe">O que postar, quando e em qual ordem nos 3 dias de abertura</div>
+      </div>
+      <span class="tag tag-open">Pendente</span>
+    </div>
+
+    <div class="item">
+      <div class="status-icon icon-open"></div>
+      <div class="item-body">
+        <div class="item-titulo">Acionar lista de espera</div>
+        <div class="item-detalhe">Comunicar os inscritos em academyelite antes da abertura geral</div>
+      </div>
+      <span class="tag tag-open">Pendente</span>
+    </div>
+
+  </div>
+
 </div>
 
-<footer>Elite Dark Academy · Uso interno</footer>
+<footer>Elite Dark Academy · Uso interno · raynern.com.br/elite-status</footer>
 
 </body>
 </html>
