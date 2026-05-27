@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elite Dark Academy — Status do Lançamento</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #080808;
+      color: #e0e0e0;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      padding: 40px 20px 80px;
+    }
+
+    .container { max-width: 780px; margin: 0 auto; }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 48px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid rgba(201,162,39,0.2);
+    }
+
+    header img { height: 52px; }
+
+    header h1 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: 0.04em;
+    }
+
+    header p {
+      font-size: 13px;
+      color: rgba(255,255,255,0.35);
+      margin-top: 3px;
+    }
+
+    .badge-data {
+      margin-left: auto;
+      font-size: 12px;
+      color: rgba(255,255,255,0.3);
+      text-align: right;
+    }
+
+    /* Resumo */
+    .resumo {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 48px;
+    }
+
+    .resumo-card {
+      background: #111;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      padding: 18px 20px;
+      text-align: center;
+    }
+
+    .resumo-card .num {
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .resumo-card .label {
+      font-size: 11px;
+      color: rgba(255,255,255,0.4);
+      margin-top: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .num.verde { color: #4CAF50; }
+    .num.amarelo { color: #C9A227; }
+    .num.vermelho { color: #e05555; }
+
+    /* Seções */
+    .secao { margin-bottom: 40px; }
+
+    .secao-titulo {
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.3);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 14px;
+    }
+
+    /* Itens */
+    .item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 14px 18px;
+      background: #111;
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 8px;
+      margin-bottom: 8px;
+      transition: border-color 0.2s;
+    }
+
+    .item:hover { border-color: rgba(201,162,39,0.2); }
+
+    .status-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 12px;
+      margin-top: 1px;
+    }
+
+    .icon-ok    { background: rgba(76,175,80,0.15);  color: #4CAF50; border: 1.5px solid #4CAF50; }
+    .icon-wait  { background: rgba(201,162,39,0.12); color: #C9A227; border: 1.5px solid #C9A227; }
+    .icon-open  { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.2); border: 1.5px solid rgba(255,255,255,0.12); }
+
+    .item-body { flex: 1; }
+
+    .item-titulo {
+      font-size: 14px;
+      font-weight: 500;
+      color: #e8e8e8;
+      line-height: 1.4;
+    }
+
+    .item-detalhe {
+      font-size: 12px;
+      color: rgba(255,255,255,0.35);
+      margin-top: 3px;
+      line-height: 1.5;
+    }
+
+    .tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 3px 8px;
+      border-radius: 20px;
+      margin-left: auto;
+      flex-shrink: 0;
+      align-self: center;
+    }
+
+    .tag-ok    { background: rgba(76,175,80,0.12);  color: #4CAF50; }
+    .tag-wait  { background: rgba(201,162,39,0.12); color: #C9A227; }
+    .tag-open  { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.3); }
+
+    footer {
+      margin-top: 60px;
+      text-align: center;
+      font-size: 12px;
+      color: rgba(255,255,255,0.15);
+    }
+
+    @media (max-width: 600px) {
+      .resumo { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .resumo-card { padding: 14px 10px; }
+      .resumo-card .num { font-size: 24px; }
+      header { flex-wrap: wrap; }
+      .badge-data { width: 100%; text-align: left; margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <img src="https://raynern.com.br/academyelite/images/logo-selo.png" alt="EDA">
+    <div>
+      <h1>Elite Dark Academy</h1>
+      <p>Painel interno de lançamento</p>
+    </div>
+    <div class="badge-data">
+      Atualizado em<br>27 mai. 2026
+    </div>
+  </header>
+
+  <!-- Resumo -->
+  <div class="resumo">
+    <div class="resumo-card">
+      <div class="num verde">2</div>
+      <div class="label">Concluído</div>
+    </div>
+    <div class="resumo-card">
+      <div class="num amarelo">2</div>
+      <div class="label">Aguardando</div>
+    </div>
+    <div class="resumo-card">
+      <div class="num vermelho">6</div>
+      <div class="label">Pendente</div>
+    </div>
+  </div>
+
+  <!-- TÉCNICO -->
+  <div class="secao">
+    <div class="secao-titulo">Técnico</div>
+
+    <div class="item">
+      <div class="status-icon icon-ok">✓</div>
+      <div class="item-body">
+        <div class="item-titulo">Página de vendas</div>
+        <div class="item-detalhe">raynern.com.br/elitedarkacademy — mobile responsivo</div>
+      </div>
+      <span class="tag tag-ok">Feito</span>
+    </div>
+
+    <div class="item">
+      <div class="status-icon icon-ok">✓</div>
+      <div class="item-body">
+        <div class="item-titulo">Discord — servidor e bot</div>
+        <div class="item-detalhe">Bot EDA no Railway, cargos automáticos, canais configurados</div>
+      </div>
+      <span class="tag tag-ok">Feito</span>
+    </div>
+
+    <div class="item">
+      <div class="status-icon icon-wait">⏳</div>
+      <div class="item-body">
+        <div class="item-titulo">Link do Hotmart na página de vendas</div>
+        <div class="item-detalhe">Botão de compra com href="#" — trocar pelo link real após criar produto</div>
+      </div>
+      <span class="tag tag-wait">Aguardando</span>
+    </div>
+
+    <div class="item">
+      <div class="status-icon icon-wait">⏳</div>
+      <div class="item-body">
+        <div class="item-titulo">Webhook Hotmart → convite Discord por email</div>
+        <div class="item-detalhe">Endpoint pronto (api/discord-invite.js) — configurar no Hotmart após criar produto</div>
+      </div>
+      <span class="tag tag-wait">Aguardando</span>
+    </div>
+
+    <div class="item">
+      <div class="status-icon icon-open"></div>
+      <div class="item-body">
+        <div class="item-titulo">Criar produto no Hotmart + checkout personalizado</div>
+        <div class="item-detalhe">Identidade visual gold/dark, link pronto para divulgação</div>
+      </div>
+      <span class="tag tag-open">Pendente</span>
+    </div>
+
+    <div class="item">
+      <div class="status-icon icon-open"></div>
+      <div class="item-body">
+        <div class="item-titulo">Área de membros</div>
+        <div class="item-detalhe">Definir plataforma, estruturar módulos e jornada do aluno</div>
+      </div>
+      <span class="tag tag-open">Pendente</span>
+    </div>
+
+  </div>
+
+  <!-- CONTEÚDO -->
+  <div class="secao">
+    <div class="secao-titulo">Conteúdo</div>
+
+    <div class="item">
+      <div class="status-icon icon-open"></div>
+      <div class="item-body">
+        <div class="item-titulo">Migrar aulas do CenaDrop para área do Elite</div>
+        <div class="item-detalhe">Organizar em módulo próprio, verificar nomes, ordem e descrições</div>
+      </div>
+      <span class="tag tag-open">Pendente</span>
+    </div>
+
+    <div class="item">
+      <div class="status-icon icon-open"></div>
+      <div class="item-body">
+        <div class="item-titulo">Gravar aulas do Narrativa (4 aulas)</div>
+        <div class="item-detalhe">Aula 1 Boas-vindas · Aula 2 Estratégia · Aula 3 Prática · Aula 4 Exemplo completo</div>
+      </div>
+      <span class="tag tag-open">Pendente</span>
+    </div>
+
+    <div class="item">
+      <div class="status-icon icon-open"></div>
+      <div class="item-body">
+        <div class="item-titulo">Gravar vídeo de boas-vindas</div>
+        <div class="item-detalhe">Rayner + Marcos, no escritório — simples e institucional</div>
+      </div>
+      <span class="tag tag-open">Pendente</span>
+    </div>
+
+  </div>
+
+</div>
+
+<footer>Elite Dark Academy · Uso interno</footer>
+
+</body>
+</html>
