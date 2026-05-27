@@ -121,7 +121,8 @@ module.exports = async function handler(req, res) {
     const key = await generateUniqueKey();
     const { data, error } = await supabase.from('licenses').insert({
       key, email: body.email||null, name: body.name||null, phone: body.phone||null,
-      notes: body.notes||null, status: 'active', source: 'manual', created_at: new Date().toISOString()
+      notes: body.notes||null, status: 'active', source: 'manual', created_at: new Date().toISOString(),
+      expires_at: body.expires_at || null
     }).select().single();
     if (error) return res.status(500).json({ error: error.message });
     return res.status(200).json({ ok: true, license: data });
@@ -151,10 +152,11 @@ module.exports = async function handler(req, res) {
   // UPDATE
   if (action === 'update') {
     const updates = {};
-    if (body.name  !== undefined) updates.name  = body.name;
-    if (body.email !== undefined) updates.email = body.email;
-    if (body.phone !== undefined) updates.phone = body.phone;
-    if (body.notes !== undefined) updates.notes = body.notes;
+    if (body.name     !== undefined) updates.name     = body.name;
+    if (body.email    !== undefined) updates.email    = body.email;
+    if (body.phone    !== undefined) updates.phone    = body.phone;
+    if (body.notes    !== undefined) updates.notes    = body.notes;
+    if (body.expires_at !== undefined) updates.expires_at = body.expires_at || null;
     await supabase.from('licenses').update(updates).eq('key', body.key);
     return res.status(200).json({ ok: true });
   }
@@ -226,16 +228,20 @@ module.exports = async function handler(req, res) {
 
   // ── NARRATIVA IA — USERS ──────────────────────────────────────
   if (action === 'narrativa-list') {
-    const { data, error } = await supabase.from('narrativa_users').select('id,email,name,active,created_at').order('created_at', { ascending: false });
+    let { data, error } = await supabase.from('narrativa_users').select('id,email,name,active,created_at,origin,purchased_at,expires_at').order('created_at', { ascending: false });
+    if (error) ({ data, error } = await supabase.from('narrativa_users').select('id,email,name,active,created_at').order('created_at', { ascending: false }));
     if (error) return res.status(500).json({ error: error.message });
     return res.status(200).json({ users: data });
   }
 
   if (action === 'narrativa-create') {
-    const { email, name, password } = body;
+    const { email, name, password, origin, purchased_at, expires_at } = body;
     if (!email || !name || !password) return res.status(400).json({ error: 'Email, nome e senha obrigatórios' });
     const password_hash = hashNarrativaPassword(password);
-    const { data, error } = await supabase.from('narrativa_users').insert({ email: email.toLowerCase(), name, password_hash, active: true }).select('id,email,name,active,created_at').single();
+    const insertData = { email: email.toLowerCase(), name, password_hash, active: true, origin: origin || 'manual' };
+    if (purchased_at) insertData.purchased_at = purchased_at;
+    if (expires_at)   insertData.expires_at   = expires_at;
+    const { data, error } = await supabase.from('narrativa_users').insert(insertData).select('id,email,name,active,created_at,origin,purchased_at,expires_at').single();
     if (error) return res.status(error.code === '23505' ? 409 : 500).json({ error: error.message });
     // Email de boas-vindas
     try {
@@ -284,12 +290,15 @@ module.exports = async function handler(req, res) {
   }
 
   if (action === 'narrativa-update') {
-    const { id, name, email, password } = body;
+    const { id, name, email, password, origin, purchased_at, expires_at } = body;
     if (!id) return res.status(400).json({ error: 'ID obrigatório' });
     const updates = {};
-    if (name)  updates.name  = name;
-    if (email) updates.email = email.toLowerCase();
-    if (password) updates.password_hash = hashNarrativaPassword(password);
+    if (name)         updates.name         = name;
+    if (email)        updates.email        = email.toLowerCase();
+    if (password)     updates.password_hash = hashNarrativaPassword(password);
+    if (origin)       updates.origin       = origin;
+    if (purchased_at !== undefined) updates.purchased_at = purchased_at || null;
+    if (expires_at   !== undefined) updates.expires_at   = expires_at   || null;
     if (!Object.keys(updates).length) return res.status(400).json({ error: 'Nada para atualizar' });
     const { error } = await supabase.from('narrativa_users').update(updates).eq('id', id);
     if (error) return res.status(500).json({ error: error.message });
@@ -764,14 +773,28 @@ module.exports = async function handler(req, res) {
       return res.status(500).json({ error: 'Erro ao carregar template: ' + e.message });
     }
 
-    const targets = testEmail ? [{ email: testEmail, name: 'Teste' }] : users;
+    let targets;
+    if (testEmail) {
+      const { data: testUser } = await supabase.from('narrativa_users')
+        .select('email, name').eq('email', testEmail.toLowerCase()).single();
+      targets = [{ email: testEmail, name: testUser?.name || 'Usuário' }];
+    } else {
+      targets = users;
+    }
+
     const resend = new Resend(process.env.RESEND_API_KEY);
     let sent = 0, failed = 0, skipped = 0;
 
     for (const u of targets) {
       if (!u.email || !u.email.includes('@')) { skipped++; continue; }
+      const firstName = (u.name || 'Usuário').split(' ')[0];
+      const html = HTML
+        .replace(/\{\{PRIMEIRO_NOME\}\}/g, firstName)
+        .replace(/\{\{EMAIL\}\}/g, u.email)
+        .replace(/\{\{SENHA\}\}/g, '&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;')
+        .replace(/\{\{NOVA_SENHA\}\}/g, '&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;');
       try {
-        await resend.emails.send({ from: tpl.from, to: u.email, subject: tpl.subject, html: HTML });
+        await resend.emails.send({ from: tpl.from, to: u.email, subject: tpl.subject, html });
         sent++;
         await new Promise(r => setTimeout(r, 120));
       } catch (err) {
