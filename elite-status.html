@@ -407,7 +407,7 @@
       <p>Painel interno de lançamento</p>
     </div>
     <div class="badge-data">
-      Atualizado em<br>27 mai. 2026 · 18h
+      Atualizado em<br>28 mai. 2026 · manhã
     </div>
   </header>
 
@@ -468,15 +468,15 @@
   <!-- Resumo -->
   <div class="resumo">
     <div class="resumo-card">
-      <div class="num verde">4</div>
+      <div class="num verde">5</div>
       <div class="label">Concluído</div>
     </div>
     <div class="resumo-card">
-      <div class="num amarelo">3</div>
+      <div class="num amarelo">2</div>
       <div class="label">Aguardando</div>
     </div>
     <div class="resumo-card">
-      <div class="num vermelho">10</div>
+      <div class="num vermelho">19</div>
       <div class="label">Pendente</div>
     </div>
   </div>
@@ -658,6 +658,90 @@
 
   </div>
 
+  <!-- NARRATIVA IA -->
+  <div class="secao">
+    <div class="secao-titulo">Narrativa IA — Produto</div>
+
+    <div class="item">
+      <div class="status-icon icon-open"></div>
+      <div class="item-body">
+        <div class="item-titulo">Criar produto no Hotmart</div>
+        <div class="item-detalhe">Definir preço, garantia, prazo de acesso e configurar produto na plataforma</div>
+      </div>
+      <span class="tag tag-open">Pendente</span>
+    </div>
+
+    <div class="item">
+      <div class="status-icon icon-open"></div>
+      <div class="item-body">
+        <div class="item-titulo">Página de vendas</div>
+        <div class="item-detalhe">Criar landing page em narrativaia.com.br/vendas com oferta, benefícios e CTA</div>
+      </div>
+      <span class="tag tag-open">Pendente</span>
+    </div>
+
+  </div>
+
+  <!-- NARRATIVA IA — SISTEMA DE ACESSO -->
+  <div class="secao">
+    <div class="secao-titulo">Narrativa IA — Sistema de Acesso</div>
+
+    <div class="item">
+      <div class="status-icon icon-ok">✓</div>
+      <div class="item-body">
+        <div class="item-titulo">Base de autenticação (login + cookie HMAC)</div>
+        <div class="item-detalhe">Login por email/senha, token HMAC-SHA256, cookie httpOnly 7 dias, middleware de proteção de rotas — já funcional</div>
+      </div>
+      <span class="tag tag-ok">Feito</span>
+    </div>
+
+    <div class="item">
+      <div class="status-icon icon-open"></div>
+      <div class="item-body">
+        <div class="item-titulo">Webhook Hotmart → criar usuário automaticamente</div>
+        <div class="item-detalhe">Compra aprovada → endpoint cria conta em narrativa_users + gera senha aleatória + envia email com credenciais</div>
+      </div>
+      <span class="tag tag-open">Pendente</span>
+    </div>
+
+    <div class="item">
+      <div class="status-icon icon-open"></div>
+      <div class="item-body">
+        <div class="item-titulo">Email de boas-vindas com credenciais de acesso</div>
+        <div class="item-detalhe">Template HTML do Narrativa IA com email, senha gerada e link para narrativaia.com.br — disparado automaticamente na compra</div>
+      </div>
+      <span class="tag tag-open">Pendente</span>
+    </div>
+
+    <div class="item">
+      <div class="status-icon icon-open"></div>
+      <div class="item-body">
+        <div class="item-titulo">Recuperação de senha pelo usuário</div>
+        <div class="item-detalhe">Tela "esqueci minha senha" → envia email com link de redefinição · usuário não depende do suporte para resetar</div>
+      </div>
+      <span class="tag tag-open">Pendente</span>
+    </div>
+
+    <div class="item">
+      <div class="status-icon icon-open"></div>
+      <div class="item-body">
+        <div class="item-titulo">Área de perfil — trocar senha</div>
+        <div class="item-detalhe">Tela simples dentro do app para o aluno redefinir a própria senha quando quiser</div>
+      </div>
+      <span class="tag tag-open">Pendente</span>
+    </div>
+
+    <div class="item">
+      <div class="status-icon icon-open"></div>
+      <div class="item-body">
+        <div class="item-titulo">Testar fluxo completo — compra → acesso</div>
+        <div class="item-detalhe">Compra de teste na Hotmart → email com credenciais → login no Narrativa IA → sessão ativa</div>
+      </div>
+      <span class="tag tag-open">Pendente</span>
+    </div>
+
+  </div>
+
   <!-- DIVULGAÇÃO -->
   <div class="secao">
     <div class="secao-titulo">Divulgação</div>
@@ -701,8 +785,8 @@
   // Configuração
   const LAUNCH     = new Date('2026-05-29T20:00:00-03:00'); // 29/05 às 20h BRT
   const START      = new Date('2026-05-20T00:00:00-03:00'); // início do projeto
-  const TOTAL      = 17; // total de tarefas
-  const CONCLUIDAS = 4;  // tarefas concluídas — atualizar manualmente
+  const TOTAL      = 26; // total de tarefas
+  const CONCLUIDAS = 5;  // tarefas concluídas — atualizar manualmente
 
   function pad(n) { return String(n).padStart(2, '0'); }
 
