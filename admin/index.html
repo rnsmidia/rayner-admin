@@ -1242,12 +1242,13 @@ th.cb-col { width: 36px; }
                   <th class="sortable" onclick="sortLicenses('name')">Nome / Email <span class="sort-icon" id="si-name"></span></th>
                   <th class="sortable" onclick="sortLicenses('status')">Status <span class="sort-icon" id="si-status"></span></th>
                   <th class="sortable" onclick="sortLicenses('source')">Origem <span class="sort-icon" id="si-source"></span></th>
+                  <th class="sortable" onclick="sortLicenses('expires_at')">Expiração <span class="sort-icon" id="si-expires_at"></span></th>
                   <th class="sortable" onclick="sortLicenses('created_at')">Data <span class="sort-icon" id="si-created_at">▼</span></th>
                   <th>Ações</th>
                 </tr>
               </thead>
               <tbody id="lic-tbody">
-                <tr><td colspan="7"><div class="loading">Carregando...</div></td></tr>
+                <tr><td colspan="8"><div class="loading">Carregando...</div></td></tr>
               </tbody>
             </table>
           </div>
@@ -1393,12 +1394,15 @@ th.cb-col { width: 36px; }
                   <th class="sortable" onclick="sortNarrativaUsers('name')">Nome <span class="sort-icon" id="nsi-name"></span></th>
                   <th class="sortable" onclick="sortNarrativaUsers('email')">Email <span class="sort-icon" id="nsi-email"></span></th>
                   <th class="sortable" onclick="sortNarrativaUsers('active')">Status <span class="sort-icon" id="nsi-active"></span></th>
+                  <th class="sortable" onclick="sortNarrativaUsers('origin')">Origem <span class="sort-icon" id="nsi-origin"></span></th>
+                  <th class="sortable" onclick="sortNarrativaUsers('purchased_at')">Compra <span class="sort-icon" id="nsi-purchased_at"></span></th>
+                  <th class="sortable" onclick="sortNarrativaUsers('expires_at')">Expiração <span class="sort-icon" id="nsi-expires_at"></span></th>
                   <th class="sortable" onclick="sortNarrativaUsers('created_at')">Criado em <span class="sort-icon" id="nsi-created_at">▼</span></th>
                   <th>Ações</th>
                 </tr>
               </thead>
               <tbody id="nusers-tbody">
-                <tr><td colspan="6"><div class="loading">Carregando...</div></td></tr>
+                <tr><td colspan="9"><div class="loading">Carregando...</div></td></tr>
               </tbody>
             </table>
           </div>
@@ -1959,6 +1963,28 @@ th.cb-col { width: 36px; }
                     </div>
                   </div>
                 </div>
+                <div class="lh-card lh-item" data-search="checkout pagamento academy elite ticket 1997">
+                  <div class="lh-card-name">Checkout R$1.997</div>
+                  <div class="lh-card-desc">Ticket anual — R$1.997 à vista</div>
+                  <div class="lh-card-footer">
+                    <span class="lh-badge checkout">Checkout</span>
+                    <div class="lh-card-acts">
+                      <button onclick="window.open('https://pay.hotmart.com/P105957646P?checkoutMode=10','_blank')" title="Abrir">↗</button>
+                      <button onclick="copyLink('https://pay.hotmart.com/P105957646P?checkoutMode=10',this)" title="Copiar">⎘</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="lh-card lh-item" data-search="checkout pagamento academy elite ticket 2997">
+                  <div class="lh-card-name">Checkout R$2.997</div>
+                  <div class="lh-card-desc">Ticket premium — R$2.997 à vista ou 12x R$309,96</div>
+                  <div class="lh-card-footer">
+                    <span class="lh-badge checkout">Checkout</span>
+                    <div class="lh-card-acts">
+                      <button onclick="window.open('https://pay.hotmart.com/P105957646P?off=36vtey76&checkoutMode=10','_blank')" title="Abrir">↗</button>
+                      <button onclick="copyLink('https://pay.hotmart.com/P105957646P?off=36vtey76&checkoutMode=10',this)" title="Copiar">⎘</button>
+                    </div>
+                  </div>
+                </div>
                 <div class="lh-card lh-item" data-search="whatsapp grupo academy elite vip alunos">
                   <div class="lh-card-name">WhatsApp VIP</div>
                   <div class="lh-card-desc">Grupo WhatsApp dos alunos VIP</div>
@@ -2294,6 +2320,7 @@ th.cb-col { width: 36px; }
     <div class="field"><label>Email (opcional)</label><input type="email" id="m-email" placeholder="joao@email.com" /></div>
     <div class="field"><label>WhatsApp (opcional)</label><input type="text" id="m-phone" placeholder="(11) 99999-9999" /></div>
     <div class="field"><label>Observações</label><textarea id="m-notes" placeholder="Notas internas..."></textarea></div>
+    <div class="field"><label>Expira em <span style="font-weight:400;color:var(--muted)">(vazio = sem expiração)</span></label><input type="date" id="m-expires" /></div>
     <div class="modal-actions">
       <button class="btn-sm" onclick="closeModal()">Cancelar</button>
       <button class="btn-sm accent" id="modal-confirm" onclick="confirmModal()">Criar</button>
@@ -2308,6 +2335,25 @@ th.cb-col { width: 36px; }
     <div class="field"><label>Nome</label><input type="text" id="nc-name" placeholder="Nome completo" /></div>
     <div class="field"><label>Email</label><input type="email" id="nc-email" placeholder="email@exemplo.com" /></div>
     <div class="field"><label>Senha</label><input type="password" id="nc-password" placeholder="Senha de acesso" /></div>
+    <div class="field"><label>Origem</label>
+      <select id="nc-origin" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:14px">
+        <option value="manual">Manual</option>
+        <option value="hotmart">Hotmart</option>
+        <option value="cortesia">Cortesia</option>
+        <option value="elite">Elite Dark Academy</option>
+      </select>
+    </div>
+    <div class="field"><label>Plano</label>
+      <select id="nc-plan" onchange="calcNarrativaExpires()" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:14px">
+        <option value="">— selecione —</option>
+        <option value="1m">1 mês</option>
+        <option value="6m">6 meses</option>
+        <option value="1y" selected>1 ano</option>
+        <option value="vitalicio">Vitalício</option>
+      </select>
+    </div>
+    <div class="field"><label>Data de compra</label><input type="date" id="nc-purchased" onchange="calcNarrativaExpires()" /></div>
+    <div class="field"><label>Expira em <span style="font-weight:400;color:var(--muted)">(calculado automaticamente)</span></label><input type="date" id="nc-expires" /></div>
     <div class="modal-actions">
       <button class="btn-sm" onclick="closeNarrativaCreateModal()">Cancelar</button>
       <button class="btn-sm accent" onclick="saveNarrativaCreate()">Criar Usuário</button>
@@ -2322,6 +2368,16 @@ th.cb-col { width: 36px; }
     <div class="field"><label>Nome</label><input type="text" id="ne-name" placeholder="Nome completo" /></div>
     <div class="field"><label>Email</label><input type="email" id="ne-email" placeholder="email@exemplo.com" /></div>
     <div class="field"><label>Nova Senha <span style="font-weight:400;color:var(--muted)">(deixe em branco para manter)</span></label><input type="password" id="ne-password" placeholder="••••••••" /></div>
+    <div class="field"><label>Origem</label>
+      <select id="ne-origin" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:14px">
+        <option value="manual">Manual</option>
+        <option value="hotmart">Hotmart</option>
+        <option value="cortesia">Cortesia</option>
+        <option value="elite">Elite Dark Academy</option>
+      </select>
+    </div>
+    <div class="field"><label>Data de compra</label><input type="date" id="ne-purchased" /></div>
+    <div class="field"><label>Expira em</label><input type="date" id="ne-expires" /></div>
     <div class="modal-actions">
       <button class="btn-sm" onclick="closeNarrativaEditModal()">Cancelar</button>
       <button class="btn-sm accent" onclick="saveNarrativaEdit()">Salvar</button>
@@ -2466,11 +2522,22 @@ async function loadAll() {
 // ── HELPERS ───────────────────────────────────
 const srcLabel = s => s === 'hotmart-RN' ? 'Hotmart RN' : s === 'hotmart-MC' ? 'Hotmart MC' : (s||'').startsWith('hotmart') ? 'Hotmart' : 'Manual';
 const fmtDate  = iso => iso ? new Date(iso).toLocaleDateString('pt-BR', {day:'2-digit',month:'2-digit',year:'numeric'}) : '—';
+const narrativaOriginLabel = s => ({ manual:'Manual', hotmart:'Hotmart', cortesia:'Cortesia', elite:'Elite Dark' }[s] || s || 'Manual');
+function fmtExpires(iso) {
+  if (!iso) return '<span style="color:var(--muted)">—</span>';
+  const exp = new Date(iso); const now = new Date();
+  const diff = Math.ceil((exp - now) / 86400000);
+  if (diff < 0)   return `<span class="badge inactive" title="${fmtDate(iso)}">Expirado há ${Math.abs(diff)}d</span>`;
+  if (diff === 0) return `<span class="badge inactive" title="${fmtDate(iso)}">Expira hoje</span>`;
+  if (diff <= 30) return `<span class="badge warn"     title="${fmtDate(iso)}">Expira em ${diff}d</span>`;
+  if (diff <= 90) return `<span style="color:#f5a623;font-size:12px"  title="${fmtDate(iso)}">em ${diff} dias</span>`;
+  return `<span style="color:var(--green);font-size:12px" title="${fmtDate(iso)}">em ${diff} dias</span>`;
+}
 
 // ── RENDER LICENÇAS ───────────────────────────
 function renderLicenses(list) {
   const tb = document.getElementById('lic-tbody');
-  if (!list.length) { tb.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="icon">🔑</div><p>Nenhuma licença encontrada.</p></div></td></tr>`; return; }
+  if (!list.length) { tb.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="icon">🔑</div><p>Nenhuma licença encontrada.</p></div></td></tr>`; return; }
   tb.innerHTML = list.map(l => `
     <tr>
       <td class="cb-col"><input type="checkbox" ${selectedKeys.has(l.key)?'checked':''} onchange="toggleSelectKey('${l.key}')" /></td>
@@ -2481,6 +2548,7 @@ function renderLicenses(list) {
       </td>
       <td><span class="badge ${l.status}">${l.status === 'active' ? 'Ativa' : 'Inativa'}</span></td>
       <td><span class="badge ${l.source||'manual'}">${srcLabel(l.source)}</span></td>
+      <td>${fmtExpires(l.expires_at)}</td>
       <td style="color:var(--muted);font-size:12px">${fmtDate(l.created_at)}</td>
       <td><div class="actions">
         <button class="btn-icon" onclick="openEditModal('${l.key}')">✏️</button>
@@ -2879,7 +2947,7 @@ function openCreateModal() {
   modalMode = 'create'; editingKey = '';
   document.getElementById('modal-title').textContent = '+ Nova Chave';
   document.getElementById('modal-confirm').textContent = 'Criar';
-  ['m-name','m-email','m-phone','m-notes'].forEach(id => document.getElementById(id).value = '');
+  ['m-name','m-email','m-phone','m-notes','m-expires'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('modal-overlay').classList.add('open');
 }
 
@@ -2888,10 +2956,11 @@ function openEditModal(key) {
   modalMode = 'edit'; editingKey = key;
   document.getElementById('modal-title').textContent = '✏️ Editar Licença';
   document.getElementById('modal-confirm').textContent = 'Salvar';
-  document.getElementById('m-name').value  = l.name  || '';
-  document.getElementById('m-email').value = l.email || '';
-  document.getElementById('m-phone').value = l.phone || '';
-  document.getElementById('m-notes').value = l.notes || '';
+  document.getElementById('m-name').value    = l.name    || '';
+  document.getElementById('m-email').value   = l.email   || '';
+  document.getElementById('m-phone').value   = l.phone   || '';
+  document.getElementById('m-notes').value   = l.notes   || '';
+  document.getElementById('m-expires').value = l.expires_at ? l.expires_at.slice(0,10) : '';
   document.getElementById('modal-overlay').classList.add('open');
 }
 
@@ -2978,18 +3047,21 @@ function filterNarrativaUsers() {
 
 function renderNarrativaUsers(list) {
   const tb = document.getElementById('nusers-tbody');
-  if (!list.length) { tb.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="icon">👤</div><p>Nenhum usuário encontrado.</p></div></td></tr>`; return; }
+  if (!list.length) { tb.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="icon">👤</div><p>Nenhum usuário encontrado.</p></div></td></tr>`; return; }
   tb.innerHTML = list.map(u => `
     <tr>
       <td class="cb-col"><input type="checkbox" class="nchk-row" value="${u.id}" ${narrativaSelected.has(u.id)?'checked':''} onchange="onNarrativaCheck('${u.id}',this.checked)" /></td>
       <td style="font-weight:600">${u.name}</td>
       <td style="color:var(--muted);font-size:12px">${u.email}</td>
       <td><span class="badge ${u.active ? 'active' : 'inactive'}">${u.active ? 'Ativo' : 'Inativo'}</span></td>
+      <td><span class="badge ${u.origin||'manual'}">${narrativaOriginLabel(u.origin)}</span></td>
+      <td style="color:var(--muted);font-size:12px">${u.purchased_at ? fmtDate(u.purchased_at) : '<span style="color:var(--muted)">—</span>'}</td>
+      <td>${fmtExpires(u.expires_at)}</td>
       <td style="color:var(--muted);font-size:12px">${fmtDate(u.created_at)}</td>
       <td><div class="actions">
         <button class="btn-icon" title="Reenviar credenciais por email" onclick="resendNarrativaEmail('${u.id}','${u.email}')">📧</button>
         <button class="btn-icon" title="Redefinir senha manualmente" onclick="resetNarrativaPassword('${u.id}','${u.email}')">🔑</button>
-        <button class="btn-icon" title="Editar" onclick="openNarrativaEditModal('${u.id}','${u.name.replace(/'/g,"\\'")}','${u.email}')">✏️</button>
+        <button class="btn-icon" title="Editar" onclick="openNarrativaEditModal('${u.id}','${u.name.replace(/'/g,"\\'")}','${u.email}','${u.origin||'manual'}','${u.purchased_at||''}','${u.expires_at||''}')">✏️</button>
         <button class="btn-icon warn" title="${u.active?'Desativar':'Ativar'}" onclick="toggleNarrativaUser('${u.id}',${u.active})">${u.active ? '🔒' : '🔓'}</button>
         <button class="btn-icon danger" onclick="deleteNarrativaUser('${u.id}','${u.email}')">🗑️</button>
       </div></td>
@@ -3027,8 +3099,8 @@ async function bulkNarrativaActivate(active) {
 
 function exportNarrativaCSV() {
   if (!allNarrativaUsers.length) return;
-  const rows = [['Nome','Email','Status','Criado em']];
-  allNarrativaUsers.forEach(u => rows.push([u.name, u.email, u.active?'Ativo':'Inativo', fmtDate(u.created_at)]));
+  const rows = [['Nome','Email','Status','Origem','Compra','Expiração','Criado em']];
+  allNarrativaUsers.forEach(u => rows.push([u.name, u.email, u.active?'Ativo':'Inativo', narrativaOriginLabel(u.origin), fmtDate(u.purchased_at), fmtDate(u.expires_at), fmtDate(u.created_at)]));
   const csv = rows.map(r => r.map(v => `"${(v||'').replace(/"/g,'""')}"`).join(',')).join('\n');
   const a = document.createElement('a');
   a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
@@ -3037,19 +3109,40 @@ function exportNarrativaCSV() {
 }
 
 function openNarrativaModal() {
-  ['nc-name','nc-email','nc-password'].forEach(id => document.getElementById(id).value = '');
+  ['nc-name','nc-email','nc-password','nc-purchased','nc-expires'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('nc-origin').value = 'manual';
+  document.getElementById('nc-plan').value = '1y';
+  const today = new Date().toISOString().slice(0,10);
+  document.getElementById('nc-purchased').value = today;
+  calcNarrativaExpires();
   document.getElementById('narrativa-create-overlay').classList.add('open');
+}
+function calcNarrativaExpires() {
+  const plan = document.getElementById('nc-plan').value;
+  const base = document.getElementById('nc-purchased').value;
+  if (!base || !plan || plan === 'vitalicio') { document.getElementById('nc-expires').value = ''; return; }
+  const d = new Date(base);
+  if (plan === '1m')  d.setMonth(d.getMonth() + 1);
+  if (plan === '6m')  d.setMonth(d.getMonth() + 6);
+  if (plan === '1y')  d.setFullYear(d.getFullYear() + 1);
+  document.getElementById('nc-expires').value = d.toISOString().slice(0,10);
 }
 function closeNarrativaCreateModal(e) {
   if (!e || e.target === document.getElementById('narrativa-create-overlay'))
     document.getElementById('narrativa-create-overlay').classList.remove('open');
 }
 async function saveNarrativaCreate() {
-  const name     = document.getElementById('nc-name').value.trim();
-  const email    = document.getElementById('nc-email').value.trim();
-  const password = document.getElementById('nc-password').value.trim();
+  const name       = document.getElementById('nc-name').value.trim();
+  const email      = document.getElementById('nc-email').value.trim();
+  const password   = document.getElementById('nc-password').value.trim();
+  const origin     = document.getElementById('nc-origin').value;
+  const purchased  = document.getElementById('nc-purchased').value;
+  const expires    = document.getElementById('nc-expires').value;
   if (!name || !email || !password) { toast('Preencha nome, email e senha', 'error'); return; }
-  const d = await apiCall('narrativa-create', { name, email, password });
+  const payload = { name, email, password, origin };
+  if (purchased) payload.purchased_at = purchased;
+  if (expires)   payload.expires_at   = expires;
+  const d = await apiCall('narrativa-create', payload);
   if (d.ok) { toast(`✅ Usuário criado: ${email}`, 'success'); closeNarrativaCreateModal(); loadNarrativaUsers(); }
   else toast('Erro: ' + (d.error || 'Falha ao criar'), 'error');
 }
@@ -3059,23 +3152,27 @@ async function confirmModal() {
   const email = document.getElementById('m-email').value.trim();
   const phone = document.getElementById('m-phone').value.trim();
   const notes = document.getElementById('m-notes').value.trim();
+  const expires = document.getElementById('m-expires').value;
   if (modalMode === 'create') {
-    const d = await apiCall('create', { name, email, phone, notes });
+    const d = await apiCall('create', { name, email, phone, notes, expires_at: expires || null });
     if (d.ok) { toast(`✅ Chave criada: ${d.license.key}`, 'success'); closeModal(); loadAll(); }
     else toast('Erro ao criar chave', 'error');
   } else {
-    const d = await apiCall('update', { key: editingKey, name, email, phone, notes });
+    const d = await apiCall('update', { key: editingKey, name, email, phone, notes, expires_at: expires || null });
     if (d.ok) { toast('✅ Atualizado', 'success'); closeModal(); loadAll(); }
     else toast('Erro ao atualizar', 'error');
   }
 }
 
 let narrativaEditId = null;
-function openNarrativaEditModal(id, name, email) {
+function openNarrativaEditModal(id, name, email, origin, purchased, expires) {
   narrativaEditId = id;
-  document.getElementById('ne-name').value = name;
-  document.getElementById('ne-email').value = email;
+  document.getElementById('ne-name').value     = name;
+  document.getElementById('ne-email').value    = email;
   document.getElementById('ne-password').value = '';
+  document.getElementById('ne-origin').value   = origin || 'manual';
+  document.getElementById('ne-purchased').value = purchased ? purchased.slice(0,10) : '';
+  document.getElementById('ne-expires').value   = expires   ? expires.slice(0,10)   : '';
   document.getElementById('narrativa-edit-overlay').classList.add('open');
 }
 function closeNarrativaEditModal(e) {
@@ -3083,11 +3180,14 @@ function closeNarrativaEditModal(e) {
     document.getElementById('narrativa-edit-overlay').classList.remove('open');
 }
 async function saveNarrativaEdit() {
-  const name     = document.getElementById('ne-name').value.trim();
-  const email    = document.getElementById('ne-email').value.trim();
-  const password = document.getElementById('ne-password').value.trim();
+  const name      = document.getElementById('ne-name').value.trim();
+  const email     = document.getElementById('ne-email').value.trim();
+  const password  = document.getElementById('ne-password').value.trim();
+  const origin    = document.getElementById('ne-origin').value;
+  const purchased = document.getElementById('ne-purchased').value;
+  const expires   = document.getElementById('ne-expires').value;
   if (!name || !email) { toast('Preencha nome e email', 'error'); return; }
-  const payload = { id: narrativaEditId, name, email };
+  const payload = { id: narrativaEditId, name, email, origin, purchased_at: purchased || null, expires_at: expires || null };
   if (password) payload.password = password;
   const d = await apiCall('narrativa-update', payload);
   if (d.ok) { toast('✅ Usuário atualizado', 'success'); closeNarrativaEditModal(); loadNarrativaUsers(); }
