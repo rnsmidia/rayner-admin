@@ -778,7 +778,7 @@ thead th.sortable:hover { color: var(--accent); }
 .blast-result.error { background: var(--red-s); color: var(--red); border: 1px solid rgba(234,84,85,.2); }
 
 /* ── EMAIL TEMPLATE CARDS ──────────────── */
-.email-grid { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; }
+.email-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px; }
 .email-card {
   background: var(--card); border: 2px solid var(--border);
   border-radius: 12px; overflow: hidden;
@@ -809,7 +809,7 @@ thead th.sortable:hover { color: var(--accent); }
 .email-card.selected .email-card-check { background: var(--accent); border-color: var(--accent); color: #fff; }
 .email-card-preview {
   border-top: 1px solid var(--border);
-  height: 420px; overflow: hidden; background: #fff;
+  height: 260px; overflow: hidden; background: #fff;
   position: relative;
 }
 .email-card-preview iframe {
@@ -2632,7 +2632,7 @@ function scaleEmailPreviews() {
     if (!iframe) return;
     const scale = container.offsetWidth / 600;
     iframe.style.transform = `scale(${scale})`;
-    iframe.style.height = Math.ceil(420 / scale) + 'px';
+    iframe.style.height = Math.ceil(260 / scale) + 'px';
   });
 }
 
