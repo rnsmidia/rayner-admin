@@ -350,9 +350,14 @@ module.exports = async function handler(req, res) {
   }
 
   if (action === 'narrativa-toggle') {
-    const { id } = body;
-    const { data: cur } = await supabase.from('narrativa_users').select('active').eq('id', id).single();
-    const active = !cur?.active;
+    const { id, force } = body;
+    let active;
+    if (typeof force === 'boolean') {
+      active = force;
+    } else {
+      const { data: cur } = await supabase.from('narrativa_users').select('active').eq('id', id).single();
+      active = !cur?.active;
+    }
     await supabase.from('narrativa_users').update({ active }).eq('id', id);
     return res.status(200).json({ ok: true, active });
   }
@@ -363,11 +368,19 @@ module.exports = async function handler(req, res) {
   }
 
   if (action === 'narrativa-stats') {
-    const { data } = await supabase.from('narrativa_users').select('active');
-    const total    = (data||[]).length;
-    const active   = (data||[]).filter(u => u.active).length;
+    const now      = new Date();
+    const d7       = new Date(now - 7  * 86400000).toISOString();
+    const d30      = new Date(now - 30 * 86400000).toISOString();
+    const today    = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+    const { data } = await supabase.from('narrativa_users').select('active, created_at');
+    const arr      = data || [];
+    const total    = arr.length;
+    const active   = arr.filter(u => u.active).length;
     const inactive = total - active;
-    return res.status(200).json({ total, active, inactive });
+    const new_today = arr.filter(u => u.created_at >= today).length;
+    const new_7d    = arr.filter(u => u.created_at >= d7).length;
+    const new_30d   = arr.filter(u => u.created_at >= d30).length;
+    return res.status(200).json({ total, active, inactive, new_today, new_7d, new_30d });
   }
 
   // LOGIN PÚBLICO — usuários do Narrativa IA Studio

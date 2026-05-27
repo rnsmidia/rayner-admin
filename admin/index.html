@@ -1344,6 +1344,18 @@ th.cb-col { width: 36px; }
               <div class="stat-icon-wrap red">🔒</div>
               <div><div class="stat-label">Inativos</div><div class="stat-val red" id="ns-inactive">—</div></div>
             </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap yellow">🌟</div>
+              <div><div class="stat-label">Novos Hoje</div><div class="stat-val yellow" id="ns-new-today">—</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap yellow">📅</div>
+              <div><div class="stat-label">Novos 7 dias</div><div class="stat-val yellow" id="ns-new-7d">—</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap yellow">📆</div>
+              <div><div class="stat-label">Novos 30 dias</div><div class="stat-val yellow" id="ns-new-30d">—</div></div>
+            </div>
           </div>
           <div class="quick-row">
             <button class="btn-sm accent" onclick="switchSection('narrativa','users')">👤 Ver Usuários</button>
@@ -1357,16 +1369,35 @@ th.cb-col { width: 36px; }
             <div class="search-wrap">
               <input type="text" id="search-nusers" placeholder="Buscar por nome ou email..." oninput="filterNarrativaUsers()" />
             </div>
+            <select id="filter-nstatus" class="btn-sm" onchange="filterNarrativaUsers()">
+              <option value="">Todos</option>
+              <option value="active">Ativos</option>
+              <option value="inactive">Inativos</option>
+            </select>
             <button class="btn-sm accent" onclick="openNarrativaModal()">+ Novo Usuário</button>
+            <button class="btn-sm" onclick="exportNarrativaCSV()">⬇ CSV</button>
             <button class="btn-sm" onclick="loadNarrativaUsers()">↻</button>
+          </div>
+          <div id="nbulk-bar" style="display:none;align-items:center;gap:10px;padding:8px 0;margin-bottom:8px">
+            <span style="font-size:13px;color:var(--muted);font-weight:600" id="nbulk-count">0 selecionados</span>
+            <span style="color:var(--border)">|</span>
+            <button class="btn-sm" style="color:var(--green);border-color:rgba(40,199,111,.3)" onclick="bulkNarrativaActivate(true)">🔓 Ativar</button>
+            <button class="btn-sm" style="color:var(--red);border-color:rgba(234,84,85,.3)"   onclick="bulkNarrativaActivate(false)">🔒 Desativar</button>
           </div>
           <div class="table-wrap">
             <table>
               <thead>
-                <tr><th>Nome</th><th>Email</th><th>Status</th><th>Criado em</th><th>Ações</th></tr>
+                <tr>
+                  <th class="cb-col"><input type="checkbox" id="nchk-all" onchange="toggleNarrativaSelectAll()" /></th>
+                  <th class="sortable" onclick="sortNarrativaUsers('name')">Nome <span class="sort-icon" id="nsi-name"></span></th>
+                  <th class="sortable" onclick="sortNarrativaUsers('email')">Email <span class="sort-icon" id="nsi-email"></span></th>
+                  <th class="sortable" onclick="sortNarrativaUsers('active')">Status <span class="sort-icon" id="nsi-active"></span></th>
+                  <th class="sortable" onclick="sortNarrativaUsers('created_at')">Criado em <span class="sort-icon" id="nsi-created_at">▼</span></th>
+                  <th>Ações</th>
+                </tr>
               </thead>
               <tbody id="nusers-tbody">
-                <tr><td colspan="5"><div class="loading">Carregando...</div></td></tr>
+                <tr><td colspan="6"><div class="loading">Carregando...</div></td></tr>
               </tbody>
             </table>
           </div>
@@ -2843,40 +2874,106 @@ function copyKey(key) {
 // ── NARRATIVA IA ──────────────────────────────
 let allNarrativaUsers = [];
 
+let narrativaSortCol = 'created_at', narrativaSortAsc = false;
+let narrativaSelected = new Set();
+
 async function loadNarrativaUsers() {
   const [ud, sd] = await Promise.all([apiCall('narrativa-list'), apiCall('narrativa-stats')]);
   if (sd.total !== undefined) {
-    document.getElementById('ns-total').textContent   = sd.total;
-    document.getElementById('ns-active').textContent  = sd.active;
-    document.getElementById('ns-inactive').textContent= sd.inactive;
-    document.getElementById('cnt-nusers').textContent = sd.total;
+    document.getElementById('ns-total').textContent    = sd.total;
+    document.getElementById('ns-active').textContent   = sd.active;
+    document.getElementById('ns-inactive').textContent = sd.inactive;
+    document.getElementById('ns-new-today').textContent = sd.new_today ?? '—';
+    document.getElementById('ns-new-7d').textContent    = sd.new_7d    ?? '—';
+    document.getElementById('ns-new-30d').textContent   = sd.new_30d   ?? '—';
+    document.getElementById('cnt-nusers').textContent  = sd.total;
   }
-  if (ud.users) { allNarrativaUsers = ud.users; renderNarrativaUsers(allNarrativaUsers); }
+  if (ud.users) { allNarrativaUsers = ud.users; narrativaSelected.clear(); filterNarrativaUsers(); }
+}
+
+function sortNarrativaUsers(col) {
+  if (narrativaSortCol === col) narrativaSortAsc = !narrativaSortAsc;
+  else { narrativaSortCol = col; narrativaSortAsc = true; }
+  ['name','email','active','created_at'].forEach(c => {
+    const el = document.getElementById('nsi-' + c);
+    if (el) el.textContent = c === col ? (narrativaSortAsc ? '▲' : '▼') : '';
+  });
+  filterNarrativaUsers();
+}
+
+function filterNarrativaUsers() {
+  const q      = (document.getElementById('search-nusers')?.value || '').toLowerCase();
+  const status = document.getElementById('filter-nstatus')?.value || '';
+  let list = allNarrativaUsers.filter(u => {
+    const matchQ = (u.name||'').toLowerCase().includes(q) || (u.email||'').toLowerCase().includes(q);
+    const matchS = !status || (status === 'active' ? u.active : !u.active);
+    return matchQ && matchS;
+  });
+  list = [...list].sort((a, b) => {
+    let va = a[narrativaSortCol] ?? '', vb = b[narrativaSortCol] ?? '';
+    if (typeof va === 'boolean') { va = va ? 1 : 0; vb = vb ? 1 : 0; }
+    return narrativaSortAsc ? (va > vb ? 1 : -1) : (va < vb ? 1 : -1);
+  });
+  renderNarrativaUsers(list);
 }
 
 function renderNarrativaUsers(list) {
   const tb = document.getElementById('nusers-tbody');
-  if (!list.length) { tb.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="icon">👤</div><p>Nenhum usuário cadastrado ainda.</p></div></td></tr>`; return; }
+  if (!list.length) { tb.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="icon">👤</div><p>Nenhum usuário encontrado.</p></div></td></tr>`; return; }
   tb.innerHTML = list.map(u => `
     <tr>
+      <td class="cb-col"><input type="checkbox" class="nchk-row" value="${u.id}" ${narrativaSelected.has(u.id)?'checked':''} onchange="onNarrativaCheck('${u.id}',this.checked)" /></td>
       <td style="font-weight:600">${u.name}</td>
       <td style="color:var(--muted);font-size:12px">${u.email}</td>
       <td><span class="badge ${u.active ? 'active' : 'inactive'}">${u.active ? 'Ativo' : 'Inativo'}</span></td>
       <td style="color:var(--muted);font-size:12px">${fmtDate(u.created_at)}</td>
       <td><div class="actions">
         <button class="btn-icon" title="Reenviar credenciais" onclick="resendNarrativaEmail('${u.id}','${u.email}')">📧</button>
-        <button class="btn-icon" title="Editar usuário" onclick="openNarrativaEditModal('${u.id}','${u.name.replace(/'/g,"\\'")}','${u.email}')">✏️</button>
-        <button class="btn-icon warn" onclick="toggleNarrativaUser('${u.id}',${u.active})">${u.active ? '🔒' : '🔓'}</button>
+        <button class="btn-icon" title="Editar" onclick="openNarrativaEditModal('${u.id}','${u.name.replace(/'/g,"\\'")}','${u.email}')">✏️</button>
+        <button class="btn-icon warn" title="${u.active?'Desativar':'Ativar'}" onclick="toggleNarrativaUser('${u.id}',${u.active})">${u.active ? '🔒' : '🔓'}</button>
         <button class="btn-icon danger" onclick="deleteNarrativaUser('${u.id}','${u.email}')">🗑️</button>
       </div></td>
     </tr>`).join('');
 }
 
-function filterNarrativaUsers() {
-  const q = document.getElementById('search-nusers').value.toLowerCase();
-  renderNarrativaUsers(allNarrativaUsers.filter(u =>
-    (u.name||'').toLowerCase().includes(q) || (u.email||'').toLowerCase().includes(q)
-  ));
+function onNarrativaCheck(id, checked) {
+  checked ? narrativaSelected.add(id) : narrativaSelected.delete(id);
+  updateNarrativaBulkBar();
+}
+
+function toggleNarrativaSelectAll() {
+  const all = document.querySelectorAll('.nchk-row');
+  const check = document.getElementById('nchk-all').checked;
+  all.forEach(cb => { cb.checked = check; check ? narrativaSelected.add(cb.value) : narrativaSelected.delete(cb.value); });
+  updateNarrativaBulkBar();
+}
+
+function updateNarrativaBulkBar() {
+  const bar = document.getElementById('nbulk-bar');
+  const n   = narrativaSelected.size;
+  bar.style.display = n > 0 ? 'flex' : 'none';
+  document.getElementById('nbulk-count').textContent = `${n} selecionado${n>1?'s':''}`;
+}
+
+async function bulkNarrativaActivate(active) {
+  const ids = [...narrativaSelected];
+  if (!ids.length) return;
+  if (!confirm(`${active?'Ativar':'Desativar'} ${ids.length} usuário(s)?`)) return;
+  await Promise.all(ids.map(id => apiCall('narrativa-toggle', { id, force: active })));
+  narrativaSelected.clear();
+  toast(`${active?'🔓 Ativados':'🔒 Desativados'}: ${ids.length}`, 'success');
+  loadNarrativaUsers();
+}
+
+function exportNarrativaCSV() {
+  if (!allNarrativaUsers.length) return;
+  const rows = [['Nome','Email','Status','Criado em']];
+  allNarrativaUsers.forEach(u => rows.push([u.name, u.email, u.active?'Ativo':'Inativo', fmtDate(u.created_at)]));
+  const csv = rows.map(r => r.map(v => `"${(v||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'narrativa-users-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
 }
 
 function openNarrativaModal() {
