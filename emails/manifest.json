@@ -1,5 +1,23 @@
 [
   {
+    "id": "narrativa-boas-vindas",
+    "product": "narrativa",
+    "label": "Boas-vindas — Credenciais de Acesso",
+    "subject": "✨ Seu acesso ao Narrativa IA Studio",
+    "from": "Narrativa IA <contato@cenadrop.com.br>",
+    "tag": "transacional",
+    "description": "Email automático disparado na criação de novo usuário — contém email e senha gerada"
+  },
+  {
+    "id": "narrativa-reset-senha",
+    "product": "narrativa",
+    "label": "Reset de Senha",
+    "subject": "🔑 Seus novos dados de acesso — Narrativa IA Studio",
+    "from": "Narrativa IA <contato@cenadrop.com.br>",
+    "tag": "transacional",
+    "description": "Email disparado ao clicar em 'Reenviar Acesso' no admin — gera nova senha e envia ao usuário"
+  },
+  {
     "id": "cenadrop-v76-aulao",
     "product": "cenadrop",
     "label": "Aulão ao Vivo — v7.6",
