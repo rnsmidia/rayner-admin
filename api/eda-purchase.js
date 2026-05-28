@@ -153,7 +153,7 @@ module.exports = async function handler(req, res) {
           Authorization:  `Bot ${process.env.DISCORD_BOT_TOKEN}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ max_uses: 1, max_age: 604800, unique: true }),
+        body: JSON.stringify({ max_uses: 1, max_age: 86400, unique: true }),
       }
     );
     const invite = await inviteRes.json();
@@ -255,7 +255,7 @@ module.exports = async function handler(req, res) {
           <div class="card-info">
             <div class="card-label">COMUNIDADE DISCORD</div>
             <div class="card-title">Servidor Elite Dark Academy</div>
-            <div class="card-sub">Convite exclusivo — uso único, válido por 7 dias</div>
+            <div class="card-sub">Convite exclusivo — uso único, válido por 24 horas</div>
             <a href="${results.discord}" class="btn-card">ENTRAR NO SERVIDOR →</a>
           </div>
         </div>`
