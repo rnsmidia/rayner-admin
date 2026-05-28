@@ -245,7 +245,7 @@ button{font-family:'Space Grotesk',sans-serif;}
   letter-spacing:.18em;text-transform:uppercase;color:var(--muted);
 }
 .prompts-label::after{content:'';flex:1;height:1px;background:var(--border);}
-.prompts-stack{display:flex;flex-direction:column;gap:16px;}
+.prompts-stack{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start;}
 
 /* search results */
 .search-header{padding:36px 60px 0;font-size:14px;color:var(--muted);flex-shrink:0;}
@@ -409,7 +409,7 @@ button{font-family:'Space Grotesk',sans-serif;}
   /* Prompts */
   .prompts-area{padding:20px 14px 48px;}
   .prompts-label{font-size:9px;}
-  .prompts-stack{gap:20px;}
+  .prompts-stack{grid-template-columns:1fr;gap:14px;}
   .search-header{padding:20px 14px 0;}
 
   /* Cards */
