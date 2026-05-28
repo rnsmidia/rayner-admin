@@ -426,7 +426,7 @@
       <p>Painel interno de lançamento</p>
     </div>
     <div class="badge-data">
-      Atualizado em<br>27 mai. 2026 · noite
+      Atualizado em<br>27 mai. 2026 · tarde
     </div>
   </header>
 
@@ -610,26 +610,34 @@
         <span class="tag tag-ok">Feito</span>
       </div>
       <div class="item">
-        <div class="status-icon icon-wait">⏳</div>
+        <div class="status-icon icon-ok">✓</div>
         <div class="item-body">
-          <div class="item-titulo">Configurar webhook no Hotmart</div>
-          <div class="item-detalhe">URL: raynern.com.br/api/discord-invite · aguardando produto</div>
+          <div class="item-titulo">Webhook unificado /api/eda-purchase</div>
+          <div class="item-detalhe">1 compra → Discord + CenaDrop + Narrativa IA + email premium com tudo · HOTTOK_MC configurado no Hotmart</div>
         </div>
-        <span class="tag tag-wait">Aguardando produto</span>
+        <span class="tag tag-ok">Feito</span>
       </div>
       <div class="item">
-        <div class="status-icon icon-wait">⏳</div>
+        <div class="status-icon icon-ok">✓</div>
         <div class="item-body">
-          <div class="item-titulo">CenaDrop — chave no email de boas-vindas</div>
-          <div class="item-detalhe">Conectar webhook ao sistema de chave existente · aguardando produto</div>
+          <div class="item-titulo">Revogação automática (cancel/reembolso)</div>
+          <div class="item-detalhe">Remove cargo Discord + desativa chave CenaDrop + desativa conta Narrativa IA em 1 evento</div>
         </div>
-        <span class="tag tag-wait">Aguardando produto</span>
+        <span class="tag tag-ok">Feito</span>
+      </div>
+      <div class="item">
+        <div class="status-icon icon-ok">✓</div>
+        <div class="item-body">
+          <div class="item-titulo">Admin — aba Membros (acesso Discord)</div>
+          <div class="item-detalhe">Lista compradores · status no servidor / pendente / revogado · botão reenviar convite 1 uso/24h</div>
+        </div>
+        <span class="tag tag-ok">Feito</span>
       </div>
       <div class="item">
         <div class="status-icon icon-ok">✓</div>
         <div class="item-body">
           <div class="item-titulo">Narrativa — provisionar acesso</div>
-          <div class="item-detalhe">Via admin → + Novo Usuário · email automático com credenciais · por plano</div>
+          <div class="item-detalhe">Via webhook eda-purchase · email automático com credenciais · ativo por 12 meses</div>
         </div>
         <span class="tag tag-ok">Feito</span>
       </div>
@@ -669,12 +677,12 @@
         <span class="tag tag-open">Pendente</span>
       </div>
       <div class="item">
-        <div class="status-icon icon-open"></div>
+        <div class="status-icon icon-wait">⏳</div>
         <div class="item-body">
           <div class="item-titulo">Testar fluxo completo de ponta a ponta</div>
-          <div class="item-detalhe">Compra → email + chave CenaDrop → Discord → área de membros</div>
+          <div class="item-detalhe">Teste via botão Hotmart agendado para 28/05 · compra → Discord + CenaDrop + Narrativa + email</div>
         </div>
-        <span class="tag tag-open">Pendente</span>
+        <span class="tag tag-wait">Amanhã</span>
       </div>
     </div>
   </div>
@@ -723,12 +731,12 @@
     </div>
     <div class="items-grid">
       <div class="item">
-        <div class="status-icon icon-open"></div>
+        <div class="status-icon icon-ok">✓</div>
         <div class="item-body">
           <div class="item-titulo">Criar produto no Hotmart</div>
-          <div class="item-detalhe">Definir preço, garantia, prazo e configurar na plataforma</div>
+          <div class="item-detalhe">Narrativa IA Studio — Assinatura Anual · R$1.097 ou 12x R$113,46 · checkout personalizado dark purple · pay.hotmart.com/H106026254Y</div>
         </div>
-        <span class="tag tag-open">Pendente</span>
+        <span class="tag tag-ok">Feito</span>
       </div>
       <div class="item">
         <div class="status-icon icon-ok">✓</div>
@@ -758,12 +766,12 @@
         <span class="tag tag-ok">Feito</span>
       </div>
       <div class="item">
-        <div class="status-icon icon-wait">⏳</div>
+        <div class="status-icon icon-ok">✓</div>
         <div class="item-body">
           <div class="item-titulo">Webhook Hotmart → criar usuário automaticamente</div>
-          <div class="item-detalhe">Endpoint /api/narrativa-access deployado · aguardando produto + HOTTOK no Vercel</div>
+          <div class="item-detalhe">Endpoint /api/narrativa-access · HOTTOK configurado no Vercel · 200 em compra, cancelamento, reembolso e chargeback</div>
         </div>
-        <span class="tag tag-wait">Aguardando produto</span>
+        <span class="tag tag-ok">Feito</span>
       </div>
       <div class="item">
         <div class="status-icon icon-ok">✓</div>
@@ -790,12 +798,12 @@
         <span class="tag tag-ok">Feito</span>
       </div>
       <div class="item">
-        <div class="status-icon icon-open"></div>
+        <div class="status-icon icon-ok">✓</div>
         <div class="item-body">
           <div class="item-titulo">Testar fluxo completo — compra → acesso</div>
-          <div class="item-detalhe">Compra Hotmart → email credenciais → login Narrativa → sessão ativa</div>
+          <div class="item-detalhe">Webhook testado com email real · usuário criado no Supabase · email com credenciais chegou · login validado</div>
         </div>
-        <span class="tag tag-open">Pendente</span>
+        <span class="tag tag-ok">Feito</span>
       </div>
     </div>
   </div>
