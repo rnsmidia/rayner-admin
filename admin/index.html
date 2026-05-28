@@ -1049,8 +1049,8 @@ th.cb-col { width: 36px; }
           </div>
         </button>
         <div id="subnav-academy" class="subnav" style="display:none">
-          <button class="sn-btn active" data-sec="waitlist" onclick="switchSection('academy','waitlist')">📋 Lista VIP <span class="sn-count" id="cnt-academy">—</span></button>
-          <button class="sn-btn" data-sec="membros" onclick="switchSection('academy','membros');loadEdaMembers()">👥 Membros <span class="sn-count" id="cnt-eda-members">—</span></button>
+          <button class="sn-btn" data-sec="waitlist" onclick="switchSection('academy','waitlist')">📋 Lista VIP <span class="sn-count" id="cnt-academy">—</span></button>
+          <button class="sn-btn active" data-sec="membros" onclick="switchSection('academy','membros');loadEdaMembers()">👥 Membros <span class="sn-count" id="cnt-eda-members">—</span></button>
           <button class="sn-btn" data-sec="funnel" onclick="switchSection('academy','funnel');loadAcademyFunnel()">📊 Funil</button>
         </div>
 
@@ -1574,7 +1574,7 @@ th.cb-col { width: 36px; }
       <!-- ── MONITOR ── -->
       <!-- ── ELITE DARK ACADEMY ── -->
       <div class="prod-panel" id="panel-academy">
-        <div class="sec-panel active" id="academy-waitlist">
+        <div class="sec-panel" id="academy-waitlist">
 
           <!-- Stats -->
           <div class="stats-grid" style="margin-bottom:24px">
@@ -1693,7 +1693,7 @@ th.cb-col { width: 36px; }
         </div>
 
         <!-- Membros (compradores — acesso Discord) -->
-        <div class="sec-panel" id="academy-membros">
+        <div class="sec-panel active" id="academy-membros">
 
           <div class="stats-grid" style="margin-bottom:24px">
             <div class="stat-card">
@@ -2533,7 +2533,7 @@ function switchProduct(prod) {
   if (prod === 'narrativa') { switchSection('narrativa', curSec['narrativa'] || 'dashboard'); loadNarrativaUsers(); }
   if (prod === 'nexus')     { switchSection('nexus',     curSec['nexus']     || 'dashboard'); loadNexusData(); loadNexusDashClicks(); }
   if (prod === 'monitor')   { switchSection('monitor',   'usage'); loadMonitor(); }
-  if (prod === 'academy')   { switchSection('academy',   'waitlist'); loadAcademyWaitlist(); }
+  if (prod === 'academy')   { switchSection('academy',   'membros');  loadEdaMembers(); }
   if (prod === 'links')     { document.getElementById('bc-sec').textContent = 'Todos os Links'; }
 }
 
