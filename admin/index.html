@@ -1050,6 +1050,7 @@ th.cb-col { width: 36px; }
         </button>
         <div id="subnav-academy" class="subnav" style="display:none">
           <button class="sn-btn active" data-sec="waitlist" onclick="switchSection('academy','waitlist')">📋 Lista VIP <span class="sn-count" id="cnt-academy">—</span></button>
+          <button class="sn-btn" data-sec="membros" onclick="switchSection('academy','membros');loadEdaMembers()">👥 Membros <span class="sn-count" id="cnt-eda-members">—</span></button>
           <button class="sn-btn" data-sec="funnel" onclick="switchSection('academy','funnel');loadAcademyFunnel()">📊 Funil</button>
         </div>
 
@@ -1691,6 +1692,56 @@ th.cb-col { width: 36px; }
 
         </div>
 
+        <!-- Membros (compradores — acesso Discord) -->
+        <div class="sec-panel" id="academy-membros">
+
+          <div class="stats-grid" style="margin-bottom:24px">
+            <div class="stat-card">
+              <div class="stat-icon-wrap purple">👥</div>
+              <div><div class="stat-label">Total Membros</div><div class="stat-val purple" id="eda-m-total">—</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap green">✅</div>
+              <div><div class="stat-label">No Servidor</div><div class="stat-val green" id="eda-m-joined">—</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap yellow">⏳</div>
+              <div><div class="stat-label">Convite Pendente</div><div class="stat-val yellow" id="eda-m-pending">—</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap red">🚫</div>
+              <div><div class="stat-label">Revogados</div><div class="stat-val red" id="eda-m-revoked">—</div></div>
+            </div>
+          </div>
+
+          <div class="toolbar">
+            <div class="search-wrap">
+              <input type="text" id="search-eda-members" placeholder="Buscar por nome ou email..." oninput="filterEdaMembers()" />
+            </div>
+            <button class="btn-sm" onclick="loadEdaMembers()">↻ Atualizar</button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Nome</th>
+                  <th>E-mail</th>
+                  <th>No Discord</th>
+                  <th>Status</th>
+                  <th>Comprado em</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="eda-members-tbody">
+                <tr><td colspan="7"><div class="empty-state"><div class="icon">👥</div><p>Carregando...</p></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
       </div>
 
       <!-- ══════════════════════════════════════════
@@ -2060,7 +2111,7 @@ th.cb-col { width: 36px; }
               <div class="lh-acc-hd" onclick="openLhSection('lhs-narrativa')">
                 <div class="lh-acc-bar" style="background:#3b82f6"></div>
                 <span class="lh-acc-title">🤖 Narrativa IA</span>
-                <span class="lh-acc-count">3</span>
+                <span class="lh-acc-count">4</span>
                 <span class="lh-acc-chevron">▾</span>
               </div>
               <div class="lh-cards" style="--lh-color:#3b82f6">
@@ -2083,6 +2134,17 @@ th.cb-col { width: 36px; }
                     <div class="lh-card-acts">
                       <button onclick="window.open('https://narrativaia.com.br/vendas','_blank')" title="Abrir">↗</button>
                       <button onclick="copyLink('https://narrativaia.com.br/vendas',this)" title="Copiar">⎘</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="lh-card lh-item" data-search="narrativa ia checkout pagamento hotmart assinatura anual">
+                  <div class="lh-card-name">Checkout Narrativa IA</div>
+                  <div class="lh-card-desc">Assinatura Anual — R$1.097 ou 12x R$113,46</div>
+                  <div class="lh-card-footer">
+                    <span class="lh-badge checkout">Checkout</span>
+                    <div class="lh-card-acts">
+                      <button onclick="window.open('https://pay.hotmart.com/H106026254Y?checkoutMode=10','_blank')" title="Abrir">↗</button>
+                      <button onclick="copyLink('https://pay.hotmart.com/H106026254Y?checkoutMode=10',this)" title="Copiar">⎘</button>
                     </div>
                   </div>
                 </div>
@@ -3774,6 +3836,101 @@ async function deleteAcademy(id, nome) {
   const r = await apiCall('academy-delete', { id });
   if (r.ok) { toast('Removido.'); loadAcademyWaitlist(); }
   else toast('Erro ao remover.', 'error');
+}
+
+// ── EDA MEMBROS (Discord) ─────────────────────
+let allEdaMembers = [];
+
+async function loadEdaMembers() {
+  const r = await apiCall('eda-members-list');
+  if (r.error) { toast('Erro ao carregar membros.', 'error'); return; }
+  allEdaMembers = r.members || [];
+
+  // Agrupa por email — pega o registro mais recente de cada comprador
+  const byEmail = {};
+  for (const m of allEdaMembers) {
+    const prev = byEmail[m.email];
+    if (!prev || new Date(m.created_at) > new Date(prev.created_at)) byEmail[m.email] = m;
+  }
+  const unique = Object.values(byEmail);
+
+  const joined  = unique.filter(m => m.discord_user_id).length;
+  const revoked = unique.filter(m => m.revoked).length;
+  const pending = unique.filter(m => !m.discord_user_id && !m.revoked).length;
+
+  document.getElementById('eda-m-total').textContent   = unique.length;
+  document.getElementById('eda-m-joined').textContent  = joined;
+  document.getElementById('eda-m-pending').textContent = pending;
+  document.getElementById('eda-m-revoked').textContent = revoked;
+  document.getElementById('cnt-eda-members').textContent = unique.length;
+
+  renderEdaMembers(unique);
+}
+
+function filterEdaMembers() {
+  const q = (document.getElementById('search-eda-members')?.value || '').toLowerCase();
+  const byEmail = {};
+  for (const m of allEdaMembers) {
+    const prev = byEmail[m.email];
+    if (!prev || new Date(m.created_at) > new Date(prev.created_at)) byEmail[m.email] = m;
+  }
+  let list = Object.values(byEmail);
+  if (q) list = list.filter(m =>
+    (m.name||'').toLowerCase().includes(q) ||
+    (m.email||'').toLowerCase().includes(q)
+  );
+  renderEdaMembers(list);
+}
+
+function renderEdaMembers(list) {
+  const tb = document.getElementById('eda-members-tbody');
+  if (!list.length) {
+    tb.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="icon">👥</div><p>Nenhum membro encontrado.</p></div></td></tr>`;
+    return;
+  }
+  tb.innerHTML = list.map((m, i) => {
+    const joined  = !!m.discord_user_id;
+    const revoked = !!m.revoked;
+
+    const statusBadge = revoked
+      ? `<span style="padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:rgba(234,84,85,.12);color:#ea5455;border:1px solid #ea545544">Revogado</span>`
+      : joined
+        ? `<span style="padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:rgba(40,199,111,.12);color:#28c76f;border:1px solid #28c76f44">No servidor</span>`
+        : `<span style="padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:rgba(255,159,67,.12);color:#ff9f43;border:1px solid #ff9f4344">Convite pendente</span>`;
+
+    const discordCell = joined
+      ? `<span style="color:#28c76f;font-size:13px">✓ Entrou</span>`
+      : `<span style="color:var(--muted);font-size:12px">—</span>`;
+
+    const resendBtn = !revoked
+      ? `<button class="btn-icon" title="Reenviar convite Discord" onclick="resendEdaInvite('${m.email}','${(m.name||'').replace(/'/g,"\\'")}',this)">🔁</button>`
+      : '';
+
+    return `<tr>
+      <td style="color:var(--muted);font-size:12px">${i + 1}</td>
+      <td style="font-weight:600">${m.name || '—'}</td>
+      <td style="color:var(--muted);font-size:13px">${m.email}</td>
+      <td>${discordCell}</td>
+      <td>${statusBadge}</td>
+      <td style="color:var(--muted);font-size:12px">${fmtDate(m.created_at)}</td>
+      <td><div class="actions">
+        <button class="btn-icon" title="Copiar e-mail" onclick="navigator.clipboard.writeText('${m.email}');toast('E-mail copiado!')">📋</button>
+        ${resendBtn}
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+async function resendEdaInvite(email, name, btn) {
+  if (!confirm(`Gerar novo convite Discord e enviar para ${email}?`)) return;
+  const orig = btn.textContent;
+  btn.textContent = '⏳';
+  btn.disabled = true;
+  const r = await apiCall('eda-resend-invite', { email, name });
+  btn.textContent = orig;
+  btn.disabled = false;
+  if (r.ok) toast(`Convite reenviado para ${email} ✓`);
+  else toast('Erro: ' + (r.error || 'falha ao enviar'), 'error');
 }
 
 // ── ACADEMY ELITE — FUNIL ─────────────────────

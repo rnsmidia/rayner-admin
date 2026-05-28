@@ -622,6 +622,84 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({ ok: true });
   }
 
+  // ── EDA MEMBERS — lista de compradores (discord_invites) ──────
+  if (action === 'eda-members-list') {
+    const { data, error } = await supabase
+      .from('discord_invites')
+      .select('id, email, name, invite_code, discord_user_id, used, revoked, revoked_reason, hotmart_order, created_at')
+      .order('created_at', { ascending: false });
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ members: data || [] });
+  }
+
+  // ── EDA RESEND INVITE — gera novo convite e reenvia email ─────
+  if (action === 'eda-resend-invite') {
+    const { email, name } = body;
+    if (!email) return res.status(400).json({ error: 'email obrigatório' });
+
+    const WELCOME_CHANNEL_EDA = '1508898202294816778';
+    const firstName = (name || email).split(' ')[0];
+
+    const inviteRes = await fetch(
+      `https://discord.com/api/v10/channels/${WELCOME_CHANNEL_EDA}/invites`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization:  `Bot ${process.env.DISCORD_BOT_TOKEN}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ max_uses: 1, max_age: 86400, unique: true }),
+      }
+    );
+    const invite = await inviteRes.json();
+    if (!invite.code) return res.status(500).json({ error: 'Discord não retornou código' });
+    const inviteUrl = `https://discord.gg/${invite.code}`;
+
+    await supabase.from('discord_invites').insert({
+      email: email.toLowerCase(),
+      name:  name || '',
+      invite_code:   invite.code,
+      hotmart_order: 'resend-manual',
+      used:    false,
+      revoked: false,
+    });
+
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    await resend.emails.send({
+      from:    'Elite Dark Academy <noreply@raynern.com.br>',
+      to:      email.toLowerCase(),
+      subject: `👑 Seu novo link de acesso ao Discord — Elite Dark Academy`,
+      html: `<!DOCTYPE html><html><head><meta charset="UTF-8">
+<style>
+  body{margin:0;padding:0;background:#050508;font-family:'Segoe UI',Arial,sans-serif;}
+  .w{max-width:560px;margin:0 auto;padding:40px 16px;}
+  .c{background:#0a0a14;border:1px solid rgba(212,175,55,.2);border-radius:16px;overflow:hidden;}
+  .h{background:linear-gradient(160deg,#0e0e1c,#07070f);padding:40px 32px;text-align:center;border-bottom:1px solid rgba(212,175,55,.12);}
+  .b{padding:36px 32px;}
+  .g{font-size:20px;color:#fff;font-weight:700;margin-bottom:10px;}
+  .t{color:rgba(255,255,255,.5);font-size:14px;line-height:1.7;margin-bottom:24px;}
+  .f{padding:20px 32px;border-top:1px solid rgba(255,255,255,.05);text-align:center;}
+  .f p{color:rgba(255,255,255,.2);font-size:11px;margin:3px 0;}
+</style>
+</head><body><div class="w"><div class="c">
+  <div class="h"><div style="font-size:40px;margin-bottom:10px;">👑</div>
+    <div style="font-size:10px;font-weight:700;letter-spacing:.2em;color:#C9A227;text-transform:uppercase">Elite Dark Academy</div>
+  </div>
+  <div class="b">
+    <div class="g">Novo link de acesso, ${firstName}.</div>
+    <p class="t">Aqui está seu novo convite para o servidor Discord do <strong style="color:#C9A227">Elite Dark Academy</strong>.<br>Este link é de uso único e válido por 24 horas.</p>
+    <div style="text-align:center;margin:28px 0;">
+      <a href="${inviteUrl}" style="display:inline-block;background:linear-gradient(135deg,#C9A227,#8B6914);color:#000;text-decoration:none;font-weight:800;font-size:14px;letter-spacing:.08em;padding:14px 36px;border-radius:10px;">ENTRAR NO DISCORD →</a>
+    </div>
+    <p class="t" style="font-size:12px;">Não compartilhe este link. Dúvidas? Responda este email.</p>
+  </div>
+  <div class="f"><p>© ${new Date().getFullYear()} Elite Dark Academy</p></div>
+</div></div></body></html>`,
+    });
+
+    return res.status(200).json({ ok: true, inviteUrl });
+  }
+
   // ── ACADEMY ELITE — FUNIL ANALYTICS ──────────────────────────
   if (action === 'academy-funnel-stats') {
     const { data } = await supabase
