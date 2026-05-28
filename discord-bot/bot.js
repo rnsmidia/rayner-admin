@@ -108,4 +108,14 @@ client.on('guildMemberAdd', async (member) => {
   }
 });
 
+client.on('error', err => console.error('❌ Discord client error:', err.message));
+client.on('warn',  msg => console.warn('⚠️ Discord warn:', msg));
+
+process.on('unhandledRejection', (reason) => {
+  console.error('❌ unhandledRejection:', reason);
+});
+process.on('uncaughtException', (err) => {
+  console.error('❌ uncaughtException:', err.message);
+});
+
 client.login(process.env.DISCORD_BOT_TOKEN);
