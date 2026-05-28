@@ -245,7 +245,7 @@ button{font-family:'Space Grotesk',sans-serif;}
   letter-spacing:.18em;text-transform:uppercase;color:var(--muted);
 }
 .prompts-label::after{content:'';flex:1;height:1px;background:var(--border);}
-.prompts-stack{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start;}
+.prompts-stack{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;grid-auto-rows:1fr;}
 
 /* search results */
 .search-header{padding:36px 60px 0;font-size:14px;color:var(--muted);flex-shrink:0;}
@@ -262,6 +262,7 @@ button{font-family:'Space Grotesk',sans-serif;}
 .prompt-card{
   background:var(--card);border:1px solid var(--border);border-radius:20px;
   overflow:hidden;transition:border-color .25s,box-shadow .25s;
+  display:flex;flex-direction:column;height:100%;
 }
 .prompt-card:hover{
   border-color:rgba(124,111,255,.22);
@@ -298,7 +299,7 @@ button{font-family:'Space Grotesk',sans-serif;}
 .ia-gemini{background:rgba(66,133,244,.08);border-color:rgba(66,133,244,.22);color:#4285f4;}
 
 /* ── PROMPT TEXT BLOCK ── */
-.prompt-block{margin:0 20px;border-radius:12px;overflow:hidden;border:1px solid var(--border2);}
+.prompt-block{margin:0 20px;border-radius:12px;overflow:hidden;border:1px solid var(--border2);flex:1;display:flex;flex-direction:column;}
 .prompt-block-header{
   display:flex;align-items:center;justify-content:space-between;
   padding:9px 16px;background:rgba(0,0,0,.35);border-bottom:1px solid var(--border);
@@ -324,7 +325,10 @@ button{font-family:'Space Grotesk',sans-serif;}
   font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.85;
   color:rgba(234,234,248,.85);white-space:pre-wrap;word-break:break-word;
   background:rgba(0,0,0,.2);
+  flex:1;overflow-y:auto;
 }
+.prompt-text::-webkit-scrollbar{width:3px;}
+.prompt-text::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 
 /* ── COPY BUTTON ── */
 .copy-wrap{padding:14px 20px 20px;}
