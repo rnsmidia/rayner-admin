@@ -431,89 +431,111 @@
   </header>
 
   <!-- Funil em tempo real -->
-  <div id="funil-wrap" style="margin-bottom:16px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(201,162,39,.7)">Funil de Conversão — Lista VIP</div>
+  <div style="background:#0e0e0e;border:1px solid rgba(201,162,39,.2);border-radius:12px;padding:18px 20px;margin-bottom:16px">
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(201,162,39,.8)">📊 Funil de Conversão — Lista VIP</div>
       <div style="font-size:10px;color:rgba(255,255,255,.2)" id="funil-updated">atualizando...</div>
     </div>
 
-    <!-- Métricas do funil -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px">
-      <div style="background:#111;border:1px solid rgba(255,255,255,.06);border-radius:9px;padding:12px 14px;text-align:center">
-        <div style="font-size:22px;font-weight:700;color:#C9A227;line-height:1" id="fn-visits">—</div>
-        <div style="font-size:9px;color:rgba(255,255,255,.35);margin-top:4px;text-transform:uppercase;letter-spacing:.06em">Visitantes</div>
+    <!-- Etapas do funil -->
+    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px">
+
+      <!-- Visitantes -->
+      <div style="display:flex;align-items:center;gap:12px;background:#111;border:1px solid rgba(255,255,255,.05);border-radius:8px;padding:11px 14px">
+        <div style="font-size:16px">👁</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600;color:#e8e8e8">Pessoas que visitaram a página</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:1px">Sessões únicas no funil de inscrição</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:22px;font-weight:800;color:#C9A227;line-height:1" id="fn-visits">—</div>
+        </div>
       </div>
-      <div style="background:#111;border:1px solid rgba(255,255,255,.06);border-radius:9px;padding:12px 14px;text-align:center">
-        <div style="font-size:22px;font-weight:700;color:#4CAF50;line-height:1" id="fn-qualified">—</div>
-        <div style="font-size:9px;color:rgba(255,255,255,.35);margin-top:4px;text-transform:uppercase;letter-spacing:.06em">Qualificados</div>
+
+      <!-- Seta + taxa -->
+      <div style="display:flex;align-items:center;gap:8px;padding:0 14px">
+        <div style="width:1px;height:14px;background:rgba(201,162,39,.2);margin-left:19px"></div>
+        <div style="font-size:10px;color:rgba(255,255,255,.25)" id="fn-rateQ-label"></div>
       </div>
-      <div style="background:#111;border:1px solid rgba(255,255,255,.06);border-radius:9px;padding:12px 14px;text-align:center">
-        <div style="font-size:22px;font-weight:700;color:#C9A227;line-height:1" id="fn-leads">—</div>
-        <div style="font-size:9px;color:rgba(255,255,255,.35);margin-top:4px;text-transform:uppercase;letter-spacing:.06em">Leads (Lista VIP)</div>
+
+      <!-- Qualificados -->
+      <div style="display:flex;align-items:center;gap:12px;background:#111;border:1px solid rgba(255,255,255,.05);border-radius:8px;padding:11px 14px">
+        <div style="font-size:16px">✅</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600;color:#e8e8e8">Qualificados pelo formulário</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:1px">Responderam as perguntas e foram aprovados</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:22px;font-weight:800;color:#4CAF50;line-height:1" id="fn-qualified">—</div>
+          <div style="font-size:10px;color:rgba(76,175,80,.6);margin-top:2px" id="fn-rateQ">—</div>
+        </div>
       </div>
-      <div style="background:#111;border:1px solid rgba(255,255,255,.06);border-radius:9px;padding:12px 14px;text-align:center">
-        <div style="font-size:22px;font-weight:700;color:#25D366;line-height:1" id="fn-whatsapp">—</div>
-        <div style="font-size:9px;color:rgba(255,255,255,.35);margin-top:4px;text-transform:uppercase;letter-spacing:.06em">Cliques WhatsApp</div>
+
+      <!-- Seta + taxa -->
+      <div style="display:flex;align-items:center;gap:8px;padding:0 14px">
+        <div style="width:1px;height:14px;background:rgba(201,162,39,.2);margin-left:19px"></div>
+        <div style="font-size:10px;color:rgba(255,255,255,.25)" id="fn-rateL-label"></div>
       </div>
+
+      <!-- Lista VIP -->
+      <div style="display:flex;align-items:center;gap:12px;background:#111;border:1px solid rgba(255,255,255,.05);border-radius:8px;padding:11px 14px">
+        <div style="font-size:16px">📋</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600;color:#e8e8e8">Inscritos na Lista VIP</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:1px">Deixaram nome, email e WhatsApp</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:22px;font-weight:800;color:#C9A227;line-height:1" id="fn-leads">—</div>
+          <div style="font-size:10px;color:rgba(201,162,39,.6);margin-top:2px" id="fn-rateL">—</div>
+        </div>
+      </div>
+
+      <!-- Seta + taxa -->
+      <div style="display:flex;align-items:center;gap:8px;padding:0 14px">
+        <div style="width:1px;height:14px;background:rgba(201,162,39,.2);margin-left:19px"></div>
+      </div>
+
+      <!-- WhatsApp -->
+      <div style="display:flex;align-items:center;gap:12px;background:#111;border:1px solid rgba(255,255,255,.05);border-radius:8px;padding:11px 14px">
+        <div style="font-size:16px">💬</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600;color:#e8e8e8">Clicaram para entrar no WhatsApp</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:1px">Foram para o grupo de espera VIP</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:22px;font-weight:800;color:#25D366;line-height:1" id="fn-whatsapp">—</div>
+          <div style="font-size:10px;color:rgba(37,211,102,.6);margin-top:2px" id="fn-rateW">—</div>
+        </div>
+      </div>
+
     </div>
 
-    <!-- Barra do funil -->
-    <div style="background:#0e0e0e;border:1px solid rgba(255,255,255,.06);border-radius:9px;padding:14px 16px;display:flex;align-items:center;gap:0">
-
-      <div style="flex:1;text-align:center">
-        <div style="font-size:9px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Visitantes</div>
-        <div style="font-size:18px;font-weight:700;color:#C9A227" id="fn2-visits">—</div>
-      </div>
-
-      <div style="display:flex;flex-direction:column;align-items:center;padding:0 8px">
-        <div style="font-size:9px;color:rgba(255,255,255,.2);margin-bottom:2px" id="fn-rateQ">—%</div>
-        <div style="color:rgba(201,162,39,.4);font-size:14px">→</div>
-        <div style="font-size:8px;color:rgba(255,255,255,.15)">qualif.</div>
-      </div>
-
-      <div style="flex:1;text-align:center">
-        <div style="font-size:9px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Qualificados</div>
-        <div style="font-size:18px;font-weight:700;color:#4CAF50" id="fn2-qualified">—</div>
-      </div>
-
-      <div style="display:flex;flex-direction:column;align-items:center;padding:0 8px">
-        <div style="font-size:9px;color:rgba(255,255,255,.2);margin-bottom:2px" id="fn-rateL">—%</div>
-        <div style="color:rgba(201,162,39,.4);font-size:14px">→</div>
-        <div style="font-size:8px;color:rgba(255,255,255,.15)">inscrição</div>
-      </div>
-
-      <div style="flex:1;text-align:center">
-        <div style="font-size:9px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Lista VIP</div>
-        <div style="font-size:18px;font-weight:700;color:#C9A227" id="fn2-leads">—</div>
-      </div>
-
-      <div style="display:flex;flex-direction:column;align-items:center;padding:0 8px">
-        <div style="font-size:9px;color:rgba(255,255,255,.2);margin-bottom:2px" id="fn-rateW">—%</div>
-        <div style="color:rgba(201,162,39,.4);font-size:14px">→</div>
-        <div style="font-size:8px;color:rgba(255,255,255,.15)">whatsapp</div>
-      </div>
-
-      <div style="flex:1;text-align:center">
-        <div style="font-size:9px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">WhatsApp</div>
-        <div style="font-size:18px;font-weight:700;color:#25D366" id="fn2-whatsapp">—</div>
-      </div>
-
-    </div>
+    <!-- Divisor -->
+    <div style="border-top:1px solid rgba(255,255,255,.06);margin-bottom:14px"></div>
 
     <!-- Membros comprados -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px">
-      <div style="background:rgba(201,162,39,.06);border:1px solid rgba(201,162,39,.2);border-radius:9px;padding:12px 14px;text-align:center">
-        <div style="font-size:22px;font-weight:700;color:#C9A227;line-height:1" id="fn-members-total">—</div>
-        <div style="font-size:9px;color:rgba(255,255,255,.35);margin-top:4px;text-transform:uppercase;letter-spacing:.06em">👑 Membros</div>
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(201,162,39,.6);margin-bottom:10px">👑 Membros — Pós-compra</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+
+      <div style="background:#111;border:1px solid rgba(201,162,39,.2);border-radius:8px;padding:12px 14px">
+        <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:6px">Total de membros</div>
+        <div style="font-size:26px;font-weight:800;color:#C9A227;line-height:1" id="fn-members-total">—</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.2);margin-top:3px">compraram o Elite</div>
       </div>
-      <div style="background:rgba(40,199,111,.06);border:1px solid rgba(40,199,111,.15);border-radius:9px;padding:12px 14px;text-align:center">
-        <div style="font-size:22px;font-weight:700;color:#28c76f;line-height:1" id="fn-members-joined">—</div>
-        <div style="font-size:9px;color:rgba(255,255,255,.35);margin-top:4px;text-transform:uppercase;letter-spacing:.06em">No Discord</div>
+
+      <div style="background:#111;border:1px solid rgba(40,199,111,.15);border-radius:8px;padding:12px 14px">
+        <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:6px">Entraram no Discord</div>
+        <div style="font-size:26px;font-weight:800;color:#28c76f;line-height:1" id="fn-members-joined">—</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.2);margin-top:3px">já no servidor</div>
       </div>
-      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:9px;padding:12px 14px;text-align:center">
-        <div style="font-size:22px;font-weight:700;color:rgba(255,255,255,.4);line-height:1" id="fn-waitlist">—</div>
-        <div style="font-size:9px;color:rgba(255,255,255,.35);margin-top:4px;text-transform:uppercase;letter-spacing:.06em">Lista VIP total</div>
+
+      <div style="background:#111;border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:12px 14px">
+        <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:6px">Lista VIP total</div>
+        <div style="font-size:26px;font-weight:800;color:rgba(255,255,255,.5);line-height:1" id="fn-waitlist">—</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.2);margin-top:3px">inscritos em espera</div>
       </div>
+
     </div>
 
   </div>
@@ -1202,19 +1224,14 @@
       if (!d.funnel) return;
 
       const f = d.funnel;
-      document.getElementById('fn-visits').textContent    = f.visits;
-      document.getElementById('fn-qualified').textContent = f.qualified;
-      document.getElementById('fn-leads').textContent     = f.leads;
-      document.getElementById('fn-whatsapp').textContent  = f.whatsapp;
+      document.getElementById('fn-visits').textContent    = f.visits.toLocaleString('pt-BR');
+      document.getElementById('fn-qualified').textContent = f.qualified.toLocaleString('pt-BR');
+      document.getElementById('fn-leads').textContent     = f.leads.toLocaleString('pt-BR');
+      document.getElementById('fn-whatsapp').textContent  = f.whatsapp.toLocaleString('pt-BR');
 
-      document.getElementById('fn2-visits').textContent    = f.visits;
-      document.getElementById('fn2-qualified').textContent = f.qualified;
-      document.getElementById('fn2-leads').textContent     = f.leads;
-      document.getElementById('fn2-whatsapp').textContent  = f.whatsapp;
-
-      document.getElementById('fn-rateQ').textContent = f.rateQ + '%';
-      document.getElementById('fn-rateL').textContent = f.rateL + '%';
-      document.getElementById('fn-rateW').textContent = f.rateW + '%';
+      document.getElementById('fn-rateQ').textContent = f.rateQ + '% dos visitantes';
+      document.getElementById('fn-rateL').textContent = f.rateL + '% dos qualificados';
+      document.getElementById('fn-rateW').textContent = f.rateW + '% dos inscritos';
 
       document.getElementById('fn-members-total').textContent  = d.members.total;
       document.getElementById('fn-members-joined').textContent = d.members.joined;
