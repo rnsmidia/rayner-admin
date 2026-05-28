@@ -849,6 +849,57 @@ thead th.sortable:hover { color: var(--accent); }
 .btn-test:hover { background: rgba(124,58,237,.08); }
 .btn-test:disabled { opacity: .5; cursor: not-allowed; }
 
+/* ── BLAST DANGER CARD ─────────────────── */
+.blast-card.danger {
+  border-color: rgba(234,84,85,.35);
+  background: linear-gradient(135deg, var(--card) 0%, rgba(234,84,85,.04) 100%);
+}
+.blast-card.danger h3 { color: #ea5455; }
+.btn-blast-danger {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: linear-gradient(135deg,#c0392b,#e74c3c);
+  color: #fff; border: none; border-radius: 10px;
+  padding: 13px 24px; font-family: 'Inter', sans-serif;
+  font-size: 14px; font-weight: 700; cursor: pointer; transition: all .2s;
+}
+.btn-blast-danger:hover { background: linear-gradient(135deg,#e74c3c,#c0392b); box-shadow: 0 4px 16px rgba(234,84,85,.4); }
+.btn-blast-danger:disabled { opacity: .5; cursor: not-allowed; }
+
+/* ── BLAST CONFIRM OVERLAY ─────────────── */
+#blast-confirm-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.7); z-index: 9999;
+  display: none; align-items: center; justify-content: center; padding: 20px;
+}
+#blast-confirm-overlay.open { display: flex; }
+#blast-confirm-modal {
+  background: var(--card); border: 1px solid rgba(234,84,85,.4);
+  border-radius: 16px; width: 100%; max-width: 440px; padding: 32px;
+  box-shadow: 0 20px 60px rgba(234,84,85,.2);
+  animation: fadeInUp .2s ease;
+}
+@keyframes fadeInUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+#blast-confirm-modal h2 { font-size: 18px; font-weight: 700; color: #ea5455; margin: 12px 0 16px; text-align:center; }
+#blast-confirm-details {
+  background: var(--bg); border: 1px solid var(--border); border-radius: 9px;
+  padding: 14px 16px; font-size: 13px; color: var(--text2); margin-bottom: 16px; line-height: 1.7;
+}
+#blast-confirm-warning {
+  background: rgba(234,84,85,.08); border: 1px solid rgba(234,84,85,.3);
+  border-radius: 9px; padding: 12px 16px;
+  font-size: 13px; color: #ea5455; margin-bottom: 20px; line-height: 1.6;
+}
+#blast-confirm-countdown {
+  font-size: 12px; color: var(--muted); text-align: center; min-height: 18px; margin-bottom: 12px;
+}
+#blast-confirm-actions { display: flex; gap: 10px; }
+#blast-confirm-actions button { flex: 1; padding: 12px; font-size: 14px; font-weight: 700; border-radius: 10px; cursor: pointer; font-family: 'Inter', sans-serif; transition: all .15s; }
+#blast-cancel-btn { background: transparent; border: 1px solid var(--border); color: var(--text2); }
+#blast-cancel-btn:hover { background: var(--hover); }
+#blast-ok-btn { background: linear-gradient(135deg,#c0392b,#e74c3c); color: #fff; border: none; }
+#blast-ok-btn:hover:not(:disabled) { background: linear-gradient(135deg,#e74c3c,#c0392b); box-shadow: 0 4px 16px rgba(234,84,85,.4); }
+#blast-ok-btn:disabled { opacity: .4; cursor: not-allowed; }
+
 /* ── CHECKBOX ───────────────────────────── */
 input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; cursor: pointer; }
 td.cb-col { width: 36px; }
@@ -1319,14 +1370,20 @@ th.cb-col { width: 36px; }
             </div>
           </div>
 
-          <!-- Test + Send -->
-          <div class="blast-card">
-            <h3 style="margin-bottom:4px">🚀 Disparar</h3>
-            <p class="blast-sub" style="margin-bottom:16px">Envie um teste antes de disparar para todos.</p>
+          <!-- Test -->
+          <div class="blast-card" style="margin-bottom:16px">
+            <h3 style="margin-bottom:4px">🧪 Envio de Teste</h3>
+            <p class="blast-sub">Envie para um email específico para verificar o resultado antes do disparo em massa.</p>
             <div class="test-email-row">
-              <input type="email" id="blast-test-email" placeholder="email@teste.com (envio de teste)" />
+              <input type="email" id="blast-test-email" placeholder="email@teste.com" />
               <button class="btn-test" id="blast-test-btn" onclick="doBlastTest()">Enviar teste</button>
             </div>
+          </div>
+
+          <!-- Blast danger -->
+          <div class="blast-card danger">
+            <h3 style="margin-bottom:4px">📣 Disparo em Massa</h3>
+            <p class="blast-sub">Envia para todos os destinatários selecionados acima. Uma confirmação será exibida.</p>
             <button class="btn-blast" id="blast-btn" onclick="doBlastemail()">
               <span id="blast-btn-icon">📣</span>
               <span id="blast-btn-text">Disparar para Todos</span>
@@ -1456,13 +1513,20 @@ th.cb-col { width: 36px; }
             </div>
           </div>
 
-          <div class="blast-card">
-            <h3 style="margin-bottom:4px">🚀 Disparar</h3>
-            <p class="blast-sub" style="margin-bottom:16px">Envie um teste antes de disparar para todos.</p>
+          <!-- Test -->
+          <div class="blast-card" style="margin-bottom:16px">
+            <h3 style="margin-bottom:4px">🧪 Envio de Teste</h3>
+            <p class="blast-sub">Envie para um email específico para verificar o resultado antes do disparo em massa.</p>
             <div class="test-email-row">
-              <input type="email" id="nblast-test-email" placeholder="email@teste.com (envio de teste)" />
+              <input type="email" id="nblast-test-email" placeholder="email@teste.com" />
               <button class="btn-test" id="nblast-test-btn" onclick="doNarrativaBlastTest()">Enviar teste</button>
             </div>
+          </div>
+
+          <!-- Blast danger -->
+          <div class="blast-card danger">
+            <h3 style="margin-bottom:4px">📣 Disparo em Massa</h3>
+            <p class="blast-sub">Envia para todos os destinatários selecionados acima. Uma confirmação será exibida.</p>
             <button class="btn-blast" id="nblast-btn" onclick="doNarrativaBlast()">
               <span id="nblast-btn-icon">📣</span>
               <span id="nblast-btn-text">Disparar para Ativos</span>
@@ -1796,13 +1860,20 @@ th.cb-col { width: 36px; }
             </div>
           </div>
 
-          <div class="blast-card">
-            <h3 style="margin-bottom:4px">🚀 Disparar</h3>
-            <p class="blast-sub" style="margin-bottom:16px">Envie um teste antes de disparar para todos.</p>
+          <!-- Test -->
+          <div class="blast-card" style="margin-bottom:16px">
+            <h3 style="margin-bottom:4px">🧪 Envio de Teste</h3>
+            <p class="blast-sub">Envie para um email específico para verificar o resultado antes do disparo em massa.</p>
             <div class="test-email-row">
-              <input type="email" id="edablast-test-email" placeholder="email@teste.com (envio de teste)" />
+              <input type="email" id="edablast-test-email" placeholder="email@teste.com" />
               <button class="btn-test" id="edablast-test-btn" onclick="doEdaBlastTest()">Enviar teste</button>
             </div>
+          </div>
+
+          <!-- Blast danger -->
+          <div class="blast-card danger">
+            <h3 style="margin-bottom:4px">📣 Disparo em Massa</h3>
+            <p class="blast-sub">Envia para todos os destinatários selecionados acima. Uma confirmação será exibida.</p>
             <button class="btn-blast" id="edablast-btn" onclick="doEdaBlast()">
               <span id="edablast-btn-icon">📣</span>
               <span id="edablast-btn-text">Disparar para Todos</span>
@@ -3023,7 +3094,11 @@ async function doBlastTest() {
 async function doBlastemail() {
   if (!blastSelectedTemplate) { toast('Selecione um template primeiro', 'error'); return; }
   const labels = { all: 'todos os usuários', active: 'usuários ativos', inactive: 'usuários inativos' };
-  if (!confirm(`Disparar "${blastSelectedTemplate}" para ${labels[blastRecipients]}?`)) return;
+  const countEl = document.getElementById('blast-recipient-count');
+  const countTxt = countEl?.textContent ? `<br><strong>Destinatários:</strong> ${countEl.textContent}` : '';
+  const details = `<strong>Template:</strong> ${blastSelectedTemplate}<br><strong>Grupo:</strong> ${labels[blastRecipients]}${countTxt}`;
+  const ok = await showBlastConfirm(details);
+  if (!ok) return;
   const btn = document.getElementById('blast-btn');
   const res = document.getElementById('blast-result');
   btn.disabled = true;
@@ -3490,7 +3565,11 @@ async function doNarrativaBlastTest() {
 async function doNarrativaBlast() {
   if (!nblastSelectedTemplate) { toast('Selecione um template primeiro', 'error'); return; }
   const labels = { all: 'todos os usuários', active: 'usuários ativos', inactive: 'usuários inativos' };
-  if (!confirm(`Disparar "${nblastSelectedTemplate}" para ${labels[nblastRecipients]}?`)) return;
+  const countEl = document.getElementById('nblast-recipient-count');
+  const countTxt = countEl?.textContent ? `<br><strong>Destinatários:</strong> ${countEl.textContent}` : '';
+  const details = `<strong>Template:</strong> ${nblastSelectedTemplate}<br><strong>Grupo:</strong> ${labels[nblastRecipients]}${countTxt}`;
+  const ok = await showBlastConfirm(details);
+  if (!ok) return;
   const btn = document.getElementById('nblast-btn');
   const res = document.getElementById('nblast-result');
   btn.disabled = true;
@@ -4150,7 +4229,11 @@ async function doEdaBlastTest() {
 async function doEdaBlast() {
   if (!edaBlastSelectedTemplate) { toast('Selecione um template primeiro', 'error'); return; }
   const labels = { all: 'todos os membros', active: 'membros ativos', revoked: 'membros revogados' };
-  if (!confirm(`Disparar "${edaBlastSelectedTemplate}" para ${labels[edaBlastRecipients]}?`)) return;
+  const countEl = document.getElementById('edablast-recipient-count');
+  const countTxt = countEl?.textContent ? `<br><strong>Destinatários:</strong> ${countEl.textContent}` : '';
+  const details = `<strong>Template:</strong> ${edaBlastSelectedTemplate}<br><strong>Grupo:</strong> ${labels[edaBlastRecipients]}${countTxt}`;
+  const ok = await showBlastConfirm(details);
+  if (!ok) return;
   const btn = document.getElementById('edablast-btn');
   const res = document.getElementById('edablast-result');
   btn.disabled = true;
@@ -4288,6 +4371,68 @@ function updateClock() {
 }
 updateClock();
 setInterval(updateClock, 60000);
+
+// ── BLAST CONFIRM MODAL ──────────────────────────────────
+let _blastConfirmResolve = null;
+let _blastConfirmTimer = null;
+
+function showBlastConfirm(details) {
+  return new Promise(resolve => {
+    _blastConfirmResolve = resolve;
+    document.getElementById('blast-confirm-details').innerHTML = details;
+    const overlay = document.getElementById('blast-confirm-overlay');
+    overlay.classList.add('open');
+    const okBtn = document.getElementById('blast-ok-btn');
+    const cd = document.getElementById('blast-confirm-countdown');
+    okBtn.disabled = true;
+    okBtn.textContent = 'Aguarde 3s...';
+    let secs = 3;
+    cd.textContent = `Botão disponível em ${secs}s`;
+    if (_blastConfirmTimer) clearInterval(_blastConfirmTimer);
+    _blastConfirmTimer = setInterval(() => {
+      secs--;
+      if (secs <= 0) {
+        clearInterval(_blastConfirmTimer);
+        _blastConfirmTimer = null;
+        okBtn.disabled = false;
+        okBtn.textContent = 'Sim, Disparar';
+        cd.textContent = '';
+      } else {
+        cd.textContent = `Botão disponível em ${secs}s`;
+      }
+    }, 1000);
+  });
+}
+
+function cancelBlastConfirm() {
+  document.getElementById('blast-confirm-overlay').classList.remove('open');
+  if (_blastConfirmTimer) { clearInterval(_blastConfirmTimer); _blastConfirmTimer = null; }
+  if (_blastConfirmResolve) { _blastConfirmResolve(false); _blastConfirmResolve = null; }
+}
+
+function okBlastConfirm() {
+  document.getElementById('blast-confirm-overlay').classList.remove('open');
+  if (_blastConfirmTimer) { clearInterval(_blastConfirmTimer); _blastConfirmTimer = null; }
+  if (_blastConfirmResolve) { _blastConfirmResolve(true); _blastConfirmResolve = null; }
+}
 </script>
+
+<!-- ── BLAST CONFIRM MODAL ── -->
+<div id="blast-confirm-overlay">
+  <div id="blast-confirm-modal">
+    <div style="font-size:36px;text-align:center;">⚠️</div>
+    <h2>Confirmar Disparo em Massa</h2>
+    <div id="blast-confirm-details"></div>
+    <div id="blast-confirm-warning">
+      ⚠️ Esta ação envia emails reais para pessoas reais.<br>
+      <strong>Não pode ser desfeita.</strong>
+    </div>
+    <div id="blast-confirm-countdown"></div>
+    <div id="blast-confirm-actions">
+      <button id="blast-cancel-btn" onclick="cancelBlastConfirm()">Cancelar</button>
+      <button id="blast-ok-btn" onclick="okBlastConfirm()" disabled>Aguarde 3s...</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
