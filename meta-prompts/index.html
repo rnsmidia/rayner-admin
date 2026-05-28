@@ -324,11 +324,7 @@ button{font-family:'Space Grotesk',sans-serif;}
   font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.85;
   color:rgba(234,234,248,.85);white-space:pre-wrap;word-break:break-word;
   background:rgba(0,0,0,.2);
-  max-height:160px;overflow-y:auto;transition:max-height .3s ease;
 }
-.prompt-text.expanded{max-height:380px;}
-.prompt-text::-webkit-scrollbar{width:3px;}
-.prompt-text::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 
 /* ── COPY BUTTON ── */
 .copy-wrap{padding:14px 20px 20px;}
@@ -594,12 +590,8 @@ function renderCard(p){
           <div class="terminal-dots"><div class="td td1"></div><div class="td td2"></div><div class="td td3"></div></div>
           Texto do Prompt
         </div>
-        <button class="btn-toggle" onclick="toggleExpand('${uid}',this)">
-          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 4l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Ver tudo
-        </button>
       </div>
-      <pre class="prompt-text" id="${uid}">${esc(p.prompt_text)}</pre>
+      <pre class="prompt-text">${esc(p.prompt_text)}</pre>
     </div>
 
     <div class="copy-wrap">
@@ -611,14 +603,6 @@ function renderCard(p){
   </div>`;
 }
 
-// ── TOGGLE EXPAND ────────────────────────────────────────────
-function toggleExpand(uid,btn){
-  const el=document.getElementById(uid);
-  const exp=el.classList.toggle('expanded');
-  btn.innerHTML=exp
-    ?`<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 6l3-3 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Recolher`
-    :`<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 4l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Ver tudo`;
-}
 
 // ── COPY ─────────────────────────────────────────────────────
 async function doCopy(btn){
