@@ -762,6 +762,137 @@
     </div>
   </div>
 
+  <!-- CHECKLIST WEBHOOK EDA -->
+  <div class="secao">
+    <div class="secao-titulo" onclick="toggleSection(this)">
+      <span>🔧 Checklist — Fluxo de Compra EDA</span>
+      <span class="secao-badge">0/11</span>
+      <span class="secao-arrow">▼</span>
+    </div>
+    <div class="items-grid" style="grid-template-columns:1fr">
+
+      <!-- Etapa 1 -->
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#e05555;padding:10px 2px 4px">🔴 Etapa 1 — Hotmart</div>
+      <div class="item">
+        <div class="status-icon icon-alert">!</div>
+        <div class="item-body">
+          <div class="item-titulo">URL do webhook do produto Elite</div>
+          <div class="item-detalhe">Deve apontar para <strong style="color:#e8e8e8">https://raynern.com.br/api/eda-purchase</strong> · estava errada (apontava para /api/webhook-hotmart)</div>
+        </div>
+        <span class="tag tag-alert">Corrigir</span>
+      </div>
+      <div class="item">
+        <div class="status-icon icon-alert">!</div>
+        <div class="item-body">
+          <div class="item-titulo">Hottok do MC no Hotmart</div>
+          <div class="item-detalhe">Verificar o valor configurado no painel Hotmart para o produto Elite e confirmar que bate com a env var</div>
+        </div>
+        <span class="tag tag-alert">Verificar</span>
+      </div>
+
+      <!-- Etapa 2 -->
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#e05555;padding:10px 2px 4px">🔴 Etapa 2 — Vercel (env vars)</div>
+      <div class="item">
+        <div class="status-icon icon-alert">!</div>
+        <div class="item-body">
+          <div class="item-titulo">HOTMART_HOTTOK_MC</div>
+          <div class="item-detalhe">Deve estar definida na Vercel e igual ao hottok do produto no Hotmart</div>
+        </div>
+        <span class="tag tag-alert">Verificar</span>
+      </div>
+      <div class="item">
+        <div class="status-icon icon-alert">!</div>
+        <div class="item-body">
+          <div class="item-titulo">DISCORD_BOT_TOKEN</div>
+          <div class="item-detalhe">Bot do EDA precisa estar configurado nas env vars da Vercel</div>
+        </div>
+        <span class="tag tag-alert">Verificar</span>
+      </div>
+      <div class="item">
+        <div class="status-icon icon-alert">!</div>
+        <div class="item-body">
+          <div class="item-titulo">RESEND_API_KEY</div>
+          <div class="item-detalhe">Confirmar se é a mesma do CenaDrop ou uma separada · domínio noreply@raynern.com.br verificado no Resend?</div>
+        </div>
+        <span class="tag tag-alert">Verificar</span>
+      </div>
+      <div class="item">
+        <div class="status-icon icon-ok">✓</div>
+        <div class="item-body">
+          <div class="item-titulo">SUPABASE_URL + SUPABASE_SERVICE_KEY</div>
+          <div class="item-detalhe">Provavelmente OK — CenaDrop já usa as mesmas variáveis</div>
+        </div>
+        <span class="tag tag-ok">OK</span>
+      </div>
+
+      <!-- Etapa 3 -->
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#C9A227;padding:10px 2px 4px">🟡 Etapa 3 — Discord (IDs no código)</div>
+      <div class="item">
+        <div class="status-icon icon-wait">?</div>
+        <div class="item-body">
+          <div class="item-titulo">WELCOME_CHANNEL — <code style="font-size:10px;color:#aaa">1508898202294816778</code></div>
+          <div class="item-detalhe">Canal onde o convite único é criado · confirmar que é o canal correto</div>
+        </div>
+        <span class="tag tag-wait">Confirmar</span>
+      </div>
+      <div class="item">
+        <div class="status-icon icon-wait">?</div>
+        <div class="item-body">
+          <div class="item-titulo">GUILD_ID — <code style="font-size:10px;color:#aaa">1508895864540626986</code></div>
+          <div class="item-detalhe">ID do servidor Discord do EDA</div>
+        </div>
+        <span class="tag tag-wait">Confirmar</span>
+      </div>
+      <div class="item">
+        <div class="status-icon icon-wait">?</div>
+        <div class="item-body">
+          <div class="item-titulo">ROLE_ID — <code style="font-size:10px;color:#aaa">1508900115459477535</code></div>
+          <div class="item-detalhe">Cargo que dá acesso ao servidor após entrar com o convite</div>
+        </div>
+        <span class="tag tag-wait">Confirmar</span>
+      </div>
+
+      <!-- Etapa 4 -->
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#C9A227;padding:10px 2px 4px">🟡 Etapa 4 — Email</div>
+      <div class="item">
+        <div class="status-icon icon-wait">?</div>
+        <div class="item-body">
+          <div class="item-titulo">Domínio noreply@raynern.com.br verificado no Resend?</div>
+          <div class="item-detalhe">Remetente usado no eda-purchase.js · sem verificação o email não sai</div>
+        </div>
+        <span class="tag tag-wait">Confirmar</span>
+      </div>
+      <div class="item">
+        <div class="status-icon icon-wait">?</div>
+        <div class="item-body">
+          <div class="item-titulo">Template eda/boas-vindas.html</div>
+          <div class="item-detalhe">Variáveis do template batem com o que o código passa: PRIMEIRO_NOME, LINK_DISCORD, CHAVE_CENADROP, LINK_DOWNLOAD_CENADROP, EMAIL_NARRATIVA, SENHA_NARRATIVA, LINK_NARRATIVA</div>
+        </div>
+        <span class="tag tag-wait">Confirmar</span>
+      </div>
+
+      <!-- Etapa 5 -->
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#4CAF50;padding:10px 2px 4px">✅ Etapa 5 — Código (OK)</div>
+      <div class="item">
+        <div class="status-icon icon-ok">✓</div>
+        <div class="item-body">
+          <div class="item-titulo">Rota /api/eda-purchase mapeada no vercel.json</div>
+          <div class="item-detalhe">Já configurado e deployado</div>
+        </div>
+        <span class="tag tag-ok">OK</span>
+      </div>
+      <div class="item">
+        <div class="status-icon icon-ok">✓</div>
+        <div class="item-body">
+          <div class="item-titulo">Tabelas Supabase existem</div>
+          <div class="item-detalhe">discord_invites, licenses, narrativa_users — todas criadas e funcionando</div>
+        </div>
+        <span class="tag tag-ok">OK</span>
+      </div>
+
+    </div>
+  </div>
+
   <!-- TÉCNICO -->
   <div class="secao">
     <div class="secao-titulo" onclick="toggleSection(this)">
