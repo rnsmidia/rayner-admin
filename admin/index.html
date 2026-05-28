@@ -2864,7 +2864,7 @@ async function loadBlastTemplates() {
   const grid = document.getElementById('blast-template-grid');
   if (!grid) return;
   try {
-    const d = await apiCall('email-templates');
+    const d = await apiCall('email-templates', { product: 'cenadrop' });
     if (!d.templates || !d.templates.length) {
       grid.innerHTML = '<div style="color:var(--muted);font-size:13px">Nenhum template encontrado.</div>';
       return;
