@@ -245,7 +245,7 @@ button{font-family:'Space Grotesk',sans-serif;}
   letter-spacing:.18em;text-transform:uppercase;color:var(--muted);
 }
 .prompts-label::after{content:'';flex:1;height:1px;background:var(--border);}
-.prompts-stack{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;grid-auto-rows:1fr;}
+.prompts-stack{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start;}
 
 /* search results */
 .search-header{padding:36px 60px 0;font-size:14px;color:var(--muted);flex-shrink:0;}
@@ -262,7 +262,6 @@ button{font-family:'Space Grotesk',sans-serif;}
 .prompt-card{
   background:var(--card);border:1px solid var(--border);border-radius:20px;
   overflow:hidden;transition:border-color .25s,box-shadow .25s;
-  display:flex;flex-direction:column;height:100%;
 }
 .prompt-card:hover{
   border-color:rgba(124,111,255,.22);
