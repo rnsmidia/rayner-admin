@@ -245,7 +245,7 @@ button{font-family:'Space Grotesk',sans-serif;}
   letter-spacing:.18em;text-transform:uppercase;color:var(--muted);
 }
 .prompts-label::after{content:'';flex:1;height:1px;background:var(--border);}
-.prompts-stack{display:flex;flex-direction:column;gap:28px;}
+.prompts-stack{display:flex;flex-direction:column;gap:16px;}
 
 /* search results */
 .search-header{padding:36px 60px 0;font-size:14px;color:var(--muted);flex-shrink:0;}
@@ -271,67 +271,26 @@ button{font-family:'Space Grotesk',sans-serif;}
 /* card top accent line */
 .prompt-card-accent{height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--teal));opacity:.7;}
 
-.prompt-head{padding:24px 28px 18px;}
+.prompt-head{padding:18px 20px 14px;}
 
-.prompt-name-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;}
-.prompt-icon-wrap{
-  flex-shrink:0;width:44px;height:44px;border-radius:12px;
-  background:linear-gradient(135deg,rgba(124,111,255,.15),rgba(0,212,170,.08));
-  border:1px solid rgba(124,111,255,.2);
-  display:flex;align-items:center;justify-content:center;font-size:20px;
-}
-.prompt-name{font-size:18px;font-weight:700;line-height:1.3;flex:1;}
-.prompt-tags{display:flex;flex-wrap:wrap;gap:6px;}
+.prompt-name-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:6px;}
+.prompt-name{font-size:15px;font-weight:700;line-height:1.4;flex:1;color:var(--text);}
+.prompt-desc{font-size:13px;color:var(--muted);line-height:1.7;margin:0 0 2px;}
+.prompt-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px;}
 .ptag{
-  padding:3px 11px;border-radius:100px;
-  font-size:11px;font-weight:600;border:1px solid transparent;cursor:pointer;
+  padding:2px 9px;border-radius:100px;
+  font-size:10px;font-weight:600;border:1px solid transparent;cursor:pointer;
   transition:opacity .15s;letter-spacing:.02em;
 }
 .ptag:hover{opacity:.75;}
 
-/* ── HOW TO USE ── */
-.how-block{
-  margin:0 28px 20px;border-radius:14px;overflow:hidden;
-  border:1px solid rgba(124,111,255,.15);
-  background:rgba(124,111,255,.04);
-}
-.how-header{
-  display:flex;align-items:center;gap:8px;
-  padding:12px 18px;border-bottom:1px solid rgba(124,111,255,.1);
-  font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;
-  letter-spacing:.15em;text-transform:uppercase;color:var(--accent2);
-}
-.how-body{padding:18px 20px 20px;display:flex;flex-direction:column;gap:0;}
-
-.how-intro{
-  font-size:14px;color:var(--text);line-height:1.8;
-  margin-bottom:16px;padding-bottom:16px;
-  border-bottom:1px solid rgba(124,111,255,.08);
-}
-
-.step-row{display:flex;align-items:flex-start;gap:14px;padding:8px 0;}
-.step-left{display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
-.step-circle{
-  width:28px;height:28px;border-radius:50%;flex-shrink:0;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  display:flex;align-items:center;justify-content:center;
-  font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#fff;
-  box-shadow:0 0 12px rgba(124,111,255,.3);
-}
-.step-line{width:2px;flex:1;min-height:12px;background:rgba(124,111,255,.15);border-radius:1px;margin-top:4px;}
-.step-row:last-child .step-line{display:none;}
-.step-text{font-size:14px;color:var(--text);line-height:1.65;padding-top:4px;}
-.step-sub{font-size:12px;color:var(--muted);margin-top:3px;font-style:italic;}
-
 /* IA badges */
-.ia-row{
-  display:flex;align-items:center;gap:8px;padding:0 28px 20px;flex-wrap:wrap;
-}
-.ia-label{font-size:12px;color:var(--muted);font-weight:500;}
+.ia-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:10px;}
+.ia-label{font-size:11px;color:var(--muted);font-weight:500;}
 .ia-badge{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:5px 13px;border-radius:100px;
-  font-size:12px;font-weight:700;letter-spacing:.02em;
+  display:inline-flex;align-items:center;gap:5px;
+  padding:3px 10px;border-radius:100px;
+  font-size:11px;font-weight:700;letter-spacing:.02em;
   border:1px solid transparent;transition:opacity .15s;
 }
 .ia-badge:hover{opacity:.8;}
@@ -339,10 +298,10 @@ button{font-family:'Space Grotesk',sans-serif;}
 .ia-gemini{background:rgba(66,133,244,.08);border-color:rgba(66,133,244,.22);color:#4285f4;}
 
 /* ── PROMPT TEXT BLOCK ── */
-.prompt-block{margin:0 28px;border-radius:14px;overflow:hidden;border:1px solid var(--border2);}
+.prompt-block{margin:0 20px;border-radius:12px;overflow:hidden;border:1px solid var(--border2);}
 .prompt-block-header{
   display:flex;align-items:center;justify-content:space-between;
-  padding:11px 18px;background:rgba(0,0,0,.35);border-bottom:1px solid var(--border);
+  padding:9px 16px;background:rgba(0,0,0,.35);border-bottom:1px solid var(--border);
 }
 .pblock-label{
   display:flex;align-items:center;gap:8px;
@@ -350,35 +309,35 @@ button{font-family:'Space Grotesk',sans-serif;}
   letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
 }
 .terminal-dots{display:flex;gap:5px;}
-.td{width:9px;height:9px;border-radius:50%;}
+.td{width:8px;height:8px;border-radius:50%;}
 .td1{background:#f87171;opacity:.6;} .td2{background:var(--yellow);opacity:.6;} .td3{background:var(--green);opacity:.6;}
 
 .btn-toggle{
-  display:flex;align-items:center;gap:5px;padding:4px 12px;border-radius:7px;border:1px solid var(--border2);
+  display:flex;align-items:center;gap:5px;padding:3px 10px;border-radius:7px;border:1px solid var(--border2);
   background:transparent;color:var(--muted);font-family:'JetBrains Mono',monospace;
   font-size:10px;font-weight:600;cursor:pointer;transition:all .15s;
 }
 .btn-toggle:hover{border-color:rgba(124,111,255,.3);color:var(--accent2);}
 
 .prompt-text{
-  padding:18px 22px;
-  font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.9;
+  padding:14px 18px;
+  font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.85;
   color:rgba(234,234,248,.85);white-space:pre-wrap;word-break:break-word;
   background:rgba(0,0,0,.2);
-  max-height:200px;overflow-y:auto;transition:max-height .3s ease;
+  max-height:160px;overflow-y:auto;transition:max-height .3s ease;
 }
-.prompt-text.expanded{max-height:420px;}
+.prompt-text.expanded{max-height:380px;}
 .prompt-text::-webkit-scrollbar{width:3px;}
 .prompt-text::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 
 /* ── COPY BUTTON ── */
-.copy-wrap{padding:20px 28px 28px;}
+.copy-wrap{padding:14px 20px 20px;}
 .btn-copy{
-  width:100%;padding:17px 24px;border-radius:14px;border:none;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:10px;
+  width:100%;padding:13px 20px;border-radius:12px;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:9px;
   background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 60%,rgba(0,212,170,.7) 100%);
-  color:#fff;font-size:16px;font-weight:700;letter-spacing:.1px;
-  box-shadow:0 4px 28px rgba(124,111,255,.4);
+  color:#fff;font-size:14px;font-weight:700;letter-spacing:.1px;
+  box-shadow:0 4px 20px rgba(124,111,255,.35);
   transition:transform .15s,box-shadow .15s;
   position:relative;overflow:hidden;
 }
@@ -388,14 +347,14 @@ button{font-family:'Space Grotesk',sans-serif;}
   transform:translateX(-100%);animation:shimmer 2.8s ease-in-out infinite;
 }
 @keyframes shimmer{0%{transform:translateX(-100%)}60%{transform:translateX(140%)}100%{transform:translateX(140%)}}
-.btn-copy:hover{transform:translateY(-2px);box-shadow:0 8px 36px rgba(124,111,255,.55);}
+.btn-copy:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(124,111,255,.5);}
 .btn-copy:active{transform:translateY(0);}
 .btn-copy.copied{
   background:linear-gradient(135deg,#166534,var(--green));
-  box-shadow:0 4px 28px rgba(74,222,128,.35);
+  box-shadow:0 4px 20px rgba(74,222,128,.3);
 }
 .btn-copy.copied::before{display:none;}
-.copy-icon{font-size:19px;position:relative;z-index:1;}
+.copy-icon{font-size:16px;position:relative;z-index:1;}
 .copy-label{position:relative;z-index:1;}
 
 /* ── MOBILE ── */
@@ -454,18 +413,16 @@ button{font-family:'Space Grotesk',sans-serif;}
   .search-header{padding:20px 14px 0;}
 
   /* Cards */
-  .prompt-card{border-radius:16px;}
-  .prompt-head{padding:16px 16px 12px;}
-  .prompt-name{font-size:16px;}
-  .how-block{margin:0 16px 16px;}
-  .how-intro{font-size:13px;}
-  .step-text{font-size:13px;}
-  .ia-row{padding:0 16px 14px;gap:6px;}
-  .prompt-block{margin:0 16px;}
-  .prompt-text{font-size:11.5px;padding:14px 16px;}
-  .copy-wrap{padding:14px 16px 20px;}
-  .btn-copy{font-size:15px;padding:15px 20px;}
-  .prompt-block-header{padding:10px 14px;}
+  .prompt-card{border-radius:14px;}
+  .prompt-head{padding:14px 14px 10px;}
+  .prompt-name{font-size:14px;}
+  .prompt-desc{font-size:12px;}
+  .ia-row{margin-top:8px;gap:5px;}
+  .prompt-block{margin:0 14px;}
+  .prompt-text{font-size:11.5px;padding:12px 14px;}
+  .copy-wrap{padding:12px 14px 16px;}
+  .btn-copy{font-size:13px;padding:12px 16px;}
+  .prompt-block-header{padding:8px 12px;}
 }
 </style>
 </head>
@@ -615,27 +572,21 @@ function renderIARow(tags){
 }
 
 // ── RENDER CARD ──────────────────────────────────────────────
-const PROMPT_ICONS=['🎭','🎨','🎙️','⚡','🔧','🎬','✨','🖼️','🎯','💡'];
-function pickIcon(name){let h=0;for(const c of name)h=(h*31+c.charCodeAt(0))&0xffffffff;return PROMPT_ICONS[Math.abs(h)%PROMPT_ICONS.length];}
-
 function renderCard(p){
   const visibleTags=(p.tags||[]).filter(t=>!['chatgpt','gemini'].includes(t));
+  const {intro}=parseDesc(p.description);
   const uid='p'+Math.random().toString(36).slice(2,8);
   return `
   <div class="prompt-card">
     <div class="prompt-card-accent"></div>
     <div class="prompt-head">
       <div class="prompt-name-row">
-        <div class="prompt-icon-wrap">${pickIcon(p.name)}</div>
-        <div style="flex:1;min-width:0">
-          <div class="prompt-name">${esc(p.name)}</div>
-          ${visibleTags.length?`<div class="prompt-tags" style="margin-top:8px">${visibleTags.map(t=>`<span class="ptag" style="${tCss(t)}" onclick="filterTag('${escA(t)}')">#${esc(t)}</span>`).join('')}</div>`:''}
-        </div>
+        <div class="prompt-name">${esc(p.name)}</div>
+        ${visibleTags.length?`<div class="prompt-tags">${visibleTags.map(t=>`<span class="ptag" style="${tCss(t)}" onclick="filterTag('${escA(t)}')">#${esc(t)}</span>`).join('')}</div>`:''}
       </div>
+      ${intro?`<p class="prompt-desc">${esc(intro).replace(/\n/g,'<br>')}</p>`:''}
+      ${renderIARow(p.tags)}
     </div>
-
-    ${renderHowBlock(p.description)}
-    ${renderIARow(p.tags)}
 
     <div class="prompt-block">
       <div class="prompt-block-header">
