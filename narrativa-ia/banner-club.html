@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 1920px; height: 640px; overflow: hidden; background: #06060f; }
+
+  .banner {
+    width: 1920px;
+    height: 640px;
+    background: linear-gradient(110deg, #06060f 0%, #0d0720 45%, #120830 70%, #1a0a3e 100%);
+    position: relative;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    font-family: 'Arial', sans-serif;
+  }
+
+  /* Linhas topo e base */
+  .line-top {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent 0%, #7c5cf8 35%, #4169ff 65%, transparent 100%);
+  }
+  .line-bottom {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent 0%, #7c5cf8 35%, #4169ff 65%, transparent 100%);
+  }
+
+  /* Glow orb atrás do dashboard */
+  .orb-main {
+    position: absolute;
+    right: -80px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 820px;
+    height: 820px;
+    background: radial-gradient(circle, rgba(108,99,255,0.22) 0%, rgba(65,105,255,0.1) 45%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .orb-top {
+    position: absolute;
+    right: 400px;
+    top: -120px;
+    width: 350px;
+    height: 350px;
+    background: radial-gradient(circle, rgba(155,127,255,0.15) 0%, transparent 60%);
+    border-radius: 50%;
+  }
+
+  /* Grade de pontos */
+  .dots {
+    position: absolute;
+    left: 560px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    gap: 36px;
+    opacity: 0.08;
+  }
+  .dot { width: 4px; height: 4px; border-radius: 50%; background: #9b7fff; }
+
+  /* Linha vertical separadora */
+  .vline {
+    position: absolute;
+    left: 620px;
+    top: 60px;
+    bottom: 60px;
+    width: 1px;
+    background: linear-gradient(180deg, transparent, rgba(124,92,248,0.25), transparent);
+  }
+
+  /* CONTEÚDO ESQUERDO */
+  .content {
+    position: relative;
+    z-index: 10;
+    padding-left: 100px;
+    max-width: 620px;
+  }
+
+  .logo-wrap {
+    margin-bottom: 28px;
+  }
+
+  .logo-wrap img {
+    height: 80px;
+    width: auto;
+    filter: drop-shadow(0 0 20px rgba(124,92,248,0.5));
+  }
+
+  .tagline {
+    font-size: 19px;
+    color: rgba(255,255,255,0.45);
+    letter-spacing: 3.5px;
+    text-transform: uppercase;
+    font-weight: 400;
+    margin-bottom: 32px;
+  }
+
+  .desc {
+    font-size: 17px;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.7;
+    max-width: 460px;
+    font-weight: 400;
+  }
+
+  .desc strong {
+    color: rgba(255,255,255,0.9);
+    font-weight: 600;
+  }
+
+  /* Badge boas-vindas */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    background: rgba(124,92,248,0.12);
+    border: 1px solid rgba(124,92,248,0.3);
+    border-radius: 40px;
+    padding: 9px 22px;
+    margin-top: 36px;
+    font-size: 13px;
+    color: #b8a5ff;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .badge-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #7c5cf8;
+    box-shadow: 0 0 8px rgba(124,92,248,0.9);
+  }
+
+  /* DASHBOARD DIREITA */
+  .dashboard-wrap {
+    position: absolute;
+    right: -40px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    width: 860px;
+  }
+
+  .dashboard-frame {
+    position: relative;
+    border-radius: 16px 16px 0 0;
+    overflow: hidden;
+    box-shadow:
+      0 0 0 1px rgba(124,92,248,0.3),
+      0 40px 80px rgba(0,0,0,0.6),
+      0 0 60px rgba(108,99,255,0.15);
+    transform: perspective(1200px) rotateY(-8deg) rotateX(3deg);
+    transform-origin: right center;
+  }
+
+  /* Barra do browser */
+  .browser-bar {
+    background: #0f0f1e;
+    border-bottom: 1px solid rgba(124,92,248,0.2);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .browser-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+  .bd-red   { background: #ff5f57; }
+  .bd-yellow{ background: #ffbd2e; }
+  .bd-green { background: #28c940; }
+
+  .browser-url {
+    margin-left: 12px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 6px;
+    padding: 4px 14px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.3);
+    font-family: monospace;
+    flex: 1;
+    max-width: 280px;
+  }
+
+  .dashboard-frame img {
+    width: 100%;
+    display: block;
+    opacity: 0.95;
+  }
+
+  /* Partículas */
+  .particle { position: absolute; border-radius: 50%; background: rgba(155,127,255,0.5); }
+  .p1 { width: 5px; height: 5px; top: 100px; right: 900px; }
+  .p2 { width: 3px; height: 3px; top: 200px; right: 870px; }
+  .p3 { width: 4px; height: 4px; bottom: 140px; right: 890px; }
+  .p4 { width: 6px; height: 6px; top: 320px; left: 540px; opacity: 0.3; }
+</style>
+</head>
+<body>
+<div class="banner">
+  <div class="line-top"></div>
+  <div class="line-bottom"></div>
+  <div class="orb-main"></div>
+  <div class="orb-top"></div>
+
+  <div class="dots">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+
+  <div class="vline"></div>
+  <div class="particle p1"></div>
+  <div class="particle p2"></div>
+  <div class="particle p3"></div>
+  <div class="particle p4"></div>
+
+  <div class="content">
+    <div class="logo-wrap">
+      <img src="/narrativa-ia/assets-hotmart/logo-full.png" alt="Narrativa IA" />
+    </div>
+    <div class="tagline">Transforme ideias em histórias cinematográficas</div>
+    <div class="desc">
+      Bem-vindo à sua área de membros.<br>
+      Aqui você encontra tudo que precisa para <strong>criar roteiros profissionais com IA</strong> do início ao fim.
+    </div>
+    <div class="badge">
+      <div class="badge-dot"></div>
+      Acesso ativo
+    </div>
+  </div>
+
+  <div class="dashboard-wrap">
+    <div class="dashboard-frame">
+      <div class="browser-bar">
+        <div class="browser-dot bd-red"></div>
+        <div class="browser-dot bd-yellow"></div>
+        <div class="browser-dot bd-green"></div>
+        <div class="browser-url">narrativaia.com.br</div>
+      </div>
+      <img src="/narrativa-ia/assets-hotmart/dashboard.png" alt="Narrativa IA Studio" />
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -4,6 +4,7 @@ const { Resend } = require('resend');
 const { pbkdf2Sync, randomBytes } = require('crypto');
 const fs = require('fs');
 const path = require('path');
+const { renderEmail } = require('../emails/render');
 
 function hashNarrativaPassword(password) {
   const salt = randomBytes(16).toString('hex');
@@ -223,38 +224,11 @@ module.exports = async function handler(req, res) {
         from: 'CenaDrop <contato@cenadrop.com.br>',
         to: lic.email,
         subject: '🔑 Sua chave CenaDrop Flow',
-        html: `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
-          body{margin:0;padding:0;background:#0a0a0a;font-family:'Segoe UI',Arial,sans-serif;}
-          .w{max-width:560px;margin:0 auto;padding:40px 20px;}
-          .c{background:#111;border:1px solid #222;border-radius:16px;overflow:hidden;}
-          .h{background:linear-gradient(135deg,#1a1a2e,#0f0f1a);padding:40px 32px;text-align:center;border-bottom:1px solid #222;}
-          .logo{font-size:28px;font-weight:800;color:#fff;}.logo span{color:#6c63ff;}
-          .b{padding:36px 32px;}.g{font-size:22px;color:#fff;font-weight:700;margin-bottom:12px;}
-          .t{color:#888;font-size:15px;line-height:1.7;margin-bottom:24px;}
-          .kb{background:#0d0d0d;border:2px solid #6c63ff;border-radius:12px;padding:24px;text-align:center;margin:28px 0;}
-          .kl{color:#555;font-size:12px;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;}
-          .kv{font-size:26px;font-weight:800;color:#6c63ff;letter-spacing:3px;font-family:'Courier New',monospace;}
-          .f{padding:24px 32px;border-top:1px solid #1a1a1a;text-align:center;}
-          .f p{color:#444;font-size:12px;margin:4px 0;}
-        </style></head><body><div class="w"><div class="c">
-          <div class="h"><div class="logo">Cena<span>Drop</span></div></div>
-          <div class="b">
-            <div class="g">Olá, ${firstName}! 👋</div>
-            <p class="t">Aqui está sua chave de acesso ao <strong style="color:#ccc">CenaDrop Flow</strong>:</p>
-            <div class="kb">
-              <div class="kl">Chave de Acesso</div>
-              <div class="kv">${lic.key}</div>
-            </div>
-            <div style="text-align:center;margin:24px 0;">
-              <a href="https://raynern.com.br/cenadrop/download" style="display:inline-block;background:linear-gradient(135deg,#6c63ff,#9f7aea);color:#fff;text-decoration:none;font-weight:800;font-size:15px;padding:14px 32px;border-radius:12px;">⬇ Baixar CenaDrop Flow</a>
-            </div>
-            <p class="t" style="font-size:13px;color:#555;">
-              Baixe a extensão, instale no Chrome, clique em "Ativar Licença" e cole sua chave.<br><br>
-              Problemas? Responda este email que te ajudamos.
-            </p>
-          </div>
-          <div class="f"><p>© ${new Date().getFullYear()} CenaDrop — cenadrop.com.br</p></div>
-        </div></div></body></html>`,
+        html: renderEmail('cenadrop/reenvio-chave', {
+          PRIMEIRO_NOME: firstName,
+          CHAVE: lic.key,
+          LINK_DOWNLOAD: 'https://raynern.com.br/cenadrop/download',
+        }),
       });
       return res.status(200).json({ ok: true, message: `Email reenviado para ${lic.email}` });
     } catch (err) {
@@ -287,39 +261,12 @@ module.exports = async function handler(req, res) {
         from: 'Narrativa IA <contato@cenadrop.com.br>',
         to: email.toLowerCase(),
         subject: '✨ Seu acesso ao Narrativa IA Studio',
-        html: `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
-          body{margin:0;padding:0;background:#09090f;font-family:'Segoe UI',Arial,sans-serif;}
-          .w{max-width:560px;margin:0 auto;padding:40px 20px;}
-          .c{background:#0d0d1e;border:1px solid rgba(124,92,248,.25);border-radius:16px;overflow:hidden;}
-          .h{background:linear-gradient(135deg,#1a0a3e,#0a0a1e);padding:40px 32px;text-align:center;border-bottom:1px solid rgba(124,92,248,.15);}
-          .logo{font-size:26px;font-weight:800;color:#fff;letter-spacing:2px;}.logo span{background:linear-gradient(135deg,#9b7fff,#4169ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-          .b{padding:36px 32px;}
-          .g{font-size:22px;color:#eeeef8;font-weight:700;margin-bottom:12px;}
-          .t{color:#8888aa;font-size:15px;line-height:1.7;margin-bottom:24px;}
-          .kb{background:#0a0a16;border:1px solid rgba(124,92,248,.3);border-radius:12px;padding:24px;margin:28px 0;}
-          .krow{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);}
-          .krow:last-child{border-bottom:none;}
-          .kl{color:#55557a;font-size:12px;text-transform:uppercase;letter-spacing:1px;}
-          .kv{color:#9b7fff;font-size:14px;font-weight:700;font-family:monospace;}
-          .btn{display:inline-block;background:linear-gradient(135deg,#6234e2,#4169ff);color:#fff;text-decoration:none;font-weight:800;font-size:15px;padding:14px 32px;border-radius:12px;}
-          .f{padding:24px 32px;border-top:1px solid rgba(255,255,255,.05);text-align:center;}
-          .f p{color:#33334a;font-size:12px;margin:4px 0;}
-        </style></head><body><div class="w"><div class="c">
-          <div class="h"><div class="logo">NARRATIVA <span>IA</span></div></div>
-          <div class="b">
-            <div class="g">Olá, ${firstName}! 👋</div>
-            <p class="t">Seu acesso ao <strong style="color:#ccc">Narrativa IA Studio</strong> foi criado. Use as credenciais abaixo para entrar:</p>
-            <div class="kb">
-              <div class="krow"><span class="kl">Email</span><span class="kv">${email.toLowerCase()}</span></div>
-              <div class="krow"><span class="kl">Senha</span><span class="kv">${password}</span></div>
-            </div>
-            <div style="text-align:center;margin:24px 0;">
-              <a href="https://narrativaia.com.br" class="btn">✨ Acessar Narrativa IA</a>
-            </div>
-            <p class="t" style="font-size:13px;color:#55557a;">Guarde essas credenciais em lugar seguro. Em caso de dúvidas, responda este email.</p>
-          </div>
-          <div class="f"><p>© ${new Date().getFullYear()} Narrativa IA Studio</p></div>
-        </div></div></body></html>`,
+        html: renderEmail('narrativa/boas-vindas', {
+          PRIMEIRO_NOME: firstName,
+          EMAIL: email.toLowerCase(),
+          SENHA: password,
+          LINK_ACESSO: 'https://narrativaia.com.br',
+        }),
       });
     } catch (e) { console.error('Email error:', e); }
     return res.status(200).json({ ok: true, user: data });
@@ -356,39 +303,12 @@ module.exports = async function handler(req, res) {
         from: 'Narrativa IA <contato@cenadrop.com.br>',
         to: user.email,
         subject: '🔑 Seus novos dados de acesso — Narrativa IA Studio',
-        html: `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
-          body{margin:0;padding:0;background:#09090f;font-family:'Segoe UI',Arial,sans-serif;}
-          .w{max-width:560px;margin:0 auto;padding:40px 20px;}
-          .c{background:#0d0d1e;border:1px solid rgba(124,92,248,.25);border-radius:16px;overflow:hidden;}
-          .h{background:linear-gradient(135deg,#1a0a3e,#0a0a1e);padding:40px 32px;text-align:center;border-bottom:1px solid rgba(124,92,248,.15);}
-          .logo{font-size:26px;font-weight:800;color:#fff;letter-spacing:2px;}.logo span{background:linear-gradient(135deg,#9b7fff,#4169ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-          .b{padding:36px 32px;}
-          .g{font-size:22px;color:#eeeef8;font-weight:700;margin-bottom:12px;}
-          .t{color:#8888aa;font-size:15px;line-height:1.7;margin-bottom:24px;}
-          .kb{background:#0a0a16;border:1px solid rgba(124,92,248,.3);border-radius:12px;padding:24px;margin:28px 0;}
-          .krow{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);}
-          .krow:last-child{border-bottom:none;}
-          .kl{color:#55557a;font-size:12px;text-transform:uppercase;letter-spacing:1px;}
-          .kv{color:#9b7fff;font-size:14px;font-weight:700;font-family:monospace;}
-          .btn{display:inline-block;background:linear-gradient(135deg,#6234e2,#4169ff);color:#fff;text-decoration:none;font-weight:800;font-size:15px;padding:14px 32px;border-radius:12px;}
-          .f{padding:24px 32px;border-top:1px solid rgba(255,255,255,.05);text-align:center;}
-          .f p{color:#33334a;font-size:12px;margin:4px 0;}
-        </style></head><body><div class="w"><div class="c">
-          <div class="h"><div class="logo">NARRATIVA <span>IA</span></div></div>
-          <div class="b">
-            <div class="g">Olá, ${firstName}! 🔑</div>
-            <p class="t">Sua senha foi redefinida. Use as credenciais abaixo para acessar o <strong style="color:#ccc">Narrativa IA Studio</strong>:</p>
-            <div class="kb">
-              <div class="krow"><span class="kl">Email</span><span class="kv">${user.email}</span></div>
-              <div class="krow"><span class="kl">Nova Senha</span><span class="kv">${newPassword}</span></div>
-            </div>
-            <div style="text-align:center;margin:24px 0;">
-              <a href="https://narrativaia.com.br" class="btn">✨ Acessar Narrativa IA</a>
-            </div>
-            <p class="t" style="font-size:13px;color:#55557a;">Recomendamos alterar sua senha após o acesso. Em caso de dúvidas, responda este email.</p>
-          </div>
-          <div class="f"><p>© ${new Date().getFullYear()} Narrativa IA Studio</p></div>
-        </div></div></body></html>`,
+        html: renderEmail('narrativa/reenvio-senha', {
+          PRIMEIRO_NOME: firstName,
+          EMAIL: user.email,
+          SENHA: newPassword,
+          LINK_ACESSO: 'https://narrativaia.com.br',
+        }),
       });
     } catch (e) { console.error('Email error:', e); }
     return res.status(200).json({ ok: true });
@@ -704,33 +624,11 @@ module.exports = async function handler(req, res) {
     await resend.emails.send({
       from:    'Elite Dark Academy <noreply@raynern.com.br>',
       to:      email.toLowerCase(),
-      subject: `👑 Seu novo link de acesso ao Discord — Elite Dark Academy`,
-      html: `<!DOCTYPE html><html><head><meta charset="UTF-8">
-<style>
-  body{margin:0;padding:0;background:#050508;font-family:'Segoe UI',Arial,sans-serif;}
-  .w{max-width:560px;margin:0 auto;padding:40px 16px;}
-  .c{background:#0a0a14;border:1px solid rgba(212,175,55,.2);border-radius:16px;overflow:hidden;}
-  .h{background:linear-gradient(160deg,#0e0e1c,#07070f);padding:40px 32px;text-align:center;border-bottom:1px solid rgba(212,175,55,.12);}
-  .b{padding:36px 32px;}
-  .g{font-size:20px;color:#fff;font-weight:700;margin-bottom:10px;}
-  .t{color:rgba(255,255,255,.5);font-size:14px;line-height:1.7;margin-bottom:24px;}
-  .f{padding:20px 32px;border-top:1px solid rgba(255,255,255,.05);text-align:center;}
-  .f p{color:rgba(255,255,255,.2);font-size:11px;margin:3px 0;}
-</style>
-</head><body><div class="w"><div class="c">
-  <div class="h"><div style="font-size:40px;margin-bottom:10px;">👑</div>
-    <div style="font-size:10px;font-weight:700;letter-spacing:.2em;color:#C9A227;text-transform:uppercase">Elite Dark Academy</div>
-  </div>
-  <div class="b">
-    <div class="g">Novo link de acesso, ${firstName}.</div>
-    <p class="t">Aqui está seu novo convite para o servidor Discord do <strong style="color:#C9A227">Elite Dark Academy</strong>.<br>Este link é de uso único e válido por 24 horas.</p>
-    <div style="text-align:center;margin:28px 0;">
-      <a href="${inviteUrl}" style="display:inline-block;background:linear-gradient(135deg,#C9A227,#8B6914);color:#000;text-decoration:none;font-weight:800;font-size:14px;letter-spacing:.08em;padding:14px 36px;border-radius:10px;">ENTRAR NO DISCORD →</a>
-    </div>
-    <p class="t" style="font-size:12px;">Não compartilhe este link. Dúvidas? Responda este email.</p>
-  </div>
-  <div class="f"><p>© ${new Date().getFullYear()} Elite Dark Academy</p></div>
-</div></div></body></html>`,
+      subject: '💬 Novo convite para o Discord EDA',
+      html: renderEmail('eda/reenvio-discord', {
+        PRIMEIRO_NOME: firstName,
+        LINK_DISCORD: inviteUrl,
+      }),
     });
 
     return res.status(200).json({ ok: true, inviteUrl });
@@ -841,7 +739,9 @@ module.exports = async function handler(req, res) {
     for (const lic of licenses) {
       if (!lic.email || !lic.email.includes('@')) { skipped++; continue; }
       try {
-        await resend.emails.send({ from: EMAIL_FROM, to: lic.email, subject: SUBJECT, html: HTML });
+        const firstNameBlast = (lic.name || 'Aluno').split(' ')[0];
+        const htmlPersonal = HTML.replace(/\{\{PRIMEIRO_NOME\}\}/g, () => firstNameBlast);
+        await resend.emails.send({ from: EMAIL_FROM, to: lic.email, subject: SUBJECT, html: htmlPersonal });
         sent++;
         // pequena pausa para não exceder rate limit do Resend
         await new Promise(r => setTimeout(r, 120));
@@ -909,6 +809,67 @@ module.exports = async function handler(req, res) {
         .replace(/\{\{NOVA_SENHA\}\}/g, '&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;');
       try {
         await resend.emails.send({ from: tpl.from, to: u.email, subject: tpl.subject, html });
+        sent++;
+        await new Promise(r => setTimeout(r, 120));
+      } catch (err) {
+        failed++;
+      }
+    }
+    return res.status(200).json({ ok: true, sent, failed, skipped, total: targets.length });
+  }
+
+  // BLAST EDA — contagem de destinatários
+  if (action === 'blast-eda-count') {
+    const { recipients = 'active' } = body;
+    let query = supabase.from('discord_invites').select('email', { count: 'exact' }).not('email', 'is', null);
+    if (recipients === 'active')  query = query.eq('revoked', false);
+    if (recipients === 'revoked') query = query.eq('revoked', true);
+    const { count, error } = await query;
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ ok: true, count });
+  }
+
+  // BLAST EDA — disparo em massa para membros EDA
+  if (action === 'blast-eda') {
+    const { template: templateId, recipients = 'active', vars: templateVars = {}, testEmail } = body;
+    if (!templateId) return res.status(400).json({ error: 'template obrigatório' });
+
+    let query = supabase.from('discord_invites').select('email, name').not('email', 'is', null);
+    if (recipients === 'active')  query = query.eq('revoked', false);
+    if (recipients === 'revoked') query = query.eq('revoked', true);
+    const { data: members, error } = await query;
+    if (error) return res.status(500).json({ error: error.message });
+
+    let targets;
+    if (testEmail) {
+      const { data: testMember } = await supabase.from('discord_invites')
+        .select('email, name').eq('email', testEmail.toLowerCase()).single();
+      targets = [{ email: testEmail, name: testMember?.name || 'Aluno' }];
+    } else {
+      targets = members;
+    }
+
+    let tpl;
+    try {
+      const manifest = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'emails', 'manifest.json'), 'utf8'));
+      tpl = manifest.find(t => t.id === templateId);
+      if (!tpl) return res.status(404).json({ error: 'Template não encontrado' });
+    } catch (e) {
+      return res.status(500).json({ error: 'Erro ao carregar manifest: ' + e.message });
+    }
+
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    let sent = 0, failed = 0, skipped = 0;
+
+    for (const m of targets) {
+      if (!m.email || !m.email.includes('@')) { skipped++; continue; }
+      const firstNameEda = (m.name || 'Aluno').split(' ')[0];
+      try {
+        const html = renderEmail(templateId, { PRIMEIRO_NOME: firstNameEda, ...templateVars });
+        const subject = tpl.subject
+          .replace(/\{\{DATA_ENCONTRO\}\}/g, () => templateVars.DATA_ENCONTRO || '')
+          .replace(/\{\{HORA_ENCONTRO\}\}/g, () => templateVars.HORA_ENCONTRO || '');
+        await resend.emails.send({ from: tpl.from, to: m.email, subject, html });
         sent++;
         await new Promise(r => setTimeout(r, 120));
       } catch (err) {

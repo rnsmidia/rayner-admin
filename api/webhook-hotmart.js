@@ -121,17 +121,22 @@ module.exports = async function handler(req, res) {
       // Gera nova chave
       const key = await generateUniqueKey();
 
+      const purchasedAt = new Date();
+      const expiresAt   = new Date(purchasedAt);
+      expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+
       await supabase.from('licenses').insert({
         key,
         email,
         name,
         phone,
-        status: 'active',
-        active: true,
-        source: origem ? `hotmart-${origem}` : 'hotmart',
-        product: productName,
-        created_at: new Date().toISOString(),
-        notes: `Compra automática via Hotmart${origem ? ` (${origem})` : ''} em ${new Date().toLocaleDateString('pt-BR')}`,
+        status:      'active',
+        active:      true,
+        source:      origem ? `hotmart-${origem}` : 'hotmart',
+        product:     productName,
+        created_at:  purchasedAt.toISOString(),
+        expires_at:  expiresAt.toISOString(),
+        notes: `Compra automática via Hotmart${origem ? ` (${origem})` : ''} em ${purchasedAt.toLocaleDateString('pt-BR')}`,
       });
 
       await sendWelcomeEmail({ name, email, key, productName });

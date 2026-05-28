@@ -1,38 +1,154 @@
 [
   {
-    "id": "narrativa-boas-vindas",
-    "product": "narrativa",
-    "label": "Boas-vindas — Credenciais de Acesso",
-    "subject": "✨ Seu acesso ao Narrativa IA Studio",
-    "from": "Narrativa IA <contato@cenadrop.com.br>",
+    "id": "cenadrop/boas-vindas",
+    "product": "cenadrop",
+    "label": "Boas-vindas — Chave de Acesso",
+    "subject": "⚡ Seu acesso ao CenaDrop Flow chegou",
+    "from": "CenaDrop <contato@cenadrop.com.br>",
     "tag": "transacional",
-    "description": "Email automático disparado na criação de novo usuário — contém email e senha gerada"
+    "vars": ["PRIMEIRO_NOME", "CHAVE", "LINK_DOWNLOAD"],
+    "description": "Enviado automaticamente após compra aprovada. Contém chave de licença e passo a passo de instalação."
   },
   {
-    "id": "narrativa-reset-senha",
+    "id": "cenadrop/reenvio-chave",
+    "product": "cenadrop",
+    "label": "Reenvio da Chave",
+    "subject": "🔑 Sua chave CenaDrop foi reenviada",
+    "from": "CenaDrop <contato@cenadrop.com.br>",
+    "tag": "transacional",
+    "vars": ["PRIMEIRO_NOME", "CHAVE", "LINK_DOWNLOAD"],
+    "description": "Enviado ao clicar em Reenviar Chave no admin. Contém a mesma chave de licença."
+  },
+  {
+    "id": "cenadrop/aulas",
+    "product": "cenadrop",
+    "label": "Nova Aula Disponível",
+    "subject": "🎬 Nova aula liberada para você — CenaDrop Flow",
+    "from": "CenaDrop <contato@cenadrop.com.br>",
+    "tag": "conteudo",
+    "vars": ["PRIMEIRO_NOME", "TITULO_AULA", "DESCRICAO_AULA", "LINK_AULA"],
+    "description": "Aviso de nova aula disponível para usuários com licença ativa."
+  },
+  {
+    "id": "cenadrop/atualizacao",
+    "product": "cenadrop",
+    "label": "Atualização de Versão",
+    "subject": "⚡ CenaDrop Flow {{VERSAO}} chegou — veja o que mudou",
+    "from": "CenaDrop <contato@cenadrop.com.br>",
+    "tag": "update",
+    "vars": ["PRIMEIRO_NOME", "VERSAO", "NOVIDADES", "LINK_DOWNLOAD"],
+    "description": "Enviado quando uma nova versão da extensão é lançada. Inclui o que há de novo e passo a passo para atualizar."
+  },
+  {
+    "id": "cenadrop/acesso-revogado",
+    "product": "cenadrop",
+    "label": "Acesso Cancelado",
+    "subject": "Seu acesso ao CenaDrop Flow foi cancelado",
+    "from": "CenaDrop <contato@cenadrop.com.br>",
+    "tag": "transacional",
+    "vars": ["PRIMEIRO_NOME"],
+    "description": "Enviado automaticamente pelo webhook Hotmart em caso de cancelamento, reembolso ou chargeback."
+  },
+
+  {
+    "id": "narrativa/boas-vindas",
     "product": "narrativa",
-    "label": "Reset de Senha",
+    "label": "Boas-vindas — Login e Senha",
+    "subject": "✨ Seu acesso ao Narrativa IA Studio chegou",
+    "from": "Narrativa IA <contato@cenadrop.com.br>",
+    "tag": "transacional",
+    "vars": ["PRIMEIRO_NOME", "EMAIL", "SENHA", "LINK_ACESSO"],
+    "description": "Enviado automaticamente após criação de conta. Contém email e senha de acesso à plataforma."
+  },
+  {
+    "id": "narrativa/reenvio-senha",
+    "product": "narrativa",
+    "label": "Reenvio de Senha",
     "subject": "🔑 Seus novos dados de acesso — Narrativa IA Studio",
     "from": "Narrativa IA <contato@cenadrop.com.br>",
     "tag": "transacional",
-    "description": "Email disparado ao clicar em 'Reenviar Acesso' no admin — gera nova senha e envia ao usuário"
+    "vars": ["PRIMEIRO_NOME", "EMAIL", "SENHA", "LINK_ACESSO"],
+    "description": "Enviado ao clicar em Reenviar Acesso no admin. Gera uma nova senha e envia ao usuário."
   },
   {
-    "id": "cenadrop-v76-aulao",
-    "product": "cenadrop",
-    "label": "Aulão ao Vivo — v7.6",
-    "subject": "Seu personagem muda de rosto em cada cena? ⚡ Aula ao vivo HOJE 20h",
-    "from": "CenaDrop <contato@cenadrop.com.br>",
-    "tag": "ao-vivo",
-    "description": "Convite para o aulão ao vivo de personagem consistente com Google Flow + CenaDrop v7.6"
+    "id": "narrativa/aulas",
+    "product": "narrativa",
+    "label": "Nova Aula Disponível",
+    "subject": "🎬 Nova aula liberada para você — Narrativa IA Studio",
+    "from": "Narrativa IA <contato@cenadrop.com.br>",
+    "tag": "conteudo",
+    "vars": ["PRIMEIRO_NOME", "TITULO_AULA", "DESCRICAO_AULA", "LINK_AULA"],
+    "description": "Aviso de nova aula disponível para usuários com acesso ativo."
   },
   {
-    "id": "cenadrop-v73-update",
-    "product": "cenadrop",
-    "label": "Novidades CenaDrop v7.3",
-    "subject": "CenaDrop v7.3 chegou — veja o que mudou",
-    "from": "CenaDrop <contato@cenadrop.com.br>",
+    "id": "narrativa/atualizacao",
+    "product": "narrativa",
+    "label": "Atualização da Plataforma",
+    "subject": "🚀 Novidade no Narrativa IA Studio — {{VERSAO}}",
+    "from": "Narrativa IA <contato@cenadrop.com.br>",
     "tag": "update",
-    "description": "Email de atualização apresentando as novidades da versão 7.3 do CenaDrop Flow"
+    "vars": ["PRIMEIRO_NOME", "VERSAO", "NOVIDADES", "LINK_ACESSO"],
+    "description": "Enviado quando há uma atualização relevante na plataforma. Não requer reinstalação."
+  },
+  {
+    "id": "narrativa/acesso-revogado",
+    "product": "narrativa",
+    "label": "Acesso Cancelado",
+    "subject": "Seu acesso ao Narrativa IA Studio foi cancelado",
+    "from": "Narrativa IA <contato@cenadrop.com.br>",
+    "tag": "transacional",
+    "vars": ["PRIMEIRO_NOME"],
+    "description": "Enviado automaticamente pelo webhook Hotmart em caso de cancelamento, reembolso ou chargeback."
+  },
+
+  {
+    "id": "eda/boas-vindas",
+    "product": "eda",
+    "label": "Boas-vindas — Todos os Acessos",
+    "subject": "👑 Seu acesso ao Elite Dark Academy chegou",
+    "from": "Elite Dark Academy <contato@cenadrop.com.br>",
+    "tag": "transacional",
+    "vars": ["PRIMEIRO_NOME", "LINK_DISCORD", "CHAVE_CENADROP", "LINK_DOWNLOAD_CENADROP", "EMAIL_NARRATIVA", "SENHA_NARRATIVA", "LINK_NARRATIVA"],
+    "description": "Enviado automaticamente após compra EDA. Contém os 3 acessos: Discord (convite único), CenaDrop (chave) e Narrativa IA (login+senha)."
+  },
+  {
+    "id": "eda/reenvio-discord",
+    "product": "eda",
+    "label": "Reenvio do Convite Discord",
+    "subject": "💬 Novo convite para o Discord EDA",
+    "from": "Elite Dark Academy <contato@cenadrop.com.br>",
+    "tag": "transacional",
+    "vars": ["PRIMEIRO_NOME", "LINK_DISCORD"],
+    "description": "Enviado ao clicar em Reenviar Convite no admin. Cria um novo convite de uso único (24h) e envia ao aluno."
+  },
+  {
+    "id": "eda/encontro-ao-vivo",
+    "product": "eda",
+    "label": "Encontro ao Vivo",
+    "subject": "🎙 Encontro ao vivo {{DATA_ENCONTRO}} às {{HORA_ENCONTRO}} — EDA",
+    "from": "Elite Dark Academy <contato@cenadrop.com.br>",
+    "tag": "evento",
+    "vars": ["PRIMEIRO_NOME", "DATA_ENCONTRO", "HORA_ENCONTRO", "TITULO_ENCONTRO", "DESCRICAO_ENCONTRO", "LINK_ENCONTRO"],
+    "description": "Convite para encontro ao vivo no Discord. Inclui data, hora, título, descrição e link direto para o servidor."
+  },
+  {
+    "id": "eda/atualizacao",
+    "product": "eda",
+    "label": "Novidade na Comunidade",
+    "subject": "✨ Novidade no Elite Dark Academy",
+    "from": "Elite Dark Academy <contato@cenadrop.com.br>",
+    "tag": "update",
+    "vars": ["PRIMEIRO_NOME", "NOVIDADES", "LINK_DISCORD"],
+    "description": "Enviado para comunicar novidades gerais da comunidade: novo canal, nova dinâmica, conteúdo especial, etc."
+  },
+  {
+    "id": "eda/acesso-revogado",
+    "product": "eda",
+    "label": "Acesso Cancelado",
+    "subject": "Seu acesso ao Elite Dark Academy foi cancelado",
+    "from": "Elite Dark Academy <contato@cenadrop.com.br>",
+    "tag": "transacional",
+    "vars": ["PRIMEIRO_NOME"],
+    "description": "Enviado automaticamente pelo webhook Hotmart. Remove Discord, bloqueia chave CenaDrop e desativa conta Narrativa."
   }
 ]

@@ -9,6 +9,7 @@
 const { createClient }      = require('@supabase/supabase-js');
 const { Resend }            = require('resend');
 const { pbkdf2Sync, randomBytes } = require('crypto');
+const { renderEmail }       = require('../emails/render');
 
 function hashPassword(password) {
   const salt = randomBytes(16).toString('hex');
@@ -98,46 +99,15 @@ module.exports = async function handler(req, res) {
     const firstName = name.split(' ')[0];
 
     await resend.emails.send({
-      from: 'Narrativa IA <contato@cenadrop.com.br>',
-      to:   email,
+      from:    'Narrativa IA <contato@cenadrop.com.br>',
+      to:      email,
       subject: '✨ Seu acesso ao Narrativa IA Studio está pronto',
-      html: `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
-        body{margin:0;padding:0;background:#09090f;font-family:'Segoe UI',Arial,sans-serif;}
-        .w{max-width:560px;margin:0 auto;padding:40px 20px;}
-        .c{background:#0d0d1e;border:1px solid rgba(124,92,248,.25);border-radius:16px;overflow:hidden;}
-        .h{background:linear-gradient(135deg,#1a0a3e,#0a0a1e);padding:40px 32px;text-align:center;border-bottom:1px solid rgba(124,92,248,.15);}
-        .logo{font-size:26px;font-weight:800;color:#fff;letter-spacing:2px;}
-        .logo span{background:linear-gradient(135deg,#9b7fff,#4169ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-        .b{padding:36px 32px;}
-        .g{font-size:22px;color:#eeeef8;font-weight:700;margin-bottom:12px;}
-        .t{color:#8888aa;font-size:15px;line-height:1.7;margin-bottom:24px;}
-        .kb{background:#0a0a16;border:1px solid rgba(124,92,248,.3);border-radius:12px;padding:24px;margin:28px 0;}
-        .krow{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);}
-        .krow:last-child{border-bottom:none;}
-        .kl{color:#55557a;font-size:12px;text-transform:uppercase;letter-spacing:1px;}
-        .kv{color:#9b7fff;font-size:14px;font-weight:700;font-family:monospace;}
-        .btn{display:inline-block;background:linear-gradient(135deg,#6234e2,#4169ff);color:#fff;text-decoration:none;font-weight:800;font-size:15px;padding:14px 32px;border-radius:12px;}
-        .f{padding:24px 32px;border-top:1px solid rgba(255,255,255,.05);text-align:center;}
-        .f p{color:#33334a;font-size:12px;margin:4px 0;}
-      </style></head><body><div class="w"><div class="c">
-        <div class="h"><div class="logo">NARRATIVA <span>IA</span></div></div>
-        <div class="b">
-          <div class="g">Bem-vindo, ${firstName}! ✨</div>
-          <p class="t">Sua compra foi confirmada. Use as credenciais abaixo para acessar o <strong style="color:#ccc">Narrativa IA Studio</strong>:</p>
-          <div class="kb">
-            <div class="krow"><span class="kl">Email</span><span class="kv">${email}</span></div>
-            <div class="krow"><span class="kl">Senha</span><span class="kv">${password}</span></div>
-          </div>
-          <div style="text-align:center;margin:24px 0;">
-            <a href="https://narrativaia.com.br" class="btn">✨ Acessar Narrativa IA</a>
-          </div>
-          <p class="t" style="font-size:13px;color:#55557a;">Recomendamos alterar sua senha após o primeiro acesso. Em caso de dúvidas, responda este email.</p>
-        </div>
-        <div class="f">
-          <p>© ${new Date().getFullYear()} Narrativa IA Studio</p>
-          <p>Você recebeu este email porque realizou uma compra.</p>
-        </div>
-      </div></div></body></html>`,
+      html:    renderEmail('narrativa/boas-vindas', {
+        PRIMEIRO_NOME: firstName,
+        EMAIL:         email,
+        SENHA:         password,
+        LINK_ACESSO:   'https://narrativaia.com.br',
+      }),
     });
 
     console.log(`✅ Acesso Narrativa IA criado para ${email} — ordem ${order}`);
