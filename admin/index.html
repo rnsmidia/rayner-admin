@@ -1300,6 +1300,13 @@ th.cb-col { width: 36px; }
             </div>
           </div>
 
+          <!-- Variáveis do template CenaDrop -->
+          <div class="blast-card" id="blast-vars-section" style="display:none;margin-bottom:16px">
+            <h3 style="margin-bottom:4px">✏️ Preencha os campos do email</h3>
+            <p class="blast-sub">Este template tem campos que precisam ser preenchidos antes do disparo.</p>
+            <div id="blast-vars-fields" style="display:grid;gap:12px;margin-top:14px"></div>
+          </div>
+
           <!-- Recipients filter -->
           <div class="blast-card" style="margin-bottom:16px">
             <h3 style="margin-bottom:4px">👥 Destinatários</h3>
@@ -1429,6 +1436,13 @@ th.cb-col { width: 36px; }
             <div class="email-grid" id="nblast-template-grid">
               <div style="color:var(--muted);font-size:13px">Carregando templates...</div>
             </div>
+          </div>
+
+          <!-- Variáveis do template Narrativa -->
+          <div class="blast-card" id="nblast-vars-section" style="display:none;margin-bottom:16px">
+            <h3 style="margin-bottom:4px">✏️ Preencha os campos do email</h3>
+            <p class="blast-sub">Este template tem campos que precisam ser preenchidos antes do disparo.</p>
+            <div id="nblast-vars-fields" style="display:grid;gap:12px;margin-top:14px"></div>
           </div>
 
           <div class="blast-card" style="margin-bottom:16px">
@@ -1762,6 +1776,13 @@ th.cb-col { width: 36px; }
             <div class="email-grid" id="edablast-template-grid">
               <div style="color:var(--muted);font-size:13px">Carregando templates...</div>
             </div>
+          </div>
+
+          <!-- Variáveis do template EDA -->
+          <div class="blast-card" id="edablast-vars-section" style="display:none;margin-bottom:16px">
+            <h3 style="margin-bottom:4px">✏️ Preencha os campos do email</h3>
+            <p class="blast-sub">Este template tem campos que precisam ser preenchidos antes do disparo.</p>
+            <div id="edablast-vars-fields" style="display:grid;gap:12px;margin-top:14px"></div>
           </div>
 
           <div class="blast-card" style="margin-bottom:16px">
@@ -2859,6 +2880,50 @@ function exportLicensesCSV() {
 // ── BLAST EMAIL ──────────────────────────────────────────────────────────────
 let blastSelectedTemplate = null;
 let blastRecipients = 'all';
+let blastTemplatesData = [];
+let nblastTemplatesData = [];
+let edaBlastTemplatesData = [];
+
+const VAR_LABELS = {
+  DATA_ENCONTRO:    { label: 'Data do encontro',          placeholder: 'Ex: 28/05/2026', type: 'text' },
+  HORA_ENCONTRO:    { label: 'Hora do encontro',          placeholder: 'Ex: 20h00',      type: 'text' },
+  TITULO_ENCONTRO:  { label: 'Título do encontro',        placeholder: 'Ex: Aula de Monetização', type: 'text' },
+  DESCRICAO_ENCONTRO: { label: 'Descrição (pode usar HTML)', placeholder: 'Ex: Vamos falar sobre...', type: 'textarea' },
+  LINK_ENCONTRO:    { label: 'Link (Discord/Zoom/etc.)',  placeholder: 'https://discord.gg/...', type: 'url' },
+  NOVIDADES:        { label: 'O que há de novo (pode usar HTML)', placeholder: 'Ex: Novo canal de mentoria...', type: 'textarea' },
+  LINK_DISCORD:     { label: 'Link do Discord',           placeholder: 'https://discord.gg/...', type: 'url' },
+  VERSAO:           { label: 'Versão',                    placeholder: 'Ex: v7.5',        type: 'text' },
+  TITULO_AULA:      { label: 'Título da aula',            placeholder: 'Ex: Personagem Consistente', type: 'text' },
+  DESCRICAO_AULA:   { label: 'Descrição da aula',         placeholder: 'Ex: Nesta aula você vai...', type: 'textarea' },
+  LINK_AULA:        { label: 'Link da aula',              placeholder: 'https://...', type: 'url' },
+  LINK_DOWNLOAD:    { label: 'Link de download',          placeholder: 'https://...', type: 'url' },
+};
+
+function renderVarsFields(tpl, sectionId, fieldsId) {
+  const section = document.getElementById(sectionId);
+  const fields  = document.getElementById(fieldsId);
+  if (!section || !fields) return;
+  const extra = (tpl?.vars || []).filter(v => v !== 'PRIMEIRO_NOME' && v !== 'EMAIL' && v !== 'SENHA');
+  if (!extra.length) { section.style.display = 'none'; fields.innerHTML = ''; return; }
+  fields.innerHTML = extra.map(v => {
+    const cfg = VAR_LABELS[v] || { label: v, placeholder: '', type: 'text' };
+    const inp = cfg.type === 'textarea'
+      ? `<textarea id="var-${sectionId}-${v}" placeholder="${cfg.placeholder}" rows="3" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:14px;resize:vertical;box-sizing:border-box"></textarea>`
+      : `<input type="${cfg.type}" id="var-${sectionId}-${v}" placeholder="${cfg.placeholder}" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:14px;box-sizing:border-box" />`;
+    return `<div><label style="display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:600">${cfg.label}</label>${inp}</div>`;
+  }).join('');
+  section.style.display = 'block';
+}
+
+function collectVars(sectionId, tpl) {
+  const extra = (tpl?.vars || []).filter(v => v !== 'PRIMEIRO_NOME' && v !== 'EMAIL' && v !== 'SENHA');
+  const result = {};
+  extra.forEach(v => {
+    const el = document.getElementById(`var-${sectionId}-${v}`);
+    if (el) result[v] = el.value.trim();
+  });
+  return result;
+}
 
 async function loadBlastTemplates() {
   const grid = document.getElementById('blast-template-grid');
@@ -2869,8 +2934,9 @@ async function loadBlastTemplates() {
       grid.innerHTML = '<div style="color:var(--muted);font-size:13px">Nenhum template encontrado.</div>';
       return;
     }
+    blastTemplatesData = d.templates;
     grid.innerHTML = d.templates.map(t => `
-      <div class="email-card" id="tpl-${t.id}" onclick="selectBlastTemplate('${t.id}')">
+      <div class="email-card" id="tpl-${t.id.replace(/\//g,'-')}" onclick="selectBlastTemplate('${t.id}')">
         <div class="email-card-header">
           <div class="email-card-meta">
             <span class="email-card-tag ${t.tag}">${t.tag}</span>
@@ -2906,9 +2972,11 @@ function scaleEmailPreviews() {
 
 function selectBlastTemplate(id) {
   blastSelectedTemplate = id;
-  document.querySelectorAll('.email-card').forEach(c => c.classList.remove('selected'));
-  const card = document.getElementById('tpl-' + id);
+  document.querySelectorAll('#blast-template-grid .email-card').forEach(c => c.classList.remove('selected'));
+  const card = document.getElementById('tpl-' + id.replace(/\//g,'-'));
   if (card) card.classList.add('selected');
+  const tpl = blastTemplatesData.find(t => t.id === id);
+  renderVarsFields(tpl, 'blast-vars-section', 'blast-vars-fields');
 }
 
 async function setBlastFilter(filter) {
@@ -2939,8 +3007,10 @@ async function doBlastTest() {
   if (!blastSelectedTemplate) { toast('Selecione um template', 'error'); return; }
   btn.disabled = true;
   btn.textContent = '⏳ Enviando...';
+  const tpl = blastTemplatesData.find(t => t.id === blastSelectedTemplate);
+  const vars = collectVars('blast-vars-section', tpl);
   try {
-    const d = await apiCall('blast-test', { template: blastSelectedTemplate, testEmail });
+    const d = await apiCall('blast-test', { template: blastSelectedTemplate, testEmail, vars });
     if (d.ok) toast(`✅ Teste enviado para ${testEmail}`, 'success');
     else toast('Erro: ' + (d.error || 'Falha'), 'error');
   } catch(e) {
@@ -2960,8 +3030,10 @@ async function doBlastemail() {
   document.getElementById('blast-btn-icon').textContent = '⏳';
   document.getElementById('blast-btn-text').textContent = 'Disparando...';
   res.className = 'blast-result';
+  const tpl = blastTemplatesData.find(t => t.id === blastSelectedTemplate);
+  const vars = collectVars('blast-vars-section', tpl);
   try {
-    const d = await apiCall('blast-cenadrop', { template: blastSelectedTemplate, recipients: blastRecipients });
+    const d = await apiCall('blast-cenadrop', { template: blastSelectedTemplate, recipients: blastRecipients, vars });
     const ts = new Date().toISOString();
     localStorage.setItem('last_blast', ts);
     document.getElementById('blast-last-sent').textContent = new Date(ts).toLocaleString('pt-BR');
@@ -3343,8 +3415,9 @@ async function loadNarrativaBlastTemplates() {
       grid.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:8px 0">Nenhum template disponível. Crie um HTML em <code>emails/</code> com <code>"product":"narrativa"</code> no manifest.</div>';
       return;
     }
+    nblastTemplatesData = d.templates;
     grid.innerHTML = d.templates.map(t => `
-      <div class="email-card" id="ntpl-${t.id}" onclick="selectNarrativaTemplate('${t.id}')">
+      <div class="email-card" id="ntpl-${t.id.replace(/\//g,'-')}" onclick="selectNarrativaTemplate('${t.id}')">
         <div class="email-card-header">
           <div class="email-card-meta">
             <span class="email-card-tag ${t.tag}">${t.tag}</span>
@@ -3375,8 +3448,10 @@ async function loadNarrativaBlastTemplates() {
 function selectNarrativaTemplate(id) {
   nblastSelectedTemplate = id;
   document.querySelectorAll('[id^="ntpl-"]').forEach(c => c.classList.remove('selected'));
-  const card = document.getElementById('ntpl-' + id);
+  const card = document.getElementById('ntpl-' + id.replace(/\//g,'-'));
   if (card) card.classList.add('selected');
+  const tpl = nblastTemplatesData.find(t => t.id === id);
+  renderVarsFields(tpl, 'nblast-vars-section', 'nblast-vars-fields');
 }
 
 async function setNarrativaFilter(filter) {
@@ -3402,8 +3477,10 @@ async function doNarrativaBlastTest() {
   if (!testEmail || !testEmail.includes('@')) { toast('Insira um email válido para teste', 'error'); return; }
   if (!nblastSelectedTemplate) { toast('Selecione um template', 'error'); return; }
   btn.disabled = true; btn.textContent = '⏳ Enviando...';
+  const tpl = nblastTemplatesData.find(t => t.id === nblastSelectedTemplate);
+  const vars = collectVars('nblast-vars-section', tpl);
   try {
-    const d = await apiCall('blast-narrativa', { template: nblastSelectedTemplate, recipients: 'all', testEmail });
+    const d = await apiCall('blast-narrativa', { template: nblastSelectedTemplate, recipients: 'all', testEmail, vars });
     if (d.ok) toast(`✅ Teste enviado para ${testEmail}`, 'success');
     else toast('Erro: ' + (d.error || 'Falha'), 'error');
   } catch(e) { toast('Erro de conexão', 'error'); }
@@ -3420,8 +3497,10 @@ async function doNarrativaBlast() {
   document.getElementById('nblast-btn-icon').textContent = '⏳';
   document.getElementById('nblast-btn-text').textContent = 'Disparando...';
   res.className = 'blast-result';
+  const tpl = nblastTemplatesData.find(t => t.id === nblastSelectedTemplate);
+  const vars = collectVars('nblast-vars-section', tpl);
   try {
-    const d = await apiCall('blast-narrativa', { template: nblastSelectedTemplate, recipients: nblastRecipients });
+    const d = await apiCall('blast-narrativa', { template: nblastSelectedTemplate, recipients: nblastRecipients, vars });
     const ts = new Date().toISOString();
     localStorage.setItem('last_nblast', ts);
     document.getElementById('nblast-last-sent').textContent = new Date(ts).toLocaleString('pt-BR');
@@ -3997,6 +4076,7 @@ async function loadEdaBlastTemplates() {
       grid.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:8px 0">Nenhum template disponível.</div>';
       return;
     }
+    edaBlastTemplatesData = d.templates;
     grid.innerHTML = d.templates.map(t => `
       <div class="email-card" id="edatpl-${t.id.replace(/\//g,'-')}" onclick="selectEdaTemplate('${t.id}')">
         <div class="email-card-header">
@@ -4030,6 +4110,8 @@ function selectEdaTemplate(id) {
   document.querySelectorAll('[id^="edatpl-"]').forEach(c => c.classList.remove('selected'));
   const card = document.getElementById('edatpl-' + id.replace(/\//g,'-'));
   if (card) card.classList.add('selected');
+  const tpl = edaBlastTemplatesData.find(t => t.id === id);
+  renderVarsFields(tpl, 'edablast-vars-section', 'edablast-vars-fields');
 }
 
 async function setEdaFilter(filter) {
@@ -4055,8 +4137,10 @@ async function doEdaBlastTest() {
   if (!testEmail || !testEmail.includes('@')) { toast('Insira um email válido para teste', 'error'); return; }
   if (!edaBlastSelectedTemplate) { toast('Selecione um template', 'error'); return; }
   btn.disabled = true; btn.textContent = '⏳ Enviando...';
+  const tpl = edaBlastTemplatesData.find(t => t.id === edaBlastSelectedTemplate);
+  const vars = collectVars('edablast-vars-section', tpl);
   try {
-    const d = await apiCall('blast-eda', { template: edaBlastSelectedTemplate, recipients: 'all', testEmail });
+    const d = await apiCall('blast-eda', { template: edaBlastSelectedTemplate, recipients: 'all', testEmail, vars });
     if (d.ok) toast(`✅ Teste enviado para ${testEmail}`, 'success');
     else toast('Erro: ' + (d.error || 'Falha'), 'error');
   } catch(e) { toast('Erro de conexão', 'error'); }
@@ -4073,8 +4157,10 @@ async function doEdaBlast() {
   document.getElementById('edablast-btn-icon').textContent = '⏳';
   document.getElementById('edablast-btn-text').textContent = 'Disparando...';
   res.className = 'blast-result';
+  const tpl = edaBlastTemplatesData.find(t => t.id === edaBlastSelectedTemplate);
+  const vars = collectVars('edablast-vars-section', tpl);
   try {
-    const d = await apiCall('blast-eda', { template: edaBlastSelectedTemplate, recipients: edaBlastRecipients });
+    const d = await apiCall('blast-eda', { template: edaBlastSelectedTemplate, recipients: edaBlastRecipients, vars });
     const ts = new Date().toISOString();
     localStorage.setItem('last_edablast', ts);
     document.getElementById('edablast-last-sent').textContent = new Date(ts).toLocaleString('pt-BR');

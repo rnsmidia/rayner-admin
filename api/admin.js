@@ -682,17 +682,15 @@ module.exports = async function handler(req, res) {
 
   // BLAST TEST — envia para um único email
   if (action === 'blast-test') {
-    const { template: templateId, testEmail } = body;
+    const { template: templateId, testEmail, vars: templateVars = {} } = body;
     if (!templateId || !testEmail) return res.status(400).json({ error: 'template e testEmail obrigatórios' });
     try {
-      const manifestPath = path.join(process.cwd(), 'emails', 'manifest.json');
-      const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+      const manifest = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'emails', 'manifest.json'), 'utf8'));
       const tpl = manifest.find(t => t.id === templateId);
       if (!tpl) return res.status(404).json({ error: 'Template não encontrado' });
-      const htmlPath = path.join(process.cwd(), 'emails', `${templateId}.html`);
-      const HTML = fs.readFileSync(htmlPath, 'utf8');
+      const html = renderEmail(templateId, { PRIMEIRO_NOME: 'Você', ...templateVars });
       const resend = new Resend(process.env.RESEND_API_KEY);
-      await resend.emails.send({ from: tpl.from, to: testEmail, subject: tpl.subject, html: HTML });
+      await resend.emails.send({ from: tpl.from, to: testEmail, subject: tpl.subject, html });
       return res.status(200).json({ ok: true, sent: 1 });
     } catch (e) {
       return res.status(500).json({ error: e.message });
@@ -701,7 +699,8 @@ module.exports = async function handler(req, res) {
 
   // BLAST CENADROP — disparo em massa
   if (action === 'blast-cenadrop') {
-    const { template: templateId = 'cenadrop-v76-aulao', recipients = 'active' } = body;
+    const { template: templateId, recipients = 'active', vars: templateVars = {} } = body;
+    if (!templateId) return res.status(400).json({ error: 'template obrigatório' });
 
     let query = supabase
       .from('licenses')
@@ -715,35 +714,26 @@ module.exports = async function handler(req, res) {
     const { data: licenses, error } = await query;
     if (error) return res.status(500).json({ error: error.message });
 
-    let HTML, tpl;
+    let tpl;
     try {
-      const manifestPath = path.join(process.cwd(), 'emails', 'manifest.json');
-      const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+      const manifest = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'emails', 'manifest.json'), 'utf8'));
       tpl = manifest.find(t => t.id === templateId);
       if (!tpl) return res.status(404).json({ error: 'Template não encontrado' });
-      const htmlPath = path.join(process.cwd(), 'emails', `${templateId}.html`);
-      HTML = fs.readFileSync(htmlPath, 'utf8');
     } catch (e) {
-      return res.status(500).json({ error: 'Erro ao carregar template: ' + e.message });
+      return res.status(500).json({ error: 'Erro ao carregar manifest: ' + e.message });
     }
 
     const resend = new Resend(process.env.RESEND_API_KEY);
-    const EMAIL_FROM = tpl.from;
-    const SUBJECT = tpl.subject;
-
-
-
     let sent = 0, failed = 0, skipped = 0;
     const errors = [];
 
     for (const lic of licenses) {
       if (!lic.email || !lic.email.includes('@')) { skipped++; continue; }
       try {
-        const firstNameBlast = (lic.name || 'Aluno').split(' ')[0];
-        const htmlPersonal = HTML.replace(/\{\{PRIMEIRO_NOME\}\}/g, () => firstNameBlast);
-        await resend.emails.send({ from: EMAIL_FROM, to: lic.email, subject: SUBJECT, html: htmlPersonal });
+        const firstName = (lic.name || 'Aluno').split(' ')[0];
+        const html = renderEmail(templateId, { PRIMEIRO_NOME: firstName, ...templateVars });
+        await resend.emails.send({ from: tpl.from, to: lic.email, subject: tpl.subject, html });
         sent++;
-        // pequena pausa para não exceder rate limit do Resend
         await new Promise(r => setTimeout(r, 120));
       } catch (err) {
         failed++;
@@ -767,7 +757,7 @@ module.exports = async function handler(req, res) {
 
   // BLAST NARRATIVA — disparo em massa para usuários do Narrativa IA
   if (action === 'blast-narrativa') {
-    const { template: templateId, recipients = 'active', testEmail } = body;
+    const { template: templateId, recipients = 'active', testEmail, vars: templateVars = {} } = body;
     if (!templateId) return res.status(400).json({ error: 'template obrigatório' });
 
     let query = supabase.from('narrativa_users').select('email, name, active').not('email', 'is', null);
@@ -776,13 +766,11 @@ module.exports = async function handler(req, res) {
     const { data: users, error } = await query;
     if (error) return res.status(500).json({ error: error.message });
 
-    let HTML, tpl;
+    let tpl;
     try {
-      const manifestPath = path.join(process.cwd(), 'emails', 'manifest.json');
-      const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+      const manifest = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'emails', 'manifest.json'), 'utf8'));
       tpl = manifest.find(t => t.id === templateId);
       if (!tpl) return res.status(404).json({ error: 'Template não encontrado' });
-      HTML = fs.readFileSync(path.join(process.cwd(), 'emails', `${templateId}.html`), 'utf8');
     } catch (e) {
       return res.status(500).json({ error: 'Erro ao carregar template: ' + e.message });
     }
@@ -802,11 +790,12 @@ module.exports = async function handler(req, res) {
     for (const u of targets) {
       if (!u.email || !u.email.includes('@')) { skipped++; continue; }
       const firstName = (u.name || 'Usuário').split(' ')[0];
-      const html = HTML
-        .replace(/\{\{PRIMEIRO_NOME\}\}/g, firstName)
-        .replace(/\{\{EMAIL\}\}/g, u.email)
-        .replace(/\{\{SENHA\}\}/g, '&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;')
-        .replace(/\{\{NOVA_SENHA\}\}/g, '&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;');
+      const html = renderEmail(templateId, {
+        PRIMEIRO_NOME: firstName,
+        EMAIL:         u.email,
+        SENHA:         '••••••••',
+        ...templateVars,
+      });
       try {
         await resend.emails.send({ from: tpl.from, to: u.email, subject: tpl.subject, html });
         sent++;
