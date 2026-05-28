@@ -98,6 +98,42 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({ ok: true });
   }
 
+  // FUNNEL STATUS — público, só leitura
+  if (action === 'funnel-status') {
+    const [funnelData, waitlistData, membersData] = await Promise.all([
+      supabase.from('academyelite_funnel_events').select('event, session_id'),
+      supabase.from('academyelite_waitlist').select('*', { count: 'exact', head: true }),
+      supabase.from('discord_invites').select('id, discord_user_id, revoked'),
+    ]);
+    const rows = funnelData.data || [];
+    const uniq = evt => new Set(rows.filter(r => r.event === evt).map(r => r.session_id)).size;
+    const visits       = uniq('funnel_start');
+    const qualified    = uniq('qualified');
+    const disqualified = uniq('disqualified');
+    const leads        = uniq('lead_captured');
+    const whatsapp     = uniq('whatsapp_click');
+    const members      = (membersData.data || []);
+    const byEmail      = {};
+    for (const m of members) {
+      if (!byEmail[m.id] || m.discord_user_id) byEmail[m.id] = m;
+    }
+    const uniqueMembers = Object.values(byEmail);
+    return res.status(200).json({
+      funnel: {
+        visits, qualified, disqualified, leads, whatsapp,
+        rateQ: visits  > 0 ? Math.round(qualified / visits  * 100) : 0,
+        rateL: qualified > 0 ? Math.round(leads / qualified * 100) : 0,
+        rateW: leads   > 0 ? Math.round(whatsapp / leads   * 100) : 0,
+      },
+      waitlist: waitlistData.count || 0,
+      members: {
+        total:   uniqueMembers.length,
+        joined:  uniqueMembers.filter(m => m.discord_user_id).length,
+        revoked: uniqueMembers.filter(m => m.revoked).length,
+      },
+    });
+  }
+
   // AUTH
   const authHeader = req.headers['authorization'] || '';
   const token = authHeader.replace('Bearer ', '');
