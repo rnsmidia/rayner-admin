@@ -51,23 +51,40 @@ client.on('guildMemberAdd', async (member) => {
     // Descobre qual invite foi usado comparando cache anterior com o atual
     try {
       const newInvites = await member.guild.invites.fetch();
-      const usedInvite = newInvites.find(inv => {
-        const cached = inviteCache.get(inv.code) ?? 0;
-        return inv.uses > cached;
-      });
+      const newMap = new Map(newInvites.map(inv => [inv.code, inv.uses]));
 
-      if (usedInvite) {
-        // Atualiza cache
-        inviteCache.set(usedInvite.code, usedInvite.uses);
-        // Salva discord_user_id no Supabase para possível revogação futura
+      // Caso 1: invite ainda existe mas com mais usos
+      let usedCode = null;
+      for (const [code, cachedUses] of inviteCache.entries()) {
+        const currentUses = newMap.get(code);
+        if (currentUses !== undefined && currentUses > cachedUses) {
+          usedCode = code;
+          break;
+        }
+      }
+
+      // Caso 2: invite desapareceu da lista (max_uses=1 e foi usado → deletado pelo Discord)
+      if (!usedCode) {
+        for (const [code] of inviteCache.entries()) {
+          if (!newMap.has(code)) {
+            usedCode = code;
+            break;
+          }
+        }
+      }
+
+      // Atualiza cache com o estado atual
+      inviteCache.clear();
+      newMap.forEach((uses, code) => inviteCache.set(code, uses));
+
+      if (usedCode) {
         await supabase()
           .from('discord_invites')
           .update({ discord_user_id: member.user.id })
-          .eq('invite_code', usedInvite.code);
-        console.log(`🔗 Invite ${usedInvite.code} vinculado ao usuário ${member.user.id}`);
+          .eq('invite_code', usedCode);
+        console.log(`🔗 Invite ${usedCode} vinculado ao usuário ${member.user.id}`);
       } else {
-        // Atualiza cache mesmo sem match
-        newInvites.forEach(inv => inviteCache.set(inv.code, inv.uses));
+        console.warn(`⚠️ Não foi possível identificar o invite usado por ${member.user.username}`);
       }
     } catch (invErr) {
       console.error('⚠️ Erro ao rastrear invite:', invErr.message);
