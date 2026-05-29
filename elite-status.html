@@ -426,7 +426,7 @@
       <p>Painel interno de lançamento</p>
     </div>
     <div class="badge-data">
-      Atualizado em<br>28 mai. 2026 · noite
+      Atualizado em<br>29 mai. 2026 · manhã
     </div>
   </header>
 
@@ -720,12 +720,12 @@
         <span class="tag tag-ok">Feito</span>
       </div>
       <div class="item">
-        <div class="status-icon icon-alert">!</div>
+        <div class="status-icon icon-ok">✓</div>
         <div class="item-body">
           <div class="item-titulo">Webhook unificado /api/eda-purchase</div>
-          <div class="item-detalhe">Endpoint pronto, mas URL no Hotmart apontava para /api/webhook-hotmart (CenaDrop) — corrigir para raynern.com.br/api/eda-purchase · verificar HOTMART_HOTTOK_MC, DISCORD_BOT_TOKEN e domínio Resend na Vercel</div>
+          <div class="item-detalhe">URL corrigida no Hotmart para raynern.com.br/api/eda-purchase · env vars verificadas · fluxo testado com sucesso</div>
         </div>
-        <span class="tag tag-alert">Corrigir</span>
+        <span class="tag tag-ok">Feito</span>
       </div>
       <div class="item">
         <div class="status-icon icon-ok">✓</div>
@@ -766,55 +766,55 @@
   <div class="secao">
     <div class="secao-titulo" onclick="toggleSection(this)">
       <span>🔧 Checklist — Fluxo de Compra EDA</span>
-      <span class="secao-badge">0/11</span>
+      <span class="secao-badge">11/11</span>
       <span class="secao-arrow">▼</span>
     </div>
     <div class="items-grid" style="grid-template-columns:1fr">
 
       <!-- Etapa 1 -->
-      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#e05555;padding:10px 2px 4px">🔴 Etapa 1 — Hotmart</div>
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#4CAF50;padding:10px 2px 4px">✅ Etapa 1 — Hotmart</div>
       <div class="item">
-        <div class="status-icon icon-alert">!</div>
+        <div class="status-icon icon-ok">✓</div>
         <div class="item-body">
           <div class="item-titulo">URL do webhook do produto Elite</div>
-          <div class="item-detalhe">Deve apontar para <strong style="color:#e8e8e8">https://raynern.com.br/api/eda-purchase</strong> · estava errada (apontava para /api/webhook-hotmart)</div>
+          <div class="item-detalhe">Apontando para <strong style="color:#e8e8e8">https://raynern.com.br/api/eda-purchase</strong> · corrigida e verificada</div>
         </div>
-        <span class="tag tag-alert">Corrigir</span>
+        <span class="tag tag-ok">Feito</span>
       </div>
       <div class="item">
-        <div class="status-icon icon-alert">!</div>
+        <div class="status-icon icon-ok">✓</div>
         <div class="item-body">
           <div class="item-titulo">Hottok do MC no Hotmart</div>
-          <div class="item-detalhe">Verificar o valor configurado no painel Hotmart para o produto Elite e confirmar que bate com a env var</div>
+          <div class="item-detalhe">Valor confirmado no painel Hotmart · bate com a env var HOTMART_HOTTOK_MC na Vercel</div>
         </div>
-        <span class="tag tag-alert">Verificar</span>
+        <span class="tag tag-ok">Feito</span>
       </div>
 
       <!-- Etapa 2 -->
-      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#e05555;padding:10px 2px 4px">🔴 Etapa 2 — Vercel (env vars)</div>
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#4CAF50;padding:10px 2px 4px">✅ Etapa 2 — Vercel (env vars)</div>
       <div class="item">
-        <div class="status-icon icon-alert">!</div>
+        <div class="status-icon icon-ok">✓</div>
         <div class="item-body">
           <div class="item-titulo">HOTMART_HOTTOK_MC</div>
-          <div class="item-detalhe">Deve estar definida na Vercel e igual ao hottok do produto no Hotmart</div>
+          <div class="item-detalhe">Definida na Vercel e igual ao hottok do produto no Hotmart · verificada</div>
         </div>
-        <span class="tag tag-alert">Verificar</span>
+        <span class="tag tag-ok">Feito</span>
       </div>
       <div class="item">
-        <div class="status-icon icon-alert">!</div>
+        <div class="status-icon icon-ok">✓</div>
         <div class="item-body">
           <div class="item-titulo">DISCORD_BOT_TOKEN</div>
-          <div class="item-detalhe">Bot do EDA precisa estar configurado nas env vars da Vercel</div>
+          <div class="item-detalhe">Bot do EDA configurado nas env vars da Vercel · ativo</div>
         </div>
-        <span class="tag tag-alert">Verificar</span>
+        <span class="tag tag-ok">Feito</span>
       </div>
       <div class="item">
-        <div class="status-icon icon-alert">!</div>
+        <div class="status-icon icon-ok">✓</div>
         <div class="item-body">
           <div class="item-titulo">RESEND_API_KEY</div>
-          <div class="item-detalhe">Confirmar se é a mesma do CenaDrop ou uma separada · domínio noreply@raynern.com.br verificado no Resend?</div>
+          <div class="item-detalhe">Configurada na Vercel · domínio noreply@raynern.com.br verificado no Resend</div>
         </div>
-        <span class="tag tag-alert">Verificar</span>
+        <span class="tag tag-ok">Feito</span>
       </div>
       <div class="item">
         <div class="status-icon icon-ok">✓</div>
@@ -826,49 +826,49 @@
       </div>
 
       <!-- Etapa 3 -->
-      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#C9A227;padding:10px 2px 4px">🟡 Etapa 3 — Discord (IDs no código)</div>
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#4CAF50;padding:10px 2px 4px">✅ Etapa 3 — Discord (IDs no código)</div>
       <div class="item">
-        <div class="status-icon icon-wait">?</div>
+        <div class="status-icon icon-ok">✓</div>
         <div class="item-body">
           <div class="item-titulo">WELCOME_CHANNEL — <code style="font-size:10px;color:#aaa">1508898202294816778</code></div>
-          <div class="item-detalhe">Canal onde o convite único é criado · confirmar que é o canal correto</div>
+          <div class="item-detalhe">Canal onde o convite único é criado · confirmado e testado no fluxo completo</div>
         </div>
-        <span class="tag tag-wait">Confirmar</span>
+        <span class="tag tag-ok">Feito</span>
       </div>
       <div class="item">
-        <div class="status-icon icon-wait">?</div>
+        <div class="status-icon icon-ok">✓</div>
         <div class="item-body">
           <div class="item-titulo">GUILD_ID — <code style="font-size:10px;color:#aaa">1508895864540626986</code></div>
-          <div class="item-detalhe">ID do servidor Discord do EDA</div>
+          <div class="item-detalhe">ID do servidor Discord do EDA · confirmado e operacional</div>
         </div>
-        <span class="tag tag-wait">Confirmar</span>
+        <span class="tag tag-ok">Feito</span>
       </div>
       <div class="item">
-        <div class="status-icon icon-wait">?</div>
+        <div class="status-icon icon-ok">✓</div>
         <div class="item-body">
           <div class="item-titulo">ROLE_ID — <code style="font-size:10px;color:#aaa">1508900115459477535</code></div>
-          <div class="item-detalhe">Cargo que dá acesso ao servidor após entrar com o convite</div>
+          <div class="item-detalhe">Cargo "Membro Elite" atribuído e removido corretamente no fluxo de compra/revogação</div>
         </div>
-        <span class="tag tag-wait">Confirmar</span>
+        <span class="tag tag-ok">Feito</span>
       </div>
 
       <!-- Etapa 4 -->
-      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#C9A227;padding:10px 2px 4px">🟡 Etapa 4 — Email</div>
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#4CAF50;padding:10px 2px 4px">✅ Etapa 4 — Email</div>
       <div class="item">
-        <div class="status-icon icon-wait">?</div>
+        <div class="status-icon icon-ok">✓</div>
         <div class="item-body">
-          <div class="item-titulo">Domínio noreply@raynern.com.br verificado no Resend?</div>
-          <div class="item-detalhe">Remetente usado no eda-purchase.js · sem verificação o email não sai</div>
+          <div class="item-titulo">Domínio noreply@raynern.com.br verificado no Resend</div>
+          <div class="item-detalhe">Remetente ativo · emails saindo corretamente pelo eda-purchase.js</div>
         </div>
-        <span class="tag tag-wait">Confirmar</span>
+        <span class="tag tag-ok">Feito</span>
       </div>
       <div class="item">
-        <div class="status-icon icon-wait">?</div>
+        <div class="status-icon icon-ok">✓</div>
         <div class="item-body">
           <div class="item-titulo">Template eda/boas-vindas.html</div>
-          <div class="item-detalhe">Variáveis do template batem com o que o código passa: PRIMEIRO_NOME, LINK_DISCORD, CHAVE_CENADROP, LINK_DOWNLOAD_CENADROP, EMAIL_NARRATIVA, SENHA_NARRATIVA, LINK_NARRATIVA</div>
+          <div class="item-detalhe">Variáveis verificadas: PRIMEIRO_NOME, LINK_DISCORD, CHAVE_CENADROP, LINK_DOWNLOAD_CENADROP, EMAIL_NARRATIVA, SENHA_NARRATIVA, LINK_NARRATIVA</div>
         </div>
-        <span class="tag tag-wait">Confirmar</span>
+        <span class="tag tag-ok">Feito</span>
       </div>
 
       <!-- Etapa 5 -->
@@ -897,7 +897,7 @@
   <div class="secao">
     <div class="secao-titulo" onclick="toggleSection(this)">
       <span>Técnico & Produto</span>
-      <span class="secao-badge">0/3</span>
+      <span class="secao-badge">3/3</span>
       <span class="secao-arrow">▼</span>
     </div>
     <div class="items-grid">
@@ -910,20 +910,20 @@
         <span class="tag tag-ok">Feito</span>
       </div>
       <div class="item">
-        <div class="status-icon icon-open"></div>
+        <div class="status-icon icon-ok">✓</div>
         <div class="item-body">
           <div class="item-titulo">Área de membros</div>
-          <div class="item-detalhe">Definir plataforma, estruturar módulos e jornada do aluno</div>
+          <div class="item-detalhe">Plataforma definida · módulos estruturados · jornada do aluno mapeada</div>
         </div>
-        <span class="tag tag-open">Pendente</span>
+        <span class="tag tag-ok">Feita</span>
       </div>
       <div class="item">
-        <div class="status-icon icon-alert">!</div>
+        <div class="status-icon icon-ok">✓</div>
         <div class="item-body">
           <div class="item-titulo">Testar fluxo completo de ponta a ponta</div>
-          <div class="item-detalhe">Teste real 28/05 falhou — compra caiu no webhook errado (CenaDrop) · só criou licença CenaDrop, sem Discord/Narrativa/email EDA · pendente reconfiguração e novo teste</div>
+          <div class="item-detalhe">Fluxo testado com sucesso em 29/05 — compra → webhook → Discord + Narrativa + email EDA tudo funcionando</div>
         </div>
-        <span class="tag tag-alert">Refazer</span>
+        <span class="tag tag-ok">Feito</span>
       </div>
     </div>
   </div>
@@ -932,33 +932,33 @@
   <div class="secao">
     <div class="secao-titulo" onclick="toggleSection(this)">
       <span>Conteúdo</span>
-      <span class="secao-badge">0/3</span>
+      <span class="secao-badge">3/3</span>
       <span class="secao-arrow">▼</span>
     </div>
     <div class="items-grid">
       <div class="item">
-        <div class="status-icon icon-open"></div>
+        <div class="status-icon icon-ok">✓</div>
         <div class="item-body">
           <div class="item-titulo">Migrar aulas do CenaDrop para área do Elite</div>
-          <div class="item-detalhe">Módulo próprio · verificar nomes, ordem e descrições</div>
+          <div class="item-detalhe">Módulo próprio · nomes, ordem e descrições verificados</div>
         </div>
-        <span class="tag tag-open">Pendente</span>
+        <span class="tag tag-ok">Feito</span>
       </div>
       <div class="item">
-        <div class="status-icon icon-open"></div>
+        <div class="status-icon icon-ok">✓</div>
         <div class="item-body">
           <div class="item-titulo">Gravar aulas do Narrativa (4 aulas)</div>
           <div class="item-detalhe">Boas-vindas · Estratégia · Prática · Exemplo completo</div>
         </div>
-        <span class="tag tag-open">Pendente</span>
+        <span class="tag tag-ok">Feito</span>
       </div>
       <div class="item">
-        <div class="status-icon icon-open"></div>
+        <div class="status-icon icon-ok">✓</div>
         <div class="item-body">
           <div class="item-titulo">Gravar vídeo de boas-vindas</div>
-          <div class="item-detalhe">Rayner + Marcos, no escritório — simples e institucional</div>
+          <div class="item-detalhe">Rayner + Marcos, no escritório — gravado e publicado</div>
         </div>
-        <span class="tag tag-open">Pendente</span>
+        <span class="tag tag-ok">Feito</span>
       </div>
     </div>
   </div>
