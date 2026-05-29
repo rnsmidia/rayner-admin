@@ -928,6 +928,44 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({ ok: true, sent, failed, skipped, total: targets.length });
   }
 
+  // ── LISTA ESPERA (desistência EDA) ───────────────────────────
+  if (action === 'lista-espera-stats') {
+    const todayIso = new Date(new Date().setHours(0,0,0,0)).toISOString();
+    const weekIso  = new Date(Date.now() - 7*24*60*60*1000).toISOString();
+    const [total, today, week] = await Promise.all([
+      supabase.from('academyelite_lista_espera').select('*', { count: 'exact', head: true }),
+      supabase.from('academyelite_lista_espera').select('*', { count: 'exact', head: true }).gte('created_at', todayIso),
+      supabase.from('academyelite_lista_espera').select('*', { count: 'exact', head: true }).gte('created_at', weekIso),
+    ]);
+    return res.status(200).json({ total: total.count || 0, today: today.count || 0, week: week.count || 0 });
+  }
+
+  if (action === 'lista-espera-list') {
+    const { data, error } = await supabase
+      .from('academyelite_lista_espera')
+      .select('id, nome, email, whatsapp, q1, q2, q3, status, created_at')
+      .order('created_at', { ascending: false });
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ lista: data || [] });
+  }
+
+  if (action === 'lista-espera-delete') {
+    const { id } = req.body;
+    if (!id) return res.status(400).json({ error: 'ID obrigatório' });
+    const { error } = await supabase.from('academyelite_lista_espera').delete().eq('id', id);
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ ok: true });
+  }
+
+  if (action === 'lista-espera-update-status') {
+    const { id, status } = req.body;
+    const valid = ['pendente', 'contatado', 'confirmado', 'descartado'];
+    if (!id || !valid.includes(status)) return res.status(400).json({ error: 'Dados inválidos' });
+    const { error } = await supabase.from('academyelite_lista_espera').update({ status }).eq('id', id);
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ ok: true });
+  }
+
   // NARRATIVA — redefinir senha (admin redefine sem enviar email)
   if (action === 'narrativa-reset-password') {
     const { id, password } = body;

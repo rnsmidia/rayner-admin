@@ -1102,6 +1102,7 @@ th.cb-col { width: 36px; }
         </button>
         <div id="subnav-academy" class="subnav" style="display:none">
           <button class="sn-btn" data-sec="waitlist" onclick="switchSection('academy','waitlist')">📋 Lista VIP <span class="sn-count" id="cnt-academy">—</span></button>
+          <button class="sn-btn" data-sec="lista-espera" onclick="switchSection('academy','lista-espera');loadListaEspera()">⏳ Lista Espera <span class="sn-count" id="cnt-lista-espera">—</span></button>
           <button class="sn-btn active" data-sec="membros" onclick="switchSection('academy','membros');loadEdaMembers()">👥 Membros <span class="sn-count" id="cnt-eda-members">—</span></button>
           <button class="sn-btn" data-sec="funnel" onclick="switchSection('academy','funnel');loadAcademyFunnel()">📊 Funil</button>
           <button class="sn-btn" data-sec="blast" onclick="switchSection('academy','blast');loadEdaBlastTemplates();setEdaFilter('all')">📣 Blast Email</button>
@@ -1717,6 +1718,53 @@ th.cb-col { width: 36px; }
               </thead>
               <tbody id="academy-tbody">
                 <tr><td colspan="7"><div class="empty-state"><div class="icon">📋</div><p>Carregando...</p></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+        <!-- Lista Espera (desistência) -->
+        <div class="sec-panel" id="academy-lista-espera">
+
+          <div class="stats-grid" style="margin-bottom:24px">
+            <div class="stat-card">
+              <div class="stat-icon-wrap purple">⏳</div>
+              <div><div class="stat-label">Total na Fila</div><div class="stat-val purple" id="le-total">—</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap yellow">📅</div>
+              <div><div class="stat-label">Hoje</div><div class="stat-val yellow" id="le-today">—</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap green">📆</div>
+              <div><div class="stat-label">Últimos 7 dias</div><div class="stat-val green" id="le-week">—</div></div>
+            </div>
+          </div>
+
+          <div class="toolbar">
+            <div class="search-wrap">
+              <input type="text" id="search-lista-espera" placeholder="Buscar por nome, email ou WhatsApp..." oninput="filterListaEspera()" />
+            </div>
+            <button class="btn-sm accent" onclick="exportListaEsperaCSV()">⬇ Exportar CSV</button>
+            <button class="btn-sm" onclick="loadListaEspera()">↻ Atualizar</button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Nome</th>
+                  <th>E-mail</th>
+                  <th>WhatsApp</th>
+                  <th>Status</th>
+                  <th>Inscrito em</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="lista-espera-tbody">
+                <tr><td colspan="7"><div class="empty-state"><div class="icon">⏳</div><p>Carregando...</p></div></td></tr>
               </tbody>
             </table>
           </div>
@@ -4043,6 +4091,103 @@ async function deleteAcademy(id, nome) {
   const r = await apiCall('academy-delete', { id });
   if (r.ok) { toast('Removido.'); loadAcademyWaitlist(); }
   else toast('Erro ao remover.', 'error');
+}
+
+// ── LISTA ESPERA (desistência) ────────────────
+let allListaEspera = [];
+
+const LE_STATUS = {
+  pendente:    { label: 'Pendente',   bg: 'rgba(255,159,67,.12)', color: '#ff9f43' },
+  contatado:   { label: 'Contatado',  bg: 'rgba(0,207,232,.12)',  color: '#00cfe8' },
+  confirmado:  { label: 'Confirmado', bg: 'rgba(40,199,111,.12)', color: '#28c76f' },
+  descartado:  { label: 'Descartado', bg: 'rgba(234,84,85,.12)',  color: '#ea5455' },
+};
+
+async function loadListaEspera() {
+  const [stats, list] = await Promise.all([
+    apiCall('lista-espera-stats'),
+    apiCall('lista-espera-list'),
+  ]);
+  if (stats.total !== undefined) {
+    document.getElementById('le-total').textContent = stats.total;
+    document.getElementById('le-today').textContent = stats.today;
+    document.getElementById('le-week').textContent  = stats.week;
+    document.getElementById('cnt-lista-espera').textContent = stats.total;
+  }
+  if (list.lista) {
+    allListaEspera = list.lista;
+    renderListaEspera(allListaEspera);
+  }
+}
+
+function filterListaEspera() {
+  const q = (document.getElementById('search-lista-espera')?.value || '').toLowerCase();
+  const filtered = q
+    ? allListaEspera.filter(r =>
+        (r.nome||'').toLowerCase().includes(q) ||
+        (r.email||'').toLowerCase().includes(q) ||
+        (r.whatsapp||'').includes(q)
+      )
+    : allListaEspera;
+  renderListaEspera(filtered);
+}
+
+function renderListaEspera(list) {
+  const tb = document.getElementById('lista-espera-tbody');
+  if (!list.length) {
+    tb.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="icon">⏳</div><p>Nenhum inscrito encontrado.</p></div></td></tr>`;
+    return;
+  }
+  tb.innerHTML = list.map((r, i) => {
+    const st = LE_STATUS[r.status] || LE_STATUS['pendente'];
+    const q1tip = r.q1 ? ` title="${r.q1}"` : '';
+    const q2tip = r.q2 ? ` title="${r.q2}"` : '';
+    const q3tip = r.q3 ? ` title="${r.q3}"` : '';
+    return `<tr>
+      <td style="color:var(--muted);font-size:12px">${i + 1}</td>
+      <td style="font-weight:600">${r.nome || '—'} ${r.q1 ? `<span${q1tip} style="font-size:10px;color:var(--muted);cursor:help">Q1 Q2 Q3</span>` : ''}</td>
+      <td style="color:var(--muted)">${r.email || '—'}</td>
+      <td>${r.whatsapp ? `<span style="font-family:'JetBrains Mono',monospace;font-size:12px">${r.whatsapp}</span>` : '<span style="color:var(--muted)">—</span>'}</td>
+      <td><span onclick="cycleLeStatus('${r.id}','${r.status || 'pendente'}')" title="Clique para avançar status" style="display:inline-block;padding:3px 11px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;background:${st.bg};color:${st.color};border:1px solid ${st.color}44;user-select:none">${st.label}</span></td>
+      <td style="color:var(--muted);font-size:12px">${fmtDate(r.created_at)}</td>
+      <td><div class="actions">
+        <button class="btn-icon" title="Copiar e-mail" onclick="navigator.clipboard.writeText('${r.email}');toast('E-mail copiado!')">📋</button>
+        <button class="btn-icon" title="Remover" onclick="deleteListaEspera('${r.id}','${r.nome}')">🗑️</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+async function cycleLeStatus(id, current) {
+  const order = ['pendente', 'contatado', 'confirmado', 'descartado'];
+  const next  = order[(order.indexOf(current) + 1) % order.length];
+  const r     = await apiCall('lista-espera-update-status', { id, status: next });
+  if (r.ok) {
+    const item = allListaEspera.find(l => l.id === id);
+    if (item) item.status = next;
+    renderListaEspera(allListaEspera);
+    toast('Status → ' + LE_STATUS[next].label);
+  } else toast('Erro ao atualizar.', 'error');
+}
+
+async function deleteListaEspera(id, nome) {
+  if (!confirm('Remover "' + nome + '" da Lista de Espera?')) return;
+  const r = await apiCall('lista-espera-delete', { id });
+  if (r.ok) { toast('Removido.'); loadListaEspera(); }
+  else toast('Erro ao remover.', 'error');
+}
+
+function exportListaEsperaCSV() {
+  if (!allListaEspera.length) { toast('Nenhum dado para exportar.', 'error'); return; }
+  const rows = [['Nome','Email','WhatsApp','Status','Inscrito em','Q1','Q2','Q3']];
+  allListaEspera.forEach(r => rows.push([
+    r.nome||'', r.email||'', r.whatsapp||'', r.status||'',
+    fmtDate(r.created_at), r.q1||'', r.q2||'', r.q3||''
+  ]));
+  const csv  = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type:'text/csv' });
+  const a    = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'lista-espera-eda.csv' });
+  document.body.appendChild(a); a.click(); a.remove();
 }
 
 // ── EDA MEMBROS (Discord) ─────────────────────
