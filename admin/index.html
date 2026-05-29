@@ -4109,9 +4109,12 @@ function renderEdaMembers(list) {
       ? `<span style="color:#28c76f;font-size:13px">✓ Entrou</span>`
       : `<span style="color:var(--muted);font-size:12px">—</span>`;
 
-    const resendBtn = !revoked
-      ? `<button class="btn-icon" title="Reenviar convite Discord" onclick="resendEdaInvite('${m.email}','${(m.name||'').replace(/'/g,"\\'")}',this)">🔁</button>`
-      : '';
+    const safeName = (m.name||'').replace(/'/g,"\\'");
+    const resendBtn   = !revoked ? `<button class="btn-icon" title="Reenviar convite Discord" onclick="resendEdaInvite('${m.email}','${safeName}',this)">🔁</button>` : '';
+    const toggleBtn   = !revoked
+      ? `<button class="btn-icon warn" title="Revogar todos os acessos" onclick="revokeEdaMember('${m.email}','${safeName}')">🔒</button>`
+      : `<button class="btn-icon" title="Reativar acessos" onclick="reactivateEdaMember('${m.email}','${safeName}')">🔓</button>`;
+    const deleteBtn   = `<button class="btn-icon danger" title="Deletar entrada" onclick="deleteEdaMember('${m.email}','${safeName}')">🗑️</button>`;
 
     return `<tr>
       <td style="color:var(--muted);font-size:12px">${i + 1}</td>
@@ -4123,6 +4126,8 @@ function renderEdaMembers(list) {
       <td><div class="actions">
         <button class="btn-icon" title="Copiar e-mail" onclick="navigator.clipboard.writeText('${m.email}');toast('E-mail copiado!')">📋</button>
         ${resendBtn}
+        ${toggleBtn}
+        ${deleteBtn}
       </div></td>
     </tr>`;
   }).join('');
@@ -4138,6 +4143,27 @@ async function resendEdaInvite(email, name, btn) {
   btn.disabled = false;
   if (r.ok) toast(`Convite reenviado para ${email} ✓`);
   else toast('Erro: ' + (r.error || 'falha ao enviar'), 'error');
+}
+
+async function revokeEdaMember(email, name) {
+  if (!confirm(`Revogar TODOS os acessos de ${name || email}?\n\nDiscord + CenaDrop + Narrativa serão desativados.`)) return;
+  const r = await apiCall('eda-revoke', { email });
+  if (r.ok) { toast(`Acesso revogado: ${email}`, 'success'); loadEdaMembers(); }
+  else toast('Erro: ' + (r.error || 'falha'), 'error');
+}
+
+async function reactivateEdaMember(email, name) {
+  if (!confirm(`Reativar acesso de ${name || email}?\n\nCenaDrop + Narrativa serão reativados.\nPara Discord, reenvie o convite após reativar.`)) return;
+  const r = await apiCall('eda-reactivate', { email });
+  if (r.ok) { toast(`Acesso reativado: ${email}`, 'success'); loadEdaMembers(); }
+  else toast('Erro: ' + (r.error || 'falha'), 'error');
+}
+
+async function deleteEdaMember(email, name) {
+  if (!confirm(`Deletar ${name || email} do admin?\n\nAtenção: isso não revoga os acessos.`)) return;
+  const r = await apiCall('eda-delete', { email });
+  if (r.ok) { toast(`Deletado: ${email}`); loadEdaMembers(); }
+  else toast('Erro: ' + (r.error || 'falha'), 'error');
 }
 
 // ── EDA BLAST ─────────────────────────────────

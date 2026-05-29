@@ -101,18 +101,21 @@ module.exports = async function handler(req, res) {
 
   // FUNNEL STATUS — público, só leitura
   if (action === 'funnel-status') {
-    const [funnelData, waitlistData, membersData] = await Promise.all([
-      supabase.from('academyelite_funnel_events').select('event, session_id'),
+    const [evtStart, evtQual, evtDisqual, evtLead, evtWa, waitlistData, membersData] = await Promise.all([
+      supabase.from('academyelite_funnel_events').select('session_id').eq('event', 'funnel_start').limit(10000),
+      supabase.from('academyelite_funnel_events').select('session_id').eq('event', 'qualified').limit(10000),
+      supabase.from('academyelite_funnel_events').select('session_id').eq('event', 'disqualified').limit(10000),
+      supabase.from('academyelite_funnel_events').select('session_id').eq('event', 'lead_captured').limit(10000),
+      supabase.from('academyelite_funnel_events').select('session_id').eq('event', 'whatsapp_click').limit(10000),
       supabase.from('academyelite_waitlist').select('*', { count: 'exact', head: true }),
       supabase.from('discord_invites').select('id, discord_user_id, revoked'),
     ]);
-    const rows = funnelData.data || [];
-    const uniq = evt => new Set(rows.filter(r => r.event === evt).map(r => r.session_id)).size;
-    const visits       = uniq('funnel_start');
-    const qualified    = uniq('qualified');
-    const disqualified = uniq('disqualified');
-    const leads        = uniq('lead_captured');
-    const whatsapp     = uniq('whatsapp_click');
+    const uniq = res => new Set((res.data || []).map(r => r.session_id)).size;
+    const visits       = uniq(evtStart);
+    const qualified    = uniq(evtQual);
+    const disqualified = uniq(evtDisqual);
+    const leads        = uniq(evtLead);
+    const whatsapp     = uniq(evtWa);
     const members      = (membersData.data || []);
     const byEmail      = {};
     for (const m of members) {
@@ -324,6 +327,18 @@ module.exports = async function handler(req, res) {
       active = !cur?.active;
     }
     await supabase.from('narrativa_users').update({ active }).eq('id', id);
+    if (!active) {
+      const { data: u } = await supabase.from('narrativa_users').select('email, origin').eq('id', id).single();
+      if (u?.origin === 'elite') {
+        const { data: inv } = await supabase.from('discord_invites')
+          .select('discord_user_id').eq('email', u.email)
+          .order('created_at', { ascending: false }).limit(1).single();
+        if (inv?.discord_user_id) {
+          await fetch(`https://discord.com/api/v10/guilds/1508895864540626986/members/${inv.discord_user_id}/roles/1508900115459477535`,
+            { method: 'DELETE', headers: { Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}` } }).catch(() => {});
+        }
+      }
+    }
     return res.status(200).json({ ok: true, active });
   }
 
@@ -632,6 +647,41 @@ module.exports = async function handler(req, res) {
     });
 
     return res.status(200).json({ ok: true, inviteUrl });
+  }
+
+  // ── EDA REVOKE ────────────────────────────────────────────────
+  if (action === 'eda-revoke') {
+    const { email } = body;
+    if (!email) return res.status(400).json({ error: 'email obrigatório' });
+    const { data: inv } = await supabase.from('discord_invites')
+      .select('discord_user_id').eq('email', email.toLowerCase())
+      .order('created_at', { ascending: false }).limit(1).single();
+    if (inv?.discord_user_id) {
+      await fetch(`https://discord.com/api/v10/guilds/1508895864540626986/members/${inv.discord_user_id}/roles/1508900115459477535`,
+        { method: 'DELETE', headers: { Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}` } }).catch(() => {});
+    }
+    await supabase.from('discord_invites').update({ revoked: true, revoked_reason: 'admin' }).eq('email', email.toLowerCase());
+    await supabase.from('licenses').update({ status: 'inactive' }).eq('email', email.toLowerCase()).eq('source', 'hotmart-EDA');
+    await supabase.from('narrativa_users').update({ active: false }).eq('email', email.toLowerCase());
+    return res.status(200).json({ ok: true });
+  }
+
+  // ── EDA REACTIVATE ────────────────────────────────────────────
+  if (action === 'eda-reactivate') {
+    const { email } = body;
+    if (!email) return res.status(400).json({ error: 'email obrigatório' });
+    await supabase.from('discord_invites').update({ revoked: false, revoked_reason: null }).eq('email', email.toLowerCase());
+    await supabase.from('licenses').update({ status: 'active' }).eq('email', email.toLowerCase()).eq('source', 'hotmart-EDA');
+    await supabase.from('narrativa_users').update({ active: true }).eq('email', email.toLowerCase());
+    return res.status(200).json({ ok: true });
+  }
+
+  // ── EDA DELETE ────────────────────────────────────────────────
+  if (action === 'eda-delete') {
+    const { email } = body;
+    if (!email) return res.status(400).json({ error: 'email obrigatório' });
+    await supabase.from('discord_invites').delete().eq('email', email.toLowerCase());
+    return res.status(200).json({ ok: true });
   }
 
   // ── ACADEMY ELITE — FUNIL ANALYTICS ──────────────────────────
