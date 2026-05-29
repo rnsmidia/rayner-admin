@@ -755,6 +755,7 @@ async function submitDesistencia() {
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({
         nome, email, whatsapp,
+        source: 'lista-espera',
         q1: funnelAnswers.q1,
         q2: funnelAnswers.q2,
         q3: funnelAnswers.q3,

@@ -28,7 +28,26 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST')   return res.status(405).json({ error: 'Method not allowed' });
 
-  const { nome, email, whatsapp } = req.body ?? {};
+  const { nome, email, whatsapp, source, q1, q2, q3 } = req.body ?? {};
+
+  // Rota alternativa: Lista de Desistência (source === 'lista-espera')
+  if (source === 'lista-espera') {
+    if (!email || !email.includes('@') || !nome || nome.trim().length < 2) {
+      return res.status(400).json({ error: 'Dados inválidos' });
+    }
+    try {
+      await supabase.from('academyelite_lista_espera').insert({
+        nome:     nome.trim(),
+        email:    email.trim().toLowerCase(),
+        whatsapp: (whatsapp || '').trim(),
+        q1:       q1 || null,
+        q2:       q2 || null,
+        q3:       q3 || null,
+        status:   'pendente',
+      });
+    } catch (_) {}
+    return res.status(200).json({ ok: true });
+  }
 
   if (!email || typeof email !== 'string' || !email.includes('@')) {
     return res.status(400).json({ error: 'E-mail inválido' });

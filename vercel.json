@@ -34,7 +34,7 @@
     { "source": "/elitedarkacademy/", "destination": "/academyelite/vendas.html" },
     { "source": "/elite-status",  "destination": "/elite-status.html" },
     { "source": "/elite-status/", "destination": "/elite-status.html" },
-    { "source": "/api/academyelite-lista-espera",  "destination": "/api/academyelite-lista-espera.js" },
+    { "source": "/api/academyelite-lista-espera",  "destination": "/api/academyelite-waitlist.js" },
     { "source": "/api/narrativa-access",       "destination": "/api/narrativa-access.js" },
     { "source": "/api/eda-purchase",           "destination": "/api/eda-purchase.js" },
     { "source": "/api/discord-invite",         "destination": "/api/discord-invite.js" },
