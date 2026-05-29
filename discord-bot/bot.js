@@ -80,11 +80,29 @@ client.on('guildMemberAdd', async (member) => {
       if (usedCode) {
         await supabase()
           .from('discord_invites')
-          .update({ discord_user_id: member.user.id })
+          .update({ discord_user_id: member.user.id, used: true })
           .eq('invite_code', usedCode);
         console.log(`🔗 Invite ${usedCode} vinculado ao usuário ${member.user.id}`);
       } else {
-        console.warn(`⚠️ Não foi possível identificar o invite usado por ${member.user.username}`);
+        // Fallback: não identificou o invite pelo cache → vincula ao registro mais recente sem discord_user_id
+        console.warn(`⚠️ Não foi possível identificar o invite usado por ${member.user.username} — usando fallback`);
+        const { data: fallbackInvite } = await supabase()
+          .from('discord_invites')
+          .select('id, invite_code')
+          .is('discord_user_id', null)
+          .eq('revoked', false)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+        if (fallbackInvite) {
+          await supabase()
+            .from('discord_invites')
+            .update({ discord_user_id: member.user.id, used: true })
+            .eq('id', fallbackInvite.id);
+          console.log(`🔗 Fallback: invite ${fallbackInvite.invite_code} vinculado ao usuário ${member.user.id}`);
+        } else {
+          console.error(`❌ Fallback também falhou: nenhum invite pendente para ${member.user.username}`);
+        }
       }
     } catch (invErr) {
       console.error('⚠️ Erro ao rastrear invite:', invErr.message);

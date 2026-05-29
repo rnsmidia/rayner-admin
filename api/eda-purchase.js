@@ -68,6 +68,12 @@ module.exports = async function handler(req, res) {
   const name   = body?.data?.buyer?.name || '';
   const order  = body?.data?.purchase?.order_id || body?.data?.purchase?.transaction || '';
 
+  // Datas de compra e expiração (timestamps Hotmart em ms)
+  const rawOrderDate   = body?.data?.purchase?.order_date || body?.data?.purchase?.approved_date;
+  const rawNextCharge  = body?.data?.subscription?.subscriber?.next_payment_date;
+  const purchasedAt    = rawOrderDate  ? new Date(Number(rawOrderDate)).toISOString()  : new Date().toISOString();
+  const expiresAt      = rawNextCharge ? new Date(Number(rawNextCharge)).toISOString() : null;
+
   if (!email) return res.status(400).json({ error: 'email ausente' });
 
   const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
@@ -218,6 +224,7 @@ module.exports = async function handler(req, res) {
         source:     'hotmart-EDA',
         notes:      `Elite Dark Academy — ordem ${order}`,
         created_at: new Date().toISOString(),
+        expires_at: expiresAt,
       });
       results.cenadrop = key;
       console.log(`✅ CenaDrop criado: ${key} para ${email}`);
@@ -249,8 +256,10 @@ module.exports = async function handler(req, res) {
         email,
         name,
         password_hash,
-        active: true,
-        origin: 'elite',
+        active:       true,
+        origin:       'elite',
+        purchased_at: purchasedAt,
+        expires_at:   expiresAt,
       });
       results.narrativa = { password: narrativaPassword };
       console.log(`✅ Narrativa IA criado: ${email}`);
