@@ -3,1384 +3,769 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Elite Dark Academy — Lista de Espera VIP</title>
-<meta name="description" content="Acesso exclusivo à estrutura, estratégias e operação de Marcos de Castro. Vagas extremamente limitadas.">
-<meta property="og:title" content="Elite Dark Academy — Lista de Espera VIP">
-<meta property="og:description" content="Não é mais sobre assistir aulas. É sobre entrar na operação do Marcos de Castro de forma VIP.">
-<meta property="og:image" content="/academyelite/images/marcos/hero-banner.jpg">
-<!-- Google Analytics 4 -->
+<title>Lista Encerrada — Elite Dark Academy</title>
+<meta name="description" content="A lista prioritária VIP do Elite Dark Academy foi encerrada.">
+<meta name="robots" content="noindex,nofollow">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-BN8R1SVLLT"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-BN8R1SVLLT');
+  gtag('js', new Date()); gtag('config', 'G-BN8R1SVLLT');
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --black: #000000;
-  --black2: #080808;
-  --black3: #0e0e0e;
-  --black4: #141414;
   --gold: #C9A227;
   --gold2: #D4AF37;
   --gold3: #E8C84A;
-  --gold-dim: rgba(201,162,39,0.15);
-  --gold-glow: rgba(201,162,39,0.08);
   --white: #ffffff;
   --white-dim: rgba(255,255,255,0.85);
   --white-muted: rgba(255,255,255,0.5);
-  --white-subtle: rgba(255,255,255,0.12);
 }
-
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 html { scroll-behavior: smooth; }
-
 body {
-  background: var(--black);
+  background: #000;
   color: var(--white);
   font-family: 'Inter', sans-serif;
   font-size: 16px;
   line-height: 1.6;
+  min-height: 100vh;
   overflow-x: hidden;
 }
-
 a { color: inherit; text-decoration: none; }
-img { max-width: 100%; height: auto; display: block; }
 
-/* ──────────────────────────────────────────
-   ANNOUNCEMENT BAR
-────────────────────────────────────────── */
-.ann-bar {
-  background: linear-gradient(90deg, #1a1200, #3a2a00, #1a1200);
-  border-bottom: 1px solid rgba(201,162,39,0.3);
-  text-align: center;
-  padding: 11px 20px;
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  color: var(--gold3);
-  position: relative;
-  overflow: hidden;
+/* ── FUNDO ─────────────────────────────────────────── */
+.bg-layer {
+  position: fixed; inset: 0; z-index: 0;
 }
-.ann-bar::before {
+.bg-layer img {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: 30% center; display: block;
+}
+.bg-layer::after {
   content: '';
-  position: absolute;
-  top: 0; left: -100%;
-  width: 60%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(201,162,39,0.08), transparent);
-  animation: shimmer 3s infinite;
-}
-@keyframes shimmer { to { left: 200%; } }
-.ann-dot { display: inline-block; width: 6px; height: 6px; background: var(--gold); border-radius: 50%; margin-right: 8px; vertical-align: middle; animation: pulse-dot 2s infinite; }
-@keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.8)} }
-
-/* ──────────────────────────────────────────
-   HERO
-────────────────────────────────────────── */
-.hero {
-  position: relative;
-  min-height: 100vh;
-  display: flex;
-  align-items: stretch;
-  overflow: hidden;
-}
-
-/* ── Imagem: ocupa 70%, vaza sobre o conteúdo ── */
-.hero-image-panel {
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 70%;
-  z-index: 1;
-}
-.hero-image-panel img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 22% center;
-  display: block;
-}
-.hero-image-panel::after {
-  content: '';
-  position: absolute;
-  inset: 0;
+  position: absolute; inset: 0;
   background: linear-gradient(
-    90deg,
-    rgba(0,0,0,0.05) 0%,
-    transparent 35%,
-    rgba(0,0,0,0.55) 60%,
-    rgba(0,0,0,0.88) 78%,
-    rgba(0,0,0,1) 92%
+    105deg,
+    rgba(0,0,0,0.95) 0%,
+    rgba(0,0,0,0.85) 45%,
+    rgba(0,0,0,0.72) 100%
   );
 }
 
-/* ── Conteúdo: começa em 46%, sobreposição de ~24% com a imagem ── */
-.hero-content {
-  position: relative;
-  z-index: 2;
-  margin-left: 46%;
-  width: 54%;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 80px 64px 80px 40px;
-  text-align: left;
-  background: transparent;
-  overflow: hidden;
+/* ── ESTRUTURA ─────────────────────────────────────── */
+.page-wrap {
+  position: relative; z-index: 1;
+  min-height: 100vh;
+  display: flex; flex-direction: column;
 }
 
-/* Logo decorativa gigante no fundo do conteúdo */
-.hero-content::after {
+/* ── HEADER ────────────────────────────────────────── */
+.page-header {
+  display: flex; align-items: center; justify-content: center;
+  padding: 28px 40px;
+  border-bottom: 1px solid rgba(201,162,39,0.12);
+  backdrop-filter: blur(6px);
+  background: rgba(0,0,0,0.3);
+}
+.header-logo img {
+  height: 96px; width: auto; display: block; mix-blend-mode: screen;
+}
+
+/* ── MAIN ──────────────────────────────────────────── */
+.page-main {
+  flex: 1;
+  display: flex; align-items: center; justify-content: center;
+  padding: 48px 24px 72px;
+}
+
+/* ── CARD ──────────────────────────────────────────── */
+.card {
+  background: rgba(4,3,1,0.92);
+  border: 1px solid rgba(201,162,39,0.22);
+  border-radius: 22px;
+  padding: 0;
+  width: 100%; max-width: 620px;
+  position: relative; overflow: hidden;
+  backdrop-filter: blur(24px);
+  box-shadow:
+    0 0 0 1px rgba(201,162,39,0.04) inset,
+    0 40px 100px rgba(0,0,0,0.7),
+    0 0 60px rgba(0,0,0,0.5);
+}
+
+/* Glow top */
+.card::before {
   content: '';
   position: absolute;
-  right: -60px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 520px;
-  height: 520px;
-  background: url('/academyelite/images/logo-selo.png') center center / contain no-repeat;
-  opacity: 0.06;
-  z-index: 0;
+  top: -80px; left: 50%; transform: translateX(-50%);
+  width: 400px; height: 260px;
+  background: radial-gradient(ellipse, rgba(201,162,39,0.055) 0%, transparent 70%);
   pointer-events: none;
 }
 
-/* Garantir que o conteúdo fica acima da logo decorativa */
-.hero-content > * {
-  position: relative;
-  z-index: 1;
-}
-
-.hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border: 1px solid rgba(201,162,39,0.5);
-  background: rgba(201,162,39,0.06);
-  color: var(--gold2);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  padding: 7px 18px;
-  border-radius: 100px;
-  margin-bottom: 36px;
-  backdrop-filter: blur(4px);
-}
-.hero-badge svg { width: 12px; height: 12px; }
-
-.hero-logo {
-  margin: 0 auto 40px;
-  /* Espaço reservado para logo do produto */
-}
-
-.hero-logo-placeholder {
-  display: inline-block;
-  padding: 12px 0;
-}
-
-.hero-logo-placeholder .logo-icon {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.3em;
-  color: var(--gold);
-  text-transform: uppercase;
-  opacity: 0.8;
-}
-
-h1.hero-headline {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(36px, 6vw, 68px);
-  font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: -0.01em;
-  color: var(--white);
-  margin-bottom: 12px;
-}
-
-h1.hero-headline em {
-  font-style: italic;
-  color: var(--gold2);
-}
-
-.hero-divider {
-  width: 60px;
-  height: 1px;
-  background: linear-gradient(90deg, var(--gold), transparent);
-  margin: 28px 0;
-}
-
-.hero-sub {
-  font-size: clamp(16px, 2.2vw, 20px);
-  color: var(--white-dim);
-  line-height: 1.65;
-  max-width: 620px;
-  margin: 0 auto 12px;
-  font-weight: 300;
-}
-
-.hero-sub strong {
-  color: var(--white);
-  font-weight: 500;
-}
-
-.hero-farewell {
-  font-size: 14px;
-  color: var(--gold2);
-  font-style: italic;
-  margin-bottom: 44px;
-  opacity: 0.85;
-}
-
-.btn-gold {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  background: linear-gradient(135deg, var(--gold) 0%, #a8841e 50%, var(--gold2) 100%);
-  color: #000;
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  padding: 18px 44px;
-  border-radius: 2px;
-  border: none;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  text-decoration: none;
-}
-.btn-gold::before {
+/* Marca d'água */
+.card::after {
   content: '';
   position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%);
-  opacity: 0;
-  transition: opacity 0.3s;
+  bottom: -40px; right: -40px;
+  width: 260px; height: 260px;
+  background: url('/academyelite/images/logo-selo.png') center / contain no-repeat;
+  opacity: 0.035;
+  pointer-events: none;
 }
-.btn-gold:hover::before { opacity: 1; }
-.btn-gold:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(201,162,39,0.35); }
-.btn-gold:active { transform: translateY(0); }
 
-.btn-gold-outline {
+/* ── BLOCO TOPO — ENCERRADA ────────────────────────── */
+.card-top {
+  padding: 48px 52px 40px;
+  text-align: center;
+  border-bottom: 1px solid rgba(201,162,39,0.1);
+  position: relative;
+}
+
+/* Badge status */
+.status-badge {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
-  background: transparent;
-  color: var(--gold2);
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
+  gap: 7px;
+  background: rgba(180,30,30,0.12);
+  border: 1px solid rgba(180,30,30,0.28);
+  border-radius: 100px;
+  padding: 5px 14px;
+  margin-bottom: 32px;
+}
+.status-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #c0392b;
+  box-shadow: 0 0 6px rgba(192,57,43,0.7);
+  animation: pulse-red 2s ease-in-out infinite;
+}
+@keyframes pulse-red {
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px rgba(192,57,43,0.7); }
+  50%       { opacity: 0.5; box-shadow: 0 0 12px rgba(192,57,43,0.3); }
+}
+.status-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  padding: 17px 44px;
-  border-radius: 2px;
-  border: 1px solid rgba(201,162,39,0.5);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-decoration: none;
-}
-.btn-gold-outline:hover {
-  background: rgba(201,162,39,0.08);
-  border-color: var(--gold);
-  box-shadow: 0 0 20px rgba(201,162,39,0.1);
+  color: rgba(220,100,100,0.9);
 }
 
-.hero-cta-note {
-  margin-top: 18px;
-  font-size: 12px;
-  color: var(--white-muted);
-  letter-spacing: 0.04em;
+/* Ícone */
+.icon-wrap {
+  width: 68px; height: 68px;
+  border-radius: 50%;
+  border: 1px solid rgba(201,162,39,0.2);
+  background: rgba(201,162,39,0.05);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 28px;
 }
-.hero-cta-note span { color: var(--gold2); font-weight: 500; }
-
-/* ──────────────────────────────────────────
-   SECTION SEPARATOR
-────────────────────────────────────────── */
-.sep {
-  width: 100%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent 0%, rgba(201,162,39,0.25) 30%, rgba(201,162,39,0.25) 70%, transparent 100%);
-  margin: 0;
+.icon-wrap svg {
+  width: 28px; height: 28px;
+  color: var(--gold); opacity: 0.85;
 }
 
-.sep-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-  padding: 0 40px;
-  margin: 0;
-}
-.sep-center::before, .sep-center::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(201,162,39,0.25));
-}
-.sep-center::after { background: linear-gradient(270deg, transparent, rgba(201,162,39,0.25)); }
-.sep-diamond {
-  width: 8px; height: 8px;
-  border: 1px solid var(--gold);
-  transform: rotate(45deg);
-  flex-shrink: 0;
-  opacity: 0.6;
-}
-
-/* ──────────────────────────────────────────
-   SECTION BASE
-────────────────────────────────────────── */
-section { position: relative; }
-
-.section-inner {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 24px;
-}
-
-.section-label {
-  font-size: 11px;
-  font-weight: 600;
+/* Eyebrow */
+.eyebrow {
+  font-size: 9px;
+  font-weight: 700;
   letter-spacing: 0.25em;
   text-transform: uppercase;
   color: var(--gold);
+  opacity: 0.65;
   margin-bottom: 16px;
-  opacity: 0.9;
 }
 
-.section-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(32px, 4.5vw, 52px);
-  font-weight: 700;
-  line-height: 1.15;
-  color: var(--white);
-}
-
-.section-title em { font-style: italic; color: var(--gold2); }
-
-/* ──────────────────────────────────────────
-   FEATURES SECTION
-────────────────────────────────────────── */
-.features {
-  padding: 90px 0 100px;
-  background: var(--black2);
-  position: relative;
-}
-.features::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: url('/academyelite/images/bg-features.jpg') center center / cover no-repeat;
-  opacity: 0.45;
-  z-index: 0;
-}
-.features .section-inner {
-  position: relative;
-  z-index: 1;
-}
-
-.features-header {
-  text-align: center;
-  margin-bottom: 64px;
-}
-
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2px;
-  background: rgba(201,162,39,0.1);
-  border: 1px solid rgba(201,162,39,0.1);
-}
-
-.feature-card {
-  background: var(--black2);
-  padding: 48px 36px;
-  position: relative;
-  transition: background 0.3s;
-}
-.feature-card:hover { background: #0d0d0d; }
-
-.feature-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 2px;
+/* Divisor */
+.gold-divider {
+  width: 36px; height: 1px;
   background: linear-gradient(90deg, transparent, var(--gold), transparent);
-  opacity: 0;
-  transition: opacity 0.3s;
+  margin: 0 auto 24px;
 }
-.feature-card:hover::before { opacity: 1; }
 
-.feature-icon {
-  width: 48px; height: 48px;
-  border: 1px solid rgba(201,162,39,0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 28px;
-  color: var(--gold);
+/* Headline principal */
+.headline {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  color: var(--white);
+  margin-bottom: 20px;
 }
-.feature-icon svg { width: 22px; height: 22px; }
-
-.feature-label {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
+.headline em {
+  font-style: italic;
   color: var(--gold2);
-  margin-bottom: 10px;
-  opacity: 0.7;
 }
 
-.feature-title {
+/* Subtítulo */
+.sub {
+  font-size: 13px;
+  color: rgba(255,255,255,0.38);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 28px;
+}
+
+/* Copy emocional */
+.loss-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 19px;
+  line-height: 1.75;
+  color: rgba(255,255,255,0.65);
+}
+.loss-text strong {
+  color: rgba(255,255,255,0.88);
+  font-weight: 600;
+}
+
+/* ── BLOCO MEIO — ESCASSEZ ─────────────────────────── */
+.card-scarcity {
+  padding: 28px 52px;
+  background: rgba(201,162,39,0.025);
+  border-bottom: 1px solid rgba(201,162,39,0.1);
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+.scarcity-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.scarcity-icon svg {
+  width: 18px; height: 18px;
+  color: var(--gold); opacity: 0.6;
+}
+.scarcity-text {
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 0.01em;
+}
+.scarcity-text strong {
+  color: rgba(255,255,255,0.65);
+  font-weight: 600;
+}
+
+/* ── BLOCO BAIXO — LISTA DE DESISTÊNCIA ────────────── */
+.card-bottom {
+  padding: 40px 52px 48px;
+  text-align: center;
+}
+
+.desistencia-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.6;
+  margin-bottom: 12px;
+}
+
+.desistencia-title {
   font-family: 'Cormorant Garamond', serif;
   font-size: 26px;
   font-weight: 600;
   color: var(--white);
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   line-height: 1.2;
 }
 
-.feature-desc {
-  font-size: 14px;
-  color: var(--white-muted);
-  line-height: 1.7;
-  font-weight: 300;
-}
-
-.feature-tag {
-  display: inline-block;
-  margin-top: 24px;
-  font-size: 11px;
-  color: var(--gold2);
-  border: 1px solid rgba(201,162,39,0.2);
-  padding: 4px 12px;
-  letter-spacing: 0.06em;
-}
-
-/* ──────────────────────────────────────────
-   MARCOS SECTION
-────────────────────────────────────────── */
-.sobre {
-  background: var(--black);
-  position: relative;
-  overflow: hidden;
-}
-
-.sobre-split {
-  position: relative;
-  min-height: 80vh;
-  display: flex;
-  align-items: stretch;
-}
-
-/* ── Imagem: ocupa 68%, vaza sobre o texto ── */
-.sobre-img-panel {
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 68%;
-  overflow: hidden;
-  background: #000;
-  z-index: 1;
-}
-.sobre-img-panel img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 25% center;
-  display: block;
-}
-.sobre-img-panel::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    90deg,
-    transparent 30%,
-    rgba(0,0,0,0.4) 55%,
-    rgba(0,0,0,0.82) 72%,
-    rgba(0,0,0,1) 88%
-  );
-}
-
-/* ── Texto: começa em 44%, sobreposição com a imagem ── */
-.sobre-text-panel {
-  position: relative;
-  z-index: 2;
-  margin-left: 44%;
-  width: 56%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 80px 70px 80px 40px;
-  background: transparent;
-}
-
-.sobre-bio {
-  font-size: 15px;
-  color: var(--white-muted);
-  line-height: 1.8;
-  font-weight: 300;
-  margin-bottom: 20px;
-}
-.sobre-bio strong { color: var(--white); font-weight: 500; }
-
-.sobre-stats {
-  display: flex;
-  gap: 0;
-  margin-top: 48px;
-  padding-top: 0;
-  border-top: none;
-}
-
-.sobre-stat {
-  flex: 1;
-  text-align: center;
-  padding: 0 20px;
-  border-right: 1px solid rgba(201,162,39,0.25);
-}
-.sobre-stat:first-child { padding-left: 0; }
-.sobre-stat:last-child { border-right: none; }
-
-.sobre-stat-num {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 42px;
-  font-weight: 700;
-  color: var(--gold2);
-  line-height: 1;
-  margin-bottom: 8px;
-}
-
-.sobre-stat-label {
-  font-size: 11px;
-  color: var(--white-muted);
-  letter-spacing: 0.06em;
-  font-weight: 400;
-}
-
-/* ── Urgency strip redesenhada ── */
-.urgency-strip {
-  background: linear-gradient(135deg, #0a0800 0%, #111000 50%, #0a0800 100%);
-  border-top: 1px solid rgba(201,162,39,0.2);
-  border-bottom: 1px solid rgba(201,162,39,0.2);
-  padding: 56px 24px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-.urgency-strip::before, .urgency-strip::after {
-  content: '';
-  position: absolute;
-  top: 50%; transform: translateY(-50%);
-  width: 300px; height: 300px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(201,162,39,0.12) 0%, transparent 70%);
-}
-.urgency-strip::before { left: -100px; }
-.urgency-strip::after  { right: -100px; }
-
-.urgency-text {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(24px, 3.5vw, 44px);
-  font-weight: 600;
-  line-height: 1.3;
-  position: relative;
-  z-index: 1;
-}
-.urgency-text span { color: var(--white); }
-.urgency-text em { color: var(--gold2); font-style: italic; }
-
-/* placeholder legado */
-.sobre-photo-placeholder {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #0a0a0a 0%, #111 100%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  color: rgba(201,162,39,0.3);
+.desistencia-desc {
   font-size: 13px;
-  letter-spacing: 0.1em;
-}
-
-.sobre-gold-accent {
-  position: absolute;
-  bottom: -20px;
-  left: -20px;
-  width: 80px;
-  height: 80px;
-  border-left: 1px solid var(--gold);
-  border-bottom: 1px solid var(--gold);
-  opacity: 0.3;
-}
-
-.sobre-content .section-label { margin-bottom: 12px; }
-
-.sobre-content .section-title {
+  line-height: 1.75;
+  color: rgba(255,255,255,0.45);
   margin-bottom: 28px;
 }
+.desistencia-desc strong {
+  color: rgba(255,255,255,0.65);
+  font-weight: 600;
+}
 
-.sobre-bio {
-  font-size: 15px;
-  color: var(--white-muted);
-  line-height: 1.8;
-  font-weight: 300;
+/* ── FUNIL ─────────────────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.funnel-step { display: none; }
+.funnel-step.active { display: block; animation: fadeInUp 0.32s ease; }
+
+/* Progresso */
+.funnel-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+.fp-bar {
+  flex: 1;
+  height: 2px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.fp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold), var(--gold3));
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+.fp-text {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.3);
+  white-space: nowrap;
+}
+
+/* Pergunta */
+.funnel-q {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--white);
+  line-height: 1.4;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+/* Opções */
+.funnel-options {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  text-align: left;
+}
+
+.fopt {
+  width: 100%;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 11px;
+  padding: 14px 18px;
+  color: rgba(255,255,255,0.75);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+}
+.fopt:hover {
+  background: rgba(201,162,39,0.08);
+  border-color: rgba(201,162,39,0.3);
+  color: var(--white);
+}
+
+/* Badge qualificado */
+.funnel-qualified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(40,199,111,0.1);
+  border: 1px solid rgba(40,199,111,0.25);
+  border-radius: 100px;
+  padding: 6px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #28c76f;
   margin-bottom: 20px;
 }
-.sobre-bio strong { color: var(--white); font-weight: 500; }
 
-.sobre-stats {
-  display: flex;
-  gap: 40px;
-  margin-top: 40px;
-  padding-top: 40px;
-  border-top: 1px solid rgba(201,162,39,0.1);
+.funnel-form-label {
+  font-size: 13px;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 16px;
+  text-align: left;
 }
 
-.sobre-stat-num {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 38px;
-  font-weight: 700;
-  color: var(--gold2);
-  line-height: 1;
-  margin-bottom: 6px;
-}
-
-.sobre-stat-label {
-  font-size: 12px;
-  color: var(--white-muted);
-  letter-spacing: 0.06em;
-  font-weight: 400;
-}
-
-/* ──────────────────────────────────────────
-   DEPOIMENTOS
-────────────────────────────────────────── */
-.depoimentos {
-  padding: 100px 0 110px;
-  background: var(--black);
-  position: relative;
-  overflow: hidden;
-}
-
-/* Background image layer */
-.depoimentos-bg {
-  position: absolute;
-  inset: 0;
-  background-image: url('/academyelite/images/bg-depoimentos.jpg');
-  background-size: 100% auto;
-  background-position: center top;
-  background-repeat: no-repeat;
-  opacity: 0.22;
-  z-index: 0;
-  pointer-events: none;
-}
-
-/* Glow dourado nas laterais via CSS */
-.depoimentos::before {
-  content: '';
-  position: absolute;
-  left: -120px; top: 50%;
-  transform: translateY(-50%);
-  width: 500px; height: 800px;
-  background: radial-gradient(ellipse, rgba(201,162,39,0.22) 0%, transparent 70%);
-  pointer-events: none;
-  z-index: 0;
-}
-.depoimentos::after {
-  content: '';
-  position: absolute;
-  right: -120px; top: 50%;
-  transform: translateY(-50%);
-  width: 500px; height: 800px;
-  background: radial-gradient(ellipse, rgba(201,162,39,0.22) 0%, transparent 70%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-.depoimentos .section-inner { position: relative; z-index: 1; }
-
-.depoimentos-header {
-  text-align: center;
-  margin-bottom: 64px;
-}
-
-.depo-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-}
-
-.depo-item {
-  position: relative;
-  overflow: hidden;
-  border: 1px solid rgba(201,162,39,0.25);
-  border-radius: 16px;
-  transition: all 0.4s ease;
-  cursor: pointer;
-  background: #080808;
-  box-shadow: 0 4px 32px rgba(0,0,0,0.7), inset 0 0 0 1px rgba(255,255,255,0.03);
-}
-.depo-item:hover {
-  border-color: rgba(201,162,39,0.55);
-  transform: translateY(-6px);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 30px rgba(201,162,39,0.12);
-}
-
-.depo-item .img-card {
-  width: 100%;
-  height: auto;
-  display: block;
-  border-radius: 15px;
-  transition: opacity 0.45s ease;
-  position: relative;
-  z-index: 2;
-}
-.depo-item:hover .img-card { opacity: 0; }
-
-.depo-item .img-original {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  background: #080808;
-  border-radius: 15px;
-  opacity: 0;
-  transition: opacity 0.45s ease;
-  z-index: 3;
-}
-.depo-item:hover .img-original { opacity: 1; }
-
-/* Badge "ver original" */
-.depo-hint {
-  position: absolute;
-  bottom: 12px;
-  right: 12px;
-  background: rgba(0,0,0,0.6);
+/* Botão iniciar */
+.btn-start-funnel {
+  display: inline-block;
+  background: rgba(201,162,39,0.1);
   border: 1px solid rgba(201,162,39,0.35);
-  color: rgba(201,162,39,0.85);
-  font-size: 9px;
-  font-weight: 500;
+  border-radius: 12px;
+  padding: 14px 28px;
+  color: var(--gold2);
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  padding: 4px 9px;
-  border-radius: 4px;
-  z-index: 4;
-  pointer-events: none;
-  transition: opacity 0.3s;
-  backdrop-filter: blur(4px);
+  cursor: pointer;
+  transition: all 0.25s;
 }
-.depo-item:hover .depo-hint { opacity: 0; }
-
-/* Linha dourada topo do card */
-.depo-item::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 8%; right: 8%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(201,162,39,0.65), transparent);
-  z-index: 1;
+.btn-start-funnel:hover {
+  background: rgba(201,162,39,0.15);
+  border-color: rgba(201,162,39,0.55);
 }
 
-/* Glow dourado no hover */
-.depo-item::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 16px;
-  background: radial-gradient(ellipse at 50% 0%, rgba(201,162,39,0.06) 0%, transparent 60%);
-  pointer-events: none;
-  z-index: 1;
-  opacity: 0;
-  transition: opacity 0.4s;
-}
-.depo-item:hover::after { opacity: 1; }
-
-/* Rodapé depoimentos */
-.depo-footer {
-  text-align: center;
-  margin-top: 48px;
+/* ── FORM ──────────────────────────────────────────── */
+.form-group {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
   gap: 10px;
-  font-size: 13px;
-  color: var(--white-muted);
-  opacity: 0.6;
-}
-.depo-footer svg { color: var(--gold); width: 16px; height: 16px; flex-shrink: 0; }
-
-/* ──────────────────────────────────────────
-   URGENCY STRIP
-────────────────────────────────────────── */
-.urgency-strip {
-  background: linear-gradient(90deg, #0d0900, #1a1200, #0d0900);
-  border-top: 1px solid rgba(201,162,39,0.15);
-  border-bottom: 1px solid rgba(201,162,39,0.15);
-  padding: 32px 24px;
-  text-align: center;
-}
-
-.urgency-text {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(20px, 3vw, 30px);
-  font-weight: 600;
-  color: var(--gold2);
-  letter-spacing: 0.02em;
-}
-
-.urgency-text span { color: var(--white); }
-
-/* ──────────────────────────────────────────
-   FINAL CTA
-────────────────────────────────────────── */
-/* ──────────────────────────────────────────
-   CTA + FORM WRAPPER (background unificado)
-────────────────────────────────────────── */
-.cta-wrapper {
-  position: relative;
-  background: var(--black);
-  overflow: hidden;
-}
-
-.cta-wrapper::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: url('/academyelite/images/bg-cta-v2.png');
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
-  opacity: 0.75;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.cta-wrapper > * { position: relative; z-index: 1; }
-
-.final-cta {
-  padding: 120px 0 80px;
-  background: transparent;
-  text-align: center;
-  position: relative;
-  overflow: visible;
-}
-
-.final-cta-content {
-  position: relative;
-  z-index: 1;
-  max-width: 680px;
-  margin: 0 auto;
-}
-
-.final-cta .section-title {
-  margin-bottom: 28px;
-}
-
-.final-cta-copy {
-  font-size: 18px;
-  color: var(--white-muted);
-  line-height: 1.7;
-  font-weight: 300;
-  margin-bottom: 48px;
-}
-
-.final-cta-copy strong { color: var(--white); font-weight: 500; }
-
-/* ──────────────────────────────────────────
-   FOOTER
-────────────────────────────────────────── */
-footer {
-  background: #050505;
-  border-top: 1px solid rgba(201,162,39,0.1);
-  padding: 44px 24px;
-  text-align: center;
-}
-
-.footer-logo {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 15px;
-  font-weight: 500;
-  letter-spacing: 0.5em;
-  color: var(--gold2);
-  text-transform: uppercase;
   margin-bottom: 14px;
+  text-align: left;
 }
 
-.footer-copy {
+.form-input {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 10px;
+  padding: 14px 18px;
+  color: var(--white);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+.form-input::placeholder { color: rgba(255,255,255,0.22); }
+.form-input:focus {
+  border-color: rgba(201,162,39,0.35);
+  background: rgba(255,255,255,0.06);
+}
+
+.btn-desistencia {
+  width: 100%;
+  background: rgba(201,162,39,0.1);
+  border: 1px solid rgba(201,162,39,0.35);
+  border-radius: 12px;
+  padding: 16px 24px;
+  color: var(--gold2);
+  font-family: 'Inter', sans-serif;
   font-size: 12px;
-  color: var(--white-muted);
-  opacity: 0.35;
-  letter-spacing: 0.06em;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.25s;
+  margin-top: 4px;
+}
+.btn-desistencia:hover {
+  background: rgba(201,162,39,0.16);
+  border-color: rgba(201,162,39,0.55);
+  box-shadow: 0 0 24px rgba(201,162,39,0.08);
+}
+.btn-desistencia:disabled {
+  opacity: 0.5; cursor: not-allowed;
 }
 
-/* ──────────────────────────────────────────
-   SCROLL ANIMATIONS
-────────────────────────────────────────── */
-.fade-up {
-  opacity: 0;
-  transform: translateY(28px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
-}
-.fade-up.visible {
-  opacity: 1;
-  transform: translateY(0);
+.form-disclaimer {
+  font-size: 10px;
+  color: rgba(255,255,255,0.2);
+  margin-top: 12px;
+  line-height: 1.6;
 }
 
-/* Depoimentos sempre visíveis — sem animação de entrada */
-.depo-item {
-  opacity: 1 !important;
-  transform: none !important;
+/* ── DESQUALIFICADO ────────────────────────────────── */
+.disq-wrap { padding: 8px 0; }
+.disq-line {
+  width: 32px; height: 1px;
+  background: rgba(255,255,255,0.15);
+  margin: 0 auto 20px;
+}
+.disq-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 12px;
+}
+.disq-desc {
+  font-size: 12px;
+  line-height: 1.8;
+  color: rgba(255,255,255,0.3);
 }
 
-.fade-up-d1 { transition-delay: 0.1s; }
-.fade-up-d2 { transition-delay: 0.2s; }
-.fade-up-d3 { transition-delay: 0.3s; }
-.fade-up-d4 { transition-delay: 0.4s; }
-
-/* ──────────────────────────────────────────
-   RESPONSIVE
-────────────────────────────────────────── */
-@media (max-width: 768px) {
-  .features-grid { grid-template-columns: 1fr; }
-  .depo-grid { grid-template-columns: 1fr 1fr; }
-  .form-card { padding: 40px 24px; }
-
-  /* ── HERO mobile ── */
-  .hero {
-    flex-direction: column;
-    min-height: auto;
-    align-items: stretch;
-  }
-  .hero-image-panel {
-    position: relative;
-    width: 100%;
-    height: 52vw;
-    min-height: 240px;
-    max-height: 340px;
-  }
-  .hero-image-panel img {
-    object-position: center 15%;
-  }
-  .hero-image-panel::after {
-    background: linear-gradient(
-      180deg,
-      transparent 30%,
-      rgba(0,0,0,.55) 65%,
-      rgba(0,0,0,1) 95%
-    );
-  }
-  .hero-content {
-    position: relative;
-    margin-left: 0;
-    width: 100%;
-    padding: 32px 24px 56px;
-    background: var(--black);
-    align-items: flex-start;
-    text-align: left;
-  }
-  .hero-content::after { display: none; }
-  h1.hero-headline { font-size: clamp(30px, 8vw, 48px); }
-  .hero-sub { font-size: 15px; }
-  .btn-gold, .btn-gold-outline { width: 100%; justify-content: center; padding: 16px 24px; }
-  .hero-logo img { height: 72px !important; }
-  .hero-badge { font-size: 10px; padding: 6px 14px; }
-
-  /* ── SOBRE mobile ── */
-  .sobre-split {
-    flex-direction: column;
-    min-height: auto;
-  }
-  .sobre-img-panel {
-    position: relative;
-    width: 100%;
-    height: 55vw;
-    min-height: 220px;
-    max-height: 320px;
-  }
-  .sobre-img-panel::after {
-    background: linear-gradient(
-      180deg,
-      transparent 40%,
-      rgba(0,0,0,.7) 75%,
-      rgba(0,0,0,1) 95%
-    );
-  }
-  .sobre-text-panel {
-    margin-left: 0;
-    width: 100%;
-    padding: 32px 24px 56px;
-    background: var(--black);
-  }
-  .sobre-stats {
-    flex-wrap: wrap;
-    gap: 0;
-    margin-top: 32px;
-  }
-  .sobre-stat {
-    flex: 0 0 50%;
-    padding: 14px 12px;
-    border-right: none;
-    border-bottom: 1px solid rgba(201,162,39,.15);
-  }
-  .sobre-stat:nth-child(odd) { border-right: 1px solid rgba(201,162,39,.15); }
-  .sobre-stat:last-child { border-bottom: none; }
-  .sobre-stat-num { font-size: 30px; }
-
-  /* ── URGENCY mobile ── */
-  .urgency-strip { padding: 36px 24px; }
-  .urgency-text { font-size: clamp(18px, 5vw, 28px); }
-
-  /* ── FINAL CTA mobile ── */
-  .final-cta { padding: 72px 0 56px; }
-  .final-cta-copy { font-size: 15px; }
+/* ── SUCESSO ───────────────────────────────────────── */
+.success-wrap { padding: 8px 0; }
+.success-icon {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  border: 1px solid rgba(201,162,39,0.3);
+  background: rgba(201,162,39,0.06);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 18px;
+}
+.success-icon svg { width: 22px; height: 22px; color: var(--gold); }
+.success-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 10px;
+}
+.success-desc {
+  font-size: 13px;
+  color: rgba(255,255,255,0.4);
+  line-height: 1.7;
 }
 
-@media (max-width: 480px) {
-  .depo-grid { grid-template-columns: 1fr; }
-  .hero-image-panel { height: 60vw; max-height: 280px; }
-  .sobre-img-panel { height: 60vw; }
-  .sobre-stat { flex: 0 0 100%; border-right: none !important; }
-  .ann-bar { font-size: 11px; padding: 10px 16px; }
+/* ── FOOTER ────────────────────────────────────────── */
+.page-footer {
+  text-align: center;
+  padding: 24px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.15);
+  letter-spacing: 0.04em;
+  border-top: 1px solid rgba(255,255,255,0.04);
+}
+
+/* ── MOBILE ────────────────────────────────────────── */
+@media (max-width: 580px) {
+  .card-top, .card-bottom { padding: 36px 24px; }
+  .card-scarcity { padding: 22px 24px; }
+  .headline { font-size: 34px; }
+  .loss-text { font-size: 17px; }
+  .desistencia-title { font-size: 22px; }
+  .page-header { padding: 20px 24px; }
+  .header-logo img { height: 78px; }
 }
 </style>
 </head>
 <body>
 
-<!-- ANNOUNCEMENT BAR -->
-<div class="ann-bar">
-  <span class="ann-dot"></span>
-  VAGAS EXTREMAMENTE LIMITADAS &nbsp;·&nbsp; LISTA DE ESPERA VIP ABERTA
+<div class="bg-layer">
+  <img src="/academyelite/images/marcos/hero-banner.jpg" alt="" aria-hidden="true">
 </div>
 
-<!-- ──── HERO ──── -->
-<section class="hero">
+<div class="page-wrap">
 
-  <!-- ── Esquerda: Imagem Marcos ── -->
-  <div class="hero-image-panel">
-    <img src="/academyelite/images/marcos/hero-banner.jpg" alt="Marcos de Castro — Elite Dark Academy">
-  </div>
-
-  <!-- ── Direita: Conteúdo ── -->
-  <div class="hero-content">
-    <div class="hero-logo" style="margin-bottom:36px;">
-      <img src="/academyelite/images/logo-selo.png" alt="Elite Dark Academy" style="height:100px;width:auto;">
+  <!-- HEADER -->
+  <header class="page-header">
+    <div class="header-logo">
+      <img src="/academyelite/images/logo-tipografia.png" alt="Elite Dark Academy">
     </div>
+  </header>
 
-    <div class="hero-badge" style="margin-bottom:32px;">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-      </svg>
-      Acesso Restrito
+  <!-- MAIN -->
+  <main class="page-main">
+    <div class="card">
+
+      <!-- BLOCO TOPO -->
+      <div class="card-top">
+
+        <div class="status-badge">
+          <span class="status-dot"></span>
+          <span class="status-label">Acesso encerrado</span>
+        </div>
+
+        <div class="icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+        </div>
+
+        <p class="eyebrow">Elite Dark Academy</p>
+        <div class="gold-divider"></div>
+
+        <h1 class="headline">Essa janela<br><em>não volta.</em></h1>
+
+        <p class="sub">Lista VIP · Vagas esgotadas</p>
+
+        <p class="loss-text">
+          As vagas foram preenchidas pelos membros que estavam na lista prioritária.<br><br>
+          <strong>Não existe data para uma próxima abertura.</strong> Esse ciclo foi estruturado para um grupo pequeno e específico — e esse grupo já está completo.
+        </p>
+
+      </div>
+
+      <!-- BLOCO ESCASSEZ -->
+      <div class="card-scarcity">
+        <span class="scarcity-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+        </span>
+        <p class="scarcity-text">
+          <strong>Sem previsão de próxima abertura.</strong> Novas turmas dependem de capacidade, agenda e estrutura — não de uma data no calendário. Pode demorar meses. Pode nunca reabrir neste formato.
+        </p>
+      </div>
+
+      <!-- BLOCO LISTA DE DESISTÊNCIA + FUNIL -->
+      <div class="card-bottom">
+
+        <p class="desistencia-label">Única alternativa disponível</p>
+        <h2 class="desistencia-title">Lista de Desistência</h2>
+        <p class="desistencia-desc">
+          Quando um membro confirma que abre mão da vaga, ela passa direto para o próximo da fila.<br>
+          <strong>Sem garantia. Sem prazo.</strong> Só avisamos quando acontece de verdade.
+        </p>
+
+        <!-- FUNIL -->
+        <div id="funnel-wrap">
+
+          <!-- Intro -->
+          <div id="f-intro" class="funnel-step active">
+            <button class="btn-start-funnel" onclick="startFunnel()">
+              → Verificar minha elegibilidade
+            </button>
+          </div>
+
+          <!-- Q1 -->
+          <div id="f-q1" class="funnel-step">
+            <div class="funnel-progress">
+              <div class="fp-bar"><div class="fp-fill" style="width:33%"></div></div>
+              <span class="fp-text">1 / 3</span>
+            </div>
+            <p class="funnel-q">O que mais te motiva a querer estar no Elite Dark Academy?</p>
+            <div class="funnel-options">
+              <button class="fopt" onclick="answer(1,'a','Bastidores reais — o que não chega ao público')">Acompanhar os bastidores reais — o que não chega ao público</button>
+              <button class="fopt" onclick="answer(1,'b','Estratégias sendo usadas agora, não daqui a meses')">Ter acesso às estratégias sendo usadas agora, não daqui a meses</button>
+              <button class="fopt" onclick="answer(1,'c','Só curioso para entender como funciona')">Só estou curioso para entender como funciona</button>
+            </div>
+          </div>
+
+          <!-- Q2 -->
+          <div id="f-q2" class="funnel-step">
+            <div class="funnel-progress">
+              <div class="fp-bar"><div class="fp-fill" style="width:66%"></div></div>
+              <span class="fp-text">2 / 3</span>
+            </div>
+            <p class="funnel-q">Você tem o hábito de investir em educação, ferramentas ou comunidades pagas?</p>
+            <div class="funnel-options">
+              <button class="fopt" onclick="answer(2,'a','Sim — invisto regularmente nesse tipo de recurso')">Sim — invisto regularmente nesse tipo de recurso</button>
+              <button class="fopt" onclick="answer(2,'b','Já investi antes e entendo o valor disso')">Já investi antes e entendo o valor disso</button>
+              <button class="fopt" onclick="answer(2,'c','Prefiro começar pelo gratuito antes de qualquer investimento')">Prefiro começar pelo gratuito antes de qualquer investimento</button>
+            </div>
+          </div>
+
+          <!-- Q3 -->
+          <div id="f-q3" class="funnel-step">
+            <div class="funnel-progress">
+              <div class="fp-bar"><div class="fp-fill" style="width:100%"></div></div>
+              <span class="fp-text">3 / 3</span>
+            </div>
+            <p class="funnel-q">Quando uma vaga surgir, você consegue confirmar dentro de 24 horas?</p>
+            <div class="funnel-options">
+              <button class="fopt" onclick="answer(3,'a','Sim — esse tipo de oportunidade não espera')">Sim — sei que esse tipo de oportunidade não espera</button>
+              <button class="fopt" onclick="answer(3,'b','Sim — se fizer sentido para o meu momento atual')">Sim — se fizer sentido para o meu momento atual</button>
+              <button class="fopt" onclick="answer(3,'c','Precisaria de alguns dias para avaliar com calma')">Precisaria de alguns dias para avaliar com calma</button>
+            </div>
+          </div>
+
+          <!-- Form (qualificado) -->
+          <div id="f-form" class="funnel-step">
+            <div class="funnel-qualified-badge">✓ Você está no perfil certo</div>
+            <p class="funnel-form-label">Preencha seus dados para entrar na fila:</p>
+            <div class="form-group">
+              <input type="text"  id="nome"     class="form-input" placeholder="Seu nome completo" autocomplete="off">
+              <input type="email" id="email"    class="form-input" placeholder="Seu melhor e-mail" autocomplete="off">
+              <input type="tel"   id="whatsapp" class="form-input" placeholder="WhatsApp (com DDD)" autocomplete="off">
+            </div>
+            <button class="btn-desistencia" id="btn-submit" onclick="submitDesistencia()">
+              Entrar na Lista de Desistência
+            </button>
+            <p class="form-disclaimer">Sem spam. Você só será contatado quando uma vaga de fato abrir.</p>
+          </div>
+
+          <!-- Desqualificado -->
+          <div id="f-disq" class="funnel-step">
+            <div class="disq-wrap">
+              <div class="disq-line"></div>
+              <p class="disq-title">Esse não é seu momento agora.</p>
+              <p class="disq-desc">
+                O Elite Dark Academy exige decisão rápida quando uma vaga aparece — e isso não é para todo mundo.<br><br>
+                Continue acompanhando o conteúdo e, quando a hora chegar, a fila vai estar aqui.
+              </p>
+            </div>
+          </div>
+
+          <!-- Sucesso -->
+          <div id="f-success" class="funnel-step">
+            <div class="success-wrap">
+              <div class="success-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              </div>
+              <p class="success-title">Você está na fila.</p>
+              <p class="success-desc">
+                Se uma vaga for liberada por desistência,<br>você será avisado imediatamente.
+              </p>
+            </div>
+          </div>
+
+        </div><!-- /funnel-wrap -->
+
+      </div>
     </div>
+  </main>
 
-    <h1 class="hero-headline" style="text-align:left;">
-      Não é mais sobre<br>
-      <em>assistir aulas.</em>
-    </h1>
+  <!-- FOOTER -->
+  <footer class="page-footer">
+    © 2025 Elite Dark Academy · Todos os direitos reservados
+  </footer>
 
-    <div class="hero-divider" style="margin:24px 0;"></div>
-
-    <p class="hero-sub" style="text-align:left;margin:0 0 10px;">
-      É sobre entrar no mundo de <strong>Marcos de Castro</strong>
-      como parte de um círculo seleto. Bastidores reais, as ferramentas
-      que ele usa, pesquisas em andamento — e proximidade direta com
-      quem constrói canais de verdade.
-    </p>
-
-    <p class="hero-farewell" style="text-align:left;margin-bottom:36px;">
-      Essa será minha despedida da proximidade aberta.<br>
-      Depois disso, meu foco será apenas no Academy.
-    </p>
-
-    <a href="#form" class="btn-gold">
-      Quero Entrar na Lista VIP
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-        <path d="M5 12h14M12 5l7 7-7 7"/>
-      </svg>
-    </a>
-
-    <p class="hero-cta-note" style="text-align:left;margin-top:18px;">
-      <span>Vagas extremamente limitadas.</span><br>
-      Apenas quem estiver na lista terá prioridade no acesso.
-    </p>
-  </div>
-
-</section>
-
-<!-- ──── SEPARATOR ──── -->
-<div class="sep-center">
-  <div class="sep-diamond"></div>
 </div>
-
-<!-- ──── FEATURES ──── -->
-<section class="features">
-  <div class="section-inner">
-    <div class="features-header">
-      <div class="section-label fade-up">O que está incluso</div>
-      <h2 class="section-title fade-up fade-up-d1">
-        Uma estrutura <em>completa.</em><br>Nada superficial.
-      </h2>
-    </div>
-
-    <div class="features-grid">
-
-      <div class="feature-card fade-up">
-        <div class="feature-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-            <circle cx="9" cy="7" r="4"/>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
-          </svg>
-        </div>
-        <div class="feature-label">Encontros</div>
-        <h3 class="feature-title">Encontros Estratégicos ao Vivo</h3>
-        <p class="feature-desc">
-          Encontros ao vivo com foco em estratégia, crescimento,
-          monetização e escala. Acesso a Marcos e ao grupo em sessões
-          exclusivas para membros do círculo.
-        </p>
-        <span class="feature-tag">AO VIVO</span>
-      </div>
-
-      <div class="feature-card fade-up fade-up-d2">
-        <div class="feature-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <rect x="2" y="3" width="20" height="14" rx="2"/>
-            <path d="M8 21h8M12 17v4"/>
-            <path d="M7 8l3 3 5-5"/>
-          </svg>
-        </div>
-        <div class="feature-label">Ferramentas</div>
-        <h3 class="feature-title">CenaDrop + Narrativa IA Inclusos</h3>
-        <p class="feature-desc">
-          As duas ferramentas que Marcos utiliza na operação real estão
-          incluídas no plano por 12 meses. Para aproveitá-las plenamente,
-          você precisará de uma assinatura ativa do Google Gemini Ultra,
-          contratada separadamente e diretamente com o Google.
-        </p>
-        <span class="feature-tag">12 MESES INCLUSOS</span>
-      </div>
-
-      <div class="feature-card fade-up fade-up-d3">
-        <div class="feature-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-          </svg>
-        </div>
-        <div class="feature-label">Análises</div>
-        <h3 class="feature-title">Análises Estratégicas em Grupo</h3>
-        <p class="feature-desc">
-          Discussões e análises estratégicas durante os encontros ao vivo,
-          com Marcos e os demais membros do círculo. Dúvidas respondidas
-          em grupo, com visão de quem opera de verdade.
-        </p>
-        <span class="feature-tag">EM GRUPO</span>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- ──── SEPARATOR ──── -->
-<div class="sep"></div>
-
-<!-- ──── SOBRE MARCOS ──── -->
-<section class="sobre">
-  <div class="sobre-split">
-
-    <!-- Esquerda: Marcos tech/analytics -->
-    <div class="sobre-img-panel fade-up">
-      <img src="/academyelite/images/marcos-operacao.jpg" alt="Marcos de Castro — Operação real">
-    </div>
-
-    <!-- Direita: texto -->
-    <div class="sobre-text-panel">
-      <div class="section-label fade-up">Quem está por trás</div>
-      <h2 class="section-title fade-up fade-up-d1" style="margin-bottom:28px;">
-        Marcos de Castro.<br>
-        <em>Operação real.</em>
-      </h2>
-
-      <p class="sobre-bio fade-up fade-up-d2">
-        <strong>Marcos de Castro</strong> não ensina teoria. Ele opera canais que escalam,
-        monetizam e se sustentam — e agora abre sua estrutura para um grupo
-        extremamente limitado de pessoas.
-      </p>
-
-      <p class="sobre-bio fade-up fade-up-d2">
-        Cada estratégia, cada ferramenta, cada encontro que você terá no
-        Elite Dark Academy vem de uma operação real, testada e validada.
-        Não é um curso. É acesso direto ao bastidor premium.
-      </p>
-
-      <div class="sobre-stats fade-up fade-up-d3">
-        <div class="sobre-stat">
-          <div class="sobre-stat-num">VIP</div>
-          <div class="sobre-stat-label">Vagas exclusivas</div>
-        </div>
-        <div class="sobre-stat">
-          <div class="sobre-stat-num">100%</div>
-          <div class="sobre-stat-label">Acesso à operação real</div>
-        </div>
-        <div class="sobre-stat">
-          <div class="sobre-stat-num">AO VIVO</div>
-          <div class="sobre-stat-label">Encontros estratégicos</div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<!-- ──── URGENCY STRIP ──── -->
-<div class="urgency-strip">
-  <div class="urgency-text">
-    Depois disso, <em>meu foco será apenas no Academy.</em><br>
-    <span style="font-size:0.7em;opacity:0.75;font-style:italic;">Esta é minha despedida da proximidade aberta.</span>
-  </div>
-</div>
-
-<!-- ──── DEPOIMENTOS ──── -->
-<section class="depoimentos">
-  <div class="depoimentos-bg"></div>
-  <div class="section-inner">
-    <div class="depoimentos-header">
-      <div class="section-label fade-up">Resultados reais</div>
-      <h2 class="section-title fade-up fade-up-d1">
-        Quem já está na <em>operação.</em>
-      </h2>
-    </div>
-
-    <div class="depo-grid">
-      <!-- Linha 1: cards compactos -->
-      <div class="depo-item">
-        <img class="img-card" src="/academyelite/images/depoimentos/card-01.png" alt="Resultado: 10,4 mil views em 48h, CTR 11,1%" loading="lazy">
-        <img class="img-original" src="/academyelite/images/depoimentos/depoimento-img2.jpg" alt="Screenshot original" loading="lazy">
-        <span class="depo-hint">ver original</span>
-      </div>
-      <div class="depo-item">
-        <img class="img-card" src="/academyelite/images/depoimentos/card-03.png" alt="Resultado: canal monetizado, retenção 4,4%" loading="lazy">
-        <img class="img-original" src="/academyelite/images/depoimentos/depoimento-alice.jpg" alt="Screenshot original" loading="lazy">
-        <span class="depo-hint">ver original</span>
-      </div>
-      <div class="depo-item">
-        <img class="img-card" src="/academyelite/images/depoimentos/card-06.png" alt="Resultado: 263,9 mil views, R$7.615,35" loading="lazy">
-        <img class="img-original" src="/academyelite/images/depoimentos/depoimento-diego.png" alt="Screenshot original" loading="lazy">
-        <span class="depo-hint">ver original</span>
-      </div>
-      <!-- Linha 2: cards compactos -->
-      <div class="depo-item">
-        <img class="img-card" src="/academyelite/images/depoimentos/card-02.png" alt="Resultado: 9.419 views em 48h" loading="lazy">
-        <img class="img-original" src="/academyelite/images/depoimentos/depoimento-dark.png" alt="Screenshot original" loading="lazy">
-        <span class="depo-hint">ver original</span>
-      </div>
-      <div class="depo-item">
-        <img class="img-card" src="/academyelite/images/depoimentos/card-04.png" alt="Resultado: 9.419 views, 7 dias de vídeos" loading="lazy">
-        <img class="img-original" src="/academyelite/images/depoimentos/depoimento-dark.png" alt="Screenshot original" loading="lazy">
-        <span class="depo-hint">ver original</span>
-      </div>
-      <div class="depo-item">
-        <img class="img-card" src="/academyelite/images/depoimentos/card-09.png" alt="Resultado: R$13.419,77 em 14 dias" loading="lazy">
-        <img class="img-original" src="/academyelite/images/depoimentos/depoimento-receita.png" alt="Screenshot original" loading="lazy">
-        <span class="depo-hint">ver original</span>
-      </div>
-      <!-- Linha 3: cards mais altos juntos -->
-      <div class="depo-item">
-        <img class="img-card" src="/academyelite/images/depoimentos/card-05.png" alt="Resultado: 165,5 mil views, R$2.916,64" loading="lazy">
-        <img class="img-original" src="/academyelite/images/depoimentos/depoimento-img1.jpg" alt="Screenshot original" loading="lazy">
-        <span class="depo-hint">ver original</span>
-      </div>
-      <div class="depo-item">
-        <img class="img-card" src="/academyelite/images/depoimentos/card-07.png" alt="Resultado: canal quase desistindo, 71,8 mil impressões" loading="lazy">
-        <img class="img-original" src="/academyelite/images/depoimentos/depoimento-img4.png" alt="Screenshot original" loading="lazy">
-        <span class="depo-hint">ver original</span>
-      </div>
-      <div class="depo-item">
-        <img class="img-card" src="/academyelite/images/depoimentos/card-08.png" alt="Resultado: monetização aprovada" loading="lazy">
-        <img class="img-original" src="/academyelite/images/depoimentos/depoimento-img6.png" alt="Screenshot original" loading="lazy">
-        <span class="depo-hint">ver original</span>
-      </div>
-    </div>
-
-    <div class="depo-footer">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-      </svg>
-      Resultados reais de membros aplicando o método com consistência.<br>
-      <small style="opacity:0.5;font-size:0.8em;">Resultados individuais variam conforme o canal e o esforço de cada membro.</small>
-    </div>
-
-  </div>
-</section>
-
-<!-- ──── FINAL CTA ──── -->
-<div class="cta-wrapper">
-<section class="final-cta">
-  <div class="section-inner">
-    <div class="final-cta-content">
-      <div class="section-label fade-up">Última chamada</div>
-      <h2 class="section-title fade-up fade-up-d1">
-        A próxima fase<br><em>começa agora.</em>
-      </h2>
-
-      <div class="hero-divider" style="margin: 32px auto;"></div>
-
-      <p class="final-cta-copy fade-up fade-up-d2">
-        Não há cronograma obrigatório. Não há fórmulas de acompanhamento.<br><br>
-        O que existe é algo mais raro: <strong>acesso ao mundo real de criação do Marcos — do jeito que ele realmente é.</strong>
-        As ferramentas que ele usa. As pesquisas que ele faz antes de publicar.
-        Os bastidores dos próprios vídeos do Marcos sendo produzidos.
-        Discussões reais com pessoas que pensam no mesmo nível.<br><br>
-        Você não entra como aluno. Entra como parte de um <strong>círculo seleto</strong>
-        que acompanha de perto como <strong>Marcos de Castro</strong> constrói — e participa
-        dos encontros ao vivo onde Marcos está presente com o grupo.
-      </p>
-
-      <a href="#form" class="btn-gold fade-up fade-up-d3">
-        Entrar na Lista de Espera VIP
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <path d="M5 12h14M12 5l7 7-7 7"/>
-        </svg>
-      </a>
-
-      <p class="hero-cta-note fade-up fade-up-d4" style="margin-top: 20px;">
-        <span>As primeiras vagas serão liberadas prioritariamente</span><br>
-        para quem estiver cadastrado.
-      </p>
-    </div>
-  </div>
-</section>
-
-</div><!-- /.cta-wrapper -->
-
-<!-- ──── FOOTER ──── -->
-<footer>
-  <div class="footer-logo">Elite &nbsp; Dark &nbsp; Academy</div>
-  <p class="footer-copy">© 2026 Marcos de Castro &nbsp;·&nbsp; Todos os direitos reservados</p>
-</footer>
 
 <script>
-// ── Scroll animations ──
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-}, { threshold: 0.12 });
-document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+const funnelAnswers = { q1: null, q2: null, q3: null };
 
-document.querySelectorAll('a[href="#form"]').forEach(a => {
-  a.href = '/academyelite/lista-prioritaria';
-});
+function showStep(id) {
+  document.querySelectorAll('.funnel-step').forEach(el => el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function startFunnel() { showStep('f-q1'); }
+
+function answer(step, option, text) {
+  const isDisqualify = option === 'c';
+  if (step === 1) funnelAnswers.q1 = text;
+  if (step === 2) funnelAnswers.q2 = text;
+  if (step === 3) funnelAnswers.q3 = text;
+
+  if (isDisqualify) { showStep('f-disq'); return; }
+
+  if (step === 1) { showStep('f-q2'); return; }
+  if (step === 2) { showStep('f-q3'); return; }
+  if (step === 3) { showStep('f-form'); return; }
+}
+
+async function submitDesistencia() {
+  const nome     = document.getElementById('nome').value.trim();
+  const email    = document.getElementById('email').value.trim();
+  const whatsapp = document.getElementById('whatsapp').value.trim();
+  const btn      = document.getElementById('btn-submit');
+
+  if (!nome || !email || !whatsapp) {
+    alert('Preencha todos os campos para continuar.');
+    return;
+  }
+
+  btn.disabled    = true;
+  btn.textContent = 'Registrando...';
+
+  try {
+    await fetch('/api/academyelite-lista-espera', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({
+        nome, email, whatsapp,
+        source: 'lista-espera',
+        q1: funnelAnswers.q1,
+        q2: funnelAnswers.q2,
+        q3: funnelAnswers.q3,
+      }),
+    });
+  } catch (_) {}
+
+  showStep('f-success');
+}
 </script>
+
 </body>
 </html>
