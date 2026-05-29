@@ -250,6 +250,7 @@ module.exports = async function handler(req, res) {
         name,
         password_hash,
         active: true,
+        origin: 'elite',
       });
       results.narrativa = { password: narrativaPassword };
       console.log(`✅ Narrativa IA criado: ${email}`);

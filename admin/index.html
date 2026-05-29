@@ -509,6 +509,7 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
 .badge.hotmart   { background: var(--yellow-s); color: var(--yellow); border: 1px solid rgba(255,159,67,.2); }
 .badge.hotmart-RN{ background: rgba(255,193,7,.12); color: #d4930a;   border: 1px solid rgba(255,193,7,.25); }
 .badge.hotmart-MC{ background: var(--orange-s); color: var(--orange); border: 1px solid rgba(253,126,20,.25); }
+.badge.hotmart-EDA,.badge.elite { background: rgba(201,162,39,.15); color: #C9A227; border: 1px solid rgba(201,162,39,.35); }
 .badge.manual    { background: var(--accent-s); color: var(--accent); border: 1px solid rgba(124,58,237,.2); }
 
 /* ════════════════════════════════════
@@ -2722,7 +2723,7 @@ async function loadAll() {
 }
 
 // ── HELPERS ───────────────────────────────────
-const srcLabel = s => s === 'hotmart-RN' ? 'Hotmart RN' : s === 'hotmart-MC' ? 'Hotmart MC' : (s||'').startsWith('hotmart') ? 'Hotmart' : 'Manual';
+const srcLabel = s => s === 'hotmart-EDA' ? 'Elite Dark' : s === 'hotmart-RN' ? 'Hotmart RN' : s === 'hotmart-MC' ? 'Hotmart MC' : (s||'').startsWith('hotmart') ? 'Hotmart' : 'Manual';
 const fmtDate  = iso => iso ? new Date(iso).toLocaleDateString('pt-BR', {day:'2-digit',month:'2-digit',year:'numeric'}) : '—';
 const narrativaOriginLabel = s => ({ manual:'Manual', hotmart:'Hotmart', cortesia:'Cortesia', elite:'Elite Dark' }[s] || s || 'Manual');
 function fmtExpires(iso) {
