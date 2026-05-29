@@ -673,6 +673,16 @@ module.exports = async function handler(req, res) {
     await supabase.from('discord_invites').update({ revoked: false, revoked_reason: null }).eq('email', email.toLowerCase());
     await supabase.from('licenses').update({ status: 'active' }).eq('email', email.toLowerCase()).eq('source', 'hotmart-EDA');
     await supabase.from('narrativa_users').update({ active: true }).eq('email', email.toLowerCase());
+
+    // Restaura cargo Discord se o usuário ainda estiver no servidor
+    const { data: inv } = await supabase.from('discord_invites')
+      .select('discord_user_id').eq('email', email.toLowerCase())
+      .not('discord_user_id', 'is', null)
+      .order('created_at', { ascending: false }).limit(1).single();
+    if (inv?.discord_user_id) {
+      await fetch(`https://discord.com/api/v10/guilds/1508895864540626986/members/${inv.discord_user_id}/roles/1508900115459477535`,
+        { method: 'PUT', headers: { Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}` } }).catch(() => {});
+    }
     return res.status(200).json({ ok: true });
   }
 
