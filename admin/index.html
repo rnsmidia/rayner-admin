@@ -947,17 +947,91 @@ th.cb-col { width: 36px; }
   font-family: 'JetBrains Mono', monospace;
 }
 
+/* ── MOBILE HEADER ────────────────────────────────────────── */
+.mobile-header {
+  display: none;
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  height: 54px;
+  background: var(--sb);
+  border-bottom: 1px solid var(--sb-border);
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+}
+.mobile-header-logo { height: 26px; width: auto; }
+.mobile-header-title { flex: 1; font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mobile-hamburger {
+  width: 36px; height: 36px; border: none; background: var(--card);
+  border-radius: 8px; color: var(--text); font-size: 18px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.sidebar-overlay {
+  display: none; position: fixed; inset: 0; z-index: 149;
+  background: rgba(0,0,0,0.55); backdrop-filter: blur(2px);
+}
+.sidebar-overlay.visible { display: block; }
+
 @media (max-width: 768px) {
-  .sidebar { display: none; }
+  /* Mobile header visible */
+  .mobile-header { display: flex; }
+
+  /* Body offset */
+  body { padding-top: 54px; }
+
+  /* Sidebar como drawer */
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.25s cubic-bezier(.4,0,.2,1);
+    z-index: 150;
+  }
+  .sidebar.mobile-open { transform: translateX(0); }
+
+  /* Conteúdo principal sem margem da sidebar */
   .main { margin-left: 0; }
-  .sec-panel { padding: 14px; }
-  td:nth-child(5), th:nth-child(5),
-  td:nth-child(6), th:nth-child(6) { display: none; }
-  .funnel-label { min-width: 120px; font-size: 12px; }
+
+  /* Padding dos painéis */
+  .sec-panel { padding: 12px; }
+  .main-content { padding: 12px; }
+
+  /* Tabelas com scroll horizontal */
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { min-width: 600px; }
+
+  /* Touch targets maiores */
+  .btn-icon { min-width: 38px; min-height: 38px; font-size: 15px; }
+  .btn-sm, .btn-primary, .btn-danger { padding: 10px 16px; font-size: 13px; }
+  input, select, textarea { font-size: 16px !important; } /* evita zoom no iOS */
+
+  /* Stats grid 2 colunas no mobile */
+  .stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; }
+
+  /* Ocultar colunas menos importantes em tabelas */
+  .hide-mobile { display: none !important; }
+
+  /* Toolbar empilhada */
+  .toolbar { flex-wrap: wrap; gap: 8px; }
+  .search-wrap { width: 100%; min-width: unset; }
+
+  /* Resumo cards no mobile */
+  .resumo { grid-template-columns: repeat(2,1fr); }
+
+  /* Modal full-screen no mobile */
+  .modal-box { width: 95% !important; max-width: 95% !important; max-height: 90vh; overflow-y: auto; }
+
+  /* Ocultar sidebar overlay ao fechar */
+  .funnel-label { min-width: 100px; font-size: 12px; }
 }
 </style>
 </head>
 <body>
+
+<!-- ════ MOBILE HEADER ════ -->
+<div class="mobile-header" id="mobile-header" style="display:none">
+  <button class="mobile-hamburger" onclick="toggleMobileSidebar()" aria-label="Menu">☰</button>
+  <img src="https://raynern.com.br/admin-assets/logo-admin.png" class="mobile-header-logo" alt="Admin" onerror="this.style.display='none'">
+  <span class="mobile-header-title" id="mobile-header-title">Admin</span>
+</div>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeMobileSidebar()"></div>
 
 <!-- ════ LOGIN ════ -->
 <div id="login-screen">
@@ -1035,7 +1109,7 @@ th.cb-col { width: 36px; }
   <div class="app">
 
     <!-- SIDEBAR -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar-main">
       <div class="sb-logo">
         <img src="/admin/logo-light.png" alt="RAYNER" />
       </div>
@@ -1856,14 +1930,16 @@ th.cb-col { width: 36px; }
                   <th>#</th>
                   <th>Nome</th>
                   <th>E-mail</th>
-                  <th>No Discord</th>
+                  <th>Discord</th>
+                  <th>CenaDrop</th>
+                  <th>Narrativa IA</th>
+                  <th>Expira em</th>
                   <th>Status</th>
-                  <th>Comprado em</th>
                   <th></th>
                 </tr>
               </thead>
               <tbody id="eda-members-tbody">
-                <tr><td colspan="7"><div class="empty-state"><div class="icon">👥</div><p>Carregando...</p></div></td></tr>
+                <tr><td colspan="9"><div class="empty-state"><div class="icon">👥</div><p>Carregando...</p></div></td></tr>
               </tbody>
             </table>
           </div>
@@ -2676,6 +2752,7 @@ function showApp(login) {
   document.getElementById('app').style.display = 'block';
   document.getElementById('user-av').textContent = (login || 'A')[0].toUpperCase();
   document.getElementById('user-nm').textContent = login || 'Admin';
+  document.getElementById('mobile-header').style.display = 'flex';
 }
 
 function logout() { sessionStorage.clear(); location.reload(); }
@@ -2702,6 +2779,21 @@ async function apiCall(action, extra = {}) {
 }
 
 // ── NAV ───────────────────────────────────────
+const prodLabels = { overview:'Overview', cenadrop: 'CenaDrop', narrativa: 'Narrativa IA', nexus: 'Nexus Saúde', monitor: 'Sistema', academy: 'Elite Dark Academy', links: 'Links Hub' };
+
+function toggleMobileSidebar() {
+  document.getElementById('sidebar-main').classList.toggle('mobile-open');
+  document.getElementById('sidebar-overlay').classList.toggle('visible');
+}
+function closeMobileSidebar() {
+  document.getElementById('sidebar-main').classList.remove('mobile-open');
+  document.getElementById('sidebar-overlay').classList.remove('visible');
+}
+function updateMobileTitle(label) {
+  const titleEl = document.getElementById('mobile-header-title');
+  if (titleEl) titleEl.textContent = label;
+}
+
 function switchProduct(prod) {
   curProd = prod;
   document.documentElement.scrollTop = 0;
@@ -2714,7 +2806,8 @@ function switchProduct(prod) {
     const el = document.getElementById('subnav-' + p);
     if (el) el.style.display = prod === p ? 'block' : 'none';
   });
-  const prodLabels = { overview:'Overview', cenadrop: 'CenaDrop', narrativa: 'Narrativa IA', nexus: 'Nexus Saúde', monitor: 'Sistema', academy: 'Elite Dark Academy', links: 'Links Hub' };
+  closeMobileSidebar();
+  updateMobileTitle(prodLabels[prod] || prod);
   document.getElementById('bc-prod').textContent = prodLabels[prod] || prod;
   const labels = { dashboard:'Dashboard', licenses:'Licenças', students:'Alunos Hotmart', users:'Usuários', buyers:'Compradores', usage:'Monitor de Uso', blast:'Blast Email', main:'Todos os Links' };
   document.getElementById('bc-sec').textContent = labels[curSec[prod] || 'dashboard'] || '—';
@@ -2735,8 +2828,9 @@ function switchSection(prod, sec) {
   );
   document.querySelectorAll(`#panel-${prod} .sec-panel`).forEach(p => p.classList.remove('active'));
   document.getElementById(`${prod}-${sec}`)?.classList.add('active');
-  const labels = { dashboard:'Dashboard', licenses:'Licenças', students:'Alunos Hotmart', users:'Usuários', buyers:'Compradores', clicks:'Cliques' };
+  const labels = { dashboard:'Dashboard', licenses:'Licenças', students:'Alunos Hotmart', users:'Usuários', buyers:'Compradores', clicks:'Cliques', membros:'Membros', blast:'Blast Email', main:'Todos os Links', usage:'Monitor de Uso' };
   document.getElementById('bc-sec').textContent = labels[sec] || sec;
+  updateMobileTitle(`${prodLabels[prod] || prod} — ${labels[sec] || sec}`);
   if (curProd !== prod) switchProduct(prod);
 }
 
@@ -4237,7 +4331,7 @@ function filterEdaMembers() {
 function renderEdaMembers(list) {
   const tb = document.getElementById('eda-members-tbody');
   if (!list.length) {
-    tb.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="icon">👥</div><p>Nenhum membro encontrado.</p></div></td></tr>`;
+    tb.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="icon">👥</div><p>Nenhum membro encontrado.</p></div></td></tr>`;
     return;
   }
   tb.innerHTML = list.map((m, i) => {
@@ -4254,20 +4348,38 @@ function renderEdaMembers(list) {
       ? `<span style="color:#28c76f;font-size:13px">✓ Entrou</span>`
       : `<span style="color:var(--muted);font-size:12px">—</span>`;
 
+    // CenaDrop
+    const lic = m.license;
+    const licCell = lic
+      ? `<span style="font-family:monospace;font-size:11px;color:${lic.status==='active'?'#28c76f':'#ea5455'}" title="${lic.key}">${lic.key}</span>`
+      : `<span style="color:var(--muted);font-size:12px">—</span>`;
+
+    // Narrativa IA
+    const nar = m.narrativa;
+    const narCell = nar
+      ? `<span style="font-size:12px;color:${nar.active?'#28c76f':'#ea5455'}">${nar.active ? '✓ Ativo' : '✗ Inativo'}</span>`
+      : `<span style="color:var(--muted);font-size:12px">—</span>`;
+
+    // Expira em (usa license ou narrativa)
+    const expiresRaw = (lic && lic.expires_at) || (nar && nar.expires_at) || null;
+    const expiresCell = expiresRaw ? fmtExpires(expiresRaw) : `<span style="color:var(--muted);font-size:12px">—</span>`;
+
     const safeName = (m.name||'').replace(/'/g,"\\'");
-    const resendBtn   = !revoked ? `<button class="btn-icon" title="Reenviar convite Discord" onclick="resendEdaInvite('${m.email}','${safeName}',this)">🔁</button>` : '';
-    const toggleBtn   = !revoked
+    const resendBtn = !revoked ? `<button class="btn-icon" title="Reenviar convite Discord" onclick="resendEdaInvite('${m.email}','${safeName}',this)">🔁</button>` : '';
+    const toggleBtn = !revoked
       ? `<button class="btn-icon warn" title="Revogar todos os acessos" onclick="revokeEdaMember('${m.email}','${safeName}')">🔒</button>`
       : `<button class="btn-icon" title="Reativar acessos" onclick="reactivateEdaMember('${m.email}','${safeName}')">🔓</button>`;
-    const deleteBtn   = `<button class="btn-icon danger" title="Deletar entrada" onclick="deleteEdaMember('${m.email}','${safeName}')">🗑️</button>`;
+    const deleteBtn = `<button class="btn-icon danger" title="Deletar entrada" onclick="deleteEdaMember('${m.email}','${safeName}')">🗑️</button>`;
 
     return `<tr>
       <td style="color:var(--muted);font-size:12px">${i + 1}</td>
       <td style="font-weight:600">${m.name || '—'}</td>
       <td style="color:var(--muted);font-size:13px">${m.email}</td>
       <td>${discordCell}</td>
+      <td>${licCell}</td>
+      <td>${narCell}</td>
+      <td>${expiresCell}</td>
       <td>${statusBadge}</td>
-      <td style="color:var(--muted);font-size:12px">${fmtDate(m.created_at)}</td>
       <td><div class="actions">
         <button class="btn-icon" title="Copiar e-mail" onclick="navigator.clipboard.writeText('${m.email}');toast('E-mail copiado!')">📋</button>
         ${resendBtn}

@@ -71,8 +71,11 @@ module.exports = async function handler(req, res) {
   // Datas de compra e expiração (timestamps Hotmart em ms)
   const rawOrderDate   = body?.data?.purchase?.order_date || body?.data?.purchase?.approved_date;
   const rawNextCharge  = body?.data?.subscription?.subscriber?.next_payment_date;
-  const purchasedAt    = rawOrderDate  ? new Date(Number(rawOrderDate)).toISOString()  : new Date().toISOString();
-  const expiresAt      = rawNextCharge ? new Date(Number(rawNextCharge)).toISOString() : null;
+  const purchasedAt    = rawOrderDate ? new Date(Number(rawOrderDate)).toISOString() : new Date().toISOString();
+  // EDA = acesso 12 meses. Usa data do Hotmart se existir; senão calcula purchased_at + 365 dias
+  const expiresAt      = rawNextCharge
+    ? new Date(Number(rawNextCharge)).toISOString()
+    : new Date(new Date(purchasedAt).getTime() + 365 * 24 * 60 * 60 * 1000).toISOString();
 
   if (!email) return res.status(400).json({ error: 'email ausente' });
 

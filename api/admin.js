@@ -600,7 +600,28 @@ module.exports = async function handler(req, res) {
       .select('id, email, name, invite_code, discord_user_id, used, revoked, revoked_reason, hotmart_order, created_at')
       .order('created_at', { ascending: false });
     if (error) return res.status(500).json({ error: error.message });
-    return res.status(200).json({ members: data || [] });
+
+    const members = data || [];
+    if (!members.length) return res.status(200).json({ members });
+
+    // Enriquecer com dados de licença (CenaDrop) e Narrativa IA por email
+    const emails = [...new Set(members.map(m => m.email).filter(Boolean))];
+    const [licData, narData] = await Promise.all([
+      supabase.from('licenses').select('email, key, status, expires_at').in('email', emails).eq('source', 'hotmart-EDA'),
+      supabase.from('narrativa_users').select('email, active, expires_at').in('email', emails).eq('origin', 'elite'),
+    ]);
+    const licMap = {};
+    for (const l of (licData.data || [])) licMap[l.email] = l;
+    const narMap = {};
+    for (const n of (narData.data || [])) narMap[n.email] = n;
+
+    const enriched = members.map(m => ({
+      ...m,
+      license:  licMap[m.email]  || null,
+      narrativa: narMap[m.email] || null,
+    }));
+
+    return res.status(200).json({ members: enriched });
   }
 
   // ── EDA RESEND INVITE — gera novo convite e reenvia email ─────
