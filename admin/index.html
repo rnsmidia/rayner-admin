@@ -1202,6 +1202,7 @@ th.cb-col { width: 36px; }
         </button>
         <div id="subnav-monitor" class="subnav" style="display:none">
           <button class="sn-btn" data-sec="usage" onclick="switchSection('monitor','usage')">📊 Uso dos Serviços</button>
+          <button class="sn-btn" data-sec="yt-api" onclick="switchSection('monitor','yt-api');loadYtMonitor()">📺 YouTube API</button>
         </div>
 
       </div><!-- /sb-nav -->
@@ -2633,6 +2634,110 @@ th.cb-col { width: 36px; }
 
           </div>
         </div>
+        <!-- ── YouTube API Monitor ── -->
+        <div class="sec-panel" id="monitor-yt-api">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+            <div>
+              <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:3px">YouTube Data API — Monitor de Quota</div>
+              <div style="font-size:13px;color:var(--muted)">Uso diário · resets à meia-noite (horário do Google) · <span id="yt-mon-updated">—</span></div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn-sm" onclick="clearYtCache()" style="color:#f87171;border-color:rgba(248,113,113,.3)">🗑 Limpar Cache Expirado</button>
+              <button class="btn-sm" onclick="loadYtMonitor()">↻ Atualizar</button>
+            </div>
+          </div>
+
+          <!-- Cards de quota por key -->
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-bottom:20px">
+
+            <!-- Key 1 -->
+            <div class="mon-card">
+              <div class="mon-header">
+                <div class="mon-logo" style="background:rgba(255,0,0,.12);color:#ff4444;font-size:18px">▶</div>
+                <div><div class="mon-svc-name">Key Principal</div><div class="mon-svc-plan">YOUTUBE_API_KEY · 10.000 units/dia</div></div>
+                <div class="mon-chip ok" id="yt-key1-chip">OK</div>
+              </div>
+              <div style="padding:12px 0 4px">
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px">
+                  <span style="color:var(--muted)">Units usadas hoje</span>
+                  <span style="font-weight:700;color:var(--text)" id="yt-key1-label">—</span>
+                </div>
+                <div style="height:8px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden">
+                  <div id="yt-key1-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#34d399,#10b981);border-radius:99px;transition:width .4s"></div>
+                </div>
+                <div style="font-size:11px;color:var(--muted);margin-top:5px" id="yt-key1-remain">— units restantes</div>
+              </div>
+            </div>
+
+            <!-- Key 2 -->
+            <div class="mon-card">
+              <div class="mon-header">
+                <div class="mon-logo" style="background:rgba(65,105,255,.12);color:#4169ff;font-size:18px">▶</div>
+                <div><div class="mon-svc-name">Key Reserva</div><div class="mon-svc-plan">YOUTUBE_API_KEY_2 · 10.000 units/dia</div></div>
+                <div class="mon-chip ok" id="yt-key2-chip">OK</div>
+              </div>
+              <div style="padding:12px 0 4px">
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px">
+                  <span style="color:var(--muted)">Units usadas hoje</span>
+                  <span style="font-weight:700;color:var(--text)" id="yt-key2-label">—</span>
+                </div>
+                <div style="height:8px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden">
+                  <div id="yt-key2-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#818cf8,#6366f1);border-radius:99px;transition:width .4s"></div>
+                </div>
+                <div style="font-size:11px;color:var(--muted);margin-top:5px" id="yt-key2-remain">— units restantes</div>
+              </div>
+            </div>
+
+            <!-- Cache stats -->
+            <div class="mon-card">
+              <div class="mon-header">
+                <div class="mon-logo" style="background:rgba(52,211,153,.12);color:#34d399;font-size:18px">⚡</div>
+                <div><div class="mon-svc-name">Cache Supabase</div><div class="mon-svc-plan">TTL 6h por busca · compartilhado entre usuários</div></div>
+                <div class="mon-chip ok" id="yt-cache-chip">Live</div>
+              </div>
+              <div style="padding:12px 0 4px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <div>
+                  <div style="font-size:22px;font-weight:800;color:#34d399" id="yt-hit-rate">—%</div>
+                  <div style="font-size:11px;color:var(--muted)">Taxa de cache hit hoje</div>
+                </div>
+                <div>
+                  <div style="font-size:22px;font-weight:800;color:var(--text)" id="yt-cache-entries">—</div>
+                  <div style="font-size:11px;color:var(--muted)">Entradas ativas no cache</div>
+                </div>
+                <div>
+                  <div style="font-size:22px;font-weight:800;color:#9b7fff" id="yt-total-calls">—</div>
+                  <div style="font-size:11px;color:var(--muted)">Buscas hoje (total)</div>
+                </div>
+                <div>
+                  <div style="font-size:22px;font-weight:800;color:#fb923c" id="yt-cache-served">—</div>
+                  <div style="font-size:11px;color:var(--muted)">Servidas pelo cache</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Log de chamadas recentes -->
+          <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px">Últimas 100 chamadas</div>
+          <div style="overflow-x:auto">
+            <table class="tbl" style="width:100%">
+              <thead>
+                <tr>
+                  <th>Horário</th>
+                  <th>Ação</th>
+                  <th>Query</th>
+                  <th>Key</th>
+                  <th>Units</th>
+                  <th>Origem</th>
+                </tr>
+              </thead>
+              <tbody id="yt-log-body">
+                <tr><td colspan="6" class="loading">Carregando...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
       </div><!-- /monitor -->
 
     </div><!-- /main -->
@@ -3955,6 +4060,66 @@ async function loadNexusClicks() {
 }
 
 // ── MONITOR ───────────────────────────────────
+async function loadYtMonitor() {
+  document.getElementById('yt-mon-updated').textContent = 'carregando...';
+  const [stats, log] = await Promise.all([
+    apiCall('yt-monitor-stats'),
+    apiCall('yt-monitor-log'),
+  ]);
+
+  document.getElementById('yt-mon-updated').textContent = 'atualizado às ' + new Date().toLocaleTimeString('pt-BR');
+
+  // Key 1
+  const k1pct = Math.min(100, Math.round((stats.key1.units / stats.key1.limit) * 100));
+  document.getElementById('yt-key1-label').textContent   = `${stats.key1.units.toLocaleString()} / ${stats.key1.limit.toLocaleString()}`;
+  document.getElementById('yt-key1-remain').textContent  = `${stats.key1.remaining.toLocaleString()} units restantes`;
+  document.getElementById('yt-key1-bar').style.width     = k1pct + '%';
+  document.getElementById('yt-key1-bar').style.background = k1pct > 80 ? 'linear-gradient(90deg,#fb923c,#ef4444)' : k1pct > 50 ? 'linear-gradient(90deg,#fbbf24,#f59e0b)' : 'linear-gradient(90deg,#34d399,#10b981)';
+  document.getElementById('yt-key1-chip').textContent    = k1pct >= 100 ? 'ESGOTADA' : 'OK';
+  document.getElementById('yt-key1-chip').className      = 'mon-chip ' + (k1pct >= 100 ? 'err' : k1pct > 80 ? 'warn' : 'ok');
+
+  // Key 2
+  const k2pct = Math.min(100, Math.round((stats.key2.units / stats.key2.limit) * 100));
+  document.getElementById('yt-key2-label').textContent   = `${stats.key2.units.toLocaleString()} / ${stats.key2.limit.toLocaleString()}`;
+  document.getElementById('yt-key2-remain').textContent  = `${stats.key2.remaining.toLocaleString()} units restantes`;
+  document.getElementById('yt-key2-bar').style.width     = k2pct + '%';
+  document.getElementById('yt-key2-bar').style.background = k2pct > 80 ? 'linear-gradient(90deg,#fb923c,#ef4444)' : 'linear-gradient(90deg,#818cf8,#6366f1)';
+  document.getElementById('yt-key2-chip').textContent    = k2pct >= 100 ? 'ESGOTADA' : k2pct === 0 ? 'Standby' : 'Ativa';
+  document.getElementById('yt-key2-chip').className      = 'mon-chip ' + (k2pct >= 100 ? 'err' : k2pct === 0 ? '' : 'warn');
+
+  // Cache stats
+  document.getElementById('yt-hit-rate').textContent     = stats.today.hitRate + '%';
+  document.getElementById('yt-cache-entries').textContent = stats.cache.activeEntries;
+  document.getElementById('yt-total-calls').textContent  = stats.today.totalCalls;
+  document.getElementById('yt-cache-served').textContent = stats.today.cacheHits;
+
+  // Log table
+  const tbody = document.getElementById('yt-log-body');
+  const rows  = log.log ?? [];
+  if (!rows.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">Nenhuma chamada registrada hoje</td></tr>'; return; }
+  tbody.innerHTML = rows.map(r => {
+    const hora    = new Date(r.created_at).toLocaleTimeString('pt-BR');
+    const origem  = r.cache_hit
+      ? '<span style="background:rgba(52,211,153,.15);color:#34d399;border:1px solid rgba(52,211,153,.3);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700">⚡ Cache</span>'
+      : `<span style="background:rgba(255,0,0,.1);color:#f87171;border:1px solid rgba(248,113,113,.3);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700">🌐 API Key ${r.key_index}</span>`;
+    const acaoCor = r.action === 'search_videos' ? '#9b7fff' : '#fb923c';
+    return `<tr>
+      <td style="color:var(--muted);font-size:12px">${hora}</td>
+      <td><span style="color:${acaoCor};font-size:11px;font-weight:700">${r.action}</span></td>
+      <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px">${r.query ?? '—'}</td>
+      <td style="text-align:center;font-size:12px">${r.cache_hit ? '—' : r.key_index}</td>
+      <td style="text-align:center;font-weight:700;color:${r.units > 0 ? '#fb923c' : '#34d399'};font-size:12px">${r.units > 0 ? r.units : '0 ⚡'}</td>
+      <td>${origem}</td>
+    </tr>`;
+  }).join('');
+}
+
+async function clearYtCache() {
+  if (!confirm('Limpar entradas expiradas do cache YouTube?')) return;
+  await apiCall('yt-cache-clear');
+  loadYtMonitor();
+}
+
 async function loadMonitor() {
   document.getElementById('mon-updated').textContent = 'carregando...';
   const d = await apiCall('monitor');

@@ -997,5 +997,53 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({ ok: true });
   }
 
+  // ── YT MONITOR — stats de uso da YouTube API ──────────────────────────────
+  if (action === 'yt-monitor-stats') {
+    const now    = new Date();
+    const today  = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+
+    const [logData, cacheData] = await Promise.all([
+      supabase.from('yt_api_log').select('key_index, units, cache_hit, created_at').gte('created_at', today),
+      supabase.from('yt_cache').select('id, hits, expires_at'),
+    ]);
+
+    const logs   = logData.data  ?? [];
+    const caches = cacheData.data ?? [];
+
+    const apiCalls   = logs.filter(l => !l.cache_hit);
+    const cacheCalls = logs.filter(l =>  l.cache_hit);
+
+    const key1Units = apiCalls.filter(l => l.key_index === 1).reduce((s, l) => s + l.units, 0);
+    const key2Units = apiCalls.filter(l => l.key_index === 2).reduce((s, l) => s + l.units, 0);
+
+    const totalCalls  = logs.length;
+    const cacheHits   = cacheCalls.length;
+    const hitRate     = totalCalls ? Math.round((cacheHits / totalCalls) * 100) : 0;
+
+    const activeCaches = caches.filter(c => new Date(c.expires_at) > now).length;
+    const totalHits    = caches.reduce((s, c) => s + (c.hits ?? 0), 0);
+
+    return res.status(200).json({
+      key1: { units: key1Units, remaining: Math.max(0, 10000 - key1Units), limit: 10000 },
+      key2: { units: key2Units, remaining: Math.max(0, 10000 - key2Units), limit: 10000 },
+      today: { totalCalls, apiCalls: apiCalls.length, cacheHits, hitRate },
+      cache: { activeEntries: activeCaches, totalServed: totalHits },
+    });
+  }
+
+  if (action === 'yt-monitor-log') {
+    const { data } = await supabase
+      .from('yt_api_log')
+      .select('id, key_index, action, query, units, cache_hit, created_at')
+      .order('created_at', { ascending: false })
+      .limit(100);
+    return res.status(200).json({ log: data ?? [] });
+  }
+
+  if (action === 'yt-cache-clear') {
+    await supabase.from('yt_cache').delete().lt('expires_at', new Date().toISOString());
+    return res.status(200).json({ ok: true });
+  }
+
   return res.status(400).json({ error: 'Ação desconhecida' });
 };
