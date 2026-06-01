@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Lista Encerrada — Elite Dark Academy</title>
-<meta name="description" content="A lista prioritária VIP do Elite Dark Academy foi encerrada.">
+<title>Lista de Espera — Elite Dark Academy</title>
+<meta name="description" content="As vagas do Elite Dark Academy estão encerradas. Entre para a lista de espera.">
 <meta name="robots" content="noindex,nofollow">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-BN8R1SVLLT"></script>
 <script>
@@ -30,8 +30,8 @@ body {
   background: #000;
   color: var(--white);
   font-family: 'Inter', sans-serif;
-  font-size: 16px;
-  line-height: 1.6;
+  font-size: 18px; /* aumentado de 16px — público idoso */
+  line-height: 1.65;
   min-height: 100vh;
   overflow-x: hidden;
 }
@@ -134,11 +134,11 @@ a { color: inherit; text-decoration: none; }
   background: rgba(180,30,30,0.12);
   border: 1px solid rgba(180,30,30,0.28);
   border-radius: 100px;
-  padding: 5px 14px;
+  padding: 6px 16px;
   margin-bottom: 32px;
 }
 .status-dot {
-  width: 6px; height: 6px;
+  width: 8px; height: 8px;
   border-radius: 50%;
   background: #c0392b;
   box-shadow: 0 0 6px rgba(192,57,43,0.7);
@@ -149,9 +149,9 @@ a { color: inherit; text-decoration: none; }
   50%       { opacity: 0.5; box-shadow: 0 0 12px rgba(192,57,43,0.3); }
 }
 .status-label {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: rgba(220,100,100,0.9);
 }
@@ -172,7 +172,7 @@ a { color: inherit; text-decoration: none; }
 
 /* Eyebrow */
 .eyebrow {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.25em;
   text-transform: uppercase;
@@ -215,8 +215,8 @@ a { color: inherit; text-decoration: none; }
 /* Copy emocional */
 .loss-text {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 19px;
-  line-height: 1.75;
+  font-size: 20px;
+  line-height: 1.8;
   color: rgba(255,255,255,0.65);
 }
 .loss-text strong {
@@ -224,7 +224,7 @@ a { color: inherit; text-decoration: none; }
   font-weight: 600;
 }
 
-/* ── BLOCO MEIO — ESCASSEZ ─────────────────────────── */
+/* ── BLOCO MEIO — LISTA ESPERA INFO ────────────────── */
 .card-scarcity {
   padding: 28px 52px;
   background: rgba(201,162,39,0.025);
@@ -235,31 +235,31 @@ a { color: inherit; text-decoration: none; }
 }
 .scarcity-icon {
   flex-shrink: 0;
-  margin-top: 2px;
+  margin-top: 4px;
 }
 .scarcity-icon svg {
-  width: 18px; height: 18px;
+  width: 20px; height: 20px;
   color: var(--gold); opacity: 0.6;
 }
 .scarcity-text {
-  font-size: 12px;
-  line-height: 1.7;
-  color: rgba(255,255,255,0.4);
+  font-size: 15px;
+  line-height: 1.75;
+  color: rgba(255,255,255,0.45);
   letter-spacing: 0.01em;
 }
 .scarcity-text strong {
-  color: rgba(255,255,255,0.65);
+  color: rgba(255,255,255,0.7);
   font-weight: 600;
 }
 
-/* ── BLOCO BAIXO — LISTA DE DESISTÊNCIA ────────────── */
+/* ── BLOCO BAIXO — LISTA DE ESPERA + FUNIL ─────────── */
 .card-bottom {
-  padding: 40px 52px 48px;
+  padding: 44px 52px 52px;
   text-align: center;
 }
 
 .desistencia-label {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.25em;
   text-transform: uppercase;
@@ -270,21 +270,21 @@ a { color: inherit; text-decoration: none; }
 
 .desistencia-title {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 600;
   color: var(--white);
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   line-height: 1.2;
 }
 
 .desistencia-desc {
-  font-size: 13px;
-  line-height: 1.75;
-  color: rgba(255,255,255,0.45);
-  margin-bottom: 28px;
+  font-size: 15px;
+  line-height: 1.8;
+  color: rgba(255,255,255,0.48);
+  margin-bottom: 30px;
 }
 .desistencia-desc strong {
-  color: rgba(255,255,255,0.65);
+  color: rgba(255,255,255,0.7);
   font-weight: 600;
 }
 
@@ -302,11 +302,11 @@ a { color: inherit; text-decoration: none; }
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 22px;
+  margin-bottom: 24px;
 }
 .fp-bar {
   flex: 1;
-  height: 2px;
+  height: 3px;
   background: rgba(255,255,255,0.08);
   border-radius: 2px;
   overflow: hidden;
@@ -318,7 +318,7 @@ a { color: inherit; text-decoration: none; }
   transition: width 0.4s ease;
 }
 .fp-text {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.1em;
   color: rgba(255,255,255,0.3);
@@ -328,11 +328,11 @@ a { color: inherit; text-decoration: none; }
 /* Pergunta */
 .funnel-q {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 20px;
+  font-size: 23px;
   font-weight: 600;
   color: var(--white);
-  line-height: 1.4;
-  margin-bottom: 20px;
+  line-height: 1.45;
+  margin-bottom: 22px;
   text-align: left;
 }
 
@@ -340,7 +340,7 @@ a { color: inherit; text-decoration: none; }
 .funnel-options {
   display: flex;
   flex-direction: column;
-  gap: 9px;
+  gap: 10px;
   text-align: left;
 }
 
@@ -348,19 +348,25 @@ a { color: inherit; text-decoration: none; }
   width: 100%;
   background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 11px;
-  padding: 14px 18px;
-  color: rgba(255,255,255,0.75);
+  border-radius: 12px;
+  padding: 17px 20px;
+  color: rgba(255,255,255,0.78);
   font-family: 'Inter', sans-serif;
-  font-size: 13px;
-  line-height: 1.5;
+  font-size: 15px;
+  line-height: 1.55;
   cursor: pointer;
   text-align: left;
   transition: all 0.2s;
+  min-height: 56px;
 }
 .fopt:hover {
   background: rgba(201,162,39,0.08);
   border-color: rgba(201,162,39,0.3);
+  color: var(--white);
+}
+.fopt-yes:hover {
+  background: rgba(40,199,111,0.07);
+  border-color: rgba(40,199,111,0.3);
   color: var(--white);
 }
 
@@ -372,18 +378,18 @@ a { color: inherit; text-decoration: none; }
   background: rgba(40,199,111,0.1);
   border: 1px solid rgba(40,199,111,0.25);
   border-radius: 100px;
-  padding: 6px 16px;
-  font-size: 11px;
+  padding: 7px 18px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.1em;
   color: #28c76f;
-  margin-bottom: 20px;
+  margin-bottom: 22px;
 }
 
 .funnel-form-label {
-  font-size: 13px;
-  color: rgba(255,255,255,0.5);
-  margin-bottom: 16px;
+  font-size: 15px;
+  color: rgba(255,255,255,0.52);
+  margin-bottom: 18px;
   text-align: left;
 }
 
@@ -393,15 +399,16 @@ a { color: inherit; text-decoration: none; }
   background: rgba(201,162,39,0.1);
   border: 1px solid rgba(201,162,39,0.35);
   border-radius: 12px;
-  padding: 14px 28px;
+  padding: 17px 36px;
   color: var(--gold2);
   font-family: 'Inter', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   cursor: pointer;
   transition: all 0.25s;
+  min-height: 56px;
 }
 .btn-start-funnel:hover {
   background: rgba(201,162,39,0.15);
@@ -412,8 +419,8 @@ a { color: inherit; text-decoration: none; }
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 14px;
+  gap: 12px;
+  margin-bottom: 16px;
   text-align: left;
 }
 
@@ -421,35 +428,37 @@ a { color: inherit; text-decoration: none; }
   width: 100%;
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.09);
-  border-radius: 10px;
-  padding: 14px 18px;
+  border-radius: 12px;
+  padding: 17px 20px;
   color: var(--white);
   font-family: 'Inter', sans-serif;
-  font-size: 13px;
+  font-size: 16px;
   outline: none;
   transition: border-color 0.2s, background 0.2s;
+  min-height: 56px;
 }
-.form-input::placeholder { color: rgba(255,255,255,0.22); }
+.form-input::placeholder { color: rgba(255,255,255,0.25); }
 .form-input:focus {
-  border-color: rgba(201,162,39,0.35);
-  background: rgba(255,255,255,0.06);
+  border-color: rgba(201,162,39,0.4);
+  background: rgba(255,255,255,0.07);
 }
 
 .btn-desistencia {
   width: 100%;
   background: rgba(201,162,39,0.1);
   border: 1px solid rgba(201,162,39,0.35);
-  border-radius: 12px;
-  padding: 16px 24px;
+  border-radius: 13px;
+  padding: 19px 24px;
   color: var(--gold2);
   font-family: 'Inter', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   cursor: pointer;
   transition: all 0.25s;
   margin-top: 4px;
+  min-height: 60px;
 }
 .btn-desistencia:hover {
   background: rgba(201,162,39,0.16);
@@ -461,10 +470,50 @@ a { color: inherit; text-decoration: none; }
 }
 
 .form-disclaimer {
+  font-size: 13px;
+  color: rgba(255,255,255,0.22);
+  margin-top: 14px;
+  line-height: 1.65;
+}
+
+/* ── CARD DE PREÇO ─────────────────────────────────── */
+.price-card {
+  background: rgba(201,162,39,0.06);
+  border: 1px solid rgba(201,162,39,0.28);
+  border-radius: 16px;
+  padding: 28px 28px 22px;
+  margin: 4px 0 24px;
+  text-align: center;
+}
+.price-badge-label {
   font-size: 10px;
-  color: rgba(255,255,255,0.2);
-  margin-top: 12px;
-  line-height: 1.6;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(201,162,39,0.6);
+  margin-bottom: 12px;
+}
+.price-main {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 38px;
+  font-weight: 700;
+  color: var(--gold2);
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+.price-avista {
+  font-size: 14px;
+  color: rgba(255,255,255,0.42);
+}
+.price-avista strong {
+  color: rgba(255,255,255,0.65);
+}
+.price-question {
+  font-size: 16px;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.65);
+  text-align: left;
+  margin-bottom: 20px;
 }
 
 /* ── DESQUALIFICADO ────────────────────────────────── */
@@ -472,50 +521,60 @@ a { color: inherit; text-decoration: none; }
 .disq-line {
   width: 32px; height: 1px;
   background: rgba(255,255,255,0.15);
-  margin: 0 auto 20px;
+  margin: 0 auto 22px;
 }
 .disq-title {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 600;
   color: rgba(255,255,255,0.6);
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 .disq-desc {
-  font-size: 12px;
-  line-height: 1.8;
-  color: rgba(255,255,255,0.3);
+  font-size: 15px;
+  line-height: 1.85;
+  color: rgba(255,255,255,0.32);
 }
 
 /* ── SUCESSO ───────────────────────────────────────── */
 .success-wrap { padding: 8px 0; }
 .success-icon {
-  width: 52px; height: 52px;
+  width: 56px; height: 56px;
   border-radius: 50%;
   border: 1px solid rgba(201,162,39,0.3);
   background: rgba(201,162,39,0.06);
   display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 18px;
+  margin: 0 auto 20px;
 }
-.success-icon svg { width: 22px; height: 22px; color: var(--gold); }
+.success-icon svg { width: 24px; height: 24px; color: var(--gold); }
 .success-title {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 22px;
+  font-size: 26px;
   font-weight: 600;
   color: var(--white);
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 .success-desc {
+  font-size: 15px;
+  color: rgba(255,255,255,0.42);
+  line-height: 1.8;
+}
+.success-highlight {
+  margin-top: 18px;
+  padding: 14px 16px;
+  background: rgba(40,199,111,0.06);
+  border: 1px solid rgba(40,199,111,0.18);
+  border-radius: 10px;
   font-size: 13px;
-  color: rgba(255,255,255,0.4);
-  line-height: 1.7;
+  color: rgba(40,199,111,0.8);
+  line-height: 1.65;
 }
 
 /* ── FOOTER ────────────────────────────────────────── */
 .page-footer {
   text-align: center;
   padding: 24px;
-  font-size: 11px;
+  font-size: 12px;
   color: rgba(255,255,255,0.15);
   letter-spacing: 0.04em;
   border-top: 1px solid rgba(255,255,255,0.04);
@@ -525,11 +584,14 @@ a { color: inherit; text-decoration: none; }
 @media (max-width: 580px) {
   .card-top, .card-bottom { padding: 36px 24px; }
   .card-scarcity { padding: 22px 24px; }
-  .headline { font-size: 34px; }
-  .loss-text { font-size: 17px; }
-  .desistencia-title { font-size: 22px; }
+  .headline { font-size: 36px; }
+  .loss-text { font-size: 18px; }
+  .desistencia-title { font-size: 24px; }
   .page-header { padding: 20px 24px; }
   .header-logo img { height: 78px; }
+  .funnel-q { font-size: 20px; }
+  .fopt { font-size: 14px; padding: 15px 16px; }
+  .price-main { font-size: 32px; }
 }
 </style>
 </head>
@@ -557,7 +619,7 @@ a { color: inherit; text-decoration: none; }
 
         <div class="status-badge">
           <span class="status-dot"></span>
-          <span class="status-label">Acesso encerrado</span>
+          <span class="status-label">Vagas encerradas</span>
         </div>
 
         <div class="icon-wrap">
@@ -570,18 +632,18 @@ a { color: inherit; text-decoration: none; }
         <p class="eyebrow">Elite Dark Academy</p>
         <div class="gold-divider"></div>
 
-        <h1 class="headline">Essa janela<br><em>não volta.</em></h1>
+        <h1 class="headline">As vagas estão<br><em>encerradas.</em></h1>
 
-        <p class="sub">Lista VIP · Vagas esgotadas</p>
+        <p class="sub">Acesso · Turma atual completa</p>
 
         <p class="loss-text">
-          As vagas foram preenchidas pelos membros que estavam na lista prioritária.<br><br>
-          <strong>Não existe data para uma próxima abertura.</strong> Esse ciclo foi estruturado para um grupo pequeno e específico — e esse grupo já está completo.
+          As vagas foram preenchidas pelos membros que já estavam na lista.<br><br>
+          <strong>Não há data prevista para a próxima abertura.</strong> Mas existe uma forma de você ser avisado em primeiro lugar — se uma oportunidade surgir.
         </p>
 
       </div>
 
-      <!-- BLOCO ESCASSEZ -->
+      <!-- BLOCO INFO -->
       <div class="card-scarcity">
         <span class="scarcity-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -591,18 +653,18 @@ a { color: inherit; text-decoration: none; }
           </svg>
         </span>
         <p class="scarcity-text">
-          <strong>Sem previsão de próxima abertura.</strong> Novas turmas dependem de capacidade, agenda e estrutura — não de uma data no calendário. Pode demorar meses. Pode nunca reabrir neste formato.
+          <strong>Novas turmas não seguem um calendário fixo.</strong> Elas dependem de capacidade e agenda. Quem está na lista de espera é avisado antes de qualquer divulgação pública.
         </p>
       </div>
 
-      <!-- BLOCO LISTA DE DESISTÊNCIA + FUNIL -->
+      <!-- BLOCO LISTA DE ESPERA + FUNIL -->
       <div class="card-bottom">
 
         <p class="desistencia-label">Única alternativa disponível</p>
-        <h2 class="desistencia-title">Lista de Desistência</h2>
+        <h2 class="desistencia-title">Lista de Espera</h2>
         <p class="desistencia-desc">
-          Quando um membro confirma que abre mão da vaga, ela passa direto para o próximo da fila.<br>
-          <strong>Sem garantia. Sem prazo.</strong> Só avisamos quando acontece de verdade.
+          Preencha o formulário abaixo para entrar na lista.<br>
+          <strong>Quando uma vaga surgir, você será um dos primeiros a saber.</strong>
         </p>
 
         <!-- FUNIL -->
@@ -611,75 +673,111 @@ a { color: inherit; text-decoration: none; }
           <!-- Intro -->
           <div id="f-intro" class="funnel-step active">
             <button class="btn-start-funnel" onclick="startFunnel()">
-              → Verificar minha elegibilidade
+              → Quero entrar na lista de espera
             </button>
           </div>
 
           <!-- Q1 -->
           <div id="f-q1" class="funnel-step">
             <div class="funnel-progress">
-              <div class="fp-bar"><div class="fp-fill" style="width:33%"></div></div>
+              <div class="fp-bar"><div class="fp-fill" style="width:25%"></div></div>
               <span class="fp-text">1 / 3</span>
             </div>
-            <p class="funnel-q">O que mais te motiva a querer estar no Elite Dark Academy?</p>
+            <p class="funnel-q">O que mais te motiva a querer fazer parte do Elite Dark Academy?</p>
             <div class="funnel-options">
-              <button class="fopt" onclick="answer(1,'a','Bastidores reais — o que não chega ao público')">Acompanhar os bastidores reais — o que não chega ao público</button>
-              <button class="fopt" onclick="answer(1,'b','Estratégias sendo usadas agora, não daqui a meses')">Ter acesso às estratégias sendo usadas agora, não daqui a meses</button>
-              <button class="fopt" onclick="answer(1,'c','Só curioso para entender como funciona')">Só estou curioso para entender como funciona</button>
+              <button class="fopt" onclick="answer(1,'a','Bastidores reais — o que não chega ao público')">Quero ver os bastidores reais — o que não aparece nos vídeos públicos</button>
+              <button class="fopt" onclick="answer(1,'b','Estratégias sendo usadas agora, não daqui a meses')">Quero acesso às estratégias sendo usadas agora, em tempo real</button>
+              <button class="fopt" onclick="answer(1,'c','Só curioso para entender como funciona')">Ainda estou descobrindo o que é — só curiosidade por enquanto</button>
             </div>
           </div>
 
           <!-- Q2 -->
           <div id="f-q2" class="funnel-step">
             <div class="funnel-progress">
-              <div class="fp-bar"><div class="fp-fill" style="width:66%"></div></div>
+              <div class="fp-bar"><div class="fp-fill" style="width:50%"></div></div>
               <span class="fp-text">2 / 3</span>
             </div>
-            <p class="funnel-q">Você tem o hábito de investir em educação, ferramentas ou comunidades pagas?</p>
+            <p class="funnel-q">Você tem o hábito de investir em cursos, comunidades ou ferramentas pagas?</p>
             <div class="funnel-options">
-              <button class="fopt" onclick="answer(2,'a','Sim — invisto regularmente nesse tipo de recurso')">Sim — invisto regularmente nesse tipo de recurso</button>
-              <button class="fopt" onclick="answer(2,'b','Já investi antes e entendo o valor disso')">Já investi antes e entendo o valor disso</button>
-              <button class="fopt" onclick="answer(2,'c','Prefiro começar pelo gratuito antes de qualquer investimento')">Prefiro começar pelo gratuito antes de qualquer investimento</button>
+              <button class="fopt" onclick="answer(2,'a','Sim — invisto regularmente nesse tipo de recurso')">Sim — faço isso com regularidade e conheço o valor disso</button>
+              <button class="fopt" onclick="answer(2,'b','Já investi antes e entendo o valor disso')">Já investi em algumas coisas e sei quando vale a pena</button>
+              <button class="fopt" onclick="answer(2,'c','Prefiro começar pelo gratuito antes de qualquer investimento')">Prefiro só consumir conteúdo gratuito por enquanto</button>
             </div>
           </div>
 
           <!-- Q3 -->
           <div id="f-q3" class="funnel-step">
             <div class="funnel-progress">
-              <div class="fp-bar"><div class="fp-fill" style="width:100%"></div></div>
+              <div class="fp-bar"><div class="fp-fill" style="width:75%"></div></div>
               <span class="fp-text">3 / 3</span>
             </div>
-            <p class="funnel-q">Quando uma vaga surgir, você consegue confirmar dentro de 24 horas?</p>
+            <p class="funnel-q">Se uma vaga aparecer e você for chamado, como você se descreveria?</p>
             <div class="funnel-options">
-              <button class="fopt" onclick="answer(3,'a','Sim — esse tipo de oportunidade não espera')">Sim — sei que esse tipo de oportunidade não espera</button>
-              <button class="fopt" onclick="answer(3,'b','Sim — se fizer sentido para o meu momento atual')">Sim — se fizer sentido para o meu momento atual</button>
-              <button class="fopt" onclick="answer(3,'c','Precisaria de alguns dias para avaliar com calma')">Precisaria de alguns dias para avaliar com calma</button>
+              <button class="fopt" onclick="answer(3,'a','Decido rápido quando algo faz sentido para mim')">Decido rápido quando algo faz sentido — não deixo oportunidade passar</button>
+              <button class="fopt" onclick="answer(3,'b','Avalio com atenção, mas tenho clareza quando quero algo')">Avalio com atenção, mas quando quero algo tenho clareza para decidir</button>
+              <button class="fopt" onclick="answer(3,'c','Ainda não tenho certeza se quero participar')">Ainda não tenho certeza se quero participar de algo assim</button>
             </div>
           </div>
 
-          <!-- Form (qualificado) -->
+          <!-- Q4: REVELAÇÃO DO PREÇO -->
+          <div id="f-q4" class="funnel-step">
+            <div class="funnel-progress">
+              <div class="fp-bar"><div class="fp-fill" style="width:100%"></div></div>
+              <span class="fp-text">Última etapa</span>
+            </div>
+            <p class="funnel-q">Antes de confirmar sua inscrição, queremos ser transparentes sobre o investimento.</p>
+
+            <div class="price-card">
+              <p class="price-badge-label">Investimento · Acesso Anual</p>
+              <p class="price-main">12x de R$&nbsp;309,96</p>
+              <p class="price-avista">ou <strong>R$&nbsp;2.997,00</strong> à vista</p>
+            </div>
+
+            <p class="price-question">
+              Sabendo disso, você confirma que tem interesse real em participar quando uma vaga surgir?
+            </p>
+
+            <div class="funnel-options">
+              <button class="fopt fopt-yes" onclick="confirmPrice(true)">✓&nbsp;&nbsp;Sim — tenho interesse mesmo sabendo o valor</button>
+              <button class="fopt" onclick="confirmPrice(false)">Não — esse valor não está no meu planejamento agora</button>
+            </div>
+          </div>
+
+          <!-- Form (qualificado + preço confirmado) -->
           <div id="f-form" class="funnel-step">
-            <div class="funnel-qualified-badge">✓ Você está no perfil certo</div>
-            <p class="funnel-form-label">Preencha seus dados para entrar na fila:</p>
+            <div class="funnel-qualified-badge">✓ Interesse confirmado</div>
+            <p class="funnel-form-label">Preencha seus dados. Entraremos em contato quando uma vaga abrir:</p>
             <div class="form-group">
               <input type="text"  id="nome"     class="form-input" placeholder="Seu nome completo" autocomplete="off">
               <input type="email" id="email"    class="form-input" placeholder="Seu melhor e-mail" autocomplete="off">
-              <input type="tel"   id="whatsapp" class="form-input" placeholder="WhatsApp (com DDD)" autocomplete="off">
+              <input type="tel"   id="whatsapp" class="form-input" placeholder="WhatsApp com DDD (ex: 11 99999-9999)" autocomplete="off">
             </div>
-            <button class="btn-desistencia" id="btn-submit" onclick="submitDesistencia()">
-              Entrar na Lista de Desistência
+            <button class="btn-desistencia" id="btn-submit" onclick="submitListaEspera()">
+              Confirmar minha inscrição na lista
             </button>
-            <p class="form-disclaimer">Sem spam. Você só será contatado quando uma vaga de fato abrir.</p>
+            <p class="form-disclaimer">Sem spam. Você só será contatado quando uma vaga de fato surgir. Seus dados ficam seguros e não são compartilhados.</p>
           </div>
 
-          <!-- Desqualificado -->
+          <!-- Desqualificado — perfil -->
           <div id="f-disq" class="funnel-step">
             <div class="disq-wrap">
               <div class="disq-line"></div>
-              <p class="disq-title">Esse não é seu momento agora.</p>
+              <p class="disq-title">Tudo bem — esse não é seu momento agora.</p>
               <p class="disq-desc">
-                O Elite Dark Academy exige decisão rápida quando uma vaga aparece — e isso não é para todo mundo.<br><br>
-                Continue acompanhando o conteúdo e, quando a hora chegar, a fila vai estar aqui.
+                O Elite Dark Academy é para quem já tomou a decisão de investir no próprio crescimento.<br><br>
+                Continue acompanhando o conteúdo. Quando a hora chegar, a lista de espera vai estar aqui esperando por você.
+              </p>
+            </div>
+          </div>
+
+          <!-- Desqualificado — preço -->
+          <div id="f-disq-price" class="funnel-step">
+            <div class="disq-wrap">
+              <div class="disq-line"></div>
+              <p class="disq-title">Tudo bem — obrigado pela honestidade.</p>
+              <p class="disq-desc">
+                Não há problema nenhum. Cada pessoa tem o seu momento certo.<br><br>
+                Continue acompanhando nosso conteúdo e, quando o investimento fizer sentido para você, pode voltar e preencher a lista novamente.
               </p>
             </div>
           </div>
@@ -692,10 +790,14 @@ a { color: inherit; text-decoration: none; }
                   <polyline points="20 6 9 17 4 12"/>
                 </svg>
               </div>
-              <p class="success-title">Você está na fila.</p>
+              <p class="success-title">Você está na lista de espera.</p>
               <p class="success-desc">
-                Se uma vaga for liberada por desistência,<br>você será avisado imediatamente.
+                Recebemos seus dados com sucesso.<br>
+                Quando uma vaga surgir, você será um dos primeiros a ser contatado.
               </p>
+              <div class="success-highlight">
+                Fique de olho no seu WhatsApp e e-mail — o contato será feito diretamente por nossa equipe.
+              </div>
             </div>
           </div>
 
@@ -713,7 +815,7 @@ a { color: inherit; text-decoration: none; }
 </div>
 
 <script>
-const funnelAnswers = { q1: null, q2: null, q3: null };
+const funnelAnswers = { q1: null, q2: null, q3: null, preco_confirmado: false };
 
 function showStep(id) {
   document.querySelectorAll('.funnel-step').forEach(el => el.classList.remove('active'));
@@ -732,17 +834,26 @@ function answer(step, option, text) {
 
   if (step === 1) { showStep('f-q2'); return; }
   if (step === 2) { showStep('f-q3'); return; }
-  if (step === 3) { showStep('f-form'); return; }
+  if (step === 3) { showStep('f-q4'); return; } // vai para revelação do preço
 }
 
-async function submitDesistencia() {
+function confirmPrice(confirmed) {
+  funnelAnswers.preco_confirmado = confirmed;
+  if (confirmed) {
+    showStep('f-form');
+  } else {
+    showStep('f-disq-price');
+  }
+}
+
+async function submitListaEspera() {
   const nome     = document.getElementById('nome').value.trim();
   const email    = document.getElementById('email').value.trim();
   const whatsapp = document.getElementById('whatsapp').value.trim();
   const btn      = document.getElementById('btn-submit');
 
   if (!nome || !email || !whatsapp) {
-    alert('Preencha todos os campos para continuar.');
+    alert('Por favor, preencha todos os campos para continuar.');
     return;
   }
 
@@ -755,10 +866,11 @@ async function submitDesistencia() {
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({
         nome, email, whatsapp,
-        source: 'lista-espera',
-        q1: funnelAnswers.q1,
-        q2: funnelAnswers.q2,
-        q3: funnelAnswers.q3,
+        source:            'lista-espera',
+        preco_confirmado:  funnelAnswers.preco_confirmado,
+        q1:                funnelAnswers.q1,
+        q2:                funnelAnswers.q2,
+        q3:                funnelAnswers.q3,
       }),
     });
   } catch (_) {}
