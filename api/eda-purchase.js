@@ -23,9 +23,10 @@ const ROLE_ID         = '1508900115459477535';
 
 const REVOKE_EVENTS = new Set([
   'PURCHASE_CANCELED', 'PURCHASE_REFUNDED', 'PURCHASE_CHARGEBACK',
+  'PURCHASE_BLOCKED',  // pagamento bloqueado (fraude, chargeback, reembolso)
   'SUBSCRIPTION_CANCELLATION',
 ]);
-const REVOKE_STATUSES = new Set(['CANCELED', 'REFUNDED', 'CHARGEBACK']);
+const REVOKE_STATUSES = new Set(['CANCELED', 'REFUNDED', 'CHARGEBACK', 'BLOCKED']);
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function hashPassword(password) {
@@ -80,6 +81,13 @@ module.exports = async function handler(req, res) {
   if (!email) return res.status(400).json({ error: 'email ausente' });
 
   const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+
+  // Loga todo webhook recebido para auditoria
+  supabase.from('eda_webhook_log').insert({
+    event, status, email, order_id: order,
+    raw_body: JSON.stringify(body).slice(0, 4000),
+    received_at: new Date().toISOString(),
+  }).then(() => {}).catch(() => {});
 
   // ── REVOGAÇÃO ─────────────────────────────────────────────────────────────
   if (REVOKE_EVENTS.has(event) || REVOKE_STATUSES.has(status)) {
