@@ -481,9 +481,9 @@ a { color: inherit; text-decoration: none; }
   background: rgba(201,162,39,0.06);
   border: 1px solid rgba(201,162,39,0.28);
   border-radius: 16px;
-  padding: 28px 28px 22px;
+  padding: 24px 24px 20px;
   margin: 4px 0 24px;
-  text-align: center;
+  text-align: left;
 }
 .price-badge-label {
   font-size: 10px;
@@ -491,22 +491,45 @@ a { color: inherit; text-decoration: none; }
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: rgba(201,162,39,0.6);
-  margin-bottom: 12px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+.price-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 0;
+}
+.price-row + .price-row {
+  border-top: 1px solid rgba(201,162,39,0.12);
+}
+.price-tier-label {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  flex-shrink: 0;
+  min-width: 90px;
+}
+.price-tier-right {
+  text-align: right;
 }
 .price-main {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 38px;
+  font-size: 26px;
   font-weight: 700;
   color: var(--gold2);
   line-height: 1.1;
-  margin-bottom: 6px;
 }
 .price-avista {
-  font-size: 14px;
-  color: rgba(255,255,255,0.42);
+  font-size: 12px;
+  color: rgba(255,255,255,0.38);
+  margin-top: 2px;
 }
 .price-avista strong {
-  color: rgba(255,255,255,0.65);
+  color: rgba(255,255,255,0.58);
 }
 .price-question {
   font-size: 16px;
@@ -729,8 +752,20 @@ a { color: inherit; text-decoration: none; }
 
             <div class="price-card">
               <p class="price-badge-label">Investimento · Acesso Anual</p>
-              <p class="price-main">12x de R$&nbsp;206,54</p>
-              <p class="price-avista">ou <strong>R$&nbsp;1.997,00</strong> à vista</p>
+              <div class="price-row">
+                <span class="price-tier-label">✦ Aluno</span>
+                <div class="price-tier-right">
+                  <p class="price-main">12x de R$&nbsp;206,54</p>
+                  <p class="price-avista">ou <strong>R$&nbsp;1.997,00</strong> à vista</p>
+                </div>
+              </div>
+              <div class="price-row">
+                <span class="price-tier-label">Não aluno</span>
+                <div class="price-tier-right">
+                  <p class="price-main" style="color:rgba(212,175,55,0.6);">12x de R$&nbsp;309,96</p>
+                  <p class="price-avista">ou <strong>R$&nbsp;2.997,00</strong> à vista</p>
+                </div>
+              </div>
             </div>
 
             <p class="price-question">
