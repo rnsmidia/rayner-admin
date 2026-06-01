@@ -715,6 +715,130 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({ ok: true });
   }
 
+  // ── EDA ADD MANUAL — replica fluxo completo de aprovação ──────
+  if (action === 'eda-add-manual') {
+    const { nome, email, expires_at } = body;
+    if (!email || !nome) return res.status(400).json({ error: 'nome e email obrigatórios' });
+
+    const emailLow    = email.toLowerCase().trim();
+    const name        = nome.trim();
+    const firstName   = name.split(' ')[0];
+    const purchasedAt = new Date().toISOString();
+    const expiresAt   = expires_at
+      ? new Date(expires_at).toISOString()
+      : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString();
+
+    const WELCOME_CHANNEL_EDA = '1508898202294816778';
+    const GUILD_ID_EDA        = '1508895864540626986';
+    const ROLE_ID_EDA         = '1508900115459477535';
+
+    const results = { discord: null, cenadrop: null, narrativa: null };
+    const errors  = [];
+
+    // 1. Discord — convite único
+    try {
+      const inviteRes = await fetch(
+        `https://discord.com/api/v10/channels/${WELCOME_CHANNEL_EDA}/invites`,
+        {
+          method: 'POST',
+          headers: { Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ max_uses: 1, max_age: 604800, unique: true }),
+        }
+      );
+      const invite = await inviteRes.json();
+      if (!invite.code) throw new Error('Discord não retornou código de convite');
+
+      await supabase.from('discord_invites').insert({
+        email:         emailLow,
+        name,
+        invite_code:   invite.code,
+        hotmart_order: 'manual-admin',
+        used:          false,
+        revoked:       false,
+      });
+      results.discord = `https://discord.gg/${invite.code}`;
+    } catch (err) {
+      errors.push({ service: 'discord', error: err.message });
+    }
+
+    // 2. CenaDrop — chave de licença
+    try {
+      const { data: existing } = await supabase
+        .from('licenses').select('key, status')
+        .eq('email', emailLow).eq('source', 'hotmart-EDA')
+        .order('created_at', { ascending: false }).limit(1).single();
+
+      if (existing) {
+        if (existing.status !== 'active') {
+          await supabase.from('licenses').update({ status: 'active', expires_at: expiresAt }).eq('key', existing.key);
+        }
+        results.cenadrop = existing.key;
+      } else {
+        const key = await generateUniqueKey();
+        await supabase.from('licenses').insert({
+          key, email: emailLow, name, status: 'active',
+          source: 'hotmart-EDA',
+          notes:  `Elite Dark Academy — adicionado manualmente pelo admin`,
+          created_at: purchasedAt,
+          expires_at: expiresAt,
+        });
+        results.cenadrop = key;
+      }
+    } catch (err) {
+      errors.push({ service: 'cenadrop', error: err.message });
+    }
+
+    // 3. Narrativa IA — conta
+    let narrativaPassword = null;
+    try {
+      const { data: existing } = await supabase
+        .from('narrativa_users').select('id, active')
+        .eq('email', emailLow).single();
+
+      if (existing) {
+        if (!existing.active) {
+          await supabase.from('narrativa_users').update({ active: true, expires_at: expiresAt }).eq('id', existing.id);
+        }
+        results.narrativa = { existing: true };
+      } else {
+        narrativaPassword = randomBytes(6).toString('hex');
+        const password_hash = hashNarrativaPassword(narrativaPassword);
+        await supabase.from('narrativa_users').insert({
+          email: emailLow, name, password_hash,
+          active: true, origin: 'elite',
+          purchased_at: purchasedAt,
+          expires_at:   expiresAt,
+        });
+        results.narrativa = { password: narrativaPassword };
+      }
+    } catch (err) {
+      errors.push({ service: 'narrativa', error: err.message });
+    }
+
+    // 4. Email premium de boas-vindas
+    try {
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      await resend.emails.send({
+        from:    'Elite Dark Academy <noreply@raynern.com.br>',
+        to:      emailLow,
+        subject: `👑 Bem-vindo ao Elite Dark Academy, ${firstName}. Seus acessos estão aqui.`,
+        html: renderEmail('eda/boas-vindas', {
+          PRIMEIRO_NOME:          firstName,
+          LINK_DISCORD:           results.discord || '#',
+          CHAVE_CENADROP:         results.cenadrop || 'Erro ao gerar — contate o suporte',
+          LINK_DOWNLOAD_CENADROP: 'https://raynern.com.br/cenadrop/download',
+          EMAIL_NARRATIVA:        emailLow,
+          SENHA_NARRATIVA:        narrativaPassword || 'use sua senha atual',
+          LINK_NARRATIVA:         'https://narrativaia.com.br',
+        }),
+      });
+    } catch (err) {
+      errors.push({ service: 'email', error: err.message });
+    }
+
+    return res.status(200).json({ ok: true, results, errors });
+  }
+
   // ── ACADEMY ELITE — FUNIL ANALYTICS ──────────────────────────
   if (action === 'academy-funnel-stats') {
     const { data } = await supabase
