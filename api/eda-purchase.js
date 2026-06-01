@@ -22,11 +22,17 @@ const GUILD_ID        = '1508895864540626986';
 const ROLE_ID         = '1508900115459477535';
 
 const REVOKE_EVENTS = new Set([
-  'PURCHASE_CANCELED', 'PURCHASE_REFUNDED', 'PURCHASE_CHARGEBACK',
-  'PURCHASE_BLOCKED',  // pagamento bloqueado (fraude, chargeback, reembolso)
-  'SUBSCRIPTION_CANCELLATION',
+  'PURCHASE_CANCELED',           // cancelamento normal
+  'PURCHASE_REFUNDED',           // reembolso aprovado
+  'PURCHASE_CHARGEBACK',         // estorno no cartão
+  'PURCHASE_BLOCKED',            // pagamento bloqueado (fraude)
+  'PURCHASE_PROTEST',            // contestação / disputa aberta pelo comprador
+  'PURCHASE_EXPIRED',            // assinatura expirou sem renovação
+  'SUBSCRIPTION_CANCELLATION',   // assinatura cancelada
 ]);
-const REVOKE_STATUSES = new Set(['CANCELED', 'REFUNDED', 'CHARGEBACK', 'BLOCKED']);
+const REVOKE_STATUSES = new Set([
+  'CANCELED', 'REFUNDED', 'CHARGEBACK', 'BLOCKED', 'DISPUTE', 'EXPIRED', 'INACTIVE',
+]);
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function hashPassword(password) {
