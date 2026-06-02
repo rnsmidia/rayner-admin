@@ -1139,6 +1139,7 @@ module.exports = async function handler(req, res) {
 
     const key1Units = apiCalls.filter(l => l.key_index === 1).reduce((s, l) => s + l.units, 0);
     const key2Units = apiCalls.filter(l => l.key_index === 2).reduce((s, l) => s + l.units, 0);
+    const key3Units = apiCalls.filter(l => l.key_index === 3).reduce((s, l) => s + l.units, 0);
 
     const totalCalls  = logs.length;
     const cacheHits   = cacheCalls.length;
@@ -1147,9 +1148,17 @@ module.exports = async function handler(req, res) {
     const activeCaches = caches.filter(c => new Date(c.expires_at) > now).length;
     const totalHits    = caches.reduce((s, c) => s + (c.hits ?? 0), 0);
 
+    // Stats do bot para o card key3
+    const { count: botRepliesTotal } = await supabase
+      .from('yt_comment_replies').select('id', { count: 'exact', head: true });
+    const { count: botRepliesToday } = await supabase
+      .from('yt_comment_replies').select('id', { count: 'exact', head: true }).gte('replied_at', today);
+
     return res.status(200).json({
       key1: { units: key1Units, remaining: Math.max(0, 10000 - key1Units), limit: 10000 },
       key2: { units: key2Units, remaining: Math.max(0, 10000 - key2Units), limit: 10000 },
+      key3: { units: key3Units, remaining: Math.max(0, 10000 - key3Units), limit: 10000,
+              bot_replies_today: botRepliesToday ?? 0, bot_replies_total: botRepliesTotal ?? 0 },
       today: { totalCalls, apiCalls: apiCalls.length, cacheHits, hitRate },
       cache: { activeEntries: activeCaches, totalServed: totalHits },
     });

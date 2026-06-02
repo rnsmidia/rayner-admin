@@ -2865,6 +2865,29 @@ th.cb-col { width: 36px; }
               </div>
             </div>
 
+            <!-- Key 3 — Bot Comentários -->
+            <div class="mon-card">
+              <div class="mon-header">
+                <div class="mon-logo" style="background:rgba(124,58,237,.12);color:#a78bfa;font-size:18px">🤖</div>
+                <div><div class="mon-svc-name">Bot Comentários</div><div class="mon-svc-plan">YOUTUBE_COMMENT_BOT_API_KEY · 10.000 units/dia</div></div>
+                <div class="mon-chip ok" id="yt-key3-chip">OK</div>
+              </div>
+              <div style="padding:12px 0 4px">
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px">
+                  <span style="color:var(--muted)">Units usadas hoje</span>
+                  <span style="font-weight:700;color:var(--text)" id="yt-key3-label">—</span>
+                </div>
+                <div style="height:8px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden">
+                  <div id="yt-key3-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#a78bfa,#7c3aed);border-radius:99px;transition:width .4s"></div>
+                </div>
+                <div style="font-size:11px;color:var(--muted);margin-top:5px" id="yt-key3-remain">— units restantes</div>
+                <div style="display:flex;gap:16px;margin-top:10px">
+                  <div><div style="font-size:18px;font-weight:800;color:#a78bfa" id="yt-bot-replies-today">—</div><div style="font-size:11px;color:var(--muted)">Respostas hoje</div></div>
+                  <div><div style="font-size:18px;font-weight:800;color:var(--text)" id="yt-bot-replies-total">—</div><div style="font-size:11px;color:var(--muted)">Total enviadas</div></div>
+                </div>
+              </div>
+            </div>
+
             <!-- Cache stats -->
             <div class="mon-card">
               <div class="mon-header">
@@ -4288,6 +4311,18 @@ async function loadYtMonitor() {
   document.getElementById('yt-key2-bar').style.background = k2pct > 80 ? 'linear-gradient(90deg,#fb923c,#ef4444)' : 'linear-gradient(90deg,#818cf8,#6366f1)';
   document.getElementById('yt-key2-chip').textContent    = k2pct >= 100 ? 'ESGOTADA' : k2pct === 0 ? 'Standby' : 'Ativa';
   document.getElementById('yt-key2-chip').className      = 'mon-chip ' + (k2pct >= 100 ? 'err' : k2pct === 0 ? '' : 'warn');
+
+  if (stats.key3) {
+    const k3pct = Math.min(100, Math.round((stats.key3.units / stats.key3.limit) * 100));
+    document.getElementById('yt-key3-label').textContent  = `${stats.key3.units.toLocaleString()} / ${stats.key3.limit.toLocaleString()}`;
+    document.getElementById('yt-key3-remain').textContent = `${stats.key3.remaining.toLocaleString()} units restantes`;
+    document.getElementById('yt-key3-bar').style.width    = k3pct + '%';
+    document.getElementById('yt-key3-bar').style.background = k3pct > 80 ? 'linear-gradient(90deg,#fb923c,#ef4444)' : 'linear-gradient(90deg,#a78bfa,#7c3aed)';
+    document.getElementById('yt-key3-chip').textContent   = k3pct >= 100 ? 'ESGOTADA' : 'OK';
+    document.getElementById('yt-key3-chip').className     = 'mon-chip ' + (k3pct >= 100 ? 'err' : 'ok');
+    document.getElementById('yt-bot-replies-today').textContent = stats.key3.bot_replies_today ?? '0';
+    document.getElementById('yt-bot-replies-total').textContent = stats.key3.bot_replies_total ?? '0';
+  }
 
   // Cache stats
   document.getElementById('yt-hit-rate').textContent     = stats.today.hitRate + '%';

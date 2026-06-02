@@ -21,11 +21,19 @@ async function getAccessToken() {
   return data.access_token;
 }
 
-async function fetchComments(videoId, apiKey) {
-  const url = `https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=${videoId}&maxResults=100&order=time&key=${process.env.YOUTUBE_COMMENT_BOT_API_KEY || apiKey}`;
+async function fetchComments(videoId, apiKey, supabase) {
+  const key = process.env.YOUTUBE_COMMENT_BOT_API_KEY || apiKey;
+  const url = `https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=${videoId}&maxResults=100&order=time&key=${key}`;
   const res  = await fetch(url);
   const data = await res.json();
   if (data.error) throw new Error(`YT API: ${data.error.message}`);
+  // Loga uso da key (key_index=3 = Bot Comentários)
+  if (supabase) {
+    supabase.from('yt_api_log').insert({
+      key_index: 3, action: 'commentThreads.list', query: videoId,
+      units: 1, cache_hit: false, created_at: new Date().toISOString(),
+    }).then(() => {}).catch(() => {});
+  }
   return data.items || [];
 }
 
@@ -61,7 +69,7 @@ async function runBotCheck(supabase, accessToken) {
     const errors = [];
 
     try {
-      const items = await fetchComments(trigger.video_id, process.env.YOUTUBE_API_KEY);
+      const items = await fetchComments(trigger.video_id, process.env.YOUTUBE_API_KEY, supabase);
 
       for (const item of items) {
         const topComment = item.snippet?.topLevelComment;
