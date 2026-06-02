@@ -22,7 +22,7 @@ async function getAccessToken() {
 }
 
 async function fetchComments(videoId, apiKey) {
-  const url = `https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=${videoId}&maxResults=100&order=time&key=${apiKey}`;
+  const url = `https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=${videoId}&maxResults=100&order=time&key=${process.env.YOUTUBE_COMMENT_BOT_API_KEY || apiKey}`;
   const res  = await fetch(url);
   const data = await res.json();
   if (data.error) throw new Error(`YT API: ${data.error.message}`);
