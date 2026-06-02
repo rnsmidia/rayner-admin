@@ -43,6 +43,12 @@
     { "source": "/narrativa-ia/checkout-banner",  "destination": "/narrativa-ia/checkout-banner.html" },
     { "source": "/narrativa-ia/checkout-banner/", "destination": "/narrativa-ia/checkout-banner.html" },
     { "source": "/narrativa-ia/banner-club",  "destination": "/narrativa-ia/banner-club.html" },
-    { "source": "/narrativa-ia/banner-club/", "destination": "/narrativa-ia/banner-club.html" }
+    { "source": "/narrativa-ia/banner-club/", "destination": "/narrativa-ia/banner-club.html" },
+    { "source": "/api/yt-auth",          "destination": "/api/yt-auth.js" },
+    { "source": "/api/yt-auth-callback", "destination": "/api/yt-auth-callback.js" },
+    { "source": "/api/yt-comment-bot",   "destination": "/api/yt-comment-bot.js" }
+  ],
+  "crons": [
+    { "path": "/api/yt-comment-bot", "schedule": "*/10 * * * *" }
   ]
 }

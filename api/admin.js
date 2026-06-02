@@ -1169,5 +1169,85 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({ ok: true });
   }
 
+  // ── YT COMMENT BOT ────────────────────────────────────────────────────────
+  if (action === 'yt-bot-status') {
+    const configured = !!process.env.YOUTUBE_COMMENT_BOT_REFRESH_TOKEN;
+    const { count } = await supabase.from('yt_comment_triggers').select('id', { count: 'exact', head: true }).eq('active', true);
+    return res.status(200).json({ configured, active_triggers: count ?? 0 });
+  }
+
+  if (action === 'yt-bot-triggers') {
+    const { data: triggers } = await supabase
+      .from('yt_comment_triggers')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    const { data: replyCounts } = await supabase
+      .from('yt_comment_replies')
+      .select('trigger_id');
+
+    const counts = {};
+    (replyCounts || []).forEach(r => { counts[r.trigger_id] = (counts[r.trigger_id] || 0) + 1; });
+
+    return res.status(200).json({
+      triggers: (triggers || []).map(t => ({ ...t, reply_count: counts[t.id] || 0 })),
+    });
+  }
+
+  if (action === 'yt-bot-add-trigger') {
+    const { video_id, video_title, keyword, reply_message } = body;
+    if (!video_id || !keyword || !reply_message) {
+      return res.status(400).json({ error: 'video_id, keyword e reply_message são obrigatórios' });
+    }
+    // Extrai ID do vídeo se vier como URL
+    const vid = video_id.includes('watch?v=')
+      ? new URL(video_id).searchParams.get('v')
+      : video_id.includes('youtu.be/')
+        ? video_id.split('youtu.be/')[1].split('?')[0]
+        : video_id.trim();
+
+    const { data, error } = await supabase.from('yt_comment_triggers').insert({
+      video_id: vid, video_title: video_title || '', keyword, reply_message, active: true,
+    }).select().single();
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ ok: true, trigger: data });
+  }
+
+  if (action === 'yt-bot-toggle-trigger') {
+    const { id } = body;
+    const { data: cur } = await supabase.from('yt_comment_triggers').select('active').eq('id', id).single();
+    await supabase.from('yt_comment_triggers').update({ active: !cur?.active }).eq('id', id);
+    return res.status(200).json({ ok: true, active: !cur?.active });
+  }
+
+  if (action === 'yt-bot-delete-trigger') {
+    const { id } = body;
+    await supabase.from('yt_comment_replies').delete().eq('trigger_id', id);
+    await supabase.from('yt_comment_triggers').delete().eq('id', id);
+    return res.status(200).json({ ok: true });
+  }
+
+  if (action === 'yt-bot-replies') {
+    const { trigger_id, limit: lim = 50 } = body;
+    let q = supabase.from('yt_comment_replies').select('*').order('replied_at', { ascending: false }).limit(lim);
+    if (trigger_id) q = q.eq('trigger_id', trigger_id);
+    const { data } = await q;
+    return res.status(200).json({ replies: data || [] });
+  }
+
+  if (action === 'yt-bot-run') {
+    if (!process.env.YOUTUBE_COMMENT_BOT_REFRESH_TOKEN) {
+      return res.status(200).json({ ok: false, error: 'Bot não autorizado — conecte o YouTube primeiro' });
+    }
+    try {
+      const { runBotCheck, getAccessToken } = require('./yt-comment-bot');
+      const accessToken = await getAccessToken();
+      const results     = await runBotCheck(supabase, accessToken);
+      return res.status(200).json({ ok: true, results });
+    } catch (err) {
+      return res.status(500).json({ ok: false, error: err.message });
+    }
+  }
+
   return res.status(400).json({ error: 'Ação desconhecida' });
 };
