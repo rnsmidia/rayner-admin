@@ -13,8 +13,8 @@
 <meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:image" content="https://raynern.com.br/meta-prompts/og-image.jpg" />
-<link rel="icon" href="/cenadrop/icon128.png">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="/meta-prompts/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#080810;--surface:#0c0c1a;--card:#10101f;--card2:#131325;
@@ -423,6 +423,28 @@ button{font-family:'Space Grotesk',sans-serif;}
   .btn-copy{font-size:13px;padding:12px 16px;}
   .prompt-block-header{padding:8px 12px;}
 }
+
+/* ═══════════ v2.0 — polish (override) ═══════════ */
+.logo-name,.banner-title,.prompt-name{font-family:'Bricolage Grotesque',sans-serif;}
+.logo-name{font-weight:800;font-size:17px;letter-spacing:-.3px;}
+.banner-title{font-weight:800;letter-spacing:-.02em;}
+.prompt-name{font-weight:700;font-size:16px;}
+/* logo (img transparente) */
+.logo-icon{background:none;box-shadow:none;object-fit:contain;border-radius:0;filter:drop-shadow(0 0 12px rgba(124,111,255,.55));animation:logoFloat 3s ease-in-out infinite alternate;}
+@keyframes logoFloat{from{filter:drop-shadow(0 0 9px rgba(124,111,255,.4))}to{filter:drop-shadow(0 0 18px rgba(124,111,255,.7))}}
+/* cards de prompt — vidro + glow (grade de 3 mantida) */
+.prompt-card{background:linear-gradient(170deg,rgba(255,255,255,.04),rgba(255,255,255,.012));backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-color:rgba(255,255,255,.07);box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 8px 26px rgba(0,0,0,.32);transition:transform .22s,border-color .22s,box-shadow .22s;}
+.prompt-card:hover{transform:translateY(-5px);border-color:rgba(124,111,255,.4);box-shadow:0 18px 46px rgba(98,52,226,.22),0 0 0 1px rgba(124,111,255,.18);}
+.prompt-card-accent{opacity:1;box-shadow:0 0 14px rgba(124,111,255,.6);}
+.btn-copy{box-shadow:0 6px 22px rgba(124,111,255,.4),inset 0 1px 0 rgba(255,255,255,.2);}
+.btn-copy:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(124,111,255,.55);}
+/* aula ativa na sidebar — leve glow */
+.class-item.active,.cls.active,.class-item[aria-current="true"]{box-shadow:0 0 22px rgba(124,111,255,.16);}
+/* selo ⚡ v2.0 */
+.vbadge{position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:4px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:800;letter-spacing:.5px;color:#fff;padding:5px 11px;border-radius:9px;background:linear-gradient(135deg,rgba(124,111,255,.3),rgba(0,212,170,.14));backdrop-filter:blur(8px);border:1px solid rgba(124,111,255,.45);box-shadow:0 0 18px rgba(124,111,255,.35),inset 0 1px 0 rgba(255,255,255,.18);}
+.vbadge .bolt{color:var(--yellow);filter:drop-shadow(0 0 5px rgba(251,191,36,.9));}
+.vbadge::after{content:'';position:absolute;top:0;left:-60%;width:45%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);animation:vbsh 3.6s ease-in-out infinite;}
+@keyframes vbsh{0%{left:-60%}55%{left:160%}100%{left:160%}}
 </style>
 </head>
 <body>
@@ -437,13 +459,14 @@ button{font-family:'Space Grotesk',sans-serif;}
 <!-- HEADER -->
 <header class="header">
   <div class="logo">
-    <div class="logo-icon">M</div>
+    <img class="logo-icon" src="/meta-prompts/logo.png" alt="Meta-Prompts">
     <div class="logo-text">
       <div class="logo-name">Meta-Prompts</div>
       <div class="logo-sub">por Rayner Nascimento</div>
     </div>
   </div>
   <div class="header-right">
+    <span class="vbadge"><span class="bolt">⚡</span> v2.0</span>
     <div class="header-count" id="header-count" style="display:none">
       <div class="hc-dot"></div>
       <span id="hc-text">0 prompts</span>
