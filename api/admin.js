@@ -27,23 +27,59 @@ const supabase = createClient(
 // ── MÚLTIPLOS ADMINS ─────────────────────────────────────────
 // Para adicionar/remover admins, edite esta lista.
 // Cada admin tem: nome, login e senha.
+// Admins sem `permissions` têm acesso total.
+// Admins com `permissions` têm acesso restrito conforme definido.
 const ADMINS = [
   { name: 'Rayner',     login: 'rnadmin', password: process.env.ADMIN_PASSWORD  || '' },
   { name: 'Marcos',     login: 'mcadmin', password: process.env.ADMIN2_PASSWORD || '' },
   { name: 'Jaqueline',  login: 'jnadmin', password: process.env.ADMIN3_PASSWORD || '' },
+  {
+    name: 'Suporte01',
+    login: 'suporte01',
+    password: process.env.SUPORTE01_PASSWORD || '',
+    permissions: {
+      panels: ['overview', 'cenadrop', 'narrativa', 'academy', 'links'],
+      cenadrop:  { sections: ['dashboard', 'licenses', 'students'], can: { resend: true } },
+      narrativa: { sections: ['dashboard', 'users'],                 can: { resend: true } },
+      academy:   { sections: ['membros'] },
+      links:     { full: true },
+    },
+  },
 ];
+
+// Actions bloqueadas para admins restritos (qualquer admin com campo `permissions`)
+const RESTRICTED_DENIED = new Set([
+  'create','toggle','regenkey','delete','update',
+  'blast-count','blast-cenadrop','blast-test','email-templates',
+  'narrativa-create','narrativa-toggle','narrativa-delete','narrativa-reset-password',
+  'blast-narrativa-count','blast-narrativa',
+  'blast-eda-count','blast-eda',
+  'eda-resend-invite','eda-revoke','eda-reactivate','eda-delete','eda-add-manual',
+  'nexus-list','nexus-resend','nexus-stats','nexus-toggle','nexus-visits',
+  'monitor',
+  'yt-monitor-stats','yt-monitor-log','yt-cache-clear',
+  'yt-bot-status','yt-bot-triggers','yt-bot-add-trigger',
+  'yt-bot-toggle-trigger','yt-bot-delete-trigger','yt-bot-replies','yt-bot-run',
+  'lista-espera-stats','lista-espera-list','lista-espera-delete','lista-espera-update-status',
+  'academy-list','academy-delete','academy-update-status','academy-funnel-stats',
+  'equipe-list','equipe-create','equipe-update','equipe-delete',
+]);
 
 function findAdmin(login, password) {
   return ADMINS.find(a => a.login === login && a.password === password);
 }
 
-function isValidToken(token) {
+function getAdminFromToken(token) {
   try {
     const decoded = Buffer.from(token, 'base64').toString('utf8');
     const [login, ...rest] = decoded.split(':');
     const password = rest.join(':');
-    return !!findAdmin(login, password);
-  } catch { return false; }
+    return ADMINS.find(a => a.login === login && a.password === password) || null;
+  } catch { return null; }
+}
+
+function isValidToken(token) {
+  return !!getAdminFromToken(token);
 }
 
 function makeToken(login, password) {
@@ -80,7 +116,10 @@ module.exports = async function handler(req, res) {
     const admin = findAdmin(body.login || '', body.password || '');
     if (admin) {
       const token = makeToken(admin.login, admin.password);
-      return res.status(200).json({ ok: true, token, name: admin.name });
+      return res.status(200).json({
+        ok: true, token, name: admin.name,
+        permissions: admin.permissions || null,
+      });
     }
     return res.status(401).json({ error: 'Login ou senha incorretos' });
   }
@@ -145,6 +184,12 @@ module.exports = async function handler(req, res) {
   const tokenOk  = isValidToken(token);
   if (!legacyOk && !tokenOk) {
     return res.status(401).json({ error: 'Não autorizado' });
+  }
+
+  // PERMISSÕES — bloqueia actions restritas para admins com role limitado
+  const currentAdmin = getAdminFromToken(token);
+  if (currentAdmin?.permissions && RESTRICTED_DENIED.has(action)) {
+    return res.status(403).json({ error: 'Acesso não autorizado para este perfil' });
   }
 
   // LIST — apenas licenças CenaDrop (exclui nxsaude)
@@ -241,7 +286,7 @@ module.exports = async function handler(req, res) {
 
   // ── NARRATIVA IA — USERS ──────────────────────────────────────
   if (action === 'narrativa-list') {
-    let { data, error } = await supabase.from('narrativa_users').select('id,email,name,active,created_at,origin,purchased_at,expires_at').order('created_at', { ascending: false });
+    let { data, error } = await supabase.from('narrativa_users').select('id,email,name,phone,active,created_at,origin,purchased_at,expires_at').order('created_at', { ascending: false });
     if (error) ({ data, error } = await supabase.from('narrativa_users').select('id,email,name,active,created_at').order('created_at', { ascending: false }));
     if (error) return res.status(500).json({ error: error.message });
     return res.status(200).json({ users: data });
@@ -254,7 +299,7 @@ module.exports = async function handler(req, res) {
     const insertData = { email: email.toLowerCase(), name, password_hash, active: true, origin: origin || 'manual' };
     if (purchased_at) insertData.purchased_at = purchased_at;
     if (expires_at)   insertData.expires_at   = expires_at;
-    const { data, error } = await supabase.from('narrativa_users').insert(insertData).select('id,email,name,active,created_at,origin,purchased_at,expires_at').single();
+    const { data, error } = await supabase.from('narrativa_users').insert(insertData).select('id,email,name,phone,active,created_at,origin,purchased_at,expires_at').single();
     if (error) return res.status(error.code === '23505' ? 409 : 500).json({ error: error.message });
     // Email de boas-vindas
     try {
@@ -384,7 +429,7 @@ module.exports = async function handler(req, res) {
   if (action === 'nexus-list') {
     const { data, error } = await supabase
       .from('licenses')
-      .select('key, name, email, status, created_at, notes')
+      .select('key, name, email, phone, status, created_at, notes')
       .eq('product', 'nxsaude')
       .order('created_at', { ascending: false });
     if (error) return res.status(500).json({ error: error.message });
@@ -606,19 +651,24 @@ module.exports = async function handler(req, res) {
 
     // Enriquecer com dados de licença (CenaDrop) e Narrativa IA por email
     const emails = [...new Set(members.map(m => m.email).filter(Boolean))];
-    const [licData, narData] = await Promise.all([
+    const [licData, narData, phoneData] = await Promise.all([
       supabase.from('licenses').select('email, key, status, expires_at').in('email', emails).eq('source', 'hotmart-EDA'),
       supabase.from('narrativa_users').select('email, active, expires_at').in('email', emails).eq('origin', 'elite'),
+      // WhatsApp: pega de QUALQUER licença do email (compra CenaDrop avulsa também serve)
+      supabase.from('licenses').select('email, phone').in('email', emails).not('phone', 'is', null),
     ]);
     const licMap = {};
     for (const l of (licData.data || [])) licMap[l.email] = l;
     const narMap = {};
     for (const n of (narData.data || [])) narMap[n.email] = n;
+    const phoneMap = {};
+    for (const p of (phoneData.data || [])) if (p.phone && !phoneMap[p.email]) phoneMap[p.email] = p.phone;
 
     const enriched = members.map(m => ({
       ...m,
       license:  licMap[m.email]  || null,
       narrativa: narMap[m.email] || null,
+      phone: phoneMap[m.email] || null,
     }));
 
     return res.status(200).json({ members: enriched });
@@ -1256,6 +1306,70 @@ module.exports = async function handler(req, res) {
     } catch (err) {
       return res.status(500).json({ ok: false, error: err.message });
     }
+  }
+
+  // ── PAINEL EQUIPE — Demandas & Produtividade ────────────────
+  // Tabela: equipe_tarefas. Status: a_fazer|em_andamento|aguardando|concluido.
+  if (action === 'equipe-list') {
+    const { data, error } = await supabase.from('equipe_tarefas').select('*')
+      .order('ordem', { ascending: true })
+      .order('created_at', { ascending: false });
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ tasks: data || [] });
+  }
+
+  if (action === 'equipe-create') {
+    const nowIso = new Date().toISOString();
+    const status = body.status || 'a_fazer';
+    const row = {
+      titulo:       String(body.titulo || '').trim(),
+      descricao:    body.descricao ?? null,
+      responsaveis: Array.isArray(body.responsaveis) ? body.responsaveis : [],
+      status,
+      prioridade:   body.prioridade || 'media',
+      prazo:        body.prazo || null,
+      area:         body.area ?? null,
+      bloqueio:     body.bloqueio ?? null,
+      criado_por:   currentAdmin?.name || null,
+      ordem:        Number.isFinite(body.ordem) ? body.ordem : 0,
+      created_at:   nowIso,
+      updated_at:   nowIso,
+      concluido_em: status === 'concluido' ? nowIso : null,
+    };
+    if (!row.titulo) return res.status(400).json({ error: 'Título obrigatório' });
+    const { data, error } = await supabase.from('equipe_tarefas').insert(row).select().single();
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ ok: true, task: data });
+  }
+
+  if (action === 'equipe-update') {
+    if (!body.id) return res.status(400).json({ error: 'id obrigatório' });
+    const updates = { updated_at: new Date().toISOString() };
+    if (body.titulo       !== undefined) updates.titulo       = String(body.titulo || '').trim();
+    if (body.descricao    !== undefined) updates.descricao    = body.descricao;
+    if (body.responsaveis !== undefined) updates.responsaveis = Array.isArray(body.responsaveis) ? body.responsaveis : [];
+    if (body.prioridade   !== undefined) updates.prioridade   = body.prioridade;
+    if (body.prazo        !== undefined) updates.prazo        = body.prazo || null;
+    if (body.area         !== undefined) updates.area         = body.area;
+    if (body.bloqueio     !== undefined) updates.bloqueio     = body.bloqueio;
+    if (body.ordem        !== undefined) updates.ordem        = body.ordem;
+    if (body.status       !== undefined) {
+      updates.status = body.status;
+      // marca/limpa a conclusão para alimentar o tempo médio do dashboard
+      const { data: cur } = await supabase.from('equipe_tarefas').select('concluido_em').eq('id', body.id).single();
+      if (body.status === 'concluido') updates.concluido_em = cur?.concluido_em || new Date().toISOString();
+      else                             updates.concluido_em = null;
+    }
+    const { data, error } = await supabase.from('equipe_tarefas').update(updates).eq('id', body.id).select().single();
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ ok: true, task: data });
+  }
+
+  if (action === 'equipe-delete') {
+    if (!body.id) return res.status(400).json({ error: 'id obrigatório' });
+    const { error } = await supabase.from('equipe_tarefas').delete().eq('id', body.id);
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ ok: true });
   }
 
   return res.status(400).json({ error: 'Ação desconhecida' });

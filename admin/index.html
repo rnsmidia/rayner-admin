@@ -1,55 +1,136 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="midnight">
 <head>
+<script>
+  /* Aplica o tema salvo o quanto antes (evita flash). Padrão: midnight */
+  (function(){ try { var t = localStorage.getItem('admin-theme') || 'midnight';
+    document.documentElement.setAttribute('data-theme', t); } catch(e){} })();
+  function syncThemeBtns(theme){
+    document.querySelectorAll('.theme-toggle').forEach(function(t){
+      var ico = t.querySelector('.tt-ico'); var txt = t.querySelector('.tt-txt');
+      if (ico) ico.textContent = theme === 'midnight' ? '🌙' : '☀️';
+      if (txt) txt.textContent = theme === 'midnight' ? 'Midnight' : 'Studio';
+    });
+  }
+  function toggleTheme(){
+    var cur = document.documentElement.getAttribute('data-theme');
+    var next = cur === 'midnight' ? 'studio' : 'midnight';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('admin-theme', next); } catch(e){}
+    syncThemeBtns(next);
+    try { if (typeof renderDashCharts === 'function' && window._dashList) renderDashCharts(window._dashList); } catch(e){}
+    try { if (typeof renderNarrativaDashboard === 'function' && window._narDashList) renderNarrativaDashboard(window._narDashList); } catch(e){}
+    try { if (typeof renderEdaDashboard === 'function' && window._edaDashList) renderEdaDashboard(window._edaDashList); } catch(e){}
+    try { if (typeof renderOverviewDist === 'function' && window._ovDist) renderOverviewDist(window._ovDist); } catch(e){}
+    try { if (typeof renderNexusDashboard === 'function' && window._nxDashList) renderNexusDashboard(window._nxDashList); } catch(e){}
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    syncThemeBtns(document.documentElement.getAttribute('data-theme') || 'midnight');
+  });
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RAYNER — Admin</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
 
+/* ── Tokens COMPARTILHADOS (não mudam por tema) */
 :root {
-  /* ── Conteúdo (claro) */
-  --bg:         #f4f5fa;
-  --surface:    #ffffff;
-  --card:       #ffffff;
-  --border:     #e6e8f0;
-  --text:       #3a3655;
-  --text2:      #6e6b7b;
-  --muted:      #a5a3ae;
-  --subtle:     #f0f0f8;
-  --shadow:     0 2px 12px rgba(58,54,85,.08);
-  --shadow-sm:  0 1px 6px  rgba(58,54,85,.06);
-
-  /* ── Sidebar (escuro, como Materio) */
-  --sb:         #231f3a;
-  --sb-hover:   rgba(255,255,255,.05);
-  --sb-active:  rgba(124,58,237,.2);
-  --sb-border:  rgba(255,255,255,.06);
-  --sb-text:    #b0aece;
-  --sb-muted:   #6e6a88;
-  --sb-active-t:#d4bbfd;
-
-  /* ── Accent */
-  --accent:     #7c3aed;
-  --accent-h:   #6d28d9;
-  --accent-s:   rgba(124,58,237,.12);
   --accent2:    #a78bfa;
+  --purple:     #7c3aed;   /* alias legado */
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 20px; --sp-6: 24px; --sp-7: 32px; --sp-8: 40px; --sp-9: 48px;
+  --r-sm: 8px; --r-md: 10px; --r-lg: 14px; --r-xl: 18px; --r-full: 999px;
+  --fs-xs: 11px; --fs-sm: 12px; --fs-md: 13px; --fs-base: 14px;
+  --fs-lg: 16px; --fs-xl: 20px; --fs-2xl: 26px; --fs-3xl: 32px;
+  --ease: cubic-bezier(.4,0,.2,1);
+  --sidebar-w: 264px;
+}
 
-  /* ── Semânticas */
-  --green:  #28c76f;
-  --red:    #ea5455;
-  --yellow: #ff9f43;
-  --orange: #fd7e14;
-  --green-s:  rgba(40,199,111,.1);
-  --red-s:    rgba(234,84,85,.1);
-  --yellow-s: rgba(255,159,67,.1);
-  --orange-s: rgba(253,126,20,.1);
+/* ════════════ ☀️ STUDIO — tema claro (bold creator) ════════════ */
+[data-theme="studio"] {
+  --bg:#f7f5ff; --surface:#ffffff; --card:#ffffff;
+  --border:#ebe6fb; --border-2:#f1edfc; --hover:#f3eefc;
+  --text:#1f1640; --text2:#6b6388; --muted:#a39cc0; --subtle:#f4f0fd;
+  --shadow:0 10px 30px rgba(124,58,237,.10),0 2px 8px rgba(124,58,237,.06);
+  --shadow-sm:0 1px 2px rgba(124,58,237,.06),0 2px 8px rgba(124,58,237,.05);
+  --shadow-lg:0 20px 50px rgba(124,58,237,.16);
+  --sb:#1a1230; --sb-hover:rgba(255,255,255,.06); --sb-active:rgba(124,58,237,.25);
+  --sb-border:rgba(255,255,255,.07); --sb-text:#b9aee0; --sb-muted:#7a719c; --sb-active-t:#fff;
+  --accent:#7c3aed; --accent-h:#6d28d9; --accent-s:rgba(124,58,237,.08);
+  --accent-grad:linear-gradient(120deg,#7c3aed 0%,#c026d3 100%);
+  --green:#16a34a; --green-s:rgba(22,163,74,.1);
+  --red:#e11d48;   --red-s:rgba(225,29,72,.1);
+  --yellow:#ea9006;--yellow-s:rgba(234,144,6,.12);
+  --orange:#fd7e14;--orange-s:rgba(253,126,20,.1);
+}
 
-  --sidebar-w: 260px;
+/* ════════════ 🌙 MIDNIGHT — tema escuro (dark pro) ════════════ */
+[data-theme="midnight"] {
+  --bg:#0c0c12; --surface:#14141d; --card:#16161f;
+  --border:#24242f; --border-2:#1d1d27; --hover:#1b1b26;
+  --text:#ececf1; --text2:#a0a0ad; --muted:#66666f; --subtle:#1b1b26;
+  --shadow:0 8px 30px rgba(0,0,0,.5); --shadow-sm:0 2px 8px rgba(0,0,0,.4);
+  --shadow-lg:0 20px 50px rgba(0,0,0,.6);
+  --sb:#08080d; --sb-hover:rgba(255,255,255,.055); --sb-active:rgba(139,92,246,.22);
+  --sb-border:rgba(255,255,255,.06); --sb-text:#9a9aa6; --sb-muted:#5e5e68; --sb-active-t:#fff;
+  --accent:#8b5cf6; --accent-h:#7c3aed; --accent-s:rgba(139,92,246,.15);
+  --accent-grad:linear-gradient(135deg,#a78bfa,#7c3aed);
+  --green:#34d399; --green-s:rgba(52,211,153,.14);
+  --red:#f87171;   --red-s:rgba(248,113,113,.14);
+  --yellow:#fbbf24;--yellow-s:rgba(251,191,36,.14);
+  --orange:#fb923c;--orange-s:rgba(251,146,60,.14);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; font-size: 14px; }
+body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; font-size: 14px; transition: background .3s var(--ease), color .3s var(--ease); }
+
+/* ── Botão de toggle de tema ── */
+.theme-toggle {
+  display:flex; align-items:center; gap:6px;
+  background: var(--subtle); border:1px solid var(--border);
+  border-radius: var(--r-full); padding:5px 12px;
+  color: var(--text2); font:600 12px 'Inter'; cursor:pointer;
+  transition: all .18s var(--ease);
+}
+.theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+.theme-toggle .tt-ico { font-size:14px; }
+
+/* ════════ Logo por tema (escuro/claro) ════════ */
+.logo-dark-bg { display:none; }
+[data-theme="midnight"] .logo-light-bg { display:none; }
+[data-theme="midnight"] .logo-dark-bg  { display:block; }
+
+/* ════════ MODO ESCURO — separação/glow dos cards ════════ */
+[data-theme="midnight"] .email-card,
+[data-theme="midnight"] .mon-card,
+[data-theme="midnight"] .stat-card,
+[data-theme="midnight"] .lh-acc,
+[data-theme="midnight"] .ov-prod-card,
+[data-theme="midnight"] .ov-last-card,
+[data-theme="midnight"] .funnel-card,
+[data-theme="midnight"] .lh-card,
+[data-theme="midnight"] .dash-card {
+  background: #181823;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 6px 22px rgba(0,0,0,.45);
+}
+[data-theme="midnight"] .email-card:hover,
+[data-theme="midnight"] .mon-card:hover,
+[data-theme="midnight"] .stat-card:hover,
+[data-theme="midnight"] .lh-acc:hover {
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06),
+              0 0 0 1px rgba(139,92,246,.4),
+              0 8px 30px rgba(139,92,246,.2);
+}
+
+/* ════════ MODO ESCURO — login mais bonito ════════ */
+[data-theme="midnight"] .login-right {
+  background: radial-gradient(120% 80% at 75% 12%, rgba(139,92,246,.12), transparent 55%), var(--bg);
+}
+[data-theme="midnight"] .login-feature-card {
+  background: #181823; border-color: var(--border);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+}
 
 /* ════════════════════════════════════
    LOGIN
@@ -272,7 +353,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
   margin-bottom: 2px; text-align: left;
 }
 .prod-btn:hover { background: var(--sb-hover); color: #fff; }
-.prod-btn.active { background: var(--sb-active); color: var(--sb-active-t); }
+.prod-btn.active { background: var(--accent-grad); color: #fff; box-shadow: 0 4px 14px rgba(124,58,237,.35); }
 
 .prod-icon {
   width: 32px; height: 32px;
@@ -281,10 +362,10 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
   display: flex; align-items: center; justify-content: center;
   font-size: 15px; flex-shrink: 0;
 }
-.prod-btn.active .prod-icon { background: rgba(124,58,237,.25); }
+.prod-btn.active .prod-icon { background: rgba(255,255,255,.22); }
 .prod-name { font-size: 13px; font-weight: 600; line-height: 1.2; }
 .prod-tag  { font-size: 10px; color: var(--sb-muted); font-weight: 400; }
-.prod-btn.active .prod-tag { color: rgba(196,168,255,.55); }
+.prod-btn.active .prod-tag { color: rgba(255,255,255,.7); }
 
 .subnav {
   margin: 2px 0 6px 20px;
@@ -305,6 +386,89 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
 .sn-btn:hover { color: #fff; background: var(--sb-hover); }
 .sn-btn.active { color: var(--sb-active-t); background: var(--sb-active); }
 
+/* ════════ ABAS NO TOPO (page-tabs) — substituem a subnav da sidebar ════════ */
+.page-tabs {
+  display: flex; gap: 6px; align-items: center;
+  border-bottom: 1px solid var(--border);
+  margin: 0 0 var(--sp-6); padding: 0 0 10px;
+  overflow-x: auto;
+}
+.tab-btn {
+  position: relative;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 18px; border: none; background: transparent;
+  color: var(--text2); font: 600 14px 'Inter'; cursor: pointer;
+  border-radius: var(--r-full); white-space: nowrap;
+  transition: all .18s var(--ease);
+}
+.tab-btn:hover { color: var(--text); background: var(--subtle); }
+/* Item ativo: pílula preenchida com gradiente */
+.tab-btn.active {
+  background: var(--accent-grad); color: #fff;
+  box-shadow: 0 4px 14px rgba(124,58,237,.35);
+}
+/* + linha (sublinhado) em gradiente na base do strip, sob a aba ativa */
+.tab-btn.active::after {
+  content: ''; position: absolute; left: 14px; right: 14px; bottom: -10px;
+  height: 3px; border-radius: 3px 3px 0 0; background: var(--accent-grad);
+}
+.tab-count {
+  font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: var(--r-full);
+  background: var(--subtle); color: var(--muted); transition: all .18s;
+}
+.tab-btn.active .tab-count { background: rgba(255,255,255,.25); color: #fff; }
+
+/* ════════ DASHBOARD (analytics) ════════ */
+.dash-topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+.period-pick { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.period-lbl { font-size: 13px; color: var(--muted); font-weight: 600; }
+.version-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 14px; border-radius: var(--r-full);
+  background: var(--card); border: 1px solid var(--border);
+  color: var(--text); font-size: 13px; text-decoration: none;
+  box-shadow: var(--shadow-sm); transition: all .18s var(--ease);
+}
+.version-pill:hover { border-color: var(--accent); transform: translateY(-1px); }
+.version-pill .vp-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 3px var(--green-s); }
+.version-pill b { color: var(--accent); font-weight: 800; }
+.version-pill .vp-date { color: var(--muted); font-size: 12px; }
+.version-pill .vp-arrow { color: var(--muted); font-size: 12px; }
+.stat-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+.dash-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r-lg); box-shadow: var(--shadow-sm); padding: 20px; }
+.card-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 16px; }
+.card-head h3 { font-size: 14px; font-weight: 700; }
+.card-sub { font-size: 12px; color: var(--muted); font-weight: 500; }
+.chart-box { position: relative; height: 260px; }
+
+.dash-charts { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-top: 24px; }
+.dash-lists  { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+@media (max-width: 900px) { .dash-charts, .dash-lists { grid-template-columns: 1fr; } }
+
+.mini-list { display: flex; flex-direction: column; gap: 2px; }
+.mini-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 10px; border-radius: 8px; transition: background .15s; }
+.mini-row:hover { background: var(--subtle); }
+.mini-name { font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 220px; }
+.mini-sub { font-size: 11px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 220px; }
+.mini-tag { font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: var(--r-full); white-space: nowrap; }
+.mini-empty { text-align: center; color: var(--muted); font-size: 13px; padding: 28px 12px; }
+
+/* ════════ Menu de ações da linha (⋯) ════════ */
+.row-menu {
+  position: fixed; display: none; z-index: 500; min-width: 180px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--r-md); box-shadow: var(--shadow-lg); padding: 6px;
+}
+.row-menu button {
+  display: flex; align-items: center; gap: 9px; width: 100%; text-align: left;
+  padding: 9px 11px; border: none; background: transparent; color: var(--text);
+  font: 600 13px 'Inter'; cursor: pointer; border-radius: 7px;
+}
+.row-menu button:hover { background: var(--subtle); }
+.row-menu button.danger { color: var(--red); }
+.row-menu button.danger:hover { background: var(--red-s); }
+
 .sn-count {
   float: right;
   background: var(--accent);
@@ -324,7 +488,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
 }
 .user-av {
   width: 32px; height: 32px;
-  background: var(--accent);
+  background: var(--accent-grad);
   border-radius: 8px;
   display: flex; align-items: center; justify-content: center;
   font-size: 13px; font-weight: 700; color: #fff;
@@ -386,10 +550,12 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
 .stat-card {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 12px; padding: 20px;
+  border-radius: var(--r-lg); padding: var(--sp-5);
   box-shadow: var(--shadow-sm);
   display: flex; flex-direction: column; gap: 10px;
+  transition: box-shadow .2s var(--ease), transform .2s var(--ease);
 }
+.stat-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
 .stat-icon-wrap {
   width: 38px; height: 38px;
   border-radius: 10px;
@@ -471,7 +637,7 @@ select.btn-sm {
 .table-wrap {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 12px; overflow: hidden;
+  border-radius: var(--r-lg); overflow-x: auto;
   box-shadow: var(--shadow-sm);
 }
 table { width: 100%; border-collapse: collapse; }
@@ -484,7 +650,9 @@ thead th {
 tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
 tbody tr:last-child { border-bottom: none; }
 tbody tr:hover { background: rgba(124,58,237,.03); }
-td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
+td { padding: 13px 12px; font-size: 13px; vertical-align: middle; }
+td:first-child, th:first-child { padding-left: 16px; }
+td:last-child,  th:last-child  { padding-right: 16px; }
 
 .key-mono {
   font-family: 'JetBrains Mono', monospace;
@@ -500,9 +668,14 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
    BADGES
 ════════════════════════════════════ */
 .badge {
-  display: inline-block; border-radius: 20px;
+  display: inline-flex; align-items: center; gap: 5px;
+  border-radius: var(--r-full);
   padding: 3px 10px; font-size: 11px;
   font-weight: 600; letter-spacing: .3px;
+}
+.badge::before {
+  content: ''; width: 6px; height: 6px;
+  border-radius: 50%; background: currentColor; flex-shrink: 0;
 }
 .badge.active    { background: var(--green-s);  color: var(--green);  border: 1px solid rgba(40,199,111,.2); }
 .badge.inactive  { background: var(--red-s);    color: var(--red);    border: 1px solid rgba(234,84,85,.2); }
@@ -515,13 +688,13 @@ td { padding: 12px 15px; font-size: 13px; vertical-align: middle; }
 /* ════════════════════════════════════
    ACTIONS
 ════════════════════════════════════ */
-.actions { display: flex; gap: 5px; }
+.actions { display: flex; gap: 4px; flex-wrap: nowrap; }
 .btn-icon {
   background: var(--subtle); border: 1px solid var(--border);
-  border-radius: 7px; padding: 5px 9px;
+  border-radius: 7px; padding: 5px 7px;
   cursor: pointer; font-size: 12px; font-weight: 600;
   color: var(--text2); font-family: 'Inter', sans-serif;
-  transition: all .15s;
+  transition: all .15s; flex-shrink: 0;
 }
 .btn-icon:hover        { border-color: var(--accent); color: var(--accent); background: var(--accent-s); }
 .btn-icon.danger:hover { border-color: var(--red);    color: var(--red);    background: var(--red-s); }
@@ -959,7 +1132,7 @@ th.cb-col { width: 36px; }
   gap: 12px;
 }
 .mobile-header-logo { height: 26px; width: auto; }
-.mobile-header-title { flex: 1; font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mobile-header-title { flex: 1; font-size: 13px; font-weight: 600; color: var(--sb-active-t); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .mobile-hamburger {
   width: 36px; height: 36px; border: none; background: var(--card);
   border-radius: 8px; color: var(--text); font-size: 18px; cursor: pointer;
@@ -1030,6 +1203,9 @@ th.cb-col { width: 36px; }
   <button class="mobile-hamburger" onclick="toggleMobileSidebar()" aria-label="Menu">☰</button>
   <img src="https://raynern.com.br/admin-assets/logo-admin.png" class="mobile-header-logo" alt="Admin" onerror="this.style.display='none'">
   <span class="mobile-header-title" id="mobile-header-title">Admin</span>
+  <button class="theme-toggle" onclick="toggleTheme()" title="Alternar tema" style="margin-left:auto;flex-shrink:0">
+    <span class="tt-ico">🌙</span>
+  </button>
 </div>
 <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeMobileSidebar()"></div>
 
@@ -1046,7 +1222,8 @@ th.cb-col { width: 36px; }
       <!-- Bloco de boas-vindas -->
       <div class="login-welcome-block">
         <div class="login-logo-wrap">
-          <img src="/admin/logo-dark.png" alt="RAYNER" />
+          <img src="/admin/logo-dark.png" alt="RAYNER" class="logo-light-bg" />
+          <img src="/admin/logo-light.png" alt="RAYNER" class="logo-dark-bg" />
         </div>
         <h1>Bem-vindo de volta</h1>
         <p>Acesse o painel para gerenciar licenças, acompanhar vendas e administrar seus produtos.</p>
@@ -1131,12 +1308,7 @@ th.cb-col { width: 36px; }
             <div class="prod-tag">Extensão Chrome</div>
           </div>
         </button>
-        <div id="subnav-cenadrop" class="subnav">
-          <button class="sn-btn active" data-sec="dashboard" onclick="switchSection('cenadrop','dashboard')">📊 Dashboard</button>
-          <button class="sn-btn" data-sec="licenses"  onclick="switchSection('cenadrop','licenses')">🔑 Licenças <span class="sn-count" id="cnt-lic">0</span></button>
-          <button class="sn-btn" data-sec="students"  onclick="switchSection('cenadrop','students')">🎓 Alunos Hotmart <span class="sn-count" id="cnt-hot">0</span></button>
-          <button class="sn-btn" data-sec="blast"     onclick="switchSection('cenadrop','blast');loadBlastTemplates();setBlastFilter('all')">📣 Blast Email</button>
-        </div>
+        <!-- subnav CenaDrop movida para abas no topo da página (#tabs-cenadrop) -->
 
         <!-- Narrativa IA -->
         <button class="prod-btn" id="btn-narrativa" onclick="switchProduct('narrativa')">
@@ -1146,12 +1318,20 @@ th.cb-col { width: 36px; }
             <div class="prod-tag">Studio Web</div>
           </div>
         </button>
-        <div id="subnav-narrativa" class="subnav" style="display:none">
-          <button class="sn-btn" data-sec="dashboard" onclick="switchSection('narrativa','dashboard')">📊 Dashboard</button>
-          <button class="sn-btn" data-sec="users"     onclick="switchSection('narrativa','users')">👤 Usuários <span class="sn-count" id="cnt-nusers">0</span></button>
-          <button class="sn-btn" data-sec="nblast"    onclick="switchSection('narrativa','nblast');loadNarrativaBlastTemplates();setNarrativaFilter('active')">📣 Blast Email</button>
-        </div>
+        <!-- subnav Narrativa movida para abas no topo (#tabs-narrativa) -->
 
+        <!-- Elite Dark Academy -->
+        <button class="prod-btn" id="btn-academy" onclick="switchProduct('academy')">
+          <div class="prod-icon">🏆</div>
+          <div>
+            <div class="prod-name">Elite Dark</div>
+            <div class="prod-tag">Academy</div>
+          </div>
+        </button>
+        <!-- subnav Elite Dark movida para abas no topo (#tabs-academy) -->
+
+        <!-- ═══ Produtos Canais ═══ -->
+        <div class="sb-section-label" style="margin-top:10px">Produtos Canais</div>
         <!-- Nexus Saúde -->
         <button class="prod-btn" id="btn-nexus" onclick="switchProduct('nexus')">
           <div class="prod-icon">💚</div>
@@ -1160,39 +1340,18 @@ th.cb-col { width: 36px; }
             <div class="prod-tag">Jejum Após os 45</div>
           </div>
         </button>
-        <div id="subnav-nexus" class="subnav" style="display:none">
-          <button class="sn-btn active" data-sec="dashboard" onclick="switchSection('nexus','dashboard')">📊 Dashboard</button>
-          <button class="sn-btn" data-sec="buyers" onclick="switchSection('nexus','buyers')">🛒 Compradores <span class="sn-count" id="cnt-nxbuyers">0</span></button>
-          <button class="sn-btn" data-sec="clicks" onclick="switchSection('nexus','clicks');loadNexusClicks()">📈 Cliques <span class="sn-count" id="cnt-nxclicks">—</span></button>
-        </div>
+        <!-- subnav Nexus movida para abas no topo (#tabs-nexus) -->
 
-        <!-- Elite Dark Academy -->
-        <button class="prod-btn" id="btn-academy" onclick="switchProduct('academy')">
-          <div class="prod-icon">🏆</div>
-          <div>
-            <div class="prod-name">Elite Dark</div>
-            <div class="prod-tag">Lista VIP</div>
-          </div>
-        </button>
-        <div id="subnav-academy" class="subnav" style="display:none">
-          <button class="sn-btn" data-sec="waitlist" onclick="switchSection('academy','waitlist')">📋 Lista VIP <span class="sn-count" id="cnt-academy">—</span></button>
-          <button class="sn-btn" data-sec="lista-espera" onclick="switchSection('academy','lista-espera');loadListaEspera()">⏳ Lista Espera <span class="sn-count" id="cnt-lista-espera">—</span></button>
-          <button class="sn-btn active" data-sec="membros" onclick="switchSection('academy','membros');loadEdaMembers()">👥 Membros <span class="sn-count" id="cnt-eda-members">—</span></button>
-          <button class="sn-btn" data-sec="funnel" onclick="switchSection('academy','funnel');loadAcademyFunnel()">📊 Funil</button>
-          <button class="sn-btn" data-sec="blast" onclick="switchSection('academy','blast');loadEdaBlastTemplates();setEdaFilter('all')">📣 Blast Email</button>
-        </div>
-
+        <!-- ═══ Sistema ═══ -->
+        <div class="sb-section-label" style="margin-top:10px">Sistema</div>
         <!-- Links Hub -->
-        <button class="prod-btn" id="btn-links" onclick="switchProduct('links')" style="margin-top:6px">
+        <button class="prod-btn" id="btn-links" onclick="switchProduct('links')">
           <div class="prod-icon">🔗</div>
           <div>
             <div class="prod-name">Links Hub</div>
             <div class="prod-tag">Domínios & URLs</div>
           </div>
         </button>
-
-        <!-- Bot YT -->
-        <div class="sb-section-label" style="margin-top:10px">Sistema</div>
         <button class="prod-btn" id="btn-ytbot" onclick="switchProduct('ytbot')">
           <div class="prod-icon">🤖</div>
           <div>
@@ -1213,6 +1372,16 @@ th.cb-col { width: 36px; }
           <button class="sn-btn" data-sec="usage" onclick="switchSection('monitor','usage')">📊 Uso dos Serviços</button>
           <button class="sn-btn" data-sec="yt-api" onclick="switchSection('monitor','yt-api');loadYtMonitor()">📺 YouTube API</button>
         </div>
+
+        <!-- ═══ Gestão ═══ -->
+        <div class="sb-section-label" style="margin-top:10px">Gestão</div>
+        <button class="prod-btn" id="btn-equipe" onclick="switchProduct('equipe')">
+          <div class="prod-icon">📋</div>
+          <div>
+            <div class="prod-name">Equipe</div>
+            <div class="prod-tag">Demandas &amp; Produtividade</div>
+          </div>
+        </button>
 
       </div><!-- /sb-nav -->
 
@@ -1236,7 +1405,10 @@ th.cb-col { width: 36px; }
           <span class="bc-sep">/</span>
           <span class="bc-sec" id="bc-sec">Dashboard</span>
         </div>
-        <div style="display:flex;align-items:center;gap:6px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Alternar tema">
+            <span class="tt-ico">🌙</span><span class="tt-txt">Midnight</span>
+          </button>
           <span id="topbar-clock">--:--</span>
           <span class="badge-live">● Live</span>
         </div>
@@ -1246,53 +1418,81 @@ th.cb-col { width: 36px; }
       <div class="prod-panel" id="panel-overview">
         <div class="sec-panel active" id="overview-main" style="padding:24px">
 
-          <!-- Cards de produtos -->
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:14px">Produtos</div>
-          <div class="ov-grid" id="ov-products-grid">
-            <!-- CenaDrop -->
-            <div class="ov-prod-card">
-              <div class="ov-prod-title"><span>🎬</span> CenaDrop</div>
-              <div class="ov-stat-row"><span class="ov-stat-label">Total</span><span class="ov-stat-val purple" id="ov-cd-total">—</span></div>
-              <div class="ov-stat-row"><span class="ov-stat-label">Ativas</span><span class="ov-stat-val green" id="ov-cd-active">—</span></div>
-              <div class="ov-stat-row"><span class="ov-stat-label">Inativas</span><span class="ov-stat-val red" id="ov-cd-inactive">—</span></div>
-              <button class="ov-go" onclick="switchProduct('cenadrop')">→ Gerenciar</button>
+          <div class="sec-head" style="margin-bottom:24px">
+            <div>
+              <h1 style="font-size:26px;font-weight:800;letter-spacing:-.6px">Visão geral do negócio</h1>
+              <p style="color:var(--text2);font-size:13px;margin-top:4px">Todos os produtos num lugar só.</p>
             </div>
-            <!-- Narrativa IA -->
-            <div class="ov-prod-card">
-              <div class="ov-prod-title"><span>✨</span> Narrativa IA</div>
-              <div class="ov-stat-row"><span class="ov-stat-label">Total</span><span class="ov-stat-val purple" id="ov-na-total">—</span></div>
-              <div class="ov-stat-row"><span class="ov-stat-label">Ativos</span><span class="ov-stat-val green" id="ov-na-active">—</span></div>
-              <button class="ov-go" onclick="switchProduct('narrativa')">→ Gerenciar</button>
+            <button class="btn-sm" onclick="loadOverview()">↻ Atualizar</button>
+          </div>
+
+          <!-- KPIs do negócio -->
+          <div class="stats-grid" style="margin-bottom:24px">
+            <div class="stat-card">
+              <div class="stat-icon-wrap purple">👥</div>
+              <div><div class="stat-label">Total de alunos</div><div class="stat-val purple" id="ov-all-total">—</div><div class="stat-sub">somando todos os produtos</div></div>
             </div>
-            <!-- Nexus Saúde -->
-            <div class="ov-prod-card">
-              <div class="ov-prod-title"><span>💚</span> Nexus Saúde</div>
-              <div class="ov-stat-row"><span class="ov-stat-label">Total</span><span class="ov-stat-val purple" id="ov-nx-total">—</span></div>
-              <div class="ov-stat-row"><span class="ov-stat-label">Ativos</span><span class="ov-stat-val green" id="ov-nx-active">—</span></div>
-              <div class="ov-stat-row"><span class="ov-stat-label">Cancelados</span><span class="ov-stat-val red" id="ov-nx-inactive">—</span></div>
-              <button class="ov-go" onclick="switchProduct('nexus')">→ Gerenciar</button>
+            <div class="stat-card">
+              <div class="stat-icon-wrap green">✅</div>
+              <div><div class="stat-label">Ativos</div><div class="stat-val green" id="ov-all-active">—</div></div>
             </div>
-            <!-- Elite Dark -->
-            <div class="ov-prod-card">
-              <div class="ov-prod-title"><span>🏆</span> Elite Dark</div>
-              <div class="ov-stat-row"><span class="ov-stat-label">Total Lista VIP</span><span class="ov-stat-val purple" id="ov-acy-total">—</span></div>
-              <button class="ov-go" onclick="switchProduct('academy')">→ Gerenciar</button>
+            <div class="stat-card">
+              <div class="stat-icon-wrap red">💤</div>
+              <div><div class="stat-label">Inativos</div><div class="stat-val red" id="ov-all-inactive">—</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap orange">📊</div>
+              <div><div class="stat-label">Taxa de atividade</div><div class="stat-val orange" id="ov-all-rate">—</div></div>
             </div>
           </div>
 
-          <!-- Últimas licenças CenaDrop -->
-          <div class="ov-last-card">
-            <div class="ov-last-title">Últimas licenças CenaDrop</div>
-            <div id="ov-last-licenses"><div style="color:var(--muted);font-size:13px">Carregando...</div></div>
+          <!-- Produtos + distribuição -->
+          <div class="dash-charts">
+            <div class="dash-card" style="padding:20px">
+              <div class="card-head"><h3>📦 Produtos</h3><span class="card-sub">clique pra gerenciar</span></div>
+              <div class="ov-grid" id="ov-products-grid">
+                <div class="ov-prod-card" onclick="switchProduct('cenadrop')" style="cursor:pointer">
+                  <div class="ov-prod-title"><span>🎬</span> CenaDrop</div>
+                  <div class="ov-stat-row"><span class="ov-stat-label">Total</span><span class="ov-stat-val purple" id="ov-cd-total">—</span></div>
+                  <div class="ov-stat-row"><span class="ov-stat-label">Ativas</span><span class="ov-stat-val green" id="ov-cd-active">—</span></div>
+                  <div class="ov-stat-row"><span class="ov-stat-label">Inativas</span><span class="ov-stat-val red" id="ov-cd-inactive">—</span></div>
+                </div>
+                <div class="ov-prod-card" onclick="switchProduct('narrativa')" style="cursor:pointer">
+                  <div class="ov-prod-title"><span>✨</span> Narrativa IA</div>
+                  <div class="ov-stat-row"><span class="ov-stat-label">Total</span><span class="ov-stat-val purple" id="ov-na-total">—</span></div>
+                  <div class="ov-stat-row"><span class="ov-stat-label">Ativos</span><span class="ov-stat-val green" id="ov-na-active">—</span></div>
+                </div>
+                <div class="ov-prod-card" onclick="switchProduct('nexus')" style="cursor:pointer">
+                  <div class="ov-prod-title"><span>💚</span> Nexus Saúde</div>
+                  <div class="ov-stat-row"><span class="ov-stat-label">Total</span><span class="ov-stat-val purple" id="ov-nx-total">—</span></div>
+                  <div class="ov-stat-row"><span class="ov-stat-label">Ativos</span><span class="ov-stat-val green" id="ov-nx-active">—</span></div>
+                  <div class="ov-stat-row"><span class="ov-stat-label">Cancelados</span><span class="ov-stat-val red" id="ov-nx-inactive">—</span></div>
+                </div>
+                <div class="ov-prod-card" onclick="switchProduct('academy')" style="cursor:pointer">
+                  <div class="ov-prod-title"><span>🏆</span> Elite Dark</div>
+                  <div class="ov-stat-row"><span class="ov-stat-label">Membros</span><span class="ov-stat-val purple" id="ov-acy-total">—</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="dash-card chart-card">
+              <div class="card-head"><h3>🍩 Alunos por produto</h3></div>
+              <div class="chart-box"><canvas id="chart-ovdist"></canvas></div>
+            </div>
           </div>
 
-          <!-- Monitor rápido -->
-          <div class="ov-last-card">
-            <div class="ov-last-title" style="margin-bottom:10px">Monitor rápido</div>
-            <div class="mon-badges" id="ov-mon-badges">
-              <span class="mon-badge-inline ok" id="ov-mon-sb">⚡ Supabase</span>
-              <span class="mon-badge-inline ok" id="ov-mon-vc">▲ Vercel</span>
-              <span class="mon-badge-inline ok" id="ov-mon-rs">✉ Resend</span>
+          <!-- Recentes + saúde -->
+          <div class="dash-lists">
+            <div class="dash-card list-card">
+              <div class="card-head"><h3>🕐 Últimas entradas</h3><span class="card-sub">CenaDrop</span></div>
+              <div id="ov-last-licenses" class="mini-list"><div class="mini-empty">Carregando...</div></div>
+            </div>
+            <div class="dash-card list-card">
+              <div class="card-head"><h3>🖥️ Saúde do sistema</h3></div>
+              <div class="mon-badges" id="ov-mon-badges" style="flex-direction:column;gap:8px;align-items:stretch">
+                <span class="mon-badge-inline ok" id="ov-mon-sb">⚡ Supabase</span>
+                <span class="mon-badge-inline ok" id="ov-mon-vc">▲ Vercel</span>
+                <span class="mon-badge-inline ok" id="ov-mon-rs">✉ Resend</span>
+              </div>
             </div>
           </div>
 
@@ -1301,49 +1501,86 @@ th.cb-col { width: 36px; }
 
       <!-- ── CENADROP ── -->
       <div class="prod-panel active" id="panel-cenadrop">
+        <!-- Abas no topo (substituem a subnav da sidebar) -->
+        <div class="page-tabs" id="tabs-cenadrop">
+          <button class="tab-btn active" data-sec="dashboard" onclick="switchSection('cenadrop','dashboard')">📊 Dashboard</button>
+          <button class="tab-btn" data-sec="licenses" onclick="switchSection('cenadrop','licenses')">👥 Alunos &amp; Licenças <span class="tab-count" id="cnt-lic">0</span></button>
+          <button class="tab-btn" data-sec="blast" onclick="switchSection('cenadrop','blast');loadBlastTemplates();setBlastFilter('all')">📣 Blast Email</button>
+        </div>
 
         <!-- Dashboard -->
         <div class="sec-panel active" id="cenadrop-dashboard">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap">
-            <span style="font-size:13px;color:var(--muted);font-weight:600">Período:</span>
-            <button class="btn-sm period-btn active" id="period-all"    onclick="setPeriod('all')">Todos</button>
-            <button class="btn-sm period-btn"        id="period-30d"   onclick="setPeriod('30d')">30 dias</button>
-            <button class="btn-sm period-btn"        id="period-7d"    onclick="setPeriod('7d')">7 dias</button>
-            <button class="btn-sm period-btn"        id="period-today" onclick="setPeriod('today')">Hoje</button>
+          <!-- Período + versão disponível -->
+          <div class="dash-topbar">
+            <div class="period-pick">
+              <span class="period-lbl">Período:</span>
+              <button class="btn-sm period-btn active" id="period-all"    onclick="setPeriod('all')">Todos</button>
+              <button class="btn-sm period-btn"        id="period-30d"   onclick="setPeriod('30d')">30 dias</button>
+              <button class="btn-sm period-btn"        id="period-7d"    onclick="setPeriod('7d')">7 dias</button>
+              <button class="btn-sm period-btn"        id="period-today" onclick="setPeriod('today')">Hoje</button>
+            </div>
+            <a class="version-pill" id="version-pill" href="https://raynern.com.br/cenadrop/download" target="_blank" title="Abrir página de download">
+              <span class="vp-dot"></span>
+              <span>Versão disponível <b id="vp-version">—</b></span>
+              <span class="vp-date" id="vp-date"></span>
+              <span class="vp-arrow">↗</span>
+            </a>
           </div>
+
+          <!-- Stat cards -->
           <div class="stats-grid">
             <div class="stat-card">
               <div class="stat-icon-wrap purple">📦</div>
-              <div><div class="stat-label">Total</div><div class="stat-val purple" id="s-total">—</div></div>
+              <div><div class="stat-label">Total de licenças</div><div class="stat-val purple" id="s-total">—</div></div>
             </div>
             <div class="stat-card">
               <div class="stat-icon-wrap green">✅</div>
               <div><div class="stat-label">Ativas</div><div class="stat-val green" id="s-active">—</div></div>
             </div>
             <div class="stat-card">
-              <div class="stat-icon-wrap red">🔒</div>
-              <div><div class="stat-label">Inativas</div><div class="stat-val red" id="s-inactive">—</div></div>
+              <div class="stat-icon-wrap purple">🎯</div>
+              <div><div class="stat-label">Taxa de ativação</div><div class="stat-val purple" id="s-activation">—</div><div class="stat-sub" id="s-activation-sub">instalaram a extensão</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap orange">🔥</div>
+              <div><div class="stat-label">Ativos (7 dias)</div><div class="stat-val orange" id="s-active7d">—</div><div class="stat-sub">usaram nos últimos 7d</div></div>
             </div>
             <div class="stat-card">
               <div class="stat-icon-wrap yellow">🛒</div>
-              <div><div class="stat-label">Hotmart Total</div><div class="stat-val yellow" id="s-hotmart">—</div></div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon-wrap yellow">🟡</div>
-              <div><div class="stat-label">Hotmart RN</div><div class="stat-val yellow" id="s-hotmart-rn">—</div></div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon-wrap orange">🟠</div>
-              <div><div class="stat-label">Hotmart MC</div><div class="stat-val orange" id="s-hotmart-mc">—</div></div>
+              <div><div class="stat-label">Via Hotmart</div><div class="stat-val yellow" id="s-hotmart">—</div></div>
             </div>
             <div class="stat-card">
               <div class="stat-icon-wrap purple">✏️</div>
               <div><div class="stat-label">Manual</div><div class="stat-val purple" id="s-manual">—</div></div>
             </div>
           </div>
-          <div class="quick-row">
-            <button class="btn-sm accent" onclick="switchSection('cenadrop','licenses')">🔑 Ver Licenças</button>
-            <button class="btn-sm" onclick="switchSection('cenadrop','students')">🎓 Ver Alunos Hotmart</button>
+
+          <!-- Gráficos -->
+          <div class="dash-charts">
+            <div class="dash-card chart-card">
+              <div class="card-head"><h3>📈 Crescimento de licenças</h3><span class="card-sub" id="growth-sub"></span></div>
+              <div class="chart-box"><canvas id="chart-growth"></canvas></div>
+            </div>
+            <div class="dash-card chart-card">
+              <div class="card-head"><h3>🍩 Por origem</h3></div>
+              <div class="chart-box"><canvas id="chart-source"></canvas></div>
+            </div>
+          </div>
+
+          <!-- Listas acionáveis -->
+          <div class="dash-lists">
+            <div class="dash-card list-card">
+              <div class="card-head"><h3>⏰ Próximas expirações</h3><span class="card-sub">30 dias</span></div>
+              <div id="list-expiring" class="mini-list"></div>
+            </div>
+            <div class="dash-card list-card">
+              <div class="card-head"><h3>⚠️ Compraram mas não ativaram</h3><span class="card-sub">sem dispositivo</span></div>
+              <div id="list-notactivated" class="mini-list"></div>
+            </div>
+          </div>
+
+          <div class="quick-row" style="margin-top:24px">
+            <button class="btn-sm accent" onclick="switchSection('cenadrop','licenses')">👥 Ver Alunos &amp; Licenças</button>
             <button class="btn-sm" onclick="loadAll()">↻ Atualizar</button>
           </div>
         </div>
@@ -1352,7 +1589,7 @@ th.cb-col { width: 36px; }
         <div class="sec-panel" id="cenadrop-licenses">
           <div class="toolbar">
             <div class="search-wrap">
-              <input type="text" id="search-lic" placeholder="Buscar por chave, email ou nome..." oninput="filterLicenses()" />
+              <input type="text" id="search-lic" placeholder="Buscar por chave, email, nome ou WhatsApp..." oninput="filterLicenses()" />
             </div>
             <select id="filter-source" class="btn-sm" onchange="filterLicenses()">
               <option value="">Todas as origens</option>
@@ -1378,49 +1615,31 @@ th.cb-col { width: 36px; }
                 <tr>
                   <th class="cb-col"><input type="checkbox" id="chk-all" onchange="toggleSelectAll()" /></th>
                   <th class="sortable" onclick="sortLicenses('key')">Chave <span class="sort-icon" id="si-key"></span></th>
-                  <th class="sortable" onclick="sortLicenses('name')">Nome / Email <span class="sort-icon" id="si-name"></span></th>
+                  <th class="sortable" onclick="sortLicenses('name')">Aluno <span class="sort-icon" id="si-name"></span></th>
+                  <th>WhatsApp</th>
+                  <th>Ativação</th>
                   <th class="sortable" onclick="sortLicenses('status')">Status <span class="sort-icon" id="si-status"></span></th>
                   <th class="sortable" onclick="sortLicenses('source')">Origem <span class="sort-icon" id="si-source"></span></th>
+                  <th class="sortable" onclick="sortLicenses('created_at')">Compra <span class="sort-icon" id="si-created_at">▼</span></th>
                   <th class="sortable" onclick="sortLicenses('expires_at')">Expiração <span class="sort-icon" id="si-expires_at"></span></th>
-                  <th class="sortable" onclick="sortLicenses('created_at')">Data <span class="sort-icon" id="si-created_at">▼</span></th>
                   <th>Ações</th>
                 </tr>
               </thead>
               <tbody id="lic-tbody">
-                <tr><td colspan="8"><div class="loading">Carregando...</div></td></tr>
+                <tr><td colspan="10"><div class="loading">Carregando...</div></td></tr>
               </tbody>
             </table>
           </div>
         </div>
 
-        <!-- Alunos Hotmart -->
-        <div class="sec-panel" id="cenadrop-students">
-          <div class="toolbar">
-            <div class="search-wrap">
-              <input type="text" id="search-hot" placeholder="Buscar por nome, email ou WhatsApp..." oninput="filterStudents()" />
-            </div>
-            <button class="btn-sm" onclick="loadAll()">↻</button>
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Nome</th><th>Email</th><th>WhatsApp</th><th>Origem</th><th>Chave</th><th>Status</th><th>Data</th><th>Ações</th>
-                </tr>
-              </thead>
-              <tbody id="hot-tbody">
-                <tr><td colspan="8"><div class="loading">Carregando...</div></td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <!-- Alunos Hotmart → mesclado em "Alunos & Licenças" (coluna WhatsApp + filtro Origem) -->
 
         <!-- Blast Email -->
         <div class="sec-panel" id="cenadrop-blast">
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:24px">
             <div class="stat-card">
               <div class="stat-icon-wrap purple">📧</div>
-              <div><div class="stat-label">Usuários com email</div><div class="stat-val purple" id="blast-email-count">—</div></div>
+              <div><div class="stat-label">Alunos com email</div><div class="stat-val purple" id="blast-email-count">—</div></div>
             </div>
             <div class="stat-card">
               <div class="stat-icon-wrap yellow">📅</div>
@@ -1482,6 +1701,11 @@ th.cb-col { width: 36px; }
 
       <!-- ── NARRATIVA IA ── -->
       <div class="prod-panel" id="panel-narrativa">
+        <div class="page-tabs" id="tabs-narrativa">
+          <button class="tab-btn active" data-sec="dashboard" onclick="switchSection('narrativa','dashboard')">📊 Dashboard</button>
+          <button class="tab-btn" data-sec="users" onclick="switchSection('narrativa','users')">👥 Alunos <span class="tab-count" id="cnt-nusers">0</span></button>
+          <button class="tab-btn" data-sec="nblast" onclick="switchSection('narrativa','nblast');loadNarrativaBlastTemplates();setNarrativaFilter('active')">📣 Blast Email</button>
+        </div>
 
         <!-- Dashboard -->
         <div class="sec-panel" id="narrativa-dashboard">
@@ -1510,9 +1734,34 @@ th.cb-col { width: 36px; }
               <div class="stat-icon-wrap yellow">📆</div>
               <div><div class="stat-label">Novos 30 dias</div><div class="stat-val yellow" id="ns-new-30d">—</div></div>
             </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap purple">📱</div>
+              <div><div class="stat-label">Com WhatsApp</div><div class="stat-val purple" id="ns-whatsapp">—</div><div class="stat-sub" id="ns-whatsapp-sub">cobertura de contato</div></div>
+            </div>
           </div>
-          <div class="quick-row">
-            <button class="btn-sm accent" onclick="switchSection('narrativa','users')">👤 Ver Usuários</button>
+
+          <!-- Gráficos -->
+          <div class="dash-charts">
+            <div class="dash-card chart-card">
+              <div class="card-head"><h3>📈 Crescimento de usuários</h3><span class="card-sub" id="ngrowth-sub"></span></div>
+              <div class="chart-box"><canvas id="chart-ngrowth"></canvas></div>
+            </div>
+            <div class="dash-card chart-card">
+              <div class="card-head"><h3>🍩 Por origem</h3></div>
+              <div class="chart-box"><canvas id="chart-nsource"></canvas></div>
+            </div>
+          </div>
+
+          <!-- Próximas expirações -->
+          <div class="dash-lists" style="grid-template-columns:1fr">
+            <div class="dash-card list-card">
+              <div class="card-head"><h3>⏰ Próximas expirações</h3><span class="card-sub">30 dias</span></div>
+              <div id="list-nexpiring" class="mini-list"></div>
+            </div>
+          </div>
+
+          <div class="quick-row" style="margin-top:24px">
+            <button class="btn-sm accent" onclick="switchSection('narrativa','users')">👥 Ver Alunos</button>
             <button class="btn-sm" onclick="loadNarrativaUsers()">↻ Atualizar</button>
           </div>
         </div>
@@ -1521,7 +1770,7 @@ th.cb-col { width: 36px; }
         <div class="sec-panel" id="narrativa-users">
           <div class="toolbar">
             <div class="search-wrap">
-              <input type="text" id="search-nusers" placeholder="Buscar por nome ou email..." oninput="filterNarrativaUsers()" />
+              <input type="text" id="search-nusers" placeholder="Buscar por nome, email ou WhatsApp..." oninput="filterNarrativaUsers()" />
             </div>
             <select id="filter-nstatus" class="btn-sm" onchange="filterNarrativaUsers()">
               <option value="">Todos</option>
@@ -1543,18 +1792,17 @@ th.cb-col { width: 36px; }
               <thead>
                 <tr>
                   <th class="cb-col"><input type="checkbox" id="nchk-all" onchange="toggleNarrativaSelectAll()" /></th>
-                  <th class="sortable" onclick="sortNarrativaUsers('name')">Nome <span class="sort-icon" id="nsi-name"></span></th>
-                  <th class="sortable" onclick="sortNarrativaUsers('email')">Email <span class="sort-icon" id="nsi-email"></span></th>
+                  <th class="sortable" onclick="sortNarrativaUsers('name')">Aluno <span class="sort-icon" id="nsi-name"></span></th>
+                  <th>WhatsApp</th>
                   <th class="sortable" onclick="sortNarrativaUsers('active')">Status <span class="sort-icon" id="nsi-active"></span></th>
                   <th class="sortable" onclick="sortNarrativaUsers('origin')">Origem <span class="sort-icon" id="nsi-origin"></span></th>
-                  <th class="sortable" onclick="sortNarrativaUsers('purchased_at')">Compra <span class="sort-icon" id="nsi-purchased_at"></span></th>
+                  <th class="sortable" onclick="sortNarrativaUsers('purchased_at')">Compra <span class="sort-icon" id="nsi-purchased_at">▼</span></th>
                   <th class="sortable" onclick="sortNarrativaUsers('expires_at')">Expiração <span class="sort-icon" id="nsi-expires_at"></span></th>
-                  <th class="sortable" onclick="sortNarrativaUsers('created_at')">Criado em <span class="sort-icon" id="nsi-created_at">▼</span></th>
                   <th>Ações</th>
                 </tr>
               </thead>
               <tbody id="nusers-tbody">
-                <tr><td colspan="9"><div class="loading">Carregando...</div></td></tr>
+                <tr><td colspan="8"><div class="loading">Carregando...</div></td></tr>
               </tbody>
             </table>
           </div>
@@ -1565,7 +1813,7 @@ th.cb-col { width: 36px; }
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:24px">
             <div class="stat-card">
               <div class="stat-icon-wrap purple">📧</div>
-              <div><div class="stat-label">Usuários com email</div><div class="stat-val purple" id="nblast-email-count">—</div></div>
+              <div><div class="stat-label">Alunos com email</div><div class="stat-val purple" id="nblast-email-count">—</div></div>
             </div>
             <div class="stat-card">
               <div class="stat-icon-wrap yellow">📅</div>
@@ -1625,6 +1873,11 @@ th.cb-col { width: 36px; }
 
       <!-- ── NEXUS SAÚDE ── -->
       <div class="prod-panel" id="panel-nexus">
+        <div class="page-tabs" id="tabs-nexus">
+          <button class="tab-btn active" data-sec="dashboard" onclick="switchSection('nexus','dashboard')">📊 Dashboard</button>
+          <button class="tab-btn" data-sec="buyers" onclick="switchSection('nexus','buyers')">👥 Alunos <span class="tab-count" id="cnt-nxbuyers">0</span></button>
+          <button class="tab-btn" data-sec="clicks" onclick="switchSection('nexus','clicks');loadNexusClicks()">📈 Cliques <span class="tab-count" id="cnt-nxclicks">—</span></button>
+        </div>
 
         <!-- Dashboard -->
         <div class="sec-panel active" id="nexus-dashboard">
@@ -1660,8 +1913,19 @@ th.cb-col { width: 36px; }
               <div><div class="stat-label">Cliques (30d)</div><div class="stat-val" style="color:#14B8A6" id="nx-clicks-dash">—</div></div>
             </div>
           </div>
+          <div class="dash-charts">
+            <div class="dash-card chart-card">
+              <div class="card-head"><h3>📈 Crescimento de compras</h3><span class="card-sub" id="nxgrowth-sub"></span></div>
+              <div class="chart-box"><canvas id="chart-nxgrowth"></canvas></div>
+            </div>
+            <div class="dash-card chart-card">
+              <div class="card-head"><h3>🍩 Ativos vs Cancelados</h3></div>
+              <div class="chart-box"><canvas id="chart-nxstatus"></canvas></div>
+            </div>
+          </div>
+
           <div class="quick-row">
-            <button class="btn-sm accent" onclick="switchSection('nexus','buyers')">🛒 Ver Compradores</button>
+            <button class="btn-sm accent" onclick="switchSection('nexus','buyers')">👥 Ver Alunos</button>
             <button class="btn-sm accent" onclick="switchSection('nexus','clicks');loadNexusClicks()" style="background:rgba(20,184,166,.15);color:#14B8A6;border-color:rgba(20,184,166,.3)">📈 Ver Cliques</button>
             <button class="btn-sm" onclick="loadNexusData()">↻ Atualizar</button>
           </div>
@@ -1671,14 +1935,14 @@ th.cb-col { width: 36px; }
         <div class="sec-panel" id="nexus-buyers">
           <div class="toolbar">
             <div class="search-wrap">
-              <input type="text" id="search-nxbuyers" placeholder="Buscar por nome ou email..." oninput="filterNexusBuyers()" />
+              <input type="text" id="search-nxbuyers" placeholder="Buscar por nome, email ou WhatsApp..." oninput="filterNexusBuyers()" />
             </div>
             <button class="btn-sm" onclick="loadNexusData()">↻</button>
           </div>
           <div class="table-wrap">
             <table>
               <thead>
-                <tr><th>Nome</th><th>Email</th><th>Status</th><th>Compra</th><th>Cancelamento</th><th>Ações</th></tr>
+                <tr><th>Aluno</th><th>WhatsApp</th><th>Status</th><th>Compra</th><th>Cancelamento</th><th>Ações</th></tr>
               </thead>
               <tbody id="nx-tbody">
                 <tr><td colspan="6"><div class="loading">Carregando...</div></td></tr>
@@ -1739,6 +2003,12 @@ th.cb-col { width: 36px; }
       <!-- ── MONITOR ── -->
       <!-- ── ELITE DARK ACADEMY ── -->
       <div class="prod-panel" id="panel-academy">
+        <div class="page-tabs" id="tabs-academy">
+          <button class="tab-btn active" data-sec="dashboard" onclick="switchSection('academy','dashboard')">📊 Dashboard</button>
+          <button class="tab-btn" data-sec="membros" onclick="switchSection('academy','membros');loadEdaMembers()">👥 Membros <span class="tab-count" id="cnt-eda-members">—</span></button>
+          <button class="tab-btn" data-sec="lista-espera" onclick="switchSection('academy','lista-espera');loadListaEspera()">⏳ Lista Espera <span class="tab-count" id="cnt-lista-espera">—</span></button>
+          <button class="tab-btn" data-sec="blast" onclick="switchSection('academy','blast');loadEdaBlastTemplates();setEdaFilter('all')">📣 Blast Email</button>
+        </div>
         <div class="sec-panel" id="academy-waitlist">
 
           <!-- Stats -->
@@ -1904,9 +2174,8 @@ th.cb-col { width: 36px; }
 
         </div>
 
-        <!-- Membros (compradores — acesso Discord) -->
-        <div class="sec-panel active" id="academy-membros">
-
+        <!-- Dashboard Elite Dark (analytics) -->
+        <div class="sec-panel active" id="academy-dashboard">
           <div class="stats-grid" style="margin-bottom:24px">
             <div class="stat-card">
               <div class="stat-icon-wrap purple">👥</div>
@@ -1926,9 +2195,34 @@ th.cb-col { width: 36px; }
             </div>
           </div>
 
+          <div class="dash-charts">
+            <div class="dash-card chart-card">
+              <div class="card-head"><h3>📈 Crescimento de membros</h3><span class="card-sub" id="edagrowth-sub"></span></div>
+              <div class="chart-box"><canvas id="chart-edagrowth"></canvas></div>
+            </div>
+            <div class="dash-card chart-card">
+              <div class="card-head"><h3>🍩 Status no Discord</h3></div>
+              <div class="chart-box"><canvas id="chart-edastatus"></canvas></div>
+            </div>
+          </div>
+
+          <div class="dash-card" style="padding:20px;margin-top:16px">
+            <div class="card-head"><h3>📦 Cobertura por produto</h3><span class="card-sub">membros com cada acesso</span></div>
+            <div id="eda-coverage" class="mini-list"></div>
+          </div>
+
+          <div class="quick-row" style="margin-top:24px">
+            <button class="btn-sm accent" onclick="switchSection('academy','membros')">👥 Ver Membros</button>
+            <button class="btn-sm" onclick="loadEdaMembers()">↻ Atualizar</button>
+          </div>
+        </div>
+
+        <!-- Membros (compradores — acesso Discord) -->
+        <div class="sec-panel" id="academy-membros">
+
           <div class="toolbar">
             <div class="search-wrap">
-              <input type="text" id="search-eda-members" placeholder="Buscar por nome ou email..." oninput="filterEdaMembers()" />
+              <input type="text" id="search-eda-members" placeholder="Buscar por nome, email ou WhatsApp..." oninput="filterEdaMembers()" />
             </div>
             <button class="btn-sm" onclick="loadEdaMembers()">↻ Atualizar</button>
             <button class="btn-sm" style="background:rgba(201,162,39,.12);border-color:rgba(201,162,39,.35);color:#C9A227" onclick="openAddEdaMemberModal()">➕ Adicionar Membro</button>
@@ -1938,19 +2232,18 @@ th.cb-col { width: 36px; }
             <table>
               <thead>
                 <tr>
-                  <th>#</th>
-                  <th>Nome</th>
-                  <th>E-mail</th>
+                  <th>Aluno</th>
+                  <th>WhatsApp</th>
                   <th>Discord</th>
                   <th>CenaDrop</th>
                   <th>Narrativa IA</th>
-                  <th>Expira em</th>
+                  <th>Expiração</th>
                   <th>Status</th>
-                  <th></th>
+                  <th>Ações</th>
                 </tr>
               </thead>
               <tbody id="eda-members-tbody">
-                <tr><td colspan="9"><div class="empty-state"><div class="icon">👥</div><p>Carregando...</p></div></td></tr>
+                <tr><td colspan="8"><div class="empty-state"><div class="icon">👥</div><p>Carregando...</p></div></td></tr>
               </tbody>
             </table>
           </div>
@@ -2940,6 +3233,88 @@ th.cb-col { width: 36px; }
 
       </div><!-- /monitor -->
 
+      <!-- ═══════════ PAINEL EQUIPE — Demandas & Produtividade ═══════════ -->
+      <style>
+        .eq-toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:16px}
+        .eq-filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+        .eq-sel{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px}
+        .kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;align-items:start}
+        @media(max-width:1000px){.kanban{grid-template-columns:1fr 1fr}}
+        @media(max-width:640px){.kanban{grid-template-columns:1fr}}
+        .kb-col{background:var(--subtle);border:1px solid var(--border);border-radius:14px;padding:12px;min-height:120px;transition:background .15s,border-color .15s}
+        .kb-col.drop-hover{background:var(--accent-s);border-color:var(--accent)}
+        .kb-col-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;font-weight:800;font-size:13px}
+        .kb-count{background:var(--card);border:1px solid var(--border);border-radius:999px;padding:1px 9px;font-size:11px;color:var(--muted)}
+        .eq-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px;box-shadow:var(--shadow-sm);cursor:grab}
+        .eq-card:active{cursor:grabbing}
+        .eq-card.dragging{opacity:.4}
+        .eq-card-top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+        .eq-title{font-weight:700;font-size:14px;line-height:1.3;flex:1}
+        .eq-desc{color:var(--muted);font-size:12px;margin-top:4px;line-height:1.4}
+        .eq-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;align-items:center}
+        .eq-chip{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--border);background:var(--subtle);color:var(--muted);white-space:nowrap}
+        .eq-avatars{display:flex}
+        .eq-av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;border:2px solid var(--card);margin-left:-6px}
+        .eq-av:first-child{margin-left:0}
+        .pri-alta{background:var(--red-s);color:var(--red);border-color:rgba(225,29,72,.25)}
+        .pri-media{background:var(--yellow-s);color:var(--yellow);border-color:rgba(255,159,67,.25)}
+        .pri-baixa{background:var(--green-s);color:var(--green);border-color:rgba(22,163,74,.25)}
+        .eq-atrasada{background:var(--red-s);color:var(--red);border-color:rgba(225,29,72,.35);font-weight:700}
+        .eq-bloqueio{margin-top:8px;font-size:12px;background:var(--red-s);color:var(--red);border-radius:8px;padding:6px 8px}
+        .eq-empty{color:var(--muted);font-size:13px;text-align:center;padding:24px}
+        .eq-group{margin-bottom:22px}
+        .eq-group-head{font-weight:800;font-size:14px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+        .eq-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+        .eq-cols2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+        @media(max-width:640px){.eq-cols2{grid-template-columns:1fr}}
+        .chk-resp{display:flex;flex-wrap:wrap;gap:8px}
+        .chk-resp label{display:flex;align-items:center;gap:6px;background:var(--subtle);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer}
+        .eq-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+        .eq-bar-label{width:120px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
+        .eq-bar-track{flex:1;background:var(--subtle);border-radius:999px;height:14px;overflow:hidden}
+        .eq-bar-fill{height:100%;background:var(--accent-grad);border-radius:999px;min-width:2px}
+        .eq-bar-val{width:34px;text-align:right;font-size:12px;color:var(--muted)}
+      </style>
+      <div class="prod-panel" id="panel-equipe">
+        <div class="page-tabs" id="tabs-equipe">
+          <button class="tab-btn active" data-sec="kanban"        onclick="switchSection('equipe','kanban')">🗂️ Kanban</button>
+          <button class="tab-btn"        data-sec="responsavel"   onclick="switchSection('equipe','responsavel')">👥 Por Responsável</button>
+          <button class="tab-btn"        data-sec="prazo"         onclick="switchSection('equipe','prazo')">📅 Por Prazo</button>
+          <button class="tab-btn"        data-sec="lista"         onclick="switchSection('equipe','lista')">📄 Lista</button>
+          <button class="tab-btn"        data-sec="produtividade" onclick="switchSection('equipe','produtividade')">📊 Produtividade</button>
+        </div>
+
+        <div class="eq-toolbar">
+          <div class="eq-filters">
+            <select id="eqf-resp"   class="eq-sel" onchange="renderEquipe()"><option value="">👥 Todos responsáveis</option></select>
+            <select id="eqf-status" class="eq-sel" onchange="renderEquipe()">
+              <option value="">Todos status</option>
+              <option value="a_fazer">A Fazer</option>
+              <option value="em_andamento">Em Andamento</option>
+              <option value="aguardando">Aguardando</option>
+              <option value="concluido">Concluído</option>
+            </select>
+            <select id="eqf-pri" class="eq-sel" onchange="renderEquipe()">
+              <option value="">Toda prioridade</option>
+              <option value="alta">Alta</option>
+              <option value="media">Média</option>
+              <option value="baixa">Baixa</option>
+            </select>
+            <select id="eqf-area" class="eq-sel" onchange="renderEquipe()"><option value="">Todas áreas</option></select>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn-sm" onclick="loadEquipe()">↻ Atualizar</button>
+            <button class="btn-sm accent" onclick="openEquipeModal()">+ Nova demanda</button>
+          </div>
+        </div>
+
+        <div class="sec-panel active" id="equipe-kanban"><div class="kanban" id="eq-kanban"></div></div>
+        <div class="sec-panel" id="equipe-responsavel"><div id="eq-responsavel"></div></div>
+        <div class="sec-panel" id="equipe-prazo"><div id="eq-prazo"></div></div>
+        <div class="sec-panel" id="equipe-lista"><div id="eq-lista"></div></div>
+        <div class="sec-panel" id="equipe-produtividade"><div id="eq-produtividade"></div></div>
+      </div><!-- /equipe -->
+
     </div><!-- /main -->
   </div><!-- /app -->
 </div>
@@ -3041,12 +3416,51 @@ th.cb-col { width: 36px; }
   </div>
 </div>
 
-<div id="toast"></div>
+<!-- MODAL EQUIPE — NOVA/EDITAR DEMANDA -->
+<div class="overlay" id="equipe-modal-overlay" onclick="closeEquipeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:560px">
+    <h2 id="eq-modal-title">Nova demanda</h2>
+    <div class="field"><label>Título</label><input type="text" id="eq-titulo" placeholder="Ex: Enviar relatório de vendas para diretoria" /></div>
+    <div class="field"><label>Descrição <span style="font-weight:400;color:var(--muted)">(o que precisa ser feito + critério de conclusão)</span></label><textarea id="eq-descricao" placeholder="O que entregar e o que define 'pronto'..."></textarea></div>
+    <div class="field"><label>Responsáveis</label><div class="chk-resp" id="eq-resp-checks"></div></div>
+    <div class="eq-cols2">
+      <div class="field"><label>Status</label>
+        <select id="eq-status" class="eq-sel" style="width:100%">
+          <option value="a_fazer">A Fazer</option>
+          <option value="em_andamento">Em Andamento</option>
+          <option value="aguardando">Aguardando</option>
+          <option value="concluido">Concluído</option>
+        </select>
+      </div>
+      <div class="field"><label>Prioridade</label>
+        <select id="eq-prioridade" class="eq-sel" style="width:100%">
+          <option value="alta">Alta</option>
+          <option value="media" selected>Média</option>
+          <option value="baixa">Baixa</option>
+        </select>
+      </div>
+    </div>
+    <div class="eq-cols2">
+      <div class="field"><label>Prazo <span style="font-weight:400;color:var(--muted)">(opcional)</span></label><input type="date" id="eq-prazo" /></div>
+      <div class="field"><label>Área/Projeto</label><input type="text" list="eq-areas-list" id="eq-area" placeholder="Financeiro, Operacional..." /><datalist id="eq-areas-list"></datalist></div>
+    </div>
+    <div class="field"><label>Bloqueio <span style="font-weight:400;color:var(--muted)">(opcional — o que está travando)</span></label><textarea id="eq-bloqueio" placeholder="Ex: aguardando aprovação do financeiro"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn-sm" id="eq-delete-btn" style="margin-right:auto;color:var(--red);border-color:rgba(225,29,72,.3);display:none" onclick="deleteEquipe()">🗑️ Excluir</button>
+      <button class="btn-sm" onclick="closeEquipeModal()">Cancelar</button>
+      <button class="btn-sm accent" id="eq-save-btn" onclick="saveEquipe()">Criar</button>
+    </div>
+  </div>
+</div>
 
+<div id="toast"></div>
+<div id="row-menu" class="row-menu"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
 const API = '/api/admin';
-let TOKEN = '', allLicenses = [], modalMode = 'create', editingKey = '';
-let curProd = 'cenadrop', curSec = { cenadrop: 'dashboard', academy: 'waitlist' };
+let TOKEN = '', PERMS = null, allLicenses = [], modalMode = 'create', editingKey = '';
+let curProd = 'cenadrop', curSec = { cenadrop: 'dashboard', academy: 'dashboard' };
 let allAcademyWaitlist = [];
 let activePeriod = 'all';
 let licSort = { col: 'created_at', dir: 'desc' };
@@ -3063,8 +3477,10 @@ function doLogin() {
   }).then(r => r.json()).then(d => {
     if (d.ok) {
       TOKEN = btoa(`${login}:${pw}`);
+      PERMS = d.permissions || null;
       sessionStorage.setItem('cd_token', TOKEN);
       sessionStorage.setItem('cd_login', login);
+      sessionStorage.setItem('cd_perms', JSON.stringify(PERMS));
       showApp(login); loadAll();
     } else {
       document.getElementById('login-err').textContent = 'Login ou senha incorretos.';
@@ -3082,6 +3498,42 @@ function showApp(login) {
   document.getElementById('user-av').textContent = (login || 'A')[0].toUpperCase();
   document.getElementById('user-nm').textContent = login || 'Admin';
   document.getElementById('mobile-header').style.display = 'flex';
+  applyPermissions(PERMS);
+}
+
+function applyPermissions(perms) {
+  if (!perms) return; // acesso total — nada a esconder
+
+  // Esconde panels não permitidos na sidebar
+  ['nexus','monitor','ytbot','equipe'].forEach(p => {
+    const btn = document.getElementById('btn-' + p);
+    if (btn) btn.style.display = 'none';
+  });
+
+  // CenaDrop: esconde tab Blast Email
+  const cdBlast = document.querySelector('#subnav-cenadrop [data-sec="blast"]');
+  if (cdBlast) cdBlast.style.display = 'none';
+
+  // Narrativa: esconde tab Blast Email
+  const nBlast = document.querySelector('#subnav-narrativa [data-sec="nblast"]');
+  if (nBlast) nBlast.style.display = 'none';
+
+  // Academy: esconde todas as tabs exceto Membros
+  document.querySelectorAll('#subnav-academy .sn-btn').forEach(btn => {
+    if (btn.dataset.sec !== 'membros') btn.style.display = 'none';
+  });
+
+  // Esconde botão "Nova Chave" (CenaDrop)
+  const btnNovaChave = document.querySelector('[onclick="openCreateModal()"]');
+  if (btnNovaChave) btnNovaChave.style.display = 'none';
+
+  // Esconde botão "Novo Usuário" (Narrativa)
+  const btnNovoUser = document.querySelector('[onclick="openNarrativaModal()"]');
+  if (btnNovoUser) btnNovoUser.style.display = 'none';
+
+  // Esconde botão "Adicionar Membro" (EDA)
+  const btnAddMembro = document.querySelector('[onclick="openAddEdaMemberModal()"]');
+  if (btnAddMembro) btnAddMembro.style.display = 'none';
 }
 
 function logout() { sessionStorage.clear(); location.reload(); }
@@ -3092,8 +3544,10 @@ if (_t) { TOKEN = _t; autoLogin(); }
 async function autoLogin() {
   try {
     const r = await apiCall('stats');
-    if (r.total !== undefined) { showApp(_l || 'Admin'); loadAll(); }
-    else sessionStorage.clear();
+    if (r.total !== undefined) {
+      PERMS = JSON.parse(sessionStorage.getItem('cd_perms') || 'null');
+      showApp(_l || 'Admin'); loadAll();
+    } else sessionStorage.clear();
   } catch { sessionStorage.clear(); }
 }
 
@@ -3108,7 +3562,7 @@ async function apiCall(action, extra = {}) {
 }
 
 // ── NAV ───────────────────────────────────────
-const prodLabels = { overview:'Overview', cenadrop: 'CenaDrop', narrativa: 'Narrativa IA', nexus: 'Nexus Saúde', monitor: 'Sistema', academy: 'Elite Dark Academy', links: 'Links Hub', ytbot: 'Bot Comentários' };
+const prodLabels = { overview:'Overview', cenadrop: 'CenaDrop', narrativa: 'Narrativa IA', nexus: 'Nexus Saúde', monitor: 'Sistema', academy: 'Elite Dark Academy', links: 'Links Hub', ytbot: 'Bot Comentários', equipe: 'Equipe' };
 
 function toggleMobileSidebar() {
   document.getElementById('sidebar-main').classList.toggle('mobile-open');
@@ -3135,18 +3589,22 @@ function switchProduct(prod) {
     const el = document.getElementById('subnav-' + p);
     if (el) el.style.display = prod === p ? 'block' : 'none';
   });
+  document.querySelectorAll(`#tabs-${prod} .tab-btn`).forEach(el =>
+    el.classList.toggle('active', el.dataset.sec === (curSec[prod] || 'dashboard'))
+  );
   closeMobileSidebar();
   updateMobileTitle(prodLabels[prod] || prod);
   document.getElementById('bc-prod').textContent = prodLabels[prod] || prod;
-  const labels = { dashboard:'Dashboard', licenses:'Licenças', students:'Alunos Hotmart', users:'Usuários', buyers:'Compradores', usage:'Monitor de Uso', blast:'Blast Email', main:'Todos os Links' };
+  const labels = { dashboard:'Dashboard', licenses:'Alunos & Licenças', users:'Alunos', buyers:'Alunos', usage:'Monitor de Uso', blast:'Blast Email', main:'Todos os Links' };
   document.getElementById('bc-sec').textContent = labels[curSec[prod] || 'dashboard'] || '—';
   if (prod === 'overview')  { document.getElementById('bc-sec').textContent = 'Visão Geral'; loadOverview(); }
   if (prod === 'narrativa') { switchSection('narrativa', curSec['narrativa'] || 'dashboard'); loadNarrativaUsers(); }
   if (prod === 'nexus')     { switchSection('nexus',     curSec['nexus']     || 'dashboard'); loadNexusData(); loadNexusDashClicks(); }
   if (prod === 'monitor')   { switchSection('monitor',   'usage'); loadMonitor(); }
-  if (prod === 'academy')   { switchSection('academy',   'membros');  loadEdaMembers(); }
+  if (prod === 'academy')   { switchSection('academy',   'dashboard'); loadEdaMembers(); }
   if (prod === 'links')     { document.getElementById('bc-sec').textContent = 'Todos os Links'; }
   if (prod === 'ytbot')    { switchSection('ytbot', 'main'); loadYtbot(); }
+  if (prod === 'equipe')   { switchSection('equipe', curSec['equipe'] || 'kanban'); loadEquipe(); }
 }
 
 function switchSection(prod, sec) {
@@ -3156,33 +3614,35 @@ function switchSection(prod, sec) {
   document.querySelectorAll(`#subnav-${prod} .sn-btn`).forEach(el =>
     el.classList.toggle('active', el.dataset.sec === sec)
   );
+  document.querySelectorAll(`#tabs-${prod} .tab-btn`).forEach(el =>
+    el.classList.toggle('active', el.dataset.sec === sec)
+  );
   document.querySelectorAll(`#panel-${prod} .sec-panel`).forEach(p => p.classList.remove('active'));
   document.getElementById(`${prod}-${sec}`)?.classList.add('active');
-  const labels = { dashboard:'Dashboard', licenses:'Licenças', students:'Alunos Hotmart', users:'Usuários', buyers:'Compradores', clicks:'Cliques', membros:'Membros', blast:'Blast Email', main:'Todos os Links', usage:'Monitor de Uso' };
+  const labels = { dashboard:'Dashboard', licenses:'Alunos & Licenças', users:'Alunos', buyers:'Alunos', clicks:'Cliques', membros:'Membros', blast:'Blast Email', main:'Todos os Links', usage:'Monitor de Uso' };
   document.getElementById('bc-sec').textContent = labels[sec] || sec;
   updateMobileTitle(`${prodLabels[prod] || prod} — ${labels[sec] || sec}`);
+  if (prod === 'equipe') renderEquipe();
   if (curProd !== prod) switchProduct(prod);
 }
 
 // ── LOAD ──────────────────────────────────────
 async function loadAll() {
+  loadVersionInfo();
   const [ld, sd] = await Promise.all([apiCall('list'), apiCall('stats')]);
   if (sd.total !== undefined) {
-    document.getElementById('s-total').textContent      = sd.total;
-    document.getElementById('s-active').textContent     = sd.active;
-    document.getElementById('s-inactive').textContent   = sd.inactive;
-    document.getElementById('s-hotmart').textContent    = sd.hotmart;
-    document.getElementById('s-hotmart-rn').textContent = sd.hotmartRN ?? 0;
-    document.getElementById('s-hotmart-mc').textContent = sd.hotmartMC ?? 0;
-    document.getElementById('s-manual').textContent     = sd.manual;
+    _setTxt('s-total',      sd.total);
+    _setTxt('s-active',     sd.active);
+    _setTxt('s-inactive',   sd.inactive);
+    _setTxt('s-hotmart',    sd.hotmart);
+    _setTxt('s-hotmart-rn', sd.hotmartRN ?? 0);
+    _setTxt('s-hotmart-mc', sd.hotmartMC ?? 0);
+    _setTxt('s-manual',     sd.manual);
   }
   if (ld.licenses) {
     allLicenses = ld.licenses;
-    const hot = allLicenses.filter(l => (l.source||'').startsWith('hotmart'));
     document.getElementById('cnt-lic').textContent = allLicenses.length;
-    document.getElementById('cnt-hot').textContent = hot.length;
     updatePeriodStats();
-    renderStudents(hot);
     // Blast count
     const withEmail = allLicenses.filter(l => l.email && l.email.trim()).length;
     const blastEl = document.getElementById('blast-email-count');
@@ -3205,34 +3665,72 @@ function fmtExpires(iso) {
   if (diff < 0)   return `<span class="badge inactive" title="${fmtDate(iso)}">Expirado há ${Math.abs(diff)}d</span>`;
   if (diff === 0) return `<span class="badge inactive" title="${fmtDate(iso)}">Expira hoje</span>`;
   if (diff <= 30) return `<span class="badge warn"     title="${fmtDate(iso)}">Expira em ${diff}d</span>`;
-  if (diff <= 90) return `<span style="color:#f5a623;font-size:12px"  title="${fmtDate(iso)}">em ${diff} dias</span>`;
-  return `<span style="color:var(--green);font-size:12px" title="${fmtDate(iso)}">em ${diff} dias</span>`;
+  if (diff <= 90) return `<span style="color:var(--yellow);font-size:12px"  title="${fmtDate(iso)}">em ${diff} dias</span>`;
+  return `<span style="color:var(--muted);font-size:12px" title="${fmtDate(iso)}">em ${diff} dias</span>`;
 }
 
 // ── RENDER LICENÇAS ───────────────────────────
+// ── Menu de ações (⋯) por linha ──
+function _showRowMenu(btn, id, html){
+  const menu = document.getElementById('row-menu');
+  if (menu.dataset.key === id && menu.style.display === 'block') { closeRowMenu(); return; }
+  menu.dataset.key = id;
+  menu.innerHTML = html;
+  const r = btn.getBoundingClientRect();
+  menu.style.display = 'block';
+  menu.style.left = Math.max(8, r.right - 180) + 'px';
+  menu.style.top  = (r.bottom + 4) + 'px';
+}
+function toggleRowMenu(btn, key){
+  const l = allLicenses.find(x => x.key === key);
+  const isActive = l && l.status === 'active';
+  _showRowMenu(btn, 'lic:'+key, `
+    <button onclick="closeRowMenu();toggleKey('${key}')">${isActive?'🔒 Desativar':'🔓 Ativar'}</button>
+    <button onclick="closeRowMenu();regenKey('${key}')">🔄 Gerar nova chave</button>
+    <button class="danger" onclick="closeRowMenu();deleteKey('${key}')">🗑️ Excluir</button>`);
+}
+function toggleNarrativaRowMenu(btn, id){
+  const u = allNarrativaUsers.find(x => String(x.id) === String(id));
+  if (!u) return;
+  const em = (u.email||'').replace(/'/g,"\\'");
+  _showRowMenu(btn, 'nar:'+id, `
+    <button onclick="closeRowMenu();resetNarrativaPassword('${id}','${em}')">🔑 Redefinir senha</button>
+    <button onclick="closeRowMenu();toggleNarrativaUser('${id}',${u.active})">${u.active?'🔒 Desativar':'🔓 Ativar'}</button>
+    <button class="danger" onclick="closeRowMenu();deleteNarrativaUser('${id}','${em}')">🗑️ Excluir</button>`);
+}
+function closeRowMenu(){ const m = document.getElementById('row-menu'); if (m){ m.style.display = 'none'; m.dataset.key = ''; } }
+document.addEventListener('click', function(e){
+  if (!e.target.closest('.row-menu-btn') && !e.target.closest('#row-menu')) closeRowMenu();
+});
+window.addEventListener('scroll', closeRowMenu, true);
+
 function renderLicenses(list) {
   const tb = document.getElementById('lic-tbody');
-  if (!list.length) { tb.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="icon">🔑</div><p>Nenhuma licença encontrada.</p></div></td></tr>`; return; }
-  tb.innerHTML = list.map(l => `
+  if (!list.length) { tb.innerHTML = `<tr><td colspan="10"><div class="empty-state"><div class="icon">🔑</div><p>Nenhuma licença encontrada.</p></div></td></tr>`; return; }
+  tb.innerHTML = list.map(l => {
+    const activated = !!l.device_id;
+    const actTitle = l.used_at ? ('Último uso: ' + fmtDate(l.used_at)) : 'Nunca ativou na extensão';
+    return `
     <tr>
       <td class="cb-col"><input type="checkbox" ${selectedKeys.has(l.key)?'checked':''} onchange="toggleSelectKey('${l.key}')" /></td>
-      <td><span class="key-mono" onclick="copyKey('${l.key}')">${l.key}</span></td>
+      <td><span class="key-mono" title="${l.key} · clique para copiar" onclick="copyKey('${l.key}')">${l.key.slice(0,7)}…</span></td>
       <td>
         <div style="font-weight:600">${l.name || '<span style="color:var(--muted)">—</span>'}</div>
         <div style="color:var(--muted);font-size:12px">${l.email || ''}</div>
       </td>
+      <td style="font-size:12px">${l.phone?`<a href="https://wa.me/55${l.phone.replace(/\D/g,'')}" target="_blank" style="color:var(--text2);text-decoration:none">📱 ${l.phone}</a>`:'<span style="color:var(--muted)">—</span>'}</td>
+      <td><span class="badge" style="background:${activated?'var(--accent-s)':'var(--yellow-s)'};color:${activated?'var(--accent)':'var(--yellow)'}" title="${actTitle}">${activated?'Ativado':'Não ativado'}</span></td>
       <td><span class="badge ${l.status}">${l.status === 'active' ? 'Ativa' : 'Inativa'}</span></td>
       <td><span class="badge ${l.source||'manual'}">${srcLabel(l.source)}</span></td>
-      <td>${fmtExpires(l.expires_at)}</td>
       <td style="color:var(--muted);font-size:12px">${fmtDate(l.created_at)}</td>
+      <td>${fmtExpires(l.expires_at)}</td>
       <td><div class="actions">
-        <button class="btn-icon" onclick="openEditModal('${l.key}')">✏️</button>
-        <button class="btn-icon" title="Reenviar email com chave" onclick="resendEmail('${l.key}','${l.email||''}')">📧</button>
-        <button class="btn-icon warn" onclick="toggleKey('${l.key}')">${l.status==='active'?'🔒':'🔓'}</button>
-        <button class="btn-icon warn" onclick="regenKey('${l.key}')">🔄</button>
-        <button class="btn-icon danger" onclick="deleteKey('${l.key}')">🗑️</button>
+        ${!PERMS ? `<button class="btn-icon" title="Editar" onclick="openEditModal('${l.key}')">✏️</button>` : ''}
+        <button class="btn-icon" title="Reenviar email com a chave" onclick="resendEmail('${l.key}','${l.email||''}')">📧</button>
+        ${!PERMS ? `<button class="btn-icon row-menu-btn" title="Mais ações" onclick="toggleRowMenu(this,'${l.key}')">⋯</button>` : ''}
       </div></td>
-    </tr>`).join('');
+    </tr>`;
+  }).join('');
   renderBulkBar();
 }
 
@@ -3251,8 +3749,8 @@ function renderStudents(list) {
       <td style="color:var(--muted);font-size:12px">${fmtDate(l.created_at)}</td>
       <td><div class="actions">
         <button class="btn-icon" title="Reenviar email com chave" onclick="resendEmail('${l.key}','${l.email||''}')">📧</button>
-        <button class="btn-icon warn" onclick="toggleKey('${l.key}')">${l.status==='active'?'🔒':'🔓'}</button>
-        <button class="btn-icon warn" onclick="regenKey('${l.key}')">🔄</button>
+        ${!PERMS ? `<button class="btn-icon warn" onclick="toggleKey('${l.key}')">${l.status==='active'?'🔒':'🔓'}</button>` : ''}
+        ${!PERMS ? `<button class="btn-icon warn" onclick="regenKey('${l.key}')">🔄</button>` : ''}
       </div></td>
     </tr>`).join('');
 }
@@ -3264,7 +3762,7 @@ function filterLicenses() {
   let list = applyPeriodFilter(allLicenses);
   list = list.filter(l =>
     (!s || l.source === s) &&
-    ((l.key||'').toLowerCase().includes(q) || (l.email||'').toLowerCase().includes(q) || (l.name||'').toLowerCase().includes(q))
+    ((l.key||'').toLowerCase().includes(q) || (l.email||'').toLowerCase().includes(q) || (l.name||'').toLowerCase().includes(q) || (l.phone||'').toLowerCase().includes(q))
   );
   renderLicenses(sortList(list));
 }
@@ -3323,17 +3821,113 @@ function setPeriod(p) {
   updatePeriodStats();
 }
 
+function _setTxt(id, v){ const e = document.getElementById(id); if (e) e.textContent = v; }
+
 function updatePeriodStats() {
   const list = applyPeriodFilter(allLicenses);
   const hot = list.filter(l => (l.source||'').startsWith('hotmart'));
-  document.getElementById('s-total').textContent      = list.length;
-  document.getElementById('s-active').textContent     = list.filter(l => l.status === 'active').length;
-  document.getElementById('s-inactive').textContent   = list.filter(l => l.status !== 'active').length;
-  document.getElementById('s-hotmart').textContent    = hot.length;
-  document.getElementById('s-hotmart-rn').textContent = list.filter(l => l.source === 'hotmart-RN').length;
-  document.getElementById('s-hotmart-mc').textContent = list.filter(l => l.source === 'hotmart-MC').length;
-  document.getElementById('s-manual').textContent     = list.filter(l => (l.source||'manual') === 'manual').length;
+  const now = Date.now();
+  const activated = list.filter(l => l.device_id);
+  const active7d  = list.filter(l => l.used_at && (now - new Date(l.used_at).getTime()) <= 7*864e5);
+  _setTxt('s-total',      list.length);
+  _setTxt('s-active',     list.filter(l => l.status === 'active').length);
+  _setTxt('s-inactive',   list.filter(l => l.status !== 'active').length);
+  _setTxt('s-hotmart',    hot.length);
+  _setTxt('s-hotmart-rn', list.filter(l => l.source === 'hotmart-RN').length);
+  _setTxt('s-hotmart-mc', list.filter(l => l.source === 'hotmart-MC').length);
+  _setTxt('s-manual',     list.filter(l => (l.source||'manual') === 'manual').length);
+  _setTxt('s-activation', list.length ? Math.round(activated.length/list.length*100) + '%' : '—');
+  _setTxt('s-activation-sub', `${activated.length} de ${list.length} instalaram`);
+  _setTxt('s-active7d',   active7d.length);
+  window._dashList = list;
+  renderDashCharts(list);
+  renderDashLists(list);
   renderLicenses(sortList(list));
+}
+
+// ── GRÁFICOS ──────────────────────────────────
+let _chartGrowth = null, _chartSource = null;
+const _cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function renderDashCharts(list){
+  if (typeof Chart === 'undefined') return;
+  const accent = _cssVar('--accent') || '#7c3aed';
+  const muted  = _cssVar('--muted')  || '#999';
+  const grid   = _cssVar('--border') || '#eee';
+
+  // Crescimento por mês
+  const byMonth = {};
+  list.forEach(l => { if(!l.created_at) return; const d = new Date(l.created_at); const k = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); byMonth[k] = (byMonth[k]||0)+1; });
+  const months = Object.keys(byMonth).sort();
+  const labels = months.map(m => { const [y,mo] = m.split('-'); return new Date(+y, +mo-1, 1).toLocaleDateString('pt-BR',{month:'short',year:'2-digit'}); });
+  const newData = months.map(m => byMonth[m]);
+  const gctx = document.getElementById('chart-growth');
+  if (gctx) {
+    if (_chartGrowth) _chartGrowth.destroy();
+    _chartGrowth = new Chart(gctx, {
+      type: 'line',
+      data: { labels, datasets: [{ label:'Novas no mês', data:newData, borderColor:accent, backgroundColor:accent+'22', fill:true, tension:.35, pointRadius:3, pointBackgroundColor:accent, borderWidth:2 }] },
+      options: { maintainAspectRatio:false, plugins:{ legend:{ display:false } },
+        scales:{ x:{ grid:{ display:false }, ticks:{ color:muted, font:{size:11} } },
+                 y:{ grid:{ color:grid }, ticks:{ color:muted, font:{size:11}, precision:0 }, beginAtZero:true } } }
+    });
+    _setTxt('growth-sub', `${list.length} licenças · ${months.length} ${months.length===1?'mês':'meses'}`);
+  }
+
+  // Donut por origem
+  const buckets = { 'Hotmart RN':0, 'Hotmart MC':0, 'Elite Dark':0, 'Hotmart (outros)':0, 'Manual':0 };
+  list.forEach(l => { const s = l.source || 'manual';
+    if (s==='hotmart-RN') buckets['Hotmart RN']++;
+    else if (s==='hotmart-MC') buckets['Hotmart MC']++;
+    else if (s==='hotmart-EDA') buckets['Elite Dark']++;
+    else if (s.startsWith('hotmart')) buckets['Hotmart (outros)']++;
+    else buckets['Manual']++;
+  });
+  const sLabels = Object.keys(buckets).filter(k => buckets[k] > 0);
+  const sData = sLabels.map(k => buckets[k]);
+  const palette = { 'Hotmart RN':'#f59e0b','Hotmart MC':'#fd7e14','Elite Dark':'#C9A227','Hotmart (outros)':'#3b82f6','Manual':'#7c3aed' };
+  const sctx = document.getElementById('chart-source');
+  if (sctx) {
+    if (_chartSource) _chartSource.destroy();
+    _chartSource = new Chart(sctx, {
+      type: 'doughnut',
+      data: { labels:sLabels, datasets:[{ data:sData, backgroundColor:sLabels.map(k=>palette[k]), borderWidth:0 }] },
+      options: { maintainAspectRatio:false, cutout:'62%', plugins:{ legend:{ position:'bottom', labels:{ color:muted, font:{size:11}, padding:12, usePointStyle:true, boxWidth:8 } } } }
+    });
+  }
+}
+
+// ── LISTAS ACIONÁVEIS ─────────────────────────
+function renderDashLists(list){
+  const now = Date.now();
+  // Próximas expirações (30 dias)
+  const exp = list.filter(l => l.expires_at).map(l => ({ l, d: Math.ceil((new Date(l.expires_at).getTime()-now)/864e5) }))
+    .filter(x => x.d <= 30 && x.d >= -1).sort((a,b) => a.d - b.d).slice(0,8);
+  const expEl = document.getElementById('list-expiring');
+  if (expEl) expEl.innerHTML = exp.length ? exp.map(({l,d}) => {
+    const cls = d <= 7 ? 'red' : 'yellow';
+    const txt = d < 0 ? 'expirou' : d === 0 ? 'hoje' : `${d}d`;
+    return `<div class="mini-row"><div style="min-width:0"><div class="mini-name">${l.name||l.email||l.key}</div><div class="mini-sub">${l.email||''}</div></div><span class="mini-tag" style="background:var(--${cls}-s);color:var(--${cls})">${txt}</span></div>`;
+  }).join('') : `<div class="mini-empty">Nenhuma expiração nos próximos 30 dias 🎉</div>`;
+  // Compraram mas não ativaram (ativa, sem device_id)
+  const na = list.filter(l => l.status === 'active' && !l.device_id).sort((a,b) => new Date(b.created_at) - new Date(a.created_at)).slice(0,8);
+  const naEl = document.getElementById('list-notactivated');
+  if (naEl) naEl.innerHTML = na.length ? na.map(l => {
+    const wa = l.phone ? `<a href="https://wa.me/55${l.phone.replace(/\D/g,'')}" target="_blank" class="mini-tag" style="background:var(--green-s);color:var(--green);text-decoration:none">📱 chamar</a>` : `<span class="mini-tag" style="background:var(--subtle);color:var(--muted)">${fmtDate(l.created_at)}</span>`;
+    return `<div class="mini-row"><div style="min-width:0"><div class="mini-name">${l.name||l.email||l.key}</div><div class="mini-sub">${l.email||''}</div></div>${wa}</div>`;
+  }).join('') : `<div class="mini-empty">Todos ativaram a extensão ✅</div>`;
+}
+
+// ── VERSÃO DISPONÍVEL (fonte: /cenadrop/version.json) ──
+async function loadVersionInfo(){
+  try {
+    const r = await fetch('/cenadrop/version.json?t=' + Date.now());
+    if (!r.ok) return;
+    const v = await r.json();
+    _setTxt('vp-version', 'v' + v.version);
+    if (v.date) _setTxt('vp-date', '· ' + new Date(v.date + 'T12:00:00').toLocaleDateString('pt-BR'));
+    const pill = document.getElementById('version-pill');
+    if (pill && v.pageUrl) pill.href = v.pageUrl;
+  } catch(e){}
 }
 
 // ── BULK ACTIONS ──────────────────────────────
@@ -3604,6 +4198,21 @@ async function doBlastemail() {
 }
 
 // ── OVERVIEW ─────────────────────────────────
+let _chartOvDist = null;
+function renderOverviewDist(dist){
+  window._ovDist = dist;
+  if (typeof Chart === 'undefined') return;
+  const muted = _cssVar('--muted') || '#999';
+  const labels = Object.keys(dist).filter(k => dist[k] > 0);
+  const data = labels.map(k => dist[k]);
+  const palette = { 'CenaDrop':'#7c3aed', 'Narrativa IA':'#a78bfa', 'Nexus Saúde':'#22c55e', 'Elite Dark':'#C9A227' };
+  const ctx = document.getElementById('chart-ovdist');
+  if (!ctx) return;
+  if (_chartOvDist) _chartOvDist.destroy();
+  _chartOvDist = new Chart(ctx, { type:'doughnut', data:{ labels, datasets:[{ data, backgroundColor:labels.map(k=>palette[k]||'#7c3aed'), borderWidth:0 }] },
+    options:{ maintainAspectRatio:false, cutout:'62%', plugins:{ legend:{ position:'bottom', labels:{ color:muted, font:{size:11}, padding:12, usePointStyle:true, boxWidth:8 } } } } });
+}
+
 async function loadOverview() {
   try {
     const [sd, nsd, nxsd, acysd] = await Promise.all([
@@ -3635,6 +4244,15 @@ async function loadOverview() {
     } else if (allAcademyWaitlist.length) {
       document.getElementById('ov-acy-total').textContent = allAcademyWaitlist.length;
     }
+    // KPIs do negócio (somando produtos) + distribuição
+    const _n = v => Number.isFinite(v) ? v : 0;
+    const totAll = _n(sd.total) + _n(nsd.total) + _n(nxsd.total) + _n(acysd.total);
+    const actAll = _n(sd.active) + _n(nsd.active) + _n(nxsd.active) + _n(acysd.active ?? acysd.total);
+    _setTxt('ov-all-total', totAll);
+    _setTxt('ov-all-active', actAll);
+    _setTxt('ov-all-inactive', Math.max(0, totAll - actAll));
+    _setTxt('ov-all-rate', totAll ? Math.round(actAll / totAll * 100) + '%' : '—');
+    renderOverviewDist({ 'CenaDrop': _n(sd.total), 'Narrativa IA': _n(nsd.total), 'Nexus Saúde': _n(nxsd.total), 'Elite Dark': _n(acysd.total) });
   } catch(e) {}
 
   // Últimas 5 licenças CenaDrop
@@ -3746,7 +4364,7 @@ async function loadNarrativaUsers() {
     document.getElementById('ns-new-30d').textContent   = sd.new_30d   ?? '—';
     document.getElementById('cnt-nusers').textContent  = sd.total;
   }
-  if (ud.users) { allNarrativaUsers = ud.users; narrativaSelected.clear(); filterNarrativaUsers(); }
+  if (ud.users) { allNarrativaUsers = ud.users; narrativaSelected.clear(); filterNarrativaUsers(); renderNarrativaDashboard(allNarrativaUsers); }
 }
 
 function sortNarrativaUsers(col) {
@@ -3763,7 +4381,7 @@ function filterNarrativaUsers() {
   const q      = (document.getElementById('search-nusers')?.value || '').toLowerCase();
   const status = document.getElementById('filter-nstatus')?.value || '';
   let list = allNarrativaUsers.filter(u => {
-    const matchQ = (u.name||'').toLowerCase().includes(q) || (u.email||'').toLowerCase().includes(q);
+    const matchQ = (u.name||'').toLowerCase().includes(q) || (u.email||'').toLowerCase().includes(q) || (u.phone||'').toLowerCase().includes(q);
     const matchS = !status || (status === 'active' ? u.active : !u.active);
     return matchQ && matchS;
   });
@@ -3775,25 +4393,77 @@ function filterNarrativaUsers() {
   renderNarrativaUsers(list);
 }
 
+// ── DASHBOARD NARRATIVA (analytics) ──
+let _chartNGrowth = null, _chartNSource = null;
+function renderNarrativaDashboard(list){
+  window._narDashList = list;
+  const withPhone = list.filter(u => (u.phone||'').trim()).length;
+  _setTxt('ns-whatsapp', list.length ? Math.round(withPhone/list.length*100) + '%' : '—');
+  _setTxt('ns-whatsapp-sub', `${withPhone} de ${list.length} têm contato`);
+  if (typeof Chart === 'undefined') return;
+  const accent = _cssVar('--accent') || '#7c3aed';
+  const muted  = _cssVar('--muted')  || '#999';
+  const grid   = _cssVar('--border') || '#eee';
+  // Crescimento por mês
+  const byMonth = {};
+  list.forEach(u => { if(!u.created_at) return; const d = new Date(u.created_at); const k = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); byMonth[k] = (byMonth[k]||0)+1; });
+  const months = Object.keys(byMonth).sort();
+  const labels = months.map(m => { const [y,mo] = m.split('-'); return new Date(+y,+mo-1,1).toLocaleDateString('pt-BR',{month:'short',year:'2-digit'}); });
+  const data = months.map(m => byMonth[m]);
+  const gctx = document.getElementById('chart-ngrowth');
+  if (gctx) { if (_chartNGrowth) _chartNGrowth.destroy();
+    _chartNGrowth = new Chart(gctx, { type:'line', data:{ labels, datasets:[{ label:'Novos', data, borderColor:accent, backgroundColor:accent+'22', fill:true, tension:.35, pointRadius:3, pointBackgroundColor:accent, borderWidth:2 }] },
+      options:{ maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ x:{ grid:{ display:false }, ticks:{ color:muted, font:{size:11} } }, y:{ grid:{ color:grid }, ticks:{ color:muted, font:{size:11}, precision:0 }, beginAtZero:true } } } });
+    _setTxt('ngrowth-sub', `${list.length} usuários · ${months.length} ${months.length===1?'mês':'meses'}`);
+  }
+  // Donut por origem
+  const buckets = { 'Hotmart':0, 'Manual':0, 'Cortesia':0, 'Elite Dark':0 };
+  list.forEach(u => { const s = (u.origin||'manual');
+    if (s==='hotmart') buckets['Hotmart']++;
+    else if (s==='cortesia') buckets['Cortesia']++;
+    else if (s==='elite') buckets['Elite Dark']++;
+    else buckets['Manual']++;
+  });
+  const sLabels = Object.keys(buckets).filter(k => buckets[k] > 0);
+  const sData = sLabels.map(k => buckets[k]);
+  const palette = { 'Hotmart':'#f59e0b','Manual':'#7c3aed','Cortesia':'#3b82f6','Elite Dark':'#C9A227' };
+  const sctx = document.getElementById('chart-nsource');
+  if (sctx) { if (_chartNSource) _chartNSource.destroy();
+    _chartNSource = new Chart(sctx, { type:'doughnut', data:{ labels:sLabels, datasets:[{ data:sData, backgroundColor:sLabels.map(k=>palette[k]), borderWidth:0 }] },
+      options:{ maintainAspectRatio:false, cutout:'62%', plugins:{ legend:{ position:'bottom', labels:{ color:muted, font:{size:11}, padding:12, usePointStyle:true, boxWidth:8 } } } } });
+  }
+  // Próximas expirações
+  const now = Date.now();
+  const exp = list.filter(u => u.expires_at).map(u => ({ u, d: Math.ceil((new Date(u.expires_at).getTime()-now)/864e5) }))
+    .filter(x => x.d <= 30 && x.d >= -1).sort((a,b) => a.d - b.d).slice(0,8);
+  const el = document.getElementById('list-nexpiring');
+  if (el) el.innerHTML = exp.length ? exp.map(({u,d}) => {
+    const cls = d <= 7 ? 'red' : 'yellow';
+    const txt = d < 0 ? 'expirou' : d === 0 ? 'hoje' : `${d}d`;
+    const wa = u.phone ? `<a href="https://wa.me/55${u.phone.replace(/\D/g,'')}" target="_blank" class="mini-tag" style="background:var(--green-s);color:var(--green);text-decoration:none">📱</a>` : '';
+    return `<div class="mini-row"><div style="min-width:0"><div class="mini-name">${u.name||u.email}</div><div class="mini-sub">${u.email||''}</div></div><div style="display:flex;gap:6px;align-items:center"><span class="mini-tag" style="background:var(--${cls}-s);color:var(--${cls})">${txt}</span>${wa}</div></div>`;
+  }).join('') : `<div class="mini-empty">Nenhuma expiração nos próximos 30 dias 🎉</div>`;
+}
+
 function renderNarrativaUsers(list) {
   const tb = document.getElementById('nusers-tbody');
-  if (!list.length) { tb.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="icon">👤</div><p>Nenhum usuário encontrado.</p></div></td></tr>`; return; }
+  if (!list.length) { tb.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="icon">👤</div><p>Nenhum usuário encontrado.</p></div></td></tr>`; return; }
   tb.innerHTML = list.map(u => `
     <tr>
       <td class="cb-col"><input type="checkbox" class="nchk-row" value="${u.id}" ${narrativaSelected.has(u.id)?'checked':''} onchange="onNarrativaCheck('${u.id}',this.checked)" /></td>
-      <td style="font-weight:600">${u.name}</td>
-      <td style="color:var(--muted);font-size:12px">${u.email}</td>
+      <td>
+        <div style="font-weight:600">${u.name || '<span style="color:var(--muted)">—</span>'}</div>
+        <div style="color:var(--muted);font-size:12px">${u.email || ''}</div>
+      </td>
+      <td style="font-size:12px">${u.phone?`<a href="https://wa.me/55${u.phone.replace(/\D/g,'')}" target="_blank" style="color:var(--text2);text-decoration:none">📱 ${u.phone}</a>`:'<span style="color:var(--muted)">—</span>'}</td>
       <td><span class="badge ${u.active ? 'active' : 'inactive'}">${u.active ? 'Ativo' : 'Inativo'}</span></td>
       <td><span class="badge ${u.origin||'manual'}">${narrativaOriginLabel(u.origin)}</span></td>
-      <td style="color:var(--muted);font-size:12px">${u.purchased_at ? fmtDate(u.purchased_at) : '<span style="color:var(--muted)">—</span>'}</td>
+      <td style="color:var(--muted);font-size:12px">${(u.purchased_at||u.created_at) ? fmtDate(u.purchased_at||u.created_at) : '<span style="color:var(--muted)">—</span>'}</td>
       <td>${fmtExpires(u.expires_at)}</td>
-      <td style="color:var(--muted);font-size:12px">${fmtDate(u.created_at)}</td>
       <td><div class="actions">
+        ${!PERMS ? `<button class="btn-icon" title="Editar" onclick="openNarrativaEditModal('${u.id}','${(u.name||'').replace(/'/g,"\\'")}','${u.email}','${u.origin||'manual'}','${u.purchased_at||''}','${u.expires_at||''}')">✏️</button>` : ''}
         <button class="btn-icon" title="Reenviar credenciais por email" onclick="resendNarrativaEmail('${u.id}','${u.email}')">📧</button>
-        <button class="btn-icon" title="Redefinir senha manualmente" onclick="resetNarrativaPassword('${u.id}','${u.email}')">🔑</button>
-        <button class="btn-icon" title="Editar" onclick="openNarrativaEditModal('${u.id}','${u.name.replace(/'/g,"\\'")}','${u.email}','${u.origin||'manual'}','${u.purchased_at||''}','${u.expires_at||''}')">✏️</button>
-        <button class="btn-icon warn" title="${u.active?'Desativar':'Ativar'}" onclick="toggleNarrativaUser('${u.id}',${u.active})">${u.active ? '🔒' : '🔓'}</button>
-        <button class="btn-icon danger" onclick="deleteNarrativaUser('${u.id}','${u.email}')">🗑️</button>
+        ${!PERMS ? `<button class="btn-icon row-menu-btn" title="Mais ações" onclick="toggleNarrativaRowMenu(this,'${u.id}')">⋯</button>` : ''}
       </div></td>
     </tr>`).join('');
 }
@@ -4100,6 +4770,7 @@ async function loadNexusData() {
     allNexusBuyers = bd.buyers;
     renderNexusBuyers(allNexusBuyers);
     analyzeNexusRisk(allNexusBuyers);
+    renderNexusDashboard(allNexusBuyers);
   }
 }
 
@@ -4181,6 +4852,38 @@ function daysBetween(isoStart, ddmmyyyy) {
   return Math.round((end - start) / 86400000);
 }
 
+// ── DASHBOARD NEXUS (analytics) ──
+let _chartNxGrowth = null, _chartNxStatus = null;
+function renderNexusDashboard(list){
+  window._nxDashList = list;
+  if (typeof Chart === 'undefined') return;
+  const accent = _cssVar('--accent') || '#7c3aed';
+  const muted  = _cssVar('--muted')  || '#999';
+  const grid   = _cssVar('--border') || '#eee';
+  const byMonth = {};
+  list.forEach(b => { if(!b.created_at) return; const d = new Date(b.created_at); const k = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); byMonth[k] = (byMonth[k]||0)+1; });
+  const months = Object.keys(byMonth).sort();
+  const labels = months.map(m => { const [y,mo] = m.split('-'); return new Date(+y,+mo-1,1).toLocaleDateString('pt-BR',{month:'short',year:'2-digit'}); });
+  const data = months.map(m => byMonth[m]);
+  const gctx = document.getElementById('chart-nxgrowth');
+  if (gctx) { if (_chartNxGrowth) _chartNxGrowth.destroy();
+    _chartNxGrowth = new Chart(gctx, { type:'line', data:{ labels, datasets:[{ label:'Compras', data, borderColor:accent, backgroundColor:accent+'22', fill:true, tension:.35, pointRadius:3, pointBackgroundColor:accent, borderWidth:2 }] },
+      options:{ maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ x:{ grid:{ display:false }, ticks:{ color:muted, font:{size:11} } }, y:{ grid:{ color:grid }, ticks:{ color:muted, font:{size:11}, precision:0 }, beginAtZero:true } } } });
+    _setTxt('nxgrowth-sub', `${list.length} compras · ${months.length} ${months.length===1?'mês':'meses'}`);
+  }
+  const active = list.filter(b => b.status === 'active').length;
+  const cancelled = list.length - active;
+  const sd = [
+    { label:'Ativos',     value:active,    color:(_cssVar('--green')||'#28c76f') },
+    { label:'Cancelados', value:cancelled, color:(_cssVar('--red')||'#ea5455') },
+  ].filter(x => x.value > 0);
+  const sctx = document.getElementById('chart-nxstatus');
+  if (sctx) { if (_chartNxStatus) _chartNxStatus.destroy();
+    _chartNxStatus = new Chart(sctx, { type:'doughnut', data:{ labels:sd.map(x=>x.label), datasets:[{ data:sd.map(x=>x.value), backgroundColor:sd.map(x=>x.color), borderWidth:0 }] },
+      options:{ maintainAspectRatio:false, cutout:'62%', plugins:{ legend:{ position:'bottom', labels:{ color:muted, font:{size:11}, padding:12, usePointStyle:true, boxWidth:8 } } } } });
+  }
+}
+
 function renderNexusBuyers(list) {
   const tb = document.getElementById('nx-tbody');
   if (!list.length) { tb.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="icon">🛒</div><p>Nenhuma compra registrada ainda.</p></div></td></tr>`; return; }
@@ -4188,12 +4891,18 @@ function renderNexusBuyers(list) {
     const cancelDate = parseCancelDate(b.notes);
     const days       = daysBetween(b.created_at, cancelDate);
     const cancelCell = cancelDate
-      ? `<div style="font-size:12px;color:#f87171;">${cancelDate}</div>
+      ? `<div style="font-size:12px;color:var(--red)">${cancelDate}</div>
          <div style="font-size:11px;color:var(--muted)">${days !== null ? `${days}d após compra` : ''}</div>`
       : `<span style="color:var(--muted)">—</span>`;
+    const waCell = b.phone
+      ? `<a href="https://wa.me/55${b.phone.replace(/\D/g,'')}" target="_blank" style="color:var(--text2);text-decoration:none;font-size:12px">📱 ${b.phone}</a>`
+      : `<span style="color:var(--muted);font-size:12px">—</span>`;
     return `<tr>
-      <td style="font-weight:600">${b.name || '<span style="color:var(--muted)">—</span>'}</td>
-      <td style="color:var(--muted);font-size:12px">${b.email || '—'}</td>
+      <td>
+        <div style="font-weight:600">${b.name || '<span style="color:var(--muted)">—</span>'}</div>
+        <div style="color:var(--muted);font-size:12px">${b.email || ''}</div>
+      </td>
+      <td>${waCell}</td>
       <td><span class="badge ${b.status}">${b.status === 'active' ? 'Ativo' : 'Cancelado'}</span></td>
       <td style="color:var(--muted);font-size:12px">${fmtDate(b.created_at)}</td>
       <td>${cancelCell}</td>
@@ -4207,7 +4916,7 @@ function renderNexusBuyers(list) {
 function filterNexusBuyers() {
   const q = document.getElementById('search-nxbuyers').value.toLowerCase();
   renderNexusBuyers(allNexusBuyers.filter(b =>
-    (b.name||'').toLowerCase().includes(q) || (b.email||'').toLowerCase().includes(q)
+    (b.name||'').toLowerCase().includes(q) || (b.email||'').toLowerCase().includes(q) || (b.phone||'').toLowerCase().includes(q)
   ));
 }
 
@@ -4479,6 +5188,302 @@ function renderGitHubCard(gh) {
 
 // ── TOAST ─────────────────────────────────────
 let toastTimer;
+// ═══════════════ PAINEL EQUIPE — Demandas & Produtividade ═══════════════
+const EQUIPE = [
+  { id:'rayner',    nome:'Rayner',    cor:'#7c3aed' },
+  { id:'marcos',    nome:'Marcos',    cor:'#0ea5e9' },
+  { id:'jaqueline', nome:'Jaqueline', cor:'#e11d48' },
+];
+const EQ_AREAS_PADRAO = ['Financeiro','Operacional','Atendimento'];
+const EQ_STATUS = [
+  { id:'a_fazer',      nome:'A Fazer' },
+  { id:'em_andamento', nome:'Em Andamento' },
+  { id:'aguardando',   nome:'Aguardando' },
+  { id:'concluido',    nome:'Concluído' },
+];
+const EQ_STATUS_LABEL = Object.fromEntries(EQ_STATUS.map(s => [s.id, s.nome]));
+const EQ_PRI_LABEL = { alta:'Alta', media:'Média', baixa:'Baixa' };
+let eqTasks = [];
+let eqEditingId = null;
+let eqDragId = null;
+let eqSuppressClick = false;
+
+function eqPerson(id){ return EQUIPE.find(p => p.id === id) || { id, nome:id, cor:'#a39cc0' }; }
+function eqToday(){ const d = new Date(); d.setHours(0,0,0,0); return d; }
+function eqIsAtrasada(t){ if (!t.prazo || t.status === 'concluido') return false; return new Date(t.prazo + 'T00:00:00') < eqToday(); }
+function eqDiasAtraso(t){ return Math.floor((eqToday() - new Date(t.prazo + 'T00:00:00')) / 86400000); }
+function eqEsc(s){ return (s == null ? '' : String(s)).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+async function loadEquipe(){
+  try {
+    const r = await apiCall('equipe-list');
+    eqTasks = r.tasks || [];
+    eqPopulateFilters();
+    renderEquipe();
+  } catch(e){ toast('Erro ao carregar demandas', 'error'); }
+}
+
+function eqPopulateFilters(){
+  const rsel = document.getElementById('eqf-resp');
+  if (rsel && rsel.options.length <= 1) {
+    EQUIPE.forEach(p => { const o = document.createElement('option'); o.value = p.id; o.textContent = p.nome; rsel.appendChild(o); });
+    const oc = document.createElement('option'); oc.value = '__shared'; oc.textContent = 'Compartilhadas'; rsel.appendChild(oc);
+  }
+  const areas = Array.from(new Set([...EQ_AREAS_PADRAO, ...eqTasks.map(t => t.area).filter(Boolean)]));
+  const asel = document.getElementById('eqf-area');
+  if (asel){ const cur = asel.value; asel.innerHTML = '<option value="">Todas áreas</option>' + areas.map(a => `<option>${eqEsc(a)}</option>`).join(''); asel.value = cur; }
+  const dl = document.getElementById('eq-areas-list');
+  if (dl) dl.innerHTML = areas.map(a => `<option value="${eqEsc(a)}">`).join('');
+}
+
+function eqFiltered(){
+  const fr = document.getElementById('eqf-resp')?.value || '';
+  const fs = document.getElementById('eqf-status')?.value || '';
+  const fp = document.getElementById('eqf-pri')?.value || '';
+  const fa = document.getElementById('eqf-area')?.value || '';
+  return eqTasks.filter(t => {
+    const resp = t.responsaveis || [];
+    if (fr === '__shared'){ if (resp.length < 2) return false; }
+    else if (fr){ if (!resp.includes(fr)) return false; }
+    if (fs && t.status !== fs) return false;
+    if (fp && t.prioridade !== fp) return false;
+    if (fa && t.area !== fa) return false;
+    return true;
+  });
+}
+
+function renderEquipe(){
+  const sec = curSec['equipe'] || 'kanban';
+  const data = eqFiltered();
+  if (sec === 'kanban')            eqRenderKanban(data);
+  else if (sec === 'responsavel')  eqRenderResponsavel(data);
+  else if (sec === 'prazo')        eqRenderPrazo(data);
+  else if (sec === 'lista')        eqRenderLista(data);
+  else if (sec === 'produtividade')eqRenderProdutividade(data);
+}
+
+function eqCardHtml(t, opts = {}){
+  const atras = eqIsAtrasada(t);
+  const avs = (t.responsaveis || []).map(id => { const p = eqPerson(id); return `<div class="eq-av" title="${eqEsc(p.nome)}" style="background:${p.cor}">${eqEsc(p.nome[0])}</div>`; }).join('');
+  const chips = [`<span class="eq-chip pri-${t.prioridade}">${EQ_PRI_LABEL[t.prioridade] || t.prioridade}</span>`];
+  if (t.area) chips.push(`<span class="eq-chip">${eqEsc(t.area)}</span>`);
+  if (atras) chips.push(`<span class="eq-chip eq-atrasada">⏰ Atrasada ${eqDiasAtraso(t)}d</span>`);
+  else if (t.prazo) chips.push(`<span class="eq-chip">📅 ${fmtDate(t.prazo)}</span>`);
+  if (opts.showStatus) chips.push(`<span class="eq-chip">${EQ_STATUS_LABEL[t.status]}</span>`);
+  return `<div class="eq-card" draggable="true" data-id="${t.id}" ondragstart="eqDragStart(event,'${t.id}')" ondragend="eqDragEnd(event)" onclick="openEquipeModal('${t.id}')">
+    <div class="eq-card-top"><div class="eq-title">${eqEsc(t.titulo)}</div><div class="eq-avatars">${avs}</div></div>
+    ${t.descricao ? `<div class="eq-desc">${eqEsc(t.descricao).slice(0,140)}</div>` : ''}
+    <div class="eq-meta">${chips.join('')}</div>
+    ${t.bloqueio ? `<div class="eq-bloqueio">🚧 ${eqEsc(t.bloqueio)}</div>` : ''}
+  </div>`;
+}
+
+function eqRenderKanban(data){
+  const el = document.getElementById('eq-kanban');
+  if (!el) return;
+  el.innerHTML = EQ_STATUS.map(s => {
+    const items = data.filter(t => t.status === s.id);
+    return `<div class="kb-col" data-status="${s.id}" ondragover="eqDragOver(event)" ondragleave="eqDragLeave(event)" ondrop="eqDrop(event,'${s.id}')">
+      <div class="kb-col-head"><span>${s.nome}</span><span class="kb-count">${items.length}</span></div>
+      ${items.length ? items.map(t => eqCardHtml(t)).join('') : '<div class="eq-empty">—</div>'}
+    </div>`;
+  }).join('');
+}
+
+function eqDragStart(e, id){ eqDragId = id; e.dataTransfer.effectAllowed = 'move'; e.currentTarget.classList.add('dragging'); }
+function eqDragEnd(e){ e.currentTarget.classList.remove('dragging'); document.querySelectorAll('.kb-col.drop-hover').forEach(c => c.classList.remove('drop-hover')); eqSuppressClick = true; setTimeout(() => { eqSuppressClick = false; }, 250); }
+function eqDragOver(e){ e.preventDefault(); e.dataTransfer.dropEffect = 'move'; e.currentTarget.classList.add('drop-hover'); }
+function eqDragLeave(e){ e.currentTarget.classList.remove('drop-hover'); }
+async function eqDrop(e, status){
+  e.preventDefault();
+  e.currentTarget.classList.remove('drop-hover');
+  const id = eqDragId; eqDragId = null;
+  if (!id) return;
+  const t = eqTasks.find(x => x.id === id);
+  if (!t || t.status === status) return;
+  const old = t.status, oldDone = t.concluido_em;
+  t.status = status;
+  if (status === 'concluido') t.concluido_em = t.concluido_em || new Date().toISOString();
+  else t.concluido_em = null;
+  renderEquipe();
+  const r = await apiCall('equipe-update', { id, status });
+  if (!r || !r.ok){ t.status = old; t.concluido_em = oldDone; renderEquipe(); toast('Erro ao mover', 'error'); }
+  else toast('✅ ' + EQ_STATUS_LABEL[status], 'success');
+}
+
+function eqRenderResponsavel(data){
+  const groups = EQUIPE.map(p => ({ label:p.nome, cor:p.cor, items:data.filter(t => (t.responsaveis || []).includes(p.id)) }));
+  groups.push({ label:'Compartilhadas', cor:'#a39cc0', items:data.filter(t => (t.responsaveis || []).length > 1) });
+  const el = document.getElementById('eq-responsavel');
+  el.innerHTML = groups.map(g => `
+    <div class="eq-group">
+      <div class="eq-group-head"><span class="eq-av" style="background:${g.cor}">${eqEsc(g.label[0])}</span> ${eqEsc(g.label)} <span class="kb-count">${g.items.length}</span></div>
+      ${g.items.length ? `<div class="eq-grid">${g.items.map(t => eqCardHtml(t, { showStatus:true })).join('')}</div>` : '<div class="eq-empty">Nenhuma demanda.</div>'}
+    </div>`).join('');
+}
+
+function eqRenderPrazo(data){
+  const today = eqToday();
+  const in7 = new Date(today); in7.setDate(in7.getDate() + 7);
+  const b = { atrasada:[], semana:[], depois:[], sem:[] };
+  data.forEach(t => {
+    if (t.status === 'concluido') return;
+    if (!t.prazo){ b.sem.push(t); return; }
+    const d = new Date(t.prazo + 'T00:00:00');
+    if (d < today) b.atrasada.push(t);
+    else if (d <= in7) b.semana.push(t);
+    else b.depois.push(t);
+  });
+  b.atrasada.sort((x,y) => new Date(x.prazo) - new Date(y.prazo));
+  b.semana.sort((x,y) => new Date(x.prazo) - new Date(y.prazo));
+  const sec = (title, items, cls) => `
+    <div class="eq-group">
+      <div class="eq-group-head ${cls || ''}">${title} <span class="kb-count">${items.length}</span></div>
+      ${items.length ? `<div class="eq-grid">${items.map(t => eqCardHtml(t, { showStatus:true })).join('')}</div>` : '<div class="eq-empty">Nada aqui.</div>'}
+    </div>`;
+  document.getElementById('eq-prazo').innerHTML =
+    sec('⏰ Atrasadas', b.atrasada) +
+    sec('📅 Vence essa semana', b.semana) +
+    sec('🗓️ Depois', b.depois) +
+    sec('∅ Sem prazo', b.sem);
+}
+
+function eqRenderLista(data){
+  const el = document.getElementById('eq-lista');
+  if (!data.length){ el.innerHTML = '<div class="eq-empty">Nenhuma demanda com esses filtros.</div>'; return; }
+  const ord = { a_fazer:0, em_andamento:1, aguardando:2, concluido:3 };
+  const rows = [...data].sort((a,b) => (ord[a.status]-ord[b.status]) || (new Date(b.created_at)-new Date(a.created_at))).map(t => {
+    const atras = eqIsAtrasada(t);
+    const resp = (t.responsaveis || []).map(id => eqPerson(id).nome).join(', ') || '—';
+    return `<tr onclick="openEquipeModal('${t.id}')" style="cursor:pointer">
+      <td><b>${eqEsc(t.titulo)}</b>${t.bloqueio ? ` <span title="${eqEsc(t.bloqueio)}">🚧</span>` : ''}</td>
+      <td>${eqEsc(resp)}</td>
+      <td><span class="eq-chip">${EQ_STATUS_LABEL[t.status]}</span></td>
+      <td><span class="eq-chip pri-${t.prioridade}">${EQ_PRI_LABEL[t.prioridade]}</span></td>
+      <td>${t.area ? eqEsc(t.area) : '—'}</td>
+      <td>${atras ? `<span class="eq-chip eq-atrasada">${eqDiasAtraso(t)}d atraso</span>` : (t.prazo ? fmtDate(t.prazo) : '—')}</td>
+    </tr>`;
+  }).join('');
+  el.innerHTML = `<div style="overflow-x:auto"><table class="tbl" style="width:100%">
+    <thead><tr><th>Tarefa</th><th>Responsáveis</th><th>Status</th><th>Prioridade</th><th>Área</th><th>Prazo</th></tr></thead>
+    <tbody>${rows}</tbody></table></div>`;
+}
+
+function eqBars(items, max){
+  return items.map(([label, val, cor]) => `
+    <div class="eq-bar-row">
+      <div class="eq-bar-label">${eqEsc(label)}</div>
+      <div class="eq-bar-track"><div class="eq-bar-fill" style="width:${max ? Math.round(val/max*100) : 0}%${cor ? `;background:${cor}` : ''}"></div></div>
+      <div class="eq-bar-val">${val}</div>
+    </div>`).join('');
+}
+
+function eqRenderProdutividade(data){
+  data = data || eqFiltered();
+  const now = new Date();
+  const weekAgo = new Date(now); weekAgo.setDate(weekAgo.getDate() - 7);
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const per = EQUIPE.map(p => {
+    const mine = data.filter(t => (t.responsaveis || []).includes(p.id));
+    return {
+      p,
+      doneWeek:  mine.filter(t => t.status === 'concluido' && t.concluido_em && new Date(t.concluido_em) >= weekAgo).length,
+      doneMonth: mine.filter(t => t.status === 'concluido' && t.concluido_em && new Date(t.concluido_em) >= monthStart).length,
+      atrasadas: mine.filter(eqIsAtrasada).length,
+      abertas:   mine.filter(t => t.status !== 'concluido').length,
+    };
+  });
+  const done = data.filter(t => t.status === 'concluido' && t.concluido_em);
+  const avgDias = done.length ? (done.reduce((a,t) => a + (new Date(t.concluido_em) - new Date(t.created_at)), 0) / done.length / 86400000) : 0;
+  const totalConcl = data.filter(t => t.status === 'concluido').length;
+  const totalAtras = data.filter(eqIsAtrasada).length;
+  const areaMap = {};
+  data.forEach(t => { const a = t.area || 'Sem área'; areaMap[a] = (areaMap[a] || 0) + 1; });
+  const areaArr = Object.entries(areaMap).sort((a,b) => b[1]-a[1]);
+  const maxArea  = Math.max(1, ...areaArr.map(x => x[1]));
+  const maxMonth = Math.max(1, ...per.map(x => x.doneMonth));
+  const maxAtras = Math.max(1, ...per.map(x => x.atrasadas));
+  const card = (icon, label, val, cor) => `
+    <div class="stat-card"><div class="stat-icon-wrap ${cor}">${icon}</div>
+      <div><div class="stat-label">${label}</div><div class="stat-val ${cor}">${val}</div></div></div>`;
+  document.getElementById('eq-produtividade').innerHTML = `
+    <div class="stats-grid" style="margin-bottom:18px">
+      ${card('✅','Concluídas (total)', totalConcl, 'green')}
+      ${card('⏰','Atrasadas agora', totalAtras, 'orange')}
+      ${card('⏱️','Tempo médio de conclusão', avgDias ? avgDias.toFixed(1) + 'd' : '—', 'purple')}
+      ${card('📋','Demandas ativas', data.filter(t => t.status !== 'concluido').length, 'purple')}
+    </div>
+    <div class="eq-cols2">
+      <div class="stat-card" style="display:block">
+        <div class="eq-group-head">Concluídas no mês — por pessoa</div>
+        ${eqBars(per.map(x => [x.p.nome, x.doneMonth, x.p.cor]), maxMonth)}
+        <div style="font-size:12px;color:var(--muted);margin-top:6px">Na semana: ${per.map(x => `${x.p.nome} ${x.doneWeek}`).join(' · ')}</div>
+      </div>
+      <div class="stat-card" style="display:block">
+        <div class="eq-group-head">Atrasadas — por pessoa</div>
+        ${eqBars(per.map(x => [x.p.nome, x.atrasadas, 'var(--red)']), maxAtras)}
+      </div>
+    </div>
+    <div class="stat-card" style="display:block;margin-top:16px">
+      <div class="eq-group-head">Distribuição por área/projeto</div>
+      ${areaArr.length ? eqBars(areaArr.map(([a,n]) => [a, n]), maxArea) : '<div class="eq-empty">Sem dados.</div>'}
+    </div>`;
+}
+
+// ── Modal ──
+function eqRenderRespChecks(selected){
+  document.getElementById('eq-resp-checks').innerHTML =
+    EQUIPE.map(p => `<label><input type="checkbox" value="${p.id}" ${selected.includes(p.id) ? 'checked' : ''}> ${eqEsc(p.nome)}</label>`).join('');
+}
+function openEquipeModal(id){
+  if (eqSuppressClick) return; // acabou de arrastar — não abre o modal
+  eqEditingId = id || null;
+  const t = id ? eqTasks.find(x => x.id === id) : null;
+  document.getElementById('eq-modal-title').textContent = t ? 'Editar demanda' : 'Nova demanda';
+  document.getElementById('eq-titulo').value      = t?.titulo || '';
+  document.getElementById('eq-descricao').value   = t?.descricao || '';
+  document.getElementById('eq-status').value      = t?.status || 'a_fazer';
+  document.getElementById('eq-prioridade').value  = t?.prioridade || 'media';
+  document.getElementById('eq-prazo').value       = t?.prazo || '';
+  document.getElementById('eq-area').value        = t?.area || '';
+  document.getElementById('eq-bloqueio').value    = t?.bloqueio || '';
+  eqRenderRespChecks(t?.responsaveis || []);
+  document.getElementById('eq-save-btn').textContent = t ? 'Salvar' : 'Criar';
+  document.getElementById('eq-delete-btn').style.display = t ? 'inline-flex' : 'none';
+  document.getElementById('equipe-modal-overlay').classList.add('open');
+}
+function closeEquipeModal(){ document.getElementById('equipe-modal-overlay').classList.remove('open'); }
+
+async function saveEquipe(){
+  const titulo = document.getElementById('eq-titulo').value.trim();
+  if (!titulo){ toast('Informe o título', 'error'); return; }
+  const responsaveis = Array.from(document.querySelectorAll('#eq-resp-checks input:checked')).map(c => c.value);
+  const payload = {
+    titulo,
+    descricao:  document.getElementById('eq-descricao').value.trim() || null,
+    responsaveis,
+    status:     document.getElementById('eq-status').value,
+    prioridade: document.getElementById('eq-prioridade').value,
+    prazo:      document.getElementById('eq-prazo').value || null,
+    area:       document.getElementById('eq-area').value.trim() || null,
+    bloqueio:   document.getElementById('eq-bloqueio').value.trim() || null,
+  };
+  const btn = document.getElementById('eq-save-btn'); btn.disabled = true;
+  const r = eqEditingId
+    ? await apiCall('equipe-update', { id:eqEditingId, ...payload })
+    : await apiCall('equipe-create', payload);
+  btn.disabled = false;
+  if (r && (r.ok || r.task)){ toast(eqEditingId ? '✅ Demanda atualizada' : '✅ Demanda criada', 'success'); closeEquipeModal(); loadEquipe(); }
+  else toast('Erro: ' + ((r && r.error) || 'falha ao salvar'), 'error');
+}
+async function deleteEquipe(){
+  if (!eqEditingId) return;
+  if (!confirm('Excluir esta demanda? Esta ação não pode ser desfeita.')) return;
+  const r = await apiCall('equipe-delete', { id:eqEditingId });
+  if (r && r.ok){ toast('🗑️ Demanda excluída', 'success'); closeEquipeModal(); loadEquipe(); }
+  else toast('Erro ao excluir', 'error');
+}
+
 function toast(msg, type = '') {
   const el = document.getElementById('toast');
   el.textContent = msg; el.className = `show ${type}`;
@@ -4713,6 +5718,7 @@ async function loadEdaMembers() {
   document.getElementById('cnt-eda-members').textContent = unique.length;
 
   renderEdaMembers(unique);
+  renderEdaDashboard(unique);
 }
 
 function filterEdaMembers() {
@@ -4725,58 +5731,123 @@ function filterEdaMembers() {
   let list = Object.values(byEmail);
   if (q) list = list.filter(m =>
     (m.name||'').toLowerCase().includes(q) ||
-    (m.email||'').toLowerCase().includes(q)
+    (m.email||'').toLowerCase().includes(q) ||
+    (m.phone||'').toLowerCase().includes(q)
   );
   renderEdaMembers(list);
+}
+
+// ── DASHBOARD ELITE DARK (analytics) ──
+let _chartEdaGrowth = null, _chartEdaStatus = null;
+function renderEdaDashboard(list){
+  window._edaDashList = list;
+  const joined  = list.filter(m => m.discord_user_id && !m.revoked).length;
+  const revoked = list.filter(m => m.revoked).length;
+  const pending = list.filter(m => !m.discord_user_id && !m.revoked).length;
+  // Cobertura por produto (sempre renderiza, não depende do Chart)
+  const total = list.length || 1;
+  const cov = [
+    { label:'💬 Discord (no servidor)', n: joined },
+    { label:'🎬 CenaDrop',              n: list.filter(m => m.license).length },
+    { label:'✨ Narrativa IA',          n: list.filter(m => m.narrativa && m.narrativa.active).length },
+    { label:'📱 WhatsApp',              n: list.filter(m => (m.phone||'').trim()).length },
+  ];
+  const covEl = document.getElementById('eda-coverage');
+  if (covEl) covEl.innerHTML = cov.map(c => {
+    const pct = Math.round(c.n / total * 100);
+    return `<div class="mini-row"><div class="mini-name">${c.label}</div>
+      <div style="display:flex;align-items:center;gap:10px;justify-content:flex-end">
+        <div style="width:120px;height:6px;background:var(--subtle);border-radius:3px;overflow:hidden"><div style="height:100%;width:${pct}%;background:var(--accent-grad)"></div></div>
+        <span style="font-size:12px;font-weight:700;color:var(--text);width:34px;text-align:right">${c.n}</span>
+        <span style="font-size:11px;color:var(--muted);width:34px;text-align:right">${pct}%</span>
+      </div></div>`;
+  }).join('');
+  if (typeof Chart === 'undefined') return;
+  const accent = _cssVar('--accent') || '#7c3aed';
+  const muted  = _cssVar('--muted')  || '#999';
+  const grid   = _cssVar('--border') || '#eee';
+  // Crescimento por mês
+  const byMonth = {};
+  list.forEach(m => { if(!m.created_at) return; const d = new Date(m.created_at); const k = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); byMonth[k] = (byMonth[k]||0)+1; });
+  const months = Object.keys(byMonth).sort();
+  const labels = months.map(m => { const [y,mo] = m.split('-'); return new Date(+y,+mo-1,1).toLocaleDateString('pt-BR',{month:'short',year:'2-digit'}); });
+  const data = months.map(m => byMonth[m]);
+  const gctx = document.getElementById('chart-edagrowth');
+  if (gctx) { if (_chartEdaGrowth) _chartEdaGrowth.destroy();
+    _chartEdaGrowth = new Chart(gctx, { type:'line', data:{ labels, datasets:[{ label:'Novos', data, borderColor:accent, backgroundColor:accent+'22', fill:true, tension:.35, pointRadius:3, pointBackgroundColor:accent, borderWidth:2 }] },
+      options:{ maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ x:{ grid:{ display:false }, ticks:{ color:muted, font:{size:11} } }, y:{ grid:{ color:grid }, ticks:{ color:muted, font:{size:11}, precision:0 }, beginAtZero:true } } } });
+    _setTxt('edagrowth-sub', `${list.length} membros · ${months.length} ${months.length===1?'mês':'meses'}`);
+  }
+  // Donut status Discord
+  const statusData = [
+    { label:'No servidor', value:joined,  color:(_cssVar('--green')||'#28c76f') },
+    { label:'Pendente',    value:pending, color:(_cssVar('--yellow')||'#ff9f43') },
+    { label:'Revogado',    value:revoked, color:(_cssVar('--red')||'#ea5455') },
+  ].filter(x => x.value > 0);
+  const sctx = document.getElementById('chart-edastatus');
+  if (sctx) { if (_chartEdaStatus) _chartEdaStatus.destroy();
+    _chartEdaStatus = new Chart(sctx, { type:'doughnut', data:{ labels:statusData.map(x=>x.label), datasets:[{ data:statusData.map(x=>x.value), backgroundColor:statusData.map(x=>x.color), borderWidth:0 }] },
+      options:{ maintainAspectRatio:false, cutout:'62%', plugins:{ legend:{ position:'bottom', labels:{ color:muted, font:{size:11}, padding:12, usePointStyle:true, boxWidth:8 } } } } });
+  }
+}
+
+function toggleEdaRowMenu(btn, email, name, revoked){
+  _showRowMenu(btn, 'eda:'+email, `
+    ${revoked
+      ? `<button onclick="closeRowMenu();reactivateEdaMember('${email}','${name}')">🔓 Reativar acessos</button>`
+      : `<button onclick="closeRowMenu();revokeEdaMember('${email}','${name}')">🔒 Revogar acessos</button>`}
+    <button class="danger" onclick="closeRowMenu();deleteEdaMember('${email}','${name}')">🗑️ Deletar entrada</button>`);
 }
 
 function renderEdaMembers(list) {
   const tb = document.getElementById('eda-members-tbody');
   if (!list.length) {
-    tb.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="icon">👥</div><p>Nenhum membro encontrado.</p></div></td></tr>`;
+    tb.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="icon">👥</div><p>Nenhum membro encontrado.</p></div></td></tr>`;
     return;
   }
-  tb.innerHTML = list.map((m, i) => {
+  tb.innerHTML = list.map(m => {
     const joined  = !!m.discord_user_id;
     const revoked = !!m.revoked;
 
     const statusBadge = revoked
-      ? `<span style="padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:rgba(234,84,85,.12);color:#ea5455;border:1px solid #ea545544">Revogado</span>`
+      ? `<span class="badge" style="background:var(--red-s);color:var(--red)">Revogado</span>`
       : joined
-        ? `<span style="padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:rgba(40,199,111,.12);color:#28c76f;border:1px solid #28c76f44">No servidor</span>`
-        : `<span style="padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:rgba(255,159,67,.12);color:#ff9f43;border:1px solid #ff9f4344">Convite pendente</span>`;
+        ? `<span class="badge" style="background:var(--green-s);color:var(--green)">No servidor</span>`
+        : `<span class="badge" style="background:var(--yellow-s);color:var(--yellow)">Pendente</span>`;
 
     const discordCell = joined
-      ? `<span style="color:#28c76f;font-size:13px">✓ Entrou</span>`
+      ? `<span style="color:var(--green);font-size:13px">✓ Entrou</span>`
       : `<span style="color:var(--muted);font-size:12px">—</span>`;
 
-    // CenaDrop
+    // CenaDrop (chave em roxo da marca, truncada)
     const lic = m.license;
     const licCell = lic
-      ? `<span style="font-family:monospace;font-size:11px;color:${lic.status==='active'?'#28c76f':'#ea5455'}" title="${lic.key}">${lic.key}</span>`
+      ? `<span class="key-mono" title="${lic.key} · ${lic.status==='active'?'ativa':'inativa'}">${lic.key.slice(0,7)}…</span>`
       : `<span style="color:var(--muted);font-size:12px">—</span>`;
 
     // Narrativa IA
     const nar = m.narrativa;
     const narCell = nar
-      ? `<span style="font-size:12px;color:${nar.active?'#28c76f':'#ea5455'}">${nar.active ? '✓ Ativo' : '✗ Inativo'}</span>`
+      ? `<span style="font-size:12px;color:${nar.active?'var(--green)':'var(--red)'}">${nar.active ? '✓ Ativo' : '✗ Inativo'}</span>`
       : `<span style="color:var(--muted);font-size:12px">—</span>`;
 
-    // Expira em (usa license ou narrativa)
     const expiresRaw = (lic && lic.expires_at) || (nar && nar.expires_at) || null;
     const expiresCell = expiresRaw ? fmtExpires(expiresRaw) : `<span style="color:var(--muted);font-size:12px">—</span>`;
 
+    const waCell = m.phone
+      ? `<a href="https://wa.me/55${m.phone.replace(/\D/g,'')}" target="_blank" style="color:var(--text2);text-decoration:none;font-size:12px">📱 ${m.phone}</a>`
+      : `<span style="color:var(--muted);font-size:12px">—</span>`;
+
     const safeName = (m.name||'').replace(/'/g,"\\'");
-    const resendBtn = !revoked ? `<button class="btn-icon" title="Reenviar convite Discord" onclick="resendEdaInvite('${m.email}','${safeName}',this)">🔁</button>` : '';
-    const toggleBtn = !revoked
-      ? `<button class="btn-icon warn" title="Revogar todos os acessos" onclick="revokeEdaMember('${m.email}','${safeName}')">🔒</button>`
-      : `<button class="btn-icon" title="Reativar acessos" onclick="reactivateEdaMember('${m.email}','${safeName}')">🔓</button>`;
-    const deleteBtn = `<button class="btn-icon danger" title="Deletar entrada" onclick="deleteEdaMember('${m.email}','${safeName}')">🗑️</button>`;
+    const resendBtn = (!PERMS && !revoked) ? `<button class="btn-icon" title="Reenviar convite Discord" onclick="resendEdaInvite('${m.email}','${safeName}',this)">🔁</button>` : '';
+    const menuBtn = !PERMS ? `<button class="btn-icon row-menu-btn" title="Mais ações" onclick="toggleEdaRowMenu(this,'${m.email}','${safeName}',${revoked})">⋯</button>` : '';
 
     return `<tr>
-      <td style="color:var(--muted);font-size:12px">${i + 1}</td>
-      <td style="font-weight:600">${m.name || '—'}</td>
-      <td style="color:var(--muted);font-size:13px">${m.email}</td>
+      <td>
+        <div style="font-weight:600">${m.name || '<span style="color:var(--muted)">—</span>'}</div>
+        <div style="color:var(--muted);font-size:12px">${m.email}</div>
+      </td>
+      <td>${waCell}</td>
       <td>${discordCell}</td>
       <td>${licCell}</td>
       <td>${narCell}</td>
@@ -4785,8 +5856,7 @@ function renderEdaMembers(list) {
       <td><div class="actions">
         <button class="btn-icon" title="Copiar e-mail" onclick="navigator.clipboard.writeText('${m.email}');toast('E-mail copiado!')">📋</button>
         ${resendBtn}
-        ${toggleBtn}
-        ${deleteBtn}
+        ${menuBtn}
       </div></td>
     </tr>`;
   }).join('');
