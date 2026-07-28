@@ -8,6 +8,7 @@
 
 const { createClient } = require('@supabase/supabase-js');
 const { Resend } = require('resend');
+const { renderEmail } = require('../emails/render');
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -155,7 +156,9 @@ module.exports = async function handler(req, res) {
         return res.status(200).json({ ok: true, message: 'Cancelamento sem email, ignorado' });
       }
 
-      // Desativa todas as licenças ativas desse email
+      // Desativa as licenças ativas desse email — MAS NUNCA as do Elite (hotmart-EDA).
+      // O Elite tem webhook próprio (eda-purchase.js); um reembolso/cancelamento do
+      // CenaDrop avulso não pode derrubar a chave que veio do Elite (mesmo email).
       const { error } = await supabase
         .from('licenses')
         .update({
@@ -164,7 +167,8 @@ module.exports = async function handler(req, res) {
           notes: `Desativado automaticamente via Hotmart — evento: ${event} em ${new Date().toLocaleDateString('pt-BR')}`,
         })
         .eq('email', email)
-        .eq('status', 'active');
+        .eq('status', 'active')
+        .neq('source', 'hotmart-EDA');
 
       if (error) {
         console.error(`[Hotmart] Erro ao desativar licença de ${email}:`, error);
@@ -189,44 +193,18 @@ module.exports = async function handler(req, res) {
 // Email de boas-vindas com a chave
 // ─────────────────────────────────────────────────────────────
 async function sendWelcomeEmail({ name, email, key, productName }) {
-  const firstName = name.split(' ')[0];
+  const firstName = (name || '').split(' ')[0] || 'tudo bem';
   await resend.emails.send({
     from: EMAIL_FROM,
     to: email,
     subject: `🎬 Seu acesso ao ${productName} chegou!`,
-    html: `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
-      body{margin:0;padding:0;background:#0a0a0a;font-family:'Segoe UI',Arial,sans-serif;}
-      .w{max-width:560px;margin:0 auto;padding:40px 20px;}
-      .c{background:#111;border:1px solid #222;border-radius:16px;overflow:hidden;}
-      .h{background:linear-gradient(135deg,#1a1a2e,#0f0f1a);padding:40px 32px;text-align:center;border-bottom:1px solid #222;}
-      .logo{font-size:28px;font-weight:800;color:#fff;}.logo span{color:#6c63ff;}
-      .b{padding:36px 32px;}.g{font-size:22px;color:#fff;font-weight:700;margin-bottom:12px;}
-      .t{color:#888;font-size:15px;line-height:1.7;margin-bottom:24px;}
-      .kb{background:#0d0d0d;border:2px solid #6c63ff;border-radius:12px;padding:24px;text-align:center;margin:28px 0;}
-      .kl{color:#555;font-size:12px;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;}
-      .kv{font-size:26px;font-weight:800;color:#6c63ff;letter-spacing:3px;font-family:'Courier New',monospace;}
-      .f{padding:24px 32px;border-top:1px solid #1a1a1a;text-align:center;}
-      .f p{color:#444;font-size:12px;margin:4px 0;}
-    </style></head><body><div class="w"><div class="c">
-      <div class="h"><div class="logo">Cena<span>Drop</span></div></div>
-      <div class="b">
-        <div class="g">Olá, ${firstName}! 🎉</div>
-        <p class="t">Seu acesso ao <strong style="color:#ccc">${productName}</strong> foi aprovado. Sua chave exclusiva está abaixo:</p>
-        <div class="kb">
-          <div class="kl">Chave de Acesso</div>
-          <div class="kv">${key}</div>
-        </div>
-        <div style="text-align:center;margin:24px 0;">
-          <a href="https://raynern.com.br/cenadrop/download" style="display:inline-block;background:linear-gradient(135deg,#6c63ff,#9f7aea);color:#fff;text-decoration:none;font-weight:800;font-size:15px;padding:14px 32px;border-radius:12px;letter-spacing:0.3px;">⬇ Baixar CenaDrop Flow</a>
-        </div>
-        <p class="t" style="font-size:13px;color:#555;">
-          Baixe a extensão, instale no Chrome, clique em "Ativar Licença" e cole sua chave.<br><br>
-          Problemas? Responda este email que te ajudamos.
-        </p>
-      </div>
-      <div class="f">
-        <p>© ${new Date().getFullYear()} CenaDrop — cenadrop.com.br</p>
-      </div>
-    </div></div></body></html>`,
+    // Template tonal (padrão Narrativa) em emails/cenadrop/boas-vindas.html —
+    // 3 passos de instalação (com dica do manifest.json), link do manual e
+    // suporte no WhatsApp. Fonte única; editar o .html, não HTML inline.
+    html: renderEmail('cenadrop/boas-vindas', {
+      PRIMEIRO_NOME: firstName,
+      CHAVE: key,
+      LINK_DOWNLOAD: 'https://cenadrop.com.br/download',
+    }),
   });
 }

@@ -29,13 +29,16 @@ const supabase = createClient(
 // Cada admin tem: nome, login e senha.
 // Admins sem `permissions` têm acesso total.
 // Admins com `permissions` têm acesso restrito conforme definido.
+// Fallback de segurança (rede) — a fonte autoritativa agora é a tabela admin_acessos.
+// Só é usado se o login NÃO existir no banco ou se o banco estiver indisponível.
 const ADMINS = [
-  { name: 'Rayner',     login: 'rnadmin', password: process.env.ADMIN_PASSWORD  || '' },
-  { name: 'Marcos',     login: 'mcadmin', password: process.env.ADMIN2_PASSWORD || '' },
-  { name: 'Jaqueline',  login: 'jnadmin', password: process.env.ADMIN3_PASSWORD || '' },
+  { name: 'Rayner',     login: 'rnadmin', role: 'master', password: process.env.ADMIN_PASSWORD  || '' },
+  { name: 'Marcos',     login: 'mcadmin', role: 'full',   password: process.env.ADMIN2_PASSWORD || '' },
+  { name: 'Jaqueline',  login: 'jnadmin', role: 'full',   password: process.env.ADMIN3_PASSWORD || '' },
   {
     name: 'Suporte01',
     login: 'suporte01',
+    role: 'restrito',
     password: process.env.SUPORTE01_PASSWORD || '',
     permissions: {
       panels: ['overview', 'cenadrop', 'narrativa', 'academy', 'links'],
@@ -86,6 +89,57 @@ function makeToken(login, password) {
   return Buffer.from(`${login}:${password}`).toString('base64');
 }
 
+// ── Resolução de admin: BANCO (admin_acessos) é autoritativo; código é fallback ──
+// Retorna: objeto admin do banco (undefined = banco indisponível → usa fallback).
+async function dbFindAdmin(login) {
+  try {
+    const { data, error } = await supabase
+      .from('admin_acessos').select('*').eq('login', login).limit(1);
+    if (error) return undefined;            // banco com problema → sinaliza fallback
+    return (data && data[0]) ? data[0] : null; // null = definitivamente não existe no banco
+  } catch { return undefined; }
+}
+
+// Valida login+senha. Retorna { name, login, role, permissions } ou null.
+async function resolveAdmin(login, password) {
+  const row = await dbFindAdmin(login);
+  if (row === undefined) {                  // banco indisponível → fallback pro código
+    return ADMINS.find(a => a.login === login && a.password && a.password === password) || null;
+  }
+  if (row) {                                // existe no banco → banco decide
+    if (!row.active) return null;
+    if (!verifyNarrativaPassword(password, row.password_hash)) return null;
+    return { name: row.name, login: row.login, role: row.role || 'full', permissions: row.permissions || null };
+  }
+  // não existe no banco → fallback pro código
+  return ADMINS.find(a => a.login === login && a.password && a.password === password) || null;
+}
+
+async function adminFromToken(token) {
+  try {
+    const decoded = Buffer.from(token, 'base64').toString('utf8');
+    const i = decoded.indexOf(':');
+    if (i < 0) return null;
+    return await resolveAdmin(decoded.slice(0, i), decoded.slice(i + 1));
+  } catch { return null; }
+}
+
+// Mapeia uma action ao painel a que pertence (p/ gating de admin restrito).
+function actionPanel(action) {
+  const a = String(action || '');
+  if (['stats', 'overview', 'funnel-status', 'track-visit', 'list'].includes(a)) return null; // utilitário/dashboard
+  if (a.startsWith('acessos')) return 'acessos';
+  if (a.startsWith('blast-narrativa')) return 'narrativa';
+  if (a.startsWith('blast-eda')) return 'academy';
+  if (a.startsWith('narrativa')) return 'narrativa';
+  if (a.startsWith('nexus')) return 'nexus';
+  if (a.startsWith('equipe')) return 'equipe';
+  if (a.startsWith('academy') || a.startsWith('eda-') || a.startsWith('lista-espera') || a.startsWith('funnel')) return 'academy';
+  if (a.startsWith('yt-') || a === 'monitor') return 'monitor';
+  if (a === 'links' || a === 'discord-invites') return 'links';
+  return 'cenadrop'; // default (chaves/licenças/alunos/blast cenadrop)
+}
+
 function generateKey() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   const seg = () => Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
@@ -113,11 +167,12 @@ module.exports = async function handler(req, res) {
 
   // LOGIN
   if (action === 'login') {
-    const admin = findAdmin(body.login || '', body.password || '');
+    const admin = await resolveAdmin(body.login || '', body.password || '');
     if (admin) {
-      const token = makeToken(admin.login, admin.password);
+      const token = makeToken(admin.login, body.password || '');
       return res.status(200).json({
         ok: true, token, name: admin.name,
+        role: admin.role || 'full',
         permissions: admin.permissions || null,
       });
     }
@@ -177,19 +232,89 @@ module.exports = async function handler(req, res) {
     });
   }
 
-  // AUTH
+  // AUTH — banco autoritativo (admin_acessos), com fallback pro código
   const authHeader = req.headers['authorization'] || '';
   const token = authHeader.replace('Bearer ', '');
-  const legacyOk = ADMINS.some(a => a.password === token || a.password === body.password);
-  const tokenOk  = isValidToken(token);
-  if (!legacyOk && !tokenOk) {
+  let currentAdmin = await adminFromToken(token);
+  if (!currentAdmin) {
+    // legado: token/senha "pelada" de um admin do código (compat sessões antigas)
+    const legacy = ADMINS.find(a => a.password && (a.password === token || a.password === body.password));
+    if (legacy) currentAdmin = legacy;
+  }
+  if (!currentAdmin) {
     return res.status(401).json({ error: 'Não autorizado' });
   }
 
-  // PERMISSÕES — bloqueia actions restritas para admins com role limitado
-  const currentAdmin = getAdminFromToken(token);
-  if (currentAdmin?.permissions && RESTRICTED_DENIED.has(action)) {
-    return res.status(403).json({ error: 'Acesso não autorizado para este perfil' });
+  // GESTÃO DE ACESSOS — só o admin master
+  if (String(action).startsWith('acessos-') && currentAdmin.role !== 'master') {
+    return res.status(403).json({ error: 'Apenas o admin master pode gerenciar acessos.' });
+  }
+
+  // PERMISSÕES do admin restrito — painel permitido + somente-leitura
+  if (currentAdmin.permissions) {
+    const perms   = currentAdmin.permissions;
+    const panel   = actionPanel(action);
+    const allowed = perms.panels || [];
+    if (panel && panel !== 'acessos' && !allowed.includes(panel)) {
+      return res.status(403).json({ error: 'Painel não autorizado para este perfil' });
+    }
+    if (perms.readOnly !== false && RESTRICTED_DENIED.has(action)) {
+      return res.status(403).json({ error: 'Perfil somente-leitura' });
+    }
+  }
+
+  // ── GESTÃO DE ACESSOS (admin master) ──────────────────────────────────────
+  if (action === 'acessos-list') {
+    const { data } = await supabase.from('admin_acessos')
+      .select('id,name,login,role,permissions,active,created_at,updated_at')
+      .order('created_at', { ascending: true });
+    return res.status(200).json({ ok: true, admins: data || [] });
+  }
+  if (action === 'acessos-create') {
+    const { name, login, password, role, permissions, active } = body;
+    if (!name || !login || !password) return res.status(400).json({ error: 'Nome, login e senha obrigatórios' });
+    const row = {
+      name, login: String(login).toLowerCase().trim(),
+      password_hash: hashNarrativaPassword(password),
+      role: role || 'restrito',
+      permissions: (role || 'restrito') === 'restrito' ? (permissions || { panels: [], readOnly: true }) : null,
+      active: active !== false,
+    };
+    const { data, error } = await supabase.from('admin_acessos').insert(row).select('id,name,login,role,active').single();
+    if (error) {
+      if (error.code === '23505') return res.status(409).json({ error: 'Esse login já existe' });
+      return res.status(500).json({ error: 'Erro ao criar acesso' });
+    }
+    return res.status(200).json({ ok: true, admin: data });
+  }
+  if (action === 'acessos-update') {
+    const { id } = body;
+    if (!id) return res.status(400).json({ error: 'id obrigatório' });
+    const { data: cur } = await supabase.from('admin_acessos').select('login').eq('id', id).single();
+    if (!cur) return res.status(404).json({ error: 'Acesso não encontrado' });
+    const upd = { updated_at: new Date().toISOString() };
+    if (body.name !== undefined)  upd.name  = body.name;
+    if (body.login !== undefined) upd.login = String(body.login).toLowerCase().trim();
+    if (body.password)            upd.password_hash = hashNarrativaPassword(body.password);
+    if (body.role !== undefined) {
+      upd.role = body.role;
+      upd.permissions = body.role === 'restrito' ? (body.permissions || { panels: [], readOnly: true }) : null;
+    } else if (body.permissions !== undefined) {
+      upd.permissions = body.permissions;
+    }
+    if (body.active !== undefined) upd.active = !!body.active;
+    // anti-lockout: o master rnadmin não pode ser rebaixado nem desativado
+    if (cur.login === 'rnadmin') { delete upd.role; delete upd.permissions; if (upd.active === false) delete upd.active; }
+    const { error } = await supabase.from('admin_acessos').update(upd).eq('id', id);
+    if (error) { if (error.code === '23505') return res.status(409).json({ error: 'Esse login já existe' }); return res.status(500).json({ error: 'Erro ao atualizar' }); }
+    return res.status(200).json({ ok: true });
+  }
+  if (action === 'acessos-delete') {
+    const { id } = body;
+    const { data: cur } = await supabase.from('admin_acessos').select('login').eq('id', id).single();
+    if (cur && cur.login === 'rnadmin') return res.status(403).json({ error: 'Não é possível excluir o admin master' });
+    await supabase.from('admin_acessos').delete().eq('id', id);
+    return res.status(200).json({ ok: true });
   }
 
   // LIST — apenas licenças CenaDrop (exclui nxsaude)
@@ -275,7 +400,7 @@ module.exports = async function handler(req, res) {
         html: renderEmail('cenadrop/reenvio-chave', {
           PRIMEIRO_NOME: firstName,
           CHAVE: lic.key,
-          LINK_DOWNLOAD: 'https://raynern.com.br/cenadrop/download',
+          LINK_DOWNLOAD: 'https://cenadrop.com.br/download',
         }),
       });
       return res.status(200).json({ ok: true, message: `Email reenviado para ${lic.email}` });
@@ -876,7 +1001,7 @@ module.exports = async function handler(req, res) {
           PRIMEIRO_NOME:          firstName,
           LINK_DISCORD:           results.discord || '#',
           CHAVE_CENADROP:         results.cenadrop || 'Erro ao gerar — contate o suporte',
-          LINK_DOWNLOAD_CENADROP: 'https://raynern.com.br/cenadrop/download',
+          LINK_DOWNLOAD_CENADROP: 'https://cenadrop.com.br/download',
           EMAIL_NARRATIVA:        emailLow,
           SENHA_NARRATIVA:        narrativaPassword || 'use sua senha atual',
           LINK_NARRATIVA:         'https://narrativaia.com.br',

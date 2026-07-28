@@ -73,6 +73,7 @@ module.exports = async function handler(req, res) {
   const status = body?.data?.purchase?.status || '';
   const email  = body?.data?.buyer?.email?.toLowerCase();
   const name   = body?.data?.buyer?.name || '';
+  const phone  = body?.data?.buyer?.phone || body?.data?.buyer?.checkout_phone || '';
   const order  = body?.data?.purchase?.order_id || body?.data?.purchase?.transaction || '';
 
   // Datas de compra e expiração (timestamps Hotmart em ms)
@@ -237,6 +238,7 @@ module.exports = async function handler(req, res) {
         key,
         email,
         name,
+        phone,
         status:     'active',
         source:     'hotmart-EDA',
         notes:      `Elite Dark Academy — ordem ${order}`,
@@ -272,6 +274,7 @@ module.exports = async function handler(req, res) {
       await supabase.from('narrativa_users').insert({
         email,
         name,
+        phone,
         password_hash,
         active:       true,
         origin:       'elite',
@@ -298,7 +301,7 @@ module.exports = async function handler(req, res) {
         PRIMEIRO_NOME:          firstName,
         LINK_DISCORD:           results.discord || '#',
         CHAVE_CENADROP:         results.cenadrop || 'Erro ao gerar — contate o suporte',
-        LINK_DOWNLOAD_CENADROP: 'https://raynern.com.br/cenadrop/download',
+        LINK_DOWNLOAD_CENADROP: 'https://cenadrop.com.br/download',
         EMAIL_NARRATIVA:        email,
         SENHA_NARRATIVA:        narrativaPassword || 'use sua senha atual',
         LINK_NARRATIVA:         'https://narrativaia.com.br',
