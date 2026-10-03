@@ -591,6 +591,25 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
 .risk-banner .rb-list { margin: 0; padding-left: 16px; color: var(--text2); font-size: 13px; line-height: 1.7; }
 @keyframes fadeIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:none; } }
 
+/* ── CADERNO DO SEU ZÉ ───────────────────────── */
+.cz-periodos { display:flex; gap:6px; }
+.cz-periodos .btn-sm.on { background: var(--accent); color:#fff; border-color: var(--accent); }
+.cz-check { display:flex; align-items:center; gap:7px; font-size:13px; color: var(--text2); cursor:pointer; }
+.cz-lido { font-size:12px; color: var(--muted); }
+.cz-sub { font-size:11.5px; color: var(--muted); margin-top:3px; line-height:1.35; }
+.cz-nota { margin-top:18px; padding:14px 16px; background: var(--subtle); border-radius:10px; font-size:13px; color: var(--muted); line-height:1.6; }
+.cz-nota b { color: var(--text); }
+.cz-select { padding:7px 10px; border-radius:8px; border:1px solid var(--border); background: var(--surface); color: var(--text); font-size:13px; }
+.cz-prod { display:inline-block; font-size:11px; font-weight:700; padding:3px 8px; border-radius:999px; margin:0 4px 4px 0; white-space:nowrap; }
+.cz-prod.caderno  { background: rgba(163,22,43,.14); color:#d6324f; }
+.cz-prod.pacote   { background: var(--yellow-s); color: var(--yellow); }
+.cz-prod.presente { background: rgba(124,58,237,.12); color: var(--accent); }
+.cz-tag { display:inline-block; font-size:10.5px; font-weight:700; padding:2px 7px; border-radius:6px; background: var(--subtle); color: var(--muted); margin-left:6px; text-transform:uppercase; letter-spacing:.04em; }
+.cz-ok   { color: var(--green); font-weight:600; font-size:13px; }
+.cz-nao  { color: var(--yellow); font-weight:600; font-size:13px; }
+.cz-ruim { color: var(--red); font-weight:600; font-size:13px; }
+.cz-mini { font-size:12px; color: var(--muted); }
+
 /* ════════════════════════════════════
    TOOLBAR
 ════════════════════════════════════ */
@@ -682,6 +701,7 @@ td:last-child,  th:last-child  { padding-right: 16px; }
 .badge.hotmart   { background: var(--yellow-s); color: var(--yellow); border: 1px solid rgba(255,159,67,.2); }
 .badge.hotmart-RN{ background: rgba(255,193,7,.12); color: #d4930a;   border: 1px solid rgba(255,193,7,.25); }
 .badge.hotmart-MC{ background: var(--orange-s); color: var(--orange); border: 1px solid rgba(253,126,20,.25); }
+.badge.hotmart-RNSOLO{ background: rgba(16,185,129,.12); color: #10b981; border: 1px solid rgba(16,185,129,.25); }
 .badge.hotmart-EDA,.badge.elite { background: rgba(201,162,39,.15); color: #C9A227; border: 1px solid rgba(201,162,39,.35); }
 .badge.manual    { background: var(--accent-s); color: var(--accent); border: 1px solid rgba(124,58,237,.2); }
 
@@ -1194,6 +1214,16 @@ th.cb-col { width: 36px; }
   /* Ocultar sidebar overlay ao fechar */
   .funnel-label { min-width: 100px; font-size: 12px; }
 }
+
+/* campos do formulário de disparo */
+.lbl { display:block; font-size:11px; color:var(--muted); text-transform:uppercase;
+       letter-spacing:.07em; margin-bottom:5px; font-weight:600; }
+.inp { width:100%; background:rgba(255,255,255,.03); border:1px solid var(--border);
+       border-radius:9px; padding:10px 12px; color:var(--text); font-size:13px;
+       font-family:inherit; outline:none; transition:border-color .2s; }
+.inp:focus { border-color:rgba(115,103,240,.5); }
+.inp::placeholder { color:rgba(255,255,255,.22); }
+select.inp { cursor:pointer; }
 </style>
 </head>
 <body>
@@ -1330,6 +1360,17 @@ th.cb-col { width: 36px; }
         </button>
         <!-- subnav Elite Dark movida para abas no topo (#tabs-academy) -->
 
+
+        <!-- ═══ Base de Contatos (transversal) — SOMENTE MASTER ═══ -->
+        <div class="sb-section-label" id="lbl-base" style="margin-top:10px;display:none">Base</div>
+        <button class="prod-btn" id="btn-contatos" onclick="switchProduct('contatos');loadContatos()" style="display:none">
+          <div class="prod-icon">🎯</div>
+          <div>
+            <div class="prod-name">Contatos</div>
+            <div class="prod-tag">Todos os produtos</div>
+          </div>
+        </button>
+
         <!-- ═══ Produtos Canais ═══ -->
         <div class="sb-section-label" style="margin-top:10px">Produtos Canais</div>
         <!-- Nexus Saúde -->
@@ -1341,6 +1382,14 @@ th.cb-col { width: 36px; }
           </div>
         </button>
         <!-- subnav Nexus movida para abas no topo (#tabs-nexus) -->
+        <!-- Caderno do Seu Zé (canal Ori) — SOMENTE MASTER por enquanto -->
+        <button class="prod-btn" id="btn-caderno" onclick="switchProduct('caderno')" style="display:none">
+          <div class="prod-icon">📿</div>
+          <div>
+            <div class="prod-name">Caderno do Seu Zé</div>
+            <div class="prod-tag">Ori · orações</div>
+          </div>
+        </button>
 
         <!-- ═══ Sistema ═══ -->
         <div class="sb-section-label" style="margin-top:10px">Sistema</div>
@@ -1380,6 +1429,14 @@ th.cb-col { width: 36px; }
           <div>
             <div class="prod-name">Equipe</div>
             <div class="prod-tag">Demandas &amp; Produtividade</div>
+          </div>
+        </button>
+
+        <button class="prod-btn" id="btn-acessos" onclick="switchProduct('acessos')" style="display:none">
+          <div class="prod-icon">🔐</div>
+          <div>
+            <div class="prod-name">Acessos</div>
+            <div class="prod-tag">Admin Master</div>
           </div>
         </button>
 
@@ -1595,6 +1652,7 @@ th.cb-col { width: 36px; }
               <option value="">Todas as origens</option>
               <option value="hotmart-RN">Hotmart RN</option>
               <option value="hotmart-MC">Hotmart MC</option>
+              <option value="hotmart-RNSOLO">Hotmart RN solo</option>
               <option value="hotmart">Hotmart (sem origem)</option>
               <option value="manual">Manual</option>
             </select>
@@ -2000,6 +2058,151 @@ th.cb-col { width: 36px; }
 
       </div><!-- /nexus -->
 
+      <!-- ═══ CADERNO DO SEU ZÉ (canal Ori) — lê o banco do próprio app, só leitura ═══ -->
+      <div class="prod-panel" id="panel-caderno">
+        <div class="page-tabs" id="tabs-caderno">
+          <button class="tab-btn active" data-sec="dashboard" onclick="switchSection('caderno','dashboard')">📊 Vendas</button>
+          <button class="tab-btn" data-sec="compradores" onclick="switchSection('caderno','compradores')">👥 Compradores <span class="tab-count" id="cnt-cz-compradores">0</span></button>
+          <button class="tab-btn" data-sec="presentes" onclick="switchSection('caderno','presentes')">🎁 Presentes <span class="tab-count" id="cnt-cz-presentes">0</span></button>
+          <button class="tab-btn" data-sec="eventos" onclick="switchSection('caderno','eventos')">🧾 Hotmart <span class="tab-count" id="cnt-cz-eventos">0</span></button>
+          <button class="tab-btn" data-sec="videos" onclick="switchSection('caderno','videos')">🎬 Vídeos <span class="tab-count" id="cnt-cz-videos">0</span></button>
+        </div>
+
+        <!-- barra comum: período + testes -->
+        <div class="toolbar" style="margin-bottom:16px;flex-wrap:wrap;gap:10px">
+          <div class="cz-periodos" id="cz-periodos">
+            <button class="btn-sm" data-dias="1" onclick="czPeriodo(1)">Hoje</button>
+            <button class="btn-sm" data-dias="7" onclick="czPeriodo(7)">7 dias</button>
+            <button class="btn-sm" data-dias="30" onclick="czPeriodo(30)">30 dias</button>
+            <button class="btn-sm" data-dias="0" onclick="czPeriodo(0)">Tudo</button>
+          </div>
+          <label class="cz-check"><input type="checkbox" id="cz-testes" onchange="renderCaderno()"> Incluir compras de teste e manuais</label>
+          <span style="flex:1"></span>
+          <span class="cz-lido" id="cz-lido"></span>
+          <button class="btn-sm" onclick="loadCaderno()">↻ Atualizar</button>
+        </div>
+
+        <div id="cz-banner" class="risk-banner ok"></div>
+
+        <!-- Vendas -->
+        <div class="sec-panel active" id="caderno-dashboard">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon-wrap" style="background:rgba(163,22,43,.14)">📿</div>
+              <div><div class="stat-label">Cadernos vendidos</div><div class="stat-val" style="color:#d6324f" id="cz-vendas">—</div><div class="cz-sub" id="cz-vendas-sub"></div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap green">💰</div>
+              <div><div class="stat-label">Receita bruta</div><div class="stat-val green" id="cz-receita">—</div><div class="cz-sub">preço de tabela, sem taxa Hotmart</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap yellow">🖨️</div>
+              <div><div class="stat-label">Bump Pacote do Devoto</div><div class="stat-val yellow" id="cz-bump-pacote">—</div><div class="cz-sub" id="cz-bump-pacote-sub"></div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap" style="background:rgba(124,58,237,.12)">🎁</div>
+              <div><div class="stat-label">Bump Presente</div><div class="stat-val" style="color:var(--accent)" id="cz-bump-presente">—</div><div class="cz-sub" id="cz-bump-presente-sub"></div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap" style="background:rgba(20,184,166,.12)">📲</div>
+              <div><div class="stat-label">Entraram no Caderno</div><div class="stat-val" style="color:#14B8A6" id="cz-ativacao">—</div><div class="cz-sub" id="cz-ativacao-sub"></div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap red">↩️</div>
+              <div><div class="stat-label">Reembolsos</div><div class="stat-val red" id="cz-reembolsos">—</div><div class="cz-sub" id="cz-reembolsos-sub"></div></div>
+            </div>
+          </div>
+
+          <div class="dash-charts">
+            <div class="dash-card chart-card">
+              <div class="card-head"><h3>📈 Vendas por dia</h3><span class="card-sub" id="cz-chart-sub"></span></div>
+              <div class="chart-box"><canvas id="chart-cz-dias"></canvas></div>
+            </div>
+            <div class="dash-card chart-card">
+              <div class="card-head"><h3>🧺 Receita por produto</h3></div>
+              <div class="chart-box"><canvas id="chart-cz-produtos"></canvas></div>
+            </div>
+          </div>
+
+          <div class="cz-nota">
+            Lido direto do banco do app do Caderno (conta do Ori) — o admin não grava nada lá.
+            Preços: Caderno R$ 19,90 · Pacote do Devoto R$ 9,90 · Presente R$ 9,90.
+            "Teste" = transação que não tem o formato da Hotmart (ex.: HPSOCIO…); "manual" = acesso sem compra.
+          </div>
+        </div>
+
+        <!-- Compradores -->
+        <div class="sec-panel" id="caderno-compradores">
+          <div class="toolbar">
+            <div class="search-wrap">
+              <input type="text" id="search-cz" placeholder="Buscar por nome, e-mail ou WhatsApp..." oninput="renderCadernoCompradores()" />
+            </div>
+            <select id="cz-filtro-comp" onchange="renderCadernoCompradores()" class="cz-select">
+              <option value="">Todos</option>
+              <option value="nunca">Nunca entraram</option>
+              <option value="pacote">Levaram o Pacote do Devoto</option>
+              <option value="presente">Compraram presente</option>
+              <option value="reembolso">Pediram reembolso</option>
+            </select>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Comprador</th><th>Levou</th><th>Compra</th><th>Entrou?</th><th>Aparelhos</th><th>Avisos</th><th>Status</th></tr></thead>
+              <tbody id="cz-tbody"><tr><td colspan="7"><div class="loading">Carregando...</div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Presentes -->
+        <div class="sec-panel" id="caderno-presentes">
+          <div class="cz-nota" style="margin:0 0 14px">
+            Quem compra o presente recebe um e-mail pra informar o e-mail de quem vai ganhar.
+            <b>Pendente</b> = pagou e ainda não informou. Passou de 2 dias, vale um lembrete.
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Quem comprou</th><th>Comprado em</th><th>Presenteado</th><th>Situação</th></tr></thead>
+              <tbody id="cz-presentes-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Eventos Hotmart -->
+        <div class="sec-panel" id="caderno-eventos">
+          <div class="cz-nota" style="margin:0 0 14px">
+            Tudo o que a Hotmart mandou pro webhook do Caderno, do mais novo pro mais antigo.
+            Serve pra conferir uma compra que "não chegou".
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Recebido</th><th>Evento</th><th>Produto</th><th>E-mail</th><th>Transação</th></tr></thead>
+              <tbody id="cz-eventos-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="sec-panel" id="caderno-videos">
+          <div class="stats-grid" style="margin-bottom:16px">
+            <div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(20,184,166,.12)">👀</div><div><div class="stat-label">Visitas vindas de vídeo</div><div class="stat-val" style="color:#14B8A6" id="cz-v-visitas">—</div><div class="stat-sub" id="cz-v-visitas-sub"></div></div></div>
+            <div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(124,58,237,.12)">🙏</div><div><div class="stat-label">Cadastros grátis de vídeo</div><div class="stat-val" style="color:var(--accent)" id="cz-v-leads">—</div><div class="stat-sub" id="cz-v-leads-sub"></div></div></div>
+            <div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(214,50,79,.12)">💰</div><div><div class="stat-label">Vendas de vídeo</div><div class="stat-val" style="color:#d6324f" id="cz-v-vendas">—</div><div class="stat-sub" id="cz-v-vendas-sub"></div></div></div>
+            <div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(245,158,11,.12)">⭐</div><div><div class="stat-label">Vídeo que mais vende</div><div class="stat-val" style="color:var(--yellow);font-size:16px" id="cz-v-top">—</div></div></div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Vídeo</th><th style="text-align:right">Visitas</th><th style="text-align:right">Cadastros grátis</th><th style="text-align:right">Vendas</th><th style="text-align:right">Receita</th><th style="text-align:right">Visita → venda</th></tr></thead>
+              <tbody id="cz-videos-tbody"></tbody>
+            </table>
+          </div>
+          <div class="cz-nota">
+            <b>Como medir um vídeo:</b> no link da descrição/comentário fixado, acrescente <code>?v=</code> + o <b>ID do vídeo no YouTube</b>
+            (o código depois de <code>watch?v=</code> ou de <code>youtu.be/</code>) — aí o painel mostra o título sozinho.<br>
+            Ex.: <code>https://oriforcadosorixas.com.br/cadernoze/gratis?v=dQw4w9WgXcQ</code> · <code>https://oriforcadosorixas.com.br/cadernoze/conheca?v=dQw4w9WgXcQ</code><br>
+            O vídeo fica guardado 30 dias no celular da pessoa: se ela pega a oração grátis hoje e compra semana que vem, a venda conta pro vídeo.
+            Vendas = Caderno (R$ 19,90) pagos de verdade; receita soma os extras do mesmo comprador. Usa o período escolhido acima.
+          </div>
+        </div>
+      </div><!-- /caderno -->
+
       <!-- ── MONITOR ── -->
       <!-- ── ELITE DARK ACADEMY ── -->
       <div class="prod-panel" id="panel-academy">
@@ -2007,6 +2210,8 @@ th.cb-col { width: 36px; }
           <button class="tab-btn active" data-sec="dashboard" onclick="switchSection('academy','dashboard')">📊 Dashboard</button>
           <button class="tab-btn" data-sec="membros" onclick="switchSection('academy','membros');loadEdaMembers()">👥 Membros <span class="tab-count" id="cnt-eda-members">—</span></button>
           <button class="tab-btn" data-sec="lista-espera" onclick="switchSection('academy','lista-espera');loadListaEspera()">⏳ Lista Espera <span class="tab-count" id="cnt-lista-espera">—</span></button>
+          <button class="tab-btn" data-sec="funnel" onclick="switchSection('academy','funnel');loadAcademyFunnel()">📊 Funil</button>
+          <button class="tab-btn" data-sec="waitlist" onclick="switchSection('academy','waitlist');loadAcademyWaitlist()">🗄️ Lista Antiga <span class="tab-count" id="cnt-academy-waitlist">—</span></button>
           <button class="tab-btn" data-sec="blast" onclick="switchSection('academy','blast');loadEdaBlastTemplates();setEdaFilter('all')">📣 Blast Email</button>
         </div>
         <div class="sec-panel" id="academy-waitlist">
@@ -2078,13 +2283,18 @@ th.cb-col { width: 36px; }
 
         </div>
 
+
         <!-- Lista Espera (desistência) -->
         <div class="sec-panel" id="academy-lista-espera">
 
-          <div class="stats-grid" style="margin-bottom:24px">
+          <div class="stats-grid" style="margin-bottom:20px">
             <div class="stat-card">
               <div class="stat-icon-wrap purple">⏳</div>
               <div><div class="stat-label">Total na Fila</div><div class="stat-val purple" id="le-total">—</div></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon-wrap red">🔥</div>
+              <div><div class="stat-label">Quentes (foram pro grupo)</div><div class="stat-val red" id="le-quentes">—</div></div>
             </div>
             <div class="stat-card">
               <div class="stat-icon-wrap yellow">📅</div>
@@ -2094,6 +2304,17 @@ th.cb-col { width: 36px; }
               <div class="stat-icon-wrap green">📆</div>
               <div><div class="stat-label">Últimos 7 dias</div><div class="stat-val green" id="le-week">—</div></div>
             </div>
+          </div>
+
+          <!-- Filtro por classificação do lead -->
+          <div class="toolbar" style="margin-bottom:12px;flex-wrap:wrap;gap:8px">
+            <span style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-right:2px">Classificação</span>
+            <button class="btn-sm" id="le-f-"                onclick="setLeFilter('')">Todos <span id="le-c-">—</span></button>
+            <button class="btn-sm" id="le-f-quente"          onclick="setLeFilter('quente')"          style="color:#ea5455;border-color:rgba(234,84,85,.3)">🔥 Quente <span id="le-c-quente">—</span></button>
+            <button class="btn-sm" id="le-f-preco_nao_coube" onclick="setLeFilter('preco_nao_coube')" style="color:#ff9f43;border-color:rgba(255,159,67,.3)">💰 Preço não coube <span id="le-c-preco_nao_coube">—</span></button>
+            <button class="btn-sm" id="le-f-indeciso"        onclick="setLeFilter('indeciso')"        style="color:#00cfe8;border-color:rgba(0,207,232,.3)">⏳ Indeciso <span id="le-c-indeciso">—</span></button>
+            <button class="btn-sm" id="le-f-sem_verba"       onclick="setLeFilter('sem_verba')"       style="color:#7367f0;border-color:rgba(115,103,240,.3)">🪙 Sem verba <span id="le-c-sem_verba">—</span></button>
+            <button class="btn-sm" id="le-f-curioso"         onclick="setLeFilter('curioso')"         style="color:#8a8d93;border-color:rgba(138,141,147,.3)">👀 Curioso <span id="le-c-curioso">—</span></button>
           </div>
 
           <div class="toolbar">
@@ -2110,6 +2331,7 @@ th.cb-col { width: 36px; }
                 <tr>
                   <th>#</th>
                   <th>Nome</th>
+                  <th>Classificação</th>
                   <th>E-mail</th>
                   <th>WhatsApp</th>
                   <th>Status</th>
@@ -2118,7 +2340,7 @@ th.cb-col { width: 36px; }
                 </tr>
               </thead>
               <tbody id="lista-espera-tbody">
-                <tr><td colspan="7"><div class="empty-state"><div class="icon">⏳</div><p>Carregando...</p></div></td></tr>
+                <tr><td colspan="8"><div class="empty-state"><div class="icon">⏳</div><p>Carregando...</p></div></td></tr>
               </tbody>
             </table>
           </div>
@@ -2316,6 +2538,132 @@ th.cb-col { width: 36px; }
       <!-- ══════════════════════════════════════════
            LINKS HUB PANEL
       ══════════════════════════════════════════ -->
+      <!-- ══════ CONTATOS — base unificada, transversal a todos os produtos ══════ -->
+      <div class="prod-panel" id="panel-contatos">
+        <div class="page-tabs" id="tabs-contatos">
+          <button class="tab-btn active" data-sec="main" onclick="switchSection('contatos','main');loadContatos()">🎯 Base <span class="tab-count" id="cnt-contatos">—</span></button>
+          <button class="tab-btn" data-sec="disparos" onclick="switchSection('contatos','disparos');loadDisparos()">📮 Disparos</button>
+        </div>
+        <!-- ══ CONTATOS — base unificada ══ -->
+        <div class="sec-panel active" id="contatos-main">
+
+          <div class="stats-grid" style="margin-bottom:20px">
+            <div class="stat-card"><div class="stat-icon-wrap purple">🎯</div>
+              <div><div class="stat-label">Total na base</div><div class="stat-val purple" id="ct-total">—</div></div></div>
+            <div class="stat-card"><div class="stat-icon-wrap green">💳</div>
+              <div><div class="stat-label">Clientes</div><div class="stat-val green" id="ct-clientes">—</div></div></div>
+            <div class="stat-card"><div class="stat-icon-wrap yellow">🎓</div>
+              <div><div class="stat-label">Alunos (sem compra)</div><div class="stat-val yellow" id="ct-alunos">—</div></div></div>
+            <div class="stat-card"><div class="stat-icon-wrap red">🔥</div>
+              <div><div class="stat-label">Leads</div><div class="stat-val red" id="ct-leads">—</div></div></div>
+          </div>
+
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:16px">
+            <div class="toolbar" style="margin-bottom:10px;flex-wrap:wrap;gap:8px">
+              <span style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;min-width:74px">Relação</span>
+              <button class="btn-sm" id="ctf-rel-"        onclick="setCtFiltro('relacao','')">Todos</button>
+              <button class="btn-sm" id="ctf-rel-cliente" onclick="setCtFiltro('relacao','cliente')" style="color:#28c76f;border-color:rgba(40,199,111,.3)">💳 Clientes <span id="ctc-cliente">—</span></button>
+              <button class="btn-sm" id="ctf-rel-aluno"   onclick="setCtFiltro('relacao','aluno')"   style="color:#ff9f43;border-color:rgba(255,159,67,.3)">🎓 Alunos <span id="ctc-aluno">—</span></button>
+              <button class="btn-sm" id="ctf-rel-lead"    onclick="setCtFiltro('relacao','lead')"    style="color:#ea5455;border-color:rgba(234,84,85,.3)">🔥 Leads <span id="ctc-lead">—</span></button>
+            </div>
+            <div class="toolbar" style="margin-bottom:10px;flex-wrap:wrap;gap:8px">
+              <span style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;min-width:74px">Produto</span>
+              <button class="btn-sm" id="ctf-prod-"          onclick="setCtFiltro('produto','')">Qualquer</button>
+              <button class="btn-sm" id="ctf-prod-cenadrop"  onclick="setCtFiltro('produto','cenadrop')">CenaDrop <span id="ctc-cenadrop">—</span></button>
+              <button class="btn-sm" id="ctf-prod-narrativa" onclick="setCtFiltro('produto','narrativa')">Narrativa <span id="ctc-narrativa">—</span></button>
+              <button class="btn-sm" id="ctf-prod-elite"     onclick="setCtFiltro('produto','elite')">Elite <span id="ctc-elite">—</span></button>
+            </div>
+            <div class="toolbar" id="ct-linha-tags" style="flex-wrap:wrap;gap:8px;margin-bottom:10px;display:none">
+              <span style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;min-width:74px">Marcador</span>
+              <button class="btn-sm" id="ctf-tag-" onclick="setCtFiltro('tag','')">Nenhum</button>
+              <span id="ct-tags-botoes" style="display:contents"></span>
+            </div>
+            <div class="toolbar" style="flex-wrap:wrap;gap:8px">
+              <span style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;min-width:74px">Engajam.</span>
+              <button class="btn-sm" id="ctf-eng-"       onclick="setCtFiltro('engajamento','')">Qualquer</button>
+              <button class="btn-sm" id="ctf-eng-quente" onclick="setCtFiltro('engajamento','quente')" style="color:#28c76f;border-color:rgba(40,199,111,.3)">🟢 Quente <span id="ctc-quente">—</span></button>
+              <button class="btn-sm" id="ctf-eng-morno"  onclick="setCtFiltro('engajamento','morno')"  style="color:#ff9f43;border-color:rgba(255,159,67,.3)">🟡 Morno <span id="ctc-morno">—</span></button>
+              <button class="btn-sm" id="ctf-eng-frio"   onclick="setCtFiltro('engajamento','frio')"   style="color:#8a8d93;border-color:rgba(138,141,147,.3)">⚪ Frio <span id="ctc-frio">—</span></button>
+            </div>
+          </div>
+
+          <div id="ct-resumo" style="background:linear-gradient(135deg,rgba(115,103,240,.1),rgba(115,103,240,.03));border:1px solid rgba(115,103,240,.3);border-radius:14px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+            <div style="flex:1;min-width:200px">
+              <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Público selecionado</div>
+              <div style="font-size:30px;font-weight:700;color:#9B7FFF;line-height:1.1"><span id="ct-selecionado">—</span> <span style="font-size:14px;font-weight:400;color:var(--muted)">pessoas</span></div>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px" id="ct-descricao">todos os contatos</div>
+            </div>
+            <button class="btn-sm accent" onclick="exportContatosCSV()">⬇ Exportar CSV</button>
+            <button class="btn-sm" onclick="loadContatos(true)">↻ Atualizar</button>
+          </div>
+
+          <div class="toolbar">
+            <div class="search-wrap"><input type="text" id="search-contatos" placeholder="Buscar por nome ou e-mail..." oninput="filtrarContatosBusca()" /></div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>#</th><th>Nome</th><th>E-mail</th><th>Relação</th><th>Produtos</th><th>Engajamento</th><th>Origem</th><th></th></tr></thead>
+              <tbody id="contatos-tbody"><tr><td colspan="8"><div class="empty-state"><div class="icon">🎯</div><p>Carregando...</p></div></td></tr></tbody>
+            </table>
+          </div>
+
+        </div>
+
+
+        <!-- ══ DISPAROS em ondas ══ -->
+        <div class="sec-panel" id="contatos-disparos">
+
+          <div style="background:linear-gradient(135deg,rgba(255,159,67,.09),rgba(255,159,67,.02));border:1px solid rgba(255,159,67,.28);border-radius:14px;padding:14px 18px;margin-bottom:18px;display:flex;gap:12px">
+            <span style="font-size:18px">🛡️</span>
+            <div style="font-size:12.5px;color:var(--muted);line-height:1.65">
+              <strong style="color:#ffd08a">Por que fatiar o envio.</strong> Boa parte da base nunca abriu o curso —
+              são caixas antigas que geram rejeição. Rejeição em massa derruba a reputação do <strong>domínio</strong>,
+              e aí a chave do CenaDrop e o acesso do Elite começam a cair em spam.
+              Mandar primeiro para os engajados constrói reputação antes de a lista fria chegar.
+              <br><br><strong style="color:#ffd08a">Trava de segurança:</strong> o primeiro clique em cada onda
+              manda uma cópia só para <strong>rn.smidia@gmail.com</strong>. O envio real só acontece no segundo
+              clique, depois que você conferir como chegou.
+            </div>
+          </div>
+
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:18px">
+            <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">1 · Escolha o e-mail</div>
+            <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Os mesmos templates dos blasts dos produtos — clique para ver a prévia.</p>
+            <div class="email-grid" id="dp-template-grid"><div style="color:var(--muted);font-size:13px">carregando…</div></div>
+
+            <div id="dp-config" style="display:none;margin-top:20px;padding-top:18px;border-top:1px solid var(--border)">
+              <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px">2 · Preencha o conteúdo</div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px">
+                <div><label class="lbl">Nome interno do disparo</label><input id="dp-nome" class="inp" placeholder="Ex: Convite Aulão — agosto"></div>
+                <div><label class="lbl">Assunto do e-mail</label><input id="dp-assunto" class="inp" oninput="dpPreverAssunto()">
+                  <p id="dp-assunto-preview" style="font-size:11.5px;color:#9B7FFF;margin-top:5px;line-height:1.4"></p></div>
+              </div>
+              <div id="dp-vars" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:12px"></div>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px">
+                <input id="dp-teste-email" class="inp" style="max-width:250px" placeholder="seu@email.com">
+                <button class="btn-sm" onclick="dpEnviarTeste()">✉ Enviar teste para mim</button>
+                <span style="font-size:11.5px;color:var(--muted)">confira como chega antes de disparar</span>
+              </div>
+            </div>
+
+            <div id="dp-passo3" style="display:none;margin-top:20px;padding-top:18px;border-top:1px solid var(--border)">
+              <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px">3 · Público e plano</div>
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                <span style="font-size:12px;color:var(--muted)">Público: <strong id="dp-publico" style="color:#9B7FFF">—</strong> <span style="opacity:.6">(mude na aba Base)</span></span>
+                <button class="btn-sm" onclick="planejarDisparo()">🧮 Calcular plano</button>
+                <button class="btn-sm accent" id="dp-criar" onclick="criarDisparo()" style="display:none">✓ Aprovar e criar</button>
+              </div>
+              <div id="dp-plano" style="margin-top:14px"></div>
+            </div>
+          </div>
+
+          <div class="toolbar"><button class="btn-sm" onclick="loadDisparos()">↻ Atualizar</button></div>
+          <div id="disparos-lista"></div>
+
+        </div>
+      </div>
+
       <div class="prod-panel" id="panel-links">
         <div class="sec-panel active" id="links-main">
 
@@ -3235,45 +3583,63 @@ th.cb-col { width: 36px; }
 
       <!-- ═══════════ PAINEL EQUIPE — Demandas & Produtividade ═══════════ -->
       <style>
-        .eq-toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:16px}
+        .eq-toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:18px}
         .eq-filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-        .eq-sel{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px}
-        .kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;align-items:start}
+        .eq-sel{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:8px 11px;color:var(--text);font-size:13px;font-weight:500;transition:border-color .15s,box-shadow .15s}
+        .eq-sel:hover{border-color:var(--accent)}
+        .eq-sel:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-s)}
+        .kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;align-items:start}
         @media(max-width:1000px){.kanban{grid-template-columns:1fr 1fr}}
         @media(max-width:640px){.kanban{grid-template-columns:1fr}}
-        .kb-col{background:var(--subtle);border:1px solid var(--border);border-radius:14px;padding:12px;min-height:120px;transition:background .15s,border-color .15s}
-        .kb-col.drop-hover{background:var(--accent-s);border-color:var(--accent)}
-        .kb-col-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;font-weight:800;font-size:13px}
-        .kb-count{background:var(--card);border:1px solid var(--border);border-radius:999px;padding:1px 9px;font-size:11px;color:var(--muted)}
-        .eq-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px;box-shadow:var(--shadow-sm);cursor:grab}
+        .kb-col{position:relative;background:linear-gradient(180deg,var(--subtle) 0%,transparent 62%);border:1px solid var(--border);border-radius:16px;padding:16px 12px 8px;min-height:140px;transition:background .18s var(--ease),border-color .18s var(--ease),box-shadow .18s var(--ease)}
+        .kb-col::before{content:'';position:absolute;top:0;left:14px;right:14px;height:3px;border-radius:0 0 4px 4px;background:var(--kb-c,var(--border))}
+        .kb-col[data-status="a_fazer"]{--kb-c:#94a3b8}
+        .kb-col[data-status="em_andamento"]{--kb-c:#8b5cf6}
+        .kb-col[data-status="aguardando"]{--kb-c:#f59e0b}
+        .kb-col[data-status="concluido"]{--kb-c:#22c55e}
+        .kb-col.drop-hover{background:var(--accent-s);border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-s)}
+        .kb-col-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;font-weight:800;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--text2)}
+        .kb-col-title{display:flex;align-items:center;gap:8px}
+        .kb-dot{width:8px;height:8px;border-radius:50%;background:var(--kb-c,var(--muted));box-shadow:0 0 0 4px color-mix(in srgb,var(--kb-c,var(--muted)) 20%,transparent)}
+        .kb-count{background:var(--card);border:1px solid var(--border);border-radius:999px;padding:2px 10px;font-size:11px;font-weight:700;color:var(--text2);min-width:26px;text-align:center}
+        .eq-card{position:relative;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:13px 14px 13px 17px;margin-bottom:11px;box-shadow:var(--shadow-sm);cursor:grab;overflow:hidden;transition:transform .16s var(--ease),box-shadow .16s var(--ease),border-color .16s var(--ease)}
+        .eq-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--pri-c,var(--border))}
+        .eq-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg);border-color:var(--pri-c,var(--accent))}
         .eq-card:active{cursor:grabbing}
-        .eq-card.dragging{opacity:.4}
-        .eq-card-top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
-        .eq-title{font-weight:700;font-size:14px;line-height:1.3;flex:1}
-        .eq-desc{color:var(--muted);font-size:12px;margin-top:4px;line-height:1.4}
-        .eq-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;align-items:center}
-        .eq-chip{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--border);background:var(--subtle);color:var(--muted);white-space:nowrap}
-        .eq-avatars{display:flex}
-        .eq-av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;border:2px solid var(--card);margin-left:-6px}
+        .eq-card.dragging{opacity:.5;transform:rotate(1.5deg) scale(.98);box-shadow:var(--shadow-lg)}
+        .eq-card.pri-alta{--pri-c:#f43f5e}
+        .eq-card.pri-media{--pri-c:#f59e0b}
+        .eq-card.pri-baixa{--pri-c:#22c55e}
+        .eq-card.is-atrasada{--pri-c:#f43f5e;border-color:rgba(244,63,94,.32)}
+        .eq-card.is-done{opacity:.62}
+        .eq-card.is-done .eq-title{text-decoration:line-through;text-decoration-color:var(--muted)}
+        .eq-card-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+        .eq-title{font-weight:700;font-size:14px;line-height:1.35;flex:1;color:var(--text);letter-spacing:-.01em}
+        .eq-desc{color:var(--text2);font-size:12.5px;margin-top:5px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+        .eq-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px;align-items:center}
+        .eq-chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;border:1px solid var(--border);background:var(--subtle);color:var(--text2);white-space:nowrap}
+        .eq-avatars{display:flex;flex-shrink:0}
+        .eq-av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;border:2px solid var(--card);margin-left:-8px;box-shadow:0 2px 6px rgba(0,0,0,.28)}
         .eq-av:first-child{margin-left:0}
-        .pri-alta{background:var(--red-s);color:var(--red);border-color:rgba(225,29,72,.25)}
-        .pri-media{background:var(--yellow-s);color:var(--yellow);border-color:rgba(255,159,67,.25)}
-        .pri-baixa{background:var(--green-s);color:var(--green);border-color:rgba(22,163,74,.25)}
-        .eq-atrasada{background:var(--red-s);color:var(--red);border-color:rgba(225,29,72,.35);font-weight:700}
-        .eq-bloqueio{margin-top:8px;font-size:12px;background:var(--red-s);color:var(--red);border-radius:8px;padding:6px 8px}
-        .eq-empty{color:var(--muted);font-size:13px;text-align:center;padding:24px}
-        .eq-group{margin-bottom:22px}
-        .eq-group-head{font-weight:800;font-size:14px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+        .eq-chip.pri-alta{background:var(--red-s);color:var(--red);border-color:rgba(225,29,72,.28)}
+        .eq-chip.pri-media{background:var(--yellow-s);color:var(--yellow);border-color:rgba(255,159,67,.28)}
+        .eq-chip.pri-baixa{background:var(--green-s);color:var(--green);border-color:rgba(22,163,74,.28)}
+        .eq-chip.eq-atrasada{background:var(--red-s);color:var(--red);border-color:rgba(225,29,72,.4);font-weight:700}
+        .eq-bloqueio{margin-top:9px;font-size:12px;background:var(--red-s);color:var(--red);border:1px solid rgba(225,29,72,.22);border-radius:9px;padding:7px 9px;line-height:1.4}
+        .eq-empty{color:var(--muted);font-size:12.5px;text-align:center;padding:22px 12px;border:1px dashed var(--border);border-radius:12px}
+        .eq-group{margin-bottom:26px}
+        .eq-group-head{font-weight:800;font-size:14px;margin-bottom:12px;display:flex;align-items:center;gap:8px;letter-spacing:-.01em}
         .eq-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
         .eq-cols2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
         @media(max-width:640px){.eq-cols2{grid-template-columns:1fr}}
         .chk-resp{display:flex;flex-wrap:wrap;gap:8px}
-        .chk-resp label{display:flex;align-items:center;gap:6px;background:var(--subtle);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer}
-        .eq-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+        .chk-resp label{display:flex;align-items:center;gap:6px;background:var(--subtle);border:1px solid var(--border);border-radius:9px;padding:6px 10px;font-size:13px;cursor:pointer;transition:border-color .15s}
+        .chk-resp label:hover{border-color:var(--accent)}
+        .eq-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
         .eq-bar-label{width:120px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
-        .eq-bar-track{flex:1;background:var(--subtle);border-radius:999px;height:14px;overflow:hidden}
-        .eq-bar-fill{height:100%;background:var(--accent-grad);border-radius:999px;min-width:2px}
-        .eq-bar-val{width:34px;text-align:right;font-size:12px;color:var(--muted)}
+        .eq-bar-track{flex:1;background:var(--subtle);border-radius:999px;height:14px;overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.12)}
+        .eq-bar-fill{height:100%;background:var(--accent-grad);border-radius:999px;min-width:2px;transition:width .5s var(--ease)}
+        .eq-bar-val{width:34px;text-align:right;font-size:12px;color:var(--muted);font-weight:600}
       </style>
       <div class="prod-panel" id="panel-equipe">
         <div class="page-tabs" id="tabs-equipe">
@@ -3315,7 +3681,58 @@ th.cb-col { width: 36px; }
         <div class="sec-panel" id="equipe-produtividade"><div id="eq-produtividade"></div></div>
       </div><!-- /equipe -->
 
+      <!-- ═══════════ PAINEL ACESSOS — Admin Master ═══════════ -->
+      <div class="prod-panel" id="panel-acessos">
+        <div class="sec-panel active" style="padding:24px">
+          <div class="sec-head" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px">
+            <div>
+              <h2 style="margin:0">🔐 Gestão de Acessos</h2>
+              <p style="color:var(--muted);font-size:13px;margin:4px 0 0;max-width:560px">Crie, edite e defina o que cada admin acessa. Só o <b>Master</b> (você) vê este painel.</p>
+            </div>
+            <button class="btn-sm accent" onclick="openAcessoModal()">+ Novo acesso</button>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="tbl" style="width:100%">
+              <thead><tr><th>Nome</th><th>Login</th><th>Perfil</th><th>Acesso</th><th>Status</th><th></th></tr></thead>
+              <tbody id="acessos-tbody"><tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">Carregando…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div><!-- /acessos -->
+
     </div><!-- /main -->
+
+    <!-- MODAL: ACESSO (Admin Master) -->
+    <div class="overlay" id="acesso-modal-overlay" onclick="closeAcessoModal(event)" style="display:none">
+      <div class="modal" onclick="event.stopPropagation()" style="max-width:520px">
+        <h2 id="ac-modal-title">Novo acesso</h2>
+        <div class="field"><label>Nome</label><input type="text" id="ac-name" placeholder="Ex: João Silva"></div>
+        <div class="field"><label>Login</label><input type="text" id="ac-login" placeholder="ex: joaoadmin"></div>
+        <div class="field"><label>Senha <span id="ac-pw-hint" style="font-weight:400;color:var(--muted)"></span></label><input type="text" id="ac-password" placeholder="senha de acesso"></div>
+        <div class="field"><label>Perfil</label>
+          <select id="ac-role" class="eq-sel" style="width:100%" onchange="acToggleRole()">
+            <option value="full">Total — vê e edita tudo</option>
+            <option value="restrito">Restrito — por painel</option>
+            <option value="master">Master — gerencia acessos</option>
+          </select>
+        </div>
+        <div id="ac-perm-box" style="display:none">
+          <div class="field"><label>Painéis que pode ver</label>
+            <div id="ac-panels" class="chk-resp"></div>
+          </div>
+          <div class="field">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400">
+              <input type="checkbox" id="ac-readonly" checked> Somente leitura (não cria/edita/exclui)
+            </label>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-sm" id="ac-delete-btn" style="margin-right:auto;color:var(--red);border-color:rgba(225,29,72,.3);display:none" onclick="deleteAcesso()">🗑️ Excluir</button>
+          <button class="btn-sm" onclick="closeAcessoModal()">Cancelar</button>
+          <button class="btn-sm accent" id="ac-save-btn" onclick="saveAcesso()">Criar</button>
+        </div>
+      </div>
+    </div>
   </div><!-- /app -->
 </div>
 
@@ -3441,7 +3858,7 @@ th.cb-col { width: 36px; }
       </div>
     </div>
     <div class="eq-cols2">
-      <div class="field"><label>Prazo <span style="font-weight:400;color:var(--muted)">(opcional)</span></label><input type="date" id="eq-prazo" /></div>
+      <div class="field"><label>Prazo <span style="font-weight:400;color:var(--muted)">(opcional)</span></label><input type="date" id="eq-prazo-in" /></div>
       <div class="field"><label>Área/Projeto</label><input type="text" list="eq-areas-list" id="eq-area" placeholder="Financeiro, Operacional..." /><datalist id="eq-areas-list"></datalist></div>
     </div>
     <div class="field"><label>Bloqueio <span style="font-weight:400;color:var(--muted)">(opcional — o que está travando)</span></label><textarea id="eq-bloqueio" placeholder="Ex: aguardando aprovação do financeiro"></textarea></div>
@@ -3459,8 +3876,8 @@ th.cb-col { width: 36px; }
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
 const API = '/api/admin';
-let TOKEN = '', PERMS = null, allLicenses = [], modalMode = 'create', editingKey = '';
-let curProd = 'cenadrop', curSec = { cenadrop: 'dashboard', academy: 'dashboard' };
+let TOKEN = '', PERMS = null, ROLE = 'full', allLicenses = [], modalMode = 'create', editingKey = '';
+let curProd = 'cenadrop', curSec = { cenadrop: 'dashboard', academy: 'dashboard', contatos: 'main' };
 let allAcademyWaitlist = [];
 let activePeriod = 'all';
 let licSort = { col: 'created_at', dir: 'desc' };
@@ -3478,9 +3895,11 @@ function doLogin() {
     if (d.ok) {
       TOKEN = btoa(`${login}:${pw}`);
       PERMS = d.permissions || null;
+      ROLE  = d.role || 'full';
       sessionStorage.setItem('cd_token', TOKEN);
       sessionStorage.setItem('cd_login', login);
       sessionStorage.setItem('cd_perms', JSON.stringify(PERMS));
+      sessionStorage.setItem('cd_role', ROLE);
       showApp(login); loadAll();
     } else {
       document.getElementById('login-err').textContent = 'Login ou senha incorretos.';
@@ -3498,42 +3917,46 @@ function showApp(login) {
   document.getElementById('user-av').textContent = (login || 'A')[0].toUpperCase();
   document.getElementById('user-nm').textContent = login || 'Admin';
   document.getElementById('mobile-header').style.display = 'flex';
+  const ab = document.getElementById('btn-acessos');
+  if (ab) ab.style.display = ROLE === 'master' ? '' : 'none';
+  // Base de contatos: só o master. Reúne clientes+leads de todos os produtos e
+  // dispara e-mail em nome do domínio — não é para todo admin "full".
+  const soMaster = ROLE === 'master' ? '' : 'none';
+  ['btn-contatos', 'lbl-base', 'btn-caderno'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = soMaster;
+  });
   applyPermissions(PERMS);
 }
 
 function applyPermissions(perms) {
-  if (!perms) return; // acesso total — nada a esconder
+  if (!perms) return; // full/master — nada a esconder
+  const allowed = perms.panels || [];
 
-  // Esconde panels não permitidos na sidebar
-  ['nexus','monitor','ytbot','equipe'].forEach(p => {
+  // Esconde botões de painel não permitidos ('ytbot' pertence ao painel 'monitor')
+  ['overview','cenadrop','narrativa','academy','contatos','nexus','links','ytbot','monitor','equipe'].forEach(p => {
     const btn = document.getElementById('btn-' + p);
-    if (btn) btn.style.display = 'none';
+    if (!btn) return;
+    const panelKey = p === 'ytbot' ? 'monitor' : p;
+    if (!allowed.includes(panelKey)) btn.style.display = 'none';
   });
 
-  // CenaDrop: esconde tab Blast Email
-  const cdBlast = document.querySelector('#subnav-cenadrop [data-sec="blast"]');
-  if (cdBlast) cdBlast.style.display = 'none';
+  // Se o painel padrão (cenadrop) não é permitido, cai no primeiro permitido
+  const order = ['overview','cenadrop','narrativa','academy','contatos','nexus','links','monitor','equipe'];
+  const first = order.find(p => allowed.includes(p));
+  if (first) switchProduct(first);
 
-  // Narrativa: esconde tab Blast Email
-  const nBlast = document.querySelector('#subnav-narrativa [data-sec="nblast"]');
-  if (nBlast) nBlast.style.display = 'none';
-
-  // Academy: esconde todas as tabs exceto Membros
-  document.querySelectorAll('#subnav-academy .sn-btn').forEach(btn => {
-    if (btn.dataset.sec !== 'membros') btn.style.display = 'none';
-  });
-
-  // Esconde botão "Nova Chave" (CenaDrop)
-  const btnNovaChave = document.querySelector('[onclick="openCreateModal()"]');
-  if (btnNovaChave) btnNovaChave.style.display = 'none';
-
-  // Esconde botão "Novo Usuário" (Narrativa)
-  const btnNovoUser = document.querySelector('[onclick="openNarrativaModal()"]');
-  if (btnNovoUser) btnNovoUser.style.display = 'none';
-
-  // Esconde botão "Adicionar Membro" (EDA)
-  const btnAddMembro = document.querySelector('[onclick="openAddEdaMemberModal()"]');
-  if (btnAddMembro) btnAddMembro.style.display = 'none';
+  // Somente-leitura: esconde ações de escrita
+  if (perms.readOnly !== false) {
+    const cdBlast = document.querySelector('#subnav-cenadrop [data-sec="blast"]');    if (cdBlast) cdBlast.style.display = 'none';
+    const nBlast  = document.querySelector('#subnav-narrativa [data-sec="nblast"]');   if (nBlast)  nBlast.style.display  = 'none';
+    // O subnav do Academy virou abas (#tabs-academy) — o seletor antigo
+    // (#subnav-academy) não casava com nada e a restrição não surtia efeito.
+    document.querySelectorAll('#tabs-academy .tab-btn').forEach(btn => { if (btn.dataset.sec !== 'membros') btn.style.display = 'none'; });
+    ['[onclick="openCreateModal()"]', '[onclick="openNarrativaModal()"]', '[onclick="openAddEdaMemberModal()"]'].forEach(sel => {
+      const b = document.querySelector(sel); if (b) b.style.display = 'none';
+    });
+  }
 }
 
 function logout() { sessionStorage.clear(); location.reload(); }
@@ -3543,11 +3966,19 @@ if (_t) { TOKEN = _t; autoLogin(); }
 
 async function autoLogin() {
   try {
-    const r = await apiCall('stats');
-    if (r.total !== undefined) {
-      PERMS = JSON.parse(sessionStorage.getItem('cd_perms') || 'null');
-      showApp(_l || 'Admin'); loadAll();
-    } else sessionStorage.clear();
+    // Pergunta ao SERVIDOR quem é este token. Antes lia do sessionStorage, e por
+    // isso mudar o perfil de alguém no painel Acessos só valia depois que a
+    // pessoa fechasse a aba — ela seguia com as permissões antigas em cache.
+    const eu = await apiCall('me');
+    if (eu && eu.ok) {
+      PERMS = eu.permissions || null;
+      ROLE  = eu.role || 'full';
+      sessionStorage.setItem('cd_perms', JSON.stringify(PERMS));
+      sessionStorage.setItem('cd_role', ROLE);
+      showApp(eu.login || _l || 'Admin'); loadAll();
+      return;
+    }
+    sessionStorage.clear();
   } catch { sessionStorage.clear(); }
 }
 
@@ -3562,7 +3993,7 @@ async function apiCall(action, extra = {}) {
 }
 
 // ── NAV ───────────────────────────────────────
-const prodLabels = { overview:'Overview', cenadrop: 'CenaDrop', narrativa: 'Narrativa IA', nexus: 'Nexus Saúde', monitor: 'Sistema', academy: 'Elite Dark Academy', links: 'Links Hub', ytbot: 'Bot Comentários', equipe: 'Equipe' };
+const prodLabels = { overview:'Overview', cenadrop: 'CenaDrop', narrativa: 'Narrativa IA', nexus: 'Nexus Saúde', caderno: 'Caderno do Seu Zé', monitor: 'Sistema', academy: 'Elite Dark Academy', contatos: 'Contatos', links: 'Links Hub', ytbot: 'Bot Comentários', equipe: 'Equipe', acessos: 'Acessos' };
 
 function toggleMobileSidebar() {
   document.getElementById('sidebar-main').classList.toggle('mobile-open');
@@ -3600,11 +4031,119 @@ function switchProduct(prod) {
   if (prod === 'overview')  { document.getElementById('bc-sec').textContent = 'Visão Geral'; loadOverview(); }
   if (prod === 'narrativa') { switchSection('narrativa', curSec['narrativa'] || 'dashboard'); loadNarrativaUsers(); }
   if (prod === 'nexus')     { switchSection('nexus',     curSec['nexus']     || 'dashboard'); loadNexusData(); loadNexusDashClicks(); }
+  if (prod === 'caderno')   { switchSection('caderno',   curSec['caderno']   || 'dashboard'); loadCaderno(); }
   if (prod === 'monitor')   { switchSection('monitor',   'usage'); loadMonitor(); }
   if (prod === 'academy')   { switchSection('academy',   'dashboard'); loadEdaMembers(); }
   if (prod === 'links')     { document.getElementById('bc-sec').textContent = 'Todos os Links'; }
   if (prod === 'ytbot')    { switchSection('ytbot', 'main'); loadYtbot(); }
   if (prod === 'equipe')   { switchSection('equipe', curSec['equipe'] || 'kanban'); loadEquipe(); }
+  if (prod === 'acessos')  { document.getElementById('bc-sec').textContent = 'Admin Master'; loadAcessos(); }
+}
+
+// ── ACESSOS (Admin Master) ────────────────────────────────
+const AC_PANELS = [
+  ['overview','Overview'], ['cenadrop','CenaDrop'], ['narrativa','Narrativa IA'],
+  ['academy','Elite Academy'], ['nexus','Nexus'], ['links','Links'],
+  ['monitor','Monitor / Sistema'], ['equipe','Equipe'],
+];
+let acEditingId = null, acList = [];
+
+async function loadAcessos() {
+  const r = await apiCall('acessos-list');
+  acList = (r && r.admins) || [];
+  renderAcessos();
+}
+function acRoleLabel(a){ return a.role==='master' ? '👑 Master' : a.role==='full' ? 'Total' : 'Restrito'; }
+function acAccessLabel(a){
+  if (a.role !== 'restrito') return 'Tudo';
+  const ps = (a.permissions && a.permissions.panels) || [];
+  const ro = !a.permissions || a.permissions.readOnly !== false;
+  return (ps.length ? ps.length + ' painéis' : 'nenhum painel') + (ro ? ' · leitura' : ' · edita');
+}
+function renderAcessos() {
+  const tb = document.getElementById('acessos-tbody');
+  if (!acList.length) { tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">Nenhum acesso.</td></tr>'; return; }
+  tb.innerHTML = acList.map(a => `
+    <tr>
+      <td><b>${eqEsc(a.name)}</b></td>
+      <td><code>${eqEsc(a.login)}</code></td>
+      <td>${acRoleLabel(a)}</td>
+      <td style="color:var(--muted);font-size:12px">${acAccessLabel(a)}</td>
+      <td>${a.active ? '<span style="color:var(--green)">● ativo</span>' : '<span style="color:var(--muted)">○ inativo</span>'}</td>
+      <td style="text-align:right;white-space:nowrap">
+        <button class="btn-icon" title="${a.active?'Desativar':'Ativar'}" onclick="toggleAcessoActive('${a.id}',${a.active?'false':'true'})">${a.active?'🔒':'🔓'}</button>
+        <button class="btn-icon" title="Editar" onclick="openAcessoModal('${a.id}')">✏️</button>
+        ${a.login==='rnadmin' ? '' : `<button class="btn-icon warn" title="Excluir" onclick="deleteAcessoRow('${a.id}','${eqEsc(a.name).replace(/'/g,"\\'")}')">🗑️</button>`}
+      </td>
+    </tr>`).join('');
+}
+function acToggleRole() {
+  const role = document.getElementById('ac-role').value;
+  document.getElementById('ac-perm-box').style.display = role === 'restrito' ? 'block' : 'none';
+}
+function acRenderPanels(selected) {
+  document.getElementById('ac-panels').innerHTML = AC_PANELS.map(([k,l]) =>
+    `<label><input type="checkbox" value="${k}" ${selected.includes(k)?'checked':''}> ${l}</label>`).join('');
+}
+function openAcessoModal(id) {
+  acEditingId = id || null;
+  const a = id ? acList.find(x => x.id === id) : null;
+  const isRoot = a && a.login === 'rnadmin';
+  document.getElementById('ac-modal-title').textContent = a ? 'Editar acesso' : 'Novo acesso';
+  document.getElementById('ac-name').value = a?.name || '';
+  document.getElementById('ac-login').value = a?.login || '';
+  document.getElementById('ac-login').disabled = !!isRoot;
+  document.getElementById('ac-password').value = '';
+  document.getElementById('ac-pw-hint').textContent = a ? '(em branco = mantém a atual)' : '';
+  document.getElementById('ac-role').value = a?.role || 'full';
+  document.getElementById('ac-role').disabled = !!isRoot;
+  acRenderPanels((a?.permissions && a.permissions.panels) || []);
+  document.getElementById('ac-readonly').checked = !a?.permissions || a.permissions.readOnly !== false;
+  acToggleRole();
+  document.getElementById('ac-save-btn').textContent = a ? 'Salvar' : 'Criar';
+  document.getElementById('ac-delete-btn').style.display = (a && !isRoot) ? 'inline-flex' : 'none';
+  document.getElementById('acesso-modal-overlay').style.display = 'flex';
+}
+function closeAcessoModal(e){ if (e && e.target !== e.currentTarget) return; document.getElementById('acesso-modal-overlay').style.display = 'none'; }
+async function saveAcesso() {
+  const name = document.getElementById('ac-name').value.trim();
+  const login = document.getElementById('ac-login').value.trim();
+  const password = document.getElementById('ac-password').value;
+  const role = document.getElementById('ac-role').value;
+  if (!name || !login) { toast('Nome e login são obrigatórios', 'error'); return; }
+  if (!acEditingId && !password) { toast('Defina uma senha', 'error'); return; }
+  let permissions = null;
+  if (role === 'restrito') {
+    const panels = Array.from(document.querySelectorAll('#ac-panels input:checked')).map(c => c.value);
+    permissions = { panels, readOnly: document.getElementById('ac-readonly').checked };
+  }
+  const payload = { name, login, role, permissions };
+  if (password) payload.password = password;
+  const r = acEditingId
+    ? await apiCall('acessos-update', { id: acEditingId, ...payload })
+    : await apiCall('acessos-create', payload);
+  if (r && (r.ok || r.admin)) { toast(acEditingId ? '✅ Acesso atualizado' : '✅ Acesso criado', 'success'); closeAcessoModal(); loadAcessos(); }
+  else toast('Erro: ' + ((r && r.error) || 'falha ao salvar'), 'error');
+}
+async function toggleAcessoActive(id, active) {
+  const r = await apiCall('acessos-update', { id, active });
+  if (r && r.ok) { toast(active ? '✅ Ativado' : '🔒 Desativado', 'success'); loadAcessos(); }
+  else toast('Erro: ' + ((r && r.error) || ''), 'error');
+}
+function deleteAcessoRow(id, name) {
+  if (!confirm(`Excluir o acesso "${name}"? Esta ação não pode ser desfeita.`)) return;
+  apiCall('acessos-delete', { id }).then(r => {
+    if (r && r.ok) { toast('🗑️ Excluído', 'success'); loadAcessos(); }
+    else toast('Erro: ' + ((r && r.error) || ''), 'error');
+  });
+}
+async function deleteAcesso() {
+  if (!acEditingId) return;
+  const a = acList.find(x => x.id === acEditingId);
+  if (!confirm(`Excluir o acesso "${a?.name || ''}"?`)) return;
+  const r = await apiCall('acessos-delete', { id: acEditingId });
+  if (r && r.ok) { toast('🗑️ Excluído', 'success'); closeAcessoModal(); loadAcessos(); }
+  else toast('Erro: ' + ((r && r.error) || ''), 'error');
 }
 
 function switchSection(prod, sec) {
@@ -3619,7 +4158,7 @@ function switchSection(prod, sec) {
   );
   document.querySelectorAll(`#panel-${prod} .sec-panel`).forEach(p => p.classList.remove('active'));
   document.getElementById(`${prod}-${sec}`)?.classList.add('active');
-  const labels = { dashboard:'Dashboard', licenses:'Alunos & Licenças', users:'Alunos', buyers:'Alunos', clicks:'Cliques', membros:'Membros', blast:'Blast Email', main:'Todos os Links', usage:'Monitor de Uso' };
+  const labels = { dashboard:'Dashboard', licenses:'Alunos & Licenças', users:'Alunos', buyers:'Alunos', clicks:'Cliques', membros:'Membros', blast:'Blast Email', main:'Todos os Links', usage:'Monitor de Uso', 'lista-espera':'Lista de Espera', funnel:'Funil', waitlist:'Lista Antiga (lançamento)', contatos:'Contatos — base unificada', compradores:'Compradores', presentes:'Presentes', eventos:'Eventos Hotmart', videos:'Vídeos' };
   document.getElementById('bc-sec').textContent = labels[sec] || sec;
   updateMobileTitle(`${prodLabels[prod] || prod} — ${labels[sec] || sec}`);
   if (prod === 'equipe') renderEquipe();
@@ -3655,7 +4194,7 @@ async function loadAll() {
 }
 
 // ── HELPERS ───────────────────────────────────
-const srcLabel = s => s === 'hotmart-EDA' ? 'Elite Dark' : s === 'hotmart-RN' ? 'Hotmart RN' : s === 'hotmart-MC' ? 'Hotmart MC' : (s||'').startsWith('hotmart') ? 'Hotmart' : 'Manual';
+const srcLabel = s => s === 'hotmart-EDA' ? 'Elite Dark' : s === 'hotmart-RN' ? 'Hotmart RN' : s === 'hotmart-MC' ? 'Hotmart MC' : s === 'hotmart-RNSOLO' ? 'Hotmart RN solo' : (s||'').startsWith('hotmart') ? 'Hotmart' : 'Manual';
 const fmtDate  = iso => iso ? new Date(iso).toLocaleDateString('pt-BR', {day:'2-digit',month:'2-digit',year:'numeric'}) : '—';
 const narrativaOriginLabel = s => ({ manual:'Manual', hotmart:'Hotmart', cortesia:'Cortesia', elite:'Elite Dark' }[s] || s || 'Manual');
 function fmtExpires(iso) {
@@ -3874,17 +4413,18 @@ function renderDashCharts(list){
   }
 
   // Donut por origem
-  const buckets = { 'Hotmart RN':0, 'Hotmart MC':0, 'Elite Dark':0, 'Hotmart (outros)':0, 'Manual':0 };
+  const buckets = { 'Hotmart RN':0, 'Hotmart MC':0, 'Hotmart RN solo':0, 'Elite Dark':0, 'Hotmart (outros)':0, 'Manual':0 };
   list.forEach(l => { const s = l.source || 'manual';
     if (s==='hotmart-RN') buckets['Hotmart RN']++;
     else if (s==='hotmart-MC') buckets['Hotmart MC']++;
+    else if (s==='hotmart-RNSOLO') buckets['Hotmart RN solo']++;
     else if (s==='hotmart-EDA') buckets['Elite Dark']++;
     else if (s.startsWith('hotmart')) buckets['Hotmart (outros)']++;
     else buckets['Manual']++;
   });
   const sLabels = Object.keys(buckets).filter(k => buckets[k] > 0);
   const sData = sLabels.map(k => buckets[k]);
-  const palette = { 'Hotmart RN':'#f59e0b','Hotmart MC':'#fd7e14','Elite Dark':'#C9A227','Hotmart (outros)':'#3b82f6','Manual':'#7c3aed' };
+  const palette = { 'Hotmart RN':'#f59e0b','Hotmart MC':'#fd7e14','Hotmart RN solo':'#10b981','Elite Dark':'#C9A227','Hotmart (outros)':'#3b82f6','Manual':'#7c3aed' };
   const sctx = document.getElementById('chart-source');
   if (sctx) {
     if (_chartSource) _chartSource.destroy();
@@ -4928,6 +5468,312 @@ async function resendNexusEmail(key, email) {
   else alert('Erro: ' + (d.error || 'Falha ao enviar'));
 }
 
+// ── CADERNO DO SEU ZÉ (canal Ori) ─────────────
+// O admin só lê o banco do app (action caderno-dados) e faz as contas aqui.
+// Cada linha de `acessos` é um e-mail × produto: caderno-ze | pacote-devoto | presente:<transação>.
+const CZ_PRECO = { caderno: 19.9, pacote: 9.9, presente: 9.9 };
+const CZ_NOME  = { caderno: 'Caderno', pacote: 'Pacote do Devoto', presente: 'Presente', ganhou: 'Ganhou de presente' };
+const CZ_ESTORNO = /REFUND|CHARGEBACK|CANCEL|PROTEST|DISPUTE/i;
+const CZ_DIA = 86400000;
+let czDados = null, czDias = 30, _chartCzDias = null, _chartCzProd = null;
+
+const czEsc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+const czBRL = v => v.toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
+const czPct = (a, b) => b ? Math.round(a / b * 100) + '%' : '—';
+const czDiasDesde = iso => iso ? Math.floor((Date.now() - new Date(iso).getTime()) / CZ_DIA) : null;
+const czDataHora = iso => iso ? new Date(iso).toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' }) : '—';
+
+async function loadCaderno() {
+  _setTxt('cz-lido', 'carregando…');
+  let d;
+  try { d = await apiCall('caderno-dados'); } catch { d = { error: 'Sem conexão com o servidor.' }; }
+  if (d.error) { czDados = null; czAviso('danger', '🚨', 'Não consegui ler o banco do Caderno', [d.error]); _setTxt('cz-lido', ''); return; }
+  if (!d.configurado) {
+    czDados = null;
+    czAviso('warning', '🔌', 'Falta conectar o banco do Caderno', [
+      'Configure CADERNO_SUPABASE_URL e CADERNO_SUPABASE_SERVICE_KEY na Vercel (projeto rayner-admin) e publique de novo.',
+      'Enquanto isso o painel fica vazio — nada no app do Caderno é afetado.',
+    ]);
+    _setTxt('cz-lido', '');
+    return;
+  }
+  czDados = czPreparar(d);
+  _setTxt('cz-lido', 'lido às ' + new Date(d.lido_em).toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' }));
+  renderCaderno();
+}
+
+function czPeriodo(dias) { czDias = dias; renderCaderno(); }
+
+// Junta cada acesso com a sua transação, a origem (real/teste/manual) e o estorno, se houver.
+function czPreparar(d) {
+  const estornos = {};
+  (d.eventos || []).forEach(e => { if (CZ_ESTORNO.test(e.evento || '') && e.transacao) estornos[e.transacao] = estornos[e.transacao] || { em: e.recebido_em, evento: e.evento }; });
+  // A transação do presente vem no nome do produto ("presente:HP…"). Se o presenteado
+  // ganhar uma linha de caderno com essa mesma transação, ela NÃO é uma venda nova.
+  const txPresentes = new Set((d.acessos || []).filter(a => String(a.produto).startsWith('presente:')).map(a => String(a.produto).slice(9)));
+  const linhas = (d.acessos || []).map(a => {
+    const txs = Array.isArray(a.transacoes) ? a.transacoes : [];
+    const tx = txs.find(t => /APPROVED|COMPLETE/i.test(t.evento || '') || t.status === 'aprovada') || txs[0] || null;
+    const id = (tx && tx.id) || '';
+    let tipo = String(a.produto || '');
+    tipo = tipo.startsWith('presente') ? 'presente' : tipo === 'pacote-devoto' ? 'pacote' : tipo === 'caderno-ze' ? 'caderno' : 'outro';
+    if (tipo === 'caderno' && id && txPresentes.has(id)) tipo = 'ganhou';
+    const txEstorno = txs.find(t => CZ_ESTORNO.test(t.evento || '') || /reembols|estorn|cancel|chargeback/i.test(t.status || ''));
+    const est = (id && estornos[id]) || (txEstorno ? { em: txEstorno.em, evento: txEstorno.evento } : null)
+             || (a.status && a.status !== 'ativo' ? { em: a.atualizado_em, evento: a.status } : null);
+    return {
+      ...a, tipo, transacao: id, video: czVideo(a.origem),
+      origem: !id ? 'manual' : /^HP\d{6,}/.test(id) ? 'real' : 'teste',
+      quando: (tx && tx.em) || a.criado_em,
+      estorno: est, aparelhos: Array.isArray(a.sessoes) ? a.sessoes.length : 0,
+    };
+  });
+  return { linhas, eventos: d.eventos || [], visitas: d.visitas || [] };
+}
+
+function czVisiveis() {
+  const testes = document.getElementById('cz-testes')?.checked;
+  return czDados.linhas.filter(l => testes || l.origem === 'real');
+}
+
+function czNoPeriodo(l) {
+  if (!czDias) return true;
+  const t = new Date(l.quando).getTime();
+  if (czDias === 1) { const h = new Date(); h.setHours(0, 0, 0, 0); return t >= h.getTime(); }
+  return t >= Date.now() - czDias * CZ_DIA;
+}
+
+function renderCaderno() {
+  document.querySelectorAll('#cz-periodos .btn-sm').forEach(b => b.classList.toggle('on', Number(b.dataset.dias) === czDias));
+  if (!czDados) return;
+  const todas = czVisiveis();
+  const per = todas.filter(czNoPeriodo);
+  const porEmail = {};
+  todas.forEach(l => { (porEmail[l.email] = porEmail[l.email] || []).push(l); });
+
+  // Vendas e receita (receita só do que não foi estornado)
+  const cadernos = per.filter(l => l.tipo === 'caderno');
+  const estornados = per.filter(l => l.estorno && CZ_PRECO[l.tipo]);
+  const receita = per.filter(l => CZ_PRECO[l.tipo] && !l.estorno).reduce((s, l) => s + CZ_PRECO[l.tipo], 0);
+  _setTxt('cz-vendas', cadernos.length);
+  _setTxt('cz-vendas-sub', `${per.filter(l => l.tipo === 'pacote').length} pacotes · ${per.filter(l => l.tipo === 'presente').length} presentes no período`);
+  _setTxt('cz-receita', czBRL(receita));
+
+  // Order bumps: dos que compraram o Caderno no período, quantos levaram cada bump
+  const compradores = [...new Set(cadernos.map(l => l.email))];
+  const levou = tipo => compradores.filter(e => (porEmail[e] || []).some(l => l.tipo === tipo)).length;
+  const nPac = levou('pacote'), nPre = levou('presente');
+  _setTxt('cz-bump-pacote', czPct(nPac, compradores.length));
+  _setTxt('cz-bump-pacote-sub', `${nPac} de ${compradores.length} compradores`);
+  _setTxt('cz-bump-presente', czPct(nPre, compradores.length));
+  _setTxt('cz-bump-presente-sub', `${nPre} de ${compradores.length} compradores`);
+
+  // Ativação: comprou e já abriu o Caderno pelo menos uma vez
+  const validos = cadernos.filter(l => !l.estorno);
+  const entraram = validos.filter(l => l.primeiro_acesso).length;
+  _setTxt('cz-ativacao', czPct(entraram, validos.length));
+  _setTxt('cz-ativacao-sub', `${entraram} de ${validos.length} · ${validos.length - entraram} nunca entraram`);
+
+  // Reembolsos e em que dia da garantia de 7 dias aconteceram
+  const diasAte = estornados.map(l => l.estorno.em ? (new Date(l.estorno.em) - new Date(l.quando)) / CZ_DIA : null).filter(x => x !== null);
+  _setTxt('cz-reembolsos', estornados.length);
+  _setTxt('cz-reembolsos-sub', estornados.length
+    ? `${czPct(estornados.length, per.filter(l => CZ_PRECO[l.tipo]).length)} das vendas · média ${(diasAte.reduce((a, b) => a + b, 0) / (diasAte.length || 1)).toFixed(1).replace('.', ',')} dias após a compra`
+    : 'nenhum no período');
+
+  _setTxt('cnt-cz-compradores', Object.keys(porEmail).length);
+  _setTxt('cnt-cz-presentes', todas.filter(l => l.tipo === 'presente').length);
+  _setTxt('cnt-cz-eventos', czDados.eventos.length);
+
+  czAlertas(todas);
+  czGraficos(per);
+  renderCadernoCompradores();
+  renderCadernoPresentes();
+  renderCadernoEventos();
+  renderCadernoVideos();
+}
+
+// Alertas olham a base inteira (não o período): é o que pede ação agora.
+function czAlertas(todas) {
+  const itens = [];
+  const nuncaEntrou = todas.filter(l => l.tipo === 'caderno' && !l.estorno && !l.primeiro_acesso && czDiasDesde(l.quando) >= 1);
+  if (nuncaEntrou.length) itens.push(`${nuncaEntrou.length} comprador(es) pagaram há mais de 1 dia e nunca abriram o Caderno — risco de reembolso ou e-mail de acesso que não chegou.`);
+  const pendentes = todas.filter(l => l.tipo === 'presente' && !l.estorno && !l.presente_para && czDiasDesde(l.quando) >= 2);
+  if (pendentes.length) itens.push(`${pendentes.length} presente(s) pago(s) há mais de 2 dias sem o e-mail de quem vai ganhar.`);
+  const txConhecidas = new Set(czDados.linhas.map(l => l.transacao).filter(Boolean));
+  czDados.linhas.forEach(l => { if (l.tipo === 'presente') txConhecidas.add(String(l.produto).slice(9)); });
+  const orfas = czDados.eventos.filter(e => /APPROVED|COMPLETE/i.test(e.evento || '') && e.transacao && !txConhecidas.has(e.transacao));
+  if (orfas.length) itens.push(`${orfas.length} venda(s) aprovada(s) pela Hotmart que não viraram acesso no Caderno — ver aba Hotmart.`);
+  if (!itens.length) { document.getElementById('cz-banner').className = 'risk-banner ok'; return; }
+  czAviso(orfas.length ? 'danger' : 'warning', orfas.length ? '🚨' : '⚠️', 'Precisa de atenção', itens);
+}
+
+function czAviso(nivel, icone, titulo, itens) {
+  const b = document.getElementById('cz-banner');
+  b.className = 'risk-banner ' + nivel;
+  b.innerHTML = `<div class="rb-icon">${icone}</div><div><div class="rb-title">${czEsc(titulo)}</div><ul class="rb-list">${itens.map(i => `<li>${czEsc(i)}</li>`).join('')}</ul></div>`;
+}
+
+function czGraficos(per) {
+  if (typeof Chart === 'undefined') return;
+  const muted = _cssVar('--muted') || '#999', grid = _cssVar('--border') || '#eee';
+  const vendas = per.filter(l => CZ_PRECO[l.tipo]);
+  const ini = new Date(); ini.setHours(0, 0, 0, 0);
+  const primeiro = vendas.reduce((m, l) => Math.min(m, new Date(l.quando).getTime()), ini.getTime());
+  const dias = czDias ? Math.max(czDias, 1) : Math.min(Math.ceil((ini.getTime() - primeiro) / CZ_DIA) + 1, 365);
+  const chaves = [], rot = [];
+  for (let i = dias - 1; i >= 0; i--) { const d = new Date(ini.getTime() - i * CZ_DIA); chaves.push(d.toDateString()); rot.push(d.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit' })); }
+  const cores = { caderno:'#d6324f', pacote:(_cssVar('--yellow') || '#ff9f43'), presente:(_cssVar('--accent') || '#7c3aed') };
+  const series = ['caderno', 'pacote', 'presente'].map(tipo => ({
+    label: CZ_NOME[tipo], backgroundColor: cores[tipo], borderRadius: 4,
+    data: chaves.map(k => vendas.filter(l => l.tipo === tipo && new Date(l.quando).toDateString() === k).length),
+  }));
+  const c1 = document.getElementById('chart-cz-dias');
+  if (c1) { if (_chartCzDias) _chartCzDias.destroy();
+    _chartCzDias = new Chart(c1, { type:'bar', data:{ labels: rot, datasets: series },
+      options:{ maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ color:muted, font:{size:11}, usePointStyle:true, boxWidth:8 } } },
+        scales:{ x:{ stacked:true, grid:{ display:false }, ticks:{ color:muted, font:{size:11} } }, y:{ stacked:true, grid:{ color:grid }, ticks:{ color:muted, precision:0 }, beginAtZero:true } } } });
+    _setTxt('cz-chart-sub', `${vendas.length} vendas · ${dias} ${dias === 1 ? 'dia' : 'dias'}`);
+  }
+  const rec = ['caderno', 'pacote', 'presente'].map(t => ({ t, v: vendas.filter(l => l.tipo === t && !l.estorno).length * CZ_PRECO[t] })).filter(x => x.v > 0);
+  const c2 = document.getElementById('chart-cz-produtos');
+  if (c2) { if (_chartCzProd) _chartCzProd.destroy();
+    _chartCzProd = new Chart(c2, { type:'doughnut', data:{ labels: rec.map(x => `${CZ_NOME[x.t]} · ${czBRL(x.v)}`), datasets:[{ data: rec.map(x => x.v), backgroundColor: rec.map(x => cores[x.t]), borderWidth:0 }] },
+      options:{ maintainAspectRatio:false, cutout:'62%', plugins:{ legend:{ position:'bottom', labels:{ color:muted, font:{size:11}, padding:12, usePointStyle:true, boxWidth:8 } } } } });
+  }
+}
+
+function renderCadernoCompradores() {
+  const tb = document.getElementById('cz-tbody');
+  if (!czDados) { tb.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="icon">📿</div><p>Sem dados do Caderno.</p></div></td></tr>`; return; }
+  const q = (document.getElementById('search-cz').value || '').toLowerCase();
+  const filtro = document.getElementById('cz-filtro-comp').value;
+  const grupos = {};
+  czVisiveis().forEach(l => { (grupos[l.email] = grupos[l.email] || []).push(l); });
+  let lista = Object.entries(grupos).map(([email, ls]) => {
+    const cad = ls.find(l => l.tipo === 'caderno' || l.tipo === 'ganhou') || ls[0];
+    return { email, ls, cad, nome: ls.map(l => l.nome).find(Boolean) || '', tel: ls.map(l => l.telefone).find(Boolean) || '',
+      quando: ls.reduce((m, l) => (!m || l.quando < m ? l.quando : m), null), estorno: ls.some(l => l.estorno) };
+  }).sort((a, b) => String(b.quando).localeCompare(String(a.quando)));
+  if (q) lista = lista.filter(g => (g.nome + ' ' + g.email + ' ' + g.tel).toLowerCase().includes(q));
+  if (filtro === 'nunca') lista = lista.filter(g => g.cad && !g.cad.primeiro_acesso && !g.estorno);
+  if (filtro === 'pacote') lista = lista.filter(g => g.ls.some(l => l.tipo === 'pacote'));
+  if (filtro === 'presente') lista = lista.filter(g => g.ls.some(l => l.tipo === 'presente'));
+  if (filtro === 'reembolso') lista = lista.filter(g => g.estorno);
+  if (!lista.length) { tb.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="icon">📿</div><p>Nenhum comprador ${q || filtro ? 'com esse filtro' : 'ainda'}.</p></div></td></tr>`; return; }
+  tb.innerHTML = lista.map(g => {
+    const prods = g.ls.map(l => `<span class="cz-prod ${l.tipo === 'ganhou' ? 'presente' : l.tipo}">${czEsc(CZ_NOME[l.tipo] || l.produto)}</span>`).join('');
+    const origem = [...new Set(g.ls.map(l => l.origem))].filter(o => o !== 'real').map(o => `<span class="cz-tag">${o}</span>`).join('');
+    const tel = g.tel ? `<div><a href="https://wa.me/${czEsc(g.tel.replace(/\D/g, '').replace(/^(?!55)/, '55'))}" target="_blank" style="color:var(--text2);text-decoration:none;font-size:12px">📱 ${czEsc(g.tel)}</a></div>` : '';
+    const c = g.cad;
+    const entrou = !c || (c.tipo !== 'caderno' && c.tipo !== 'ganhou') ? '<span class="cz-mini">—</span>'
+      : c.primeiro_acesso ? `<span class="cz-ok">Sim</span><div class="cz-mini">${czDataHora(c.primeiro_acesso)}</div>`
+      : `<span class="cz-nao">Ainda não</span><div class="cz-mini">${czDiasDesde(c.quando) ?? 0}d desde a compra</div>`;
+    const avisos = c && (c.tipo === 'caderno' || c.tipo === 'ganhou')
+      ? (c.sem_lembretes ? '<span class="cz-mini">desligou</span>' : `<span class="cz-mini">${(c.lembretes || []).length} recebido(s)</span>`) : '<span class="cz-mini">—</span>';
+    const status = g.estorno ? '<span class="badge inactive">Reembolsado</span>' : '<span class="badge active">Ativo</span>';
+    return `<tr>
+      <td><div style="font-weight:600">${czEsc(g.nome) || '<span style="color:var(--muted)">—</span>'}${origem}</div><div style="color:var(--muted);font-size:12px">${czEsc(g.email)}</div>${tel}</td>
+      <td>${prods}</td>
+      <td style="color:var(--muted);font-size:12px">${czDataHora(g.quando)}</td>
+      <td>${entrou}</td>
+      <td><span class="cz-mini">${c ? c.aparelhos : 0} de 2</span></td>
+      <td>${avisos}</td>
+      <td>${status}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderCadernoPresentes() {
+  const tb = document.getElementById('cz-presentes-tbody');
+  const lista = czDados ? czVisiveis().filter(l => l.tipo === 'presente').sort((a, b) => String(b.quando).localeCompare(String(a.quando))) : [];
+  if (!lista.length) { tb.innerHTML = `<tr><td colspan="4"><div class="empty-state"><div class="icon">🎁</div><p>Nenhum presente vendido ainda.</p></div></td></tr>`; return; }
+  tb.innerHTML = lista.map(l => {
+    const dias = czDiasDesde(l.quando) ?? 0;
+    const sit = l.estorno ? '<span class="badge inactive">Reembolsado</span>'
+      : l.presente_para ? '<span class="cz-ok">Entregue</span>'
+      : `<span class="${dias >= 2 ? 'cz-ruim' : 'cz-nao'}">Pendente há ${dias} ${dias === 1 ? 'dia' : 'dias'}</span>`;
+    return `<tr>
+      <td><div style="font-weight:600">${czEsc(l.nome) || '—'}${l.origem !== 'real' ? `<span class="cz-tag">${l.origem}</span>` : ''}</div><div style="color:var(--muted);font-size:12px">${czEsc(l.email)}</div></td>
+      <td style="color:var(--muted);font-size:12px">${czDataHora(l.quando)}</td>
+      <td>${l.presente_para ? czEsc(l.presente_para) : '<span class="cz-mini">ainda não informado</span>'}</td>
+      <td>${sit}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderCadernoEventos() {
+  const tb = document.getElementById('cz-eventos-tbody');
+  const lista = czDados ? czDados.eventos : [];
+  if (!lista.length) { tb.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="icon">🧾</div><p>Nenhum evento da Hotmart recebido.</p></div></td></tr>`; return; }
+  tb.innerHTML = lista.slice(0, 300).map(e => {
+    const cor = CZ_ESTORNO.test(e.evento || '') ? 'var(--red)' : /APPROVED|COMPLETE/i.test(e.evento || '') ? 'var(--green)' : 'var(--text2)';
+    return `<tr>
+      <td style="color:var(--muted);font-size:12px;white-space:nowrap">${czDataHora(e.recebido_em)}</td>
+      <td style="font-weight:600;font-size:12px;color:${cor}">${czEsc(e.evento)}</td>
+      <td style="font-size:12px">${czEsc(e.produto)}</td>
+      <td style="font-size:12px">${czEsc(e.email)}</td>
+      <td style="font-size:12px;color:var(--muted);font-family:monospace">${czEsc(e.transacao)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── CADERNO › VÍDEOS (medição por ?v=) ────────
+// "ze01__gratis-app" → "ze01": o vídeo é sempre a 1ª parte da origem (ver lib/origem.ts no app do Caderno).
+function czVideo(origem) {
+  const v = String(origem || '').split('__')[0].replace(/[^a-zA-Z0-9_-]/g, '');
+  return v && v !== 'pagina-de-vendas' && v !== 'gratis-app' && !/^email-|^presentes-app/.test(v) ? v : null;
+}
+
+async function renderCadernoVideos() {
+  const tb = document.getElementById('cz-videos-tbody');
+  if (!czDados) return;
+  const dentro = t => { if (!czDias) return true; const ms = new Date(t).getTime();
+    if (czDias === 1) { const h = new Date(); h.setHours(0,0,0,0); return ms >= h.getTime(); } return ms >= Date.now() - czDias * CZ_DIA; };
+  const porVideo = {};
+  const linha = v => (porVideo[v] = porVideo[v] || { visitas: 0, leads: 0, vendas: 0, receita: 0 });
+  (czDados.visitas || []).filter(x => dentro(x.criado_em)).forEach(x => { linha(x.video || 'direto').visitas++; });
+  // cadastros grátis (não passam pelo filtro de "compra real": não têm transação da Hotmart)
+  czDados.linhas.filter(l => l.produto === 'gratis' && dentro(l.criado_em)).forEach(l => { linha(l.video || 'direto').leads++; });
+  // vendas reais do Caderno no período; a receita soma os extras do mesmo comprador
+  const reais = czDados.linhas.filter(l => l.origem === 'real' && !l.estorno);
+  reais.filter(l => l.tipo === 'caderno' && dentro(l.quando)).forEach(l => {
+    const r = linha(l.video || 'direto'); r.vendas++;
+    r.receita += reais.filter(x => x.email === l.email && CZ_PRECO[x.tipo] && Math.abs(new Date(x.quando) - new Date(l.quando)) < CZ_DIA).reduce((s, x) => s + CZ_PRECO[x.tipo], 0);
+  });
+  const lista = Object.entries(porVideo).map(([video, r]) => ({ video, ...r }))
+    .sort((a, b) => (a.video === 'direto') - (b.video === 'direto') || b.vendas - a.vendas || b.leads - a.leads || b.visitas - a.visitas);
+  const deVideo = lista.filter(r => r.video !== 'direto');
+  const soma = k => deVideo.reduce((s, r) => s + r[k], 0), tot = k => lista.reduce((s, r) => s + r[k], 0);
+  _setTxt('cz-v-visitas', soma('visitas')); _setTxt('cz-v-visitas-sub', `de ${tot('visitas')} visitas no total`);
+  _setTxt('cz-v-leads', soma('leads'));     _setTxt('cz-v-leads-sub', `de ${tot('leads')} cadastros no total`);
+  _setTxt('cz-v-vendas', soma('vendas'));   _setTxt('cz-v-vendas-sub', `${czBRL(soma('receita'))} · de ${tot('vendas')} vendas no total`);
+  _setTxt('cnt-cz-videos', deVideo.length);
+  if (!lista.length) {
+    _setTxt('cz-v-top', '—');
+    tb.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="icon">🎬</div><p>Nenhuma visita, cadastro ou venda no período.<br>Coloque <code>?v=ID-do-vídeo</code> nos links dos vídeos (veja abaixo).</p></div></td></tr>`;
+    return;
+  }
+  const titulos = await Promise.all(lista.map(r => r.video === 'direto' ? null : resolveYtTitle(r.video)));
+  const top = deVideo.find(r => r.vendas > 0);
+  _setTxt('cz-v-top', top ? (titulos[lista.indexOf(top)] || top.video) : '—');
+  tb.innerHTML = lista.map((r, i) => {
+    const nome = r.video === 'direto'
+      ? '🔗 Sem vídeo (link sem <code>?v=</code>, busca ou direto)'
+      : titulos[i] ? `🎬 <strong>${czEsc(titulos[i])}</strong> <span style="color:var(--muted);font-size:11px;font-family:'JetBrains Mono',monospace">${czEsc(r.video)}</span>`
+      : `🎬 <span style="font-family:'JetBrains Mono',monospace">${czEsc(r.video)}</span>`;
+    const conv = r.visitas ? (r.vendas / r.visitas * 100).toFixed(1).replace('.', ',') + '%' : '—';
+    return `<tr${r.video === 'direto' ? ' style="opacity:.75"' : ''}>
+      <td>${nome}</td>
+      <td style="text-align:right;font-family:'JetBrains Mono',monospace">${r.visitas}</td>
+      <td style="text-align:right;font-family:'JetBrains Mono',monospace">${r.leads}</td>
+      <td style="text-align:right;font-weight:700;font-family:'JetBrains Mono',monospace">${r.vendas}</td>
+      <td style="text-align:right">${czBRL(r.receita)}</td>
+      <td style="text-align:right;color:var(--muted)">${conv}</td>
+    </tr>`;
+  }).join('');
+}
+
 // ── NEXUS CLIQUES ─────────────────────────────
 const YT_API_KEY = 'AIzaSyBO7rzNeh1mKSn2QLDwHQnTD3VOwyYBsv4';
 const ytTitleCache = {};
@@ -5270,7 +6116,7 @@ function eqCardHtml(t, opts = {}){
   if (atras) chips.push(`<span class="eq-chip eq-atrasada">⏰ Atrasada ${eqDiasAtraso(t)}d</span>`);
   else if (t.prazo) chips.push(`<span class="eq-chip">📅 ${fmtDate(t.prazo)}</span>`);
   if (opts.showStatus) chips.push(`<span class="eq-chip">${EQ_STATUS_LABEL[t.status]}</span>`);
-  return `<div class="eq-card" draggable="true" data-id="${t.id}" ondragstart="eqDragStart(event,'${t.id}')" ondragend="eqDragEnd(event)" onclick="openEquipeModal('${t.id}')">
+  return `<div class="eq-card pri-${t.prioridade}${atras ? ' is-atrasada' : ''}${t.status === 'concluido' ? ' is-done' : ''}" draggable="true" data-id="${t.id}" ondragstart="eqDragStart(event,'${t.id}')" ondragend="eqDragEnd(event)" onclick="openEquipeModal('${t.id}')">
     <div class="eq-card-top"><div class="eq-title">${eqEsc(t.titulo)}</div><div class="eq-avatars">${avs}</div></div>
     ${t.descricao ? `<div class="eq-desc">${eqEsc(t.descricao).slice(0,140)}</div>` : ''}
     <div class="eq-meta">${chips.join('')}</div>
@@ -5284,7 +6130,7 @@ function eqRenderKanban(data){
   el.innerHTML = EQ_STATUS.map(s => {
     const items = data.filter(t => t.status === s.id);
     return `<div class="kb-col" data-status="${s.id}" ondragover="eqDragOver(event)" ondragleave="eqDragLeave(event)" ondrop="eqDrop(event,'${s.id}')">
-      <div class="kb-col-head"><span>${s.nome}</span><span class="kb-count">${items.length}</span></div>
+      <div class="kb-col-head"><span class="kb-col-title"><span class="kb-dot"></span>${s.nome}</span><span class="kb-count">${items.length}</span></div>
       ${items.length ? items.map(t => eqCardHtml(t)).join('') : '<div class="eq-empty">—</div>'}
     </div>`;
   }).join('');
@@ -5444,7 +6290,7 @@ function openEquipeModal(id){
   document.getElementById('eq-descricao').value   = t?.descricao || '';
   document.getElementById('eq-status').value      = t?.status || 'a_fazer';
   document.getElementById('eq-prioridade').value  = t?.prioridade || 'media';
-  document.getElementById('eq-prazo').value       = t?.prazo || '';
+  document.getElementById('eq-prazo-in').value    = t?.prazo || '';
   document.getElementById('eq-area').value        = t?.area || '';
   document.getElementById('eq-bloqueio').value    = t?.bloqueio || '';
   eqRenderRespChecks(t?.responsaveis || []);
@@ -5464,7 +6310,7 @@ async function saveEquipe(){
     responsaveis,
     status:     document.getElementById('eq-status').value,
     prioridade: document.getElementById('eq-prioridade').value,
-    prazo:      document.getElementById('eq-prazo').value || null,
+    prazo:      document.getElementById('eq-prazo-in').value || null,
     area:       document.getElementById('eq-area').value.trim() || null,
     bloqueio:   document.getElementById('eq-bloqueio').value.trim() || null,
   };
@@ -5515,6 +6361,8 @@ async function loadAcademyWaitlist() {
     document.getElementById('acy-analise').textContent     = ana;
     document.getElementById('acy-descartado').textContent  = desc;
     document.getElementById('cnt-academy').textContent     = allAcademyWaitlist.length;
+    const cntAntiga = document.getElementById('cnt-academy-waitlist');
+    if (cntAntiga) cntAntiga.textContent = allAcademyWaitlist.length;
   }
   if (stats.today !== undefined) {
     document.getElementById('acy-today').textContent = stats.today;
@@ -5594,14 +6442,479 @@ async function deleteAcademy(id, nome) {
   else toast('Erro ao remover.', 'error');
 }
 
+
+
+// ══ DISPAROS EM ONDAS ═══════════════════════════════════════
+// Reaproveita os MESMOS templates dos blasts dos produtos (emails/manifest.json),
+// com prévia, assunto e variáveis declaradas. Nada de lista paralela.
+let dpTemplates = [], dpSelecionado = null, dpPlano = null, dpEnviando = false;
+
+const DP_ROTULO_VAR = {
+  NOVIDADES: 'O que há de novo (texto do corpo)',
+  LINK_DISCORD: 'Link do Discord',
+  LINK_ACESSO: 'Link de acesso',
+  LINK_DOWNLOAD: 'Link de download',
+  VERSAO: 'Versão',
+  TITULO_AULA: 'Título da aula', DESCRICAO_AULA: 'Descrição da aula', LINK_AULA: 'Link da aula',
+  TITULO_ENCONTRO: 'Título do encontro', DESCRICAO_ENCONTRO: 'Descrição do encontro',
+  DATA_ENCONTRO: 'Data (ex: 20/08)', HORA_ENCONTRO: 'Hora (ex: 20h)', LINK_ENCONTRO: 'Link do encontro',
+  CHAVE: 'Chave', SENHA: 'Senha', EMAIL: 'E-mail',
+};
+
+function dpDescreverPublico() {
+  const p = [];
+  if (ctFiltros.relacao)     p.push({cliente:'clientes',aluno:'alunos sem compra',lead:'leads'}[ctFiltros.relacao]);
+  if (ctFiltros.produto)     p.push('com ' + ctFiltros.produto);
+  if (ctFiltros.engajamento) p.push('engajamento ' + ctFiltros.engajamento);
+  if (ctFiltros.tag)         p.push('marcador "' + ctFiltros.tag + '"');
+  return p.length ? p.join(' · ') : 'TODOS os contatos';
+}
+
+async function loadDisparos() {
+  const grid = document.getElementById('dp-template-grid');
+  if (grid && !dpTemplates.length) {
+    const d = await apiCall('email-templates');            // sem product = todos
+    dpTemplates = d.templates || [];
+    grid.innerHTML = dpTemplates.map(t => `
+      <div class="email-card" id="dptpl-${t.id.replace(/\//g,'-')}" onclick="dpSelecionar('${t.id}')">
+        <div class="email-card-header">
+          <div class="email-card-meta">
+            <span class="email-card-tag ${t.tag}">${t.product}</span>
+            <h4>${t.label}</h4>
+            <p>${t.description}</p>
+            <span class="email-card-subject">✉ ${t.subject}</span>
+          </div>
+          <div class="email-card-check">✓</div>
+        </div>
+        <div class="email-card-preview"><iframe src="/emails/${t.id}.html" scrolling="yes" loading="lazy"></iframe></div>
+      </div>`).join('');
+    if (typeof scaleEmailPreviews === 'function') requestAnimationFrame(scaleEmailPreviews);
+  }
+  const pub = document.getElementById('dp-publico');
+  if (pub) pub.textContent = dpDescreverPublico();
+  const r = await apiCall('disparo-list');
+  renderDisparos(r.disparos || []);
+}
+
+function dpSelecionar(id) {
+  dpSelecionado = dpTemplates.find(t => t.id === id);
+  if (!dpSelecionado) return;
+  document.querySelectorAll('[id^="dptpl-"]').forEach(c => c.classList.remove('selected'));
+  document.getElementById('dptpl-' + id.replace(/\//g,'-'))?.classList.add('selected');
+
+  document.getElementById('dp-assunto').value = dpSelecionado.subject || '';
+  document.getElementById('dp-nome').value = document.getElementById('dp-nome').value ||
+    `${dpSelecionado.label} — ${new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'short'})}`;
+
+  // PRIMEIRO_NOME é preenchido por contato — não vira campo.
+  const vars = (dpSelecionado.vars || []).filter(v => v !== 'PRIMEIRO_NOME');
+  document.getElementById('dp-vars').innerHTML = vars.map(v => `
+    <div><label class="lbl">${DP_ROTULO_VAR[v] || v}</label>
+      <input class="inp dp-var" data-var="${v}" placeholder="obrigatório" oninput="dpPreverAssunto()"></div>`).join('');
+  dpPreverAssunto();
+
+  document.getElementById('dp-config').style.display = '';
+  document.getElementById('dp-passo3').style.display = '';
+  document.getElementById('dp-publico').textContent = dpDescreverPublico();
+  document.getElementById('dp-plano').innerHTML = '';
+  document.getElementById('dp-criar').style.display = 'none';
+  dpPlano = null;
+}
+
+// Mostra como o assunto vai CHEGAR, com as variáveis já trocadas.
+function dpPreverAssunto() {
+  const el = document.getElementById('dp-assunto-preview');
+  if (!el) return;
+  const cru = document.getElementById('dp-assunto').value;
+  const vars = dpColetarVars();
+  const pendentes = [...cru.matchAll(/\{\{([A-Z_]+)\}\}/g)].map(m => m[1]).filter(k => !vars[k]);
+  const final = cru.replace(/\{\{([A-Z_]+)\}\}/g, (m,k) => vars[k] || m);
+  if (!cru.includes('{{')) { el.textContent = ''; return; }
+  el.innerHTML = pendentes.length
+    ? `<span style="color:#ea5455">⚠ preencha ${pendentes.join(', ')} — hoje chegaria assim:</span> ${final}`
+    : `Vai chegar como: <strong>${final}</strong>`;
+}
+
+function dpColetarVars() {
+  const o = {};
+  document.querySelectorAll('.dp-var').forEach(i => { o[i.dataset.var] = i.value.trim(); });
+  return o;
+}
+
+async function dpEnviarTeste() {
+  if (!dpSelecionado) { toast('Escolha um template.', 'error'); return; }
+  const email = document.getElementById('dp-teste-email').value.trim();
+  if (!email.includes('@')) { toast('Informe um e-mail válido.', 'error'); return; }
+  const r = await apiCall('disparo-teste', {
+    templateId: dpSelecionado.id, assunto: document.getElementById('dp-assunto').value,
+    vars: dpColetarVars(), email,
+  });
+  toast(r.ok ? 'Teste enviado — confira sua caixa.' : (r.error || 'Erro ao enviar.'), r.ok ? 'success' : 'error');
+}
+
+async function planejarDisparo() {
+  document.getElementById('dp-plano').innerHTML = '<p style="color:var(--muted);font-size:12px">calculando…</p>';
+  const r = await apiCall('disparo-planejar', { filtros: ctFiltros });
+  if (r.error) { toast(r.error, 'error'); return; }
+  dpPlano = r;
+  if (!r.total) {
+    document.getElementById('dp-plano').innerHTML = '<p style="color:#ea5455;font-size:13px">Nenhum contato nesse público.</p>';
+    document.getElementById('dp-criar').style.display = 'none';
+    return;
+  }
+  const dias = ['hoje','+1 dia','+2 dias','+3 dias','+4 dias','+5 dias','+6 dias','+7 dias'];
+  document.getElementById('dp-plano').innerHTML = `
+    <div style="background:rgba(115,103,240,.06);border:1px solid rgba(115,103,240,.25);border-radius:12px;padding:16px">
+      <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Plano sugerido</div>
+      <div style="font-size:14px;color:var(--text);margin-bottom:12px"><strong>${r.total}</strong> pessoas · ${dpDescreverPublico()} · <strong>${r.ondas.length}</strong> ondas</div>
+      <table style="width:100%;font-size:13px">
+        ${r.ondas.map((o,i) => `<tr>
+          <td style="padding:6px 0;color:var(--muted);width:70px">Onda ${o.ordem}</td>
+          <td style="color:var(--muted);width:80px">${dias[i] || '+'+i+' dias'}</td>
+          <td>${o.rotulo}</td>
+          <td style="text-align:right;font-weight:700;color:#9B7FFF">${o.tamanho}</td>
+        </tr>`).join('')}
+      </table>
+      <p style="font-size:11.5px;color:var(--muted);margin-top:12px;line-height:1.6">
+        Os dias são sugestão — você dispara cada onda manualmente, quando quiser.
+        A ordem (engajados primeiro) é o que protege a reputação do domínio.
+      </p>
+    </div>`;
+  document.getElementById('dp-criar').style.display = '';
+}
+
+async function criarDisparo() {
+  const nome = document.getElementById('dp-nome').value.trim();
+  const assunto = document.getElementById('dp-assunto').value.trim();
+  if (!dpSelecionado) { toast('Escolha um template.', 'error'); return; }
+  if (!nome || !assunto) { toast('Preencha nome e assunto.', 'error'); return; }
+  if (!dpPlano) { toast('Calcule o plano antes.', 'error'); return; }
+  if (!confirm(`Criar disparo "${nome}"?\n\n${dpPlano.total} pessoas em ${dpPlano.ondas.length} ondas.\nNada é enviado agora — você dispara onda a onda.`)) return;
+  const r = await apiCall('disparo-criar', {
+    nome, assunto, templateId: dpSelecionado.id,
+    vars: dpColetarVars(), filtros: ctFiltros,
+  });
+  if (r.ok) {
+    toast('Disparo criado. Nenhum e-mail enviado ainda.');
+    document.getElementById('dp-nome').value = ''; document.getElementById('dp-assunto').value = '';
+    document.getElementById('dp-plano').innerHTML = ''; document.getElementById('dp-criar').style.display = 'none';
+    document.getElementById('dp-vars').innerHTML = ''; document.getElementById('dp-config').style.display = 'none';
+    document.getElementById('dp-passo3').style.display = 'none'; dpSelecionado = null;
+    document.querySelectorAll('[id^="dptpl-"]').forEach(c => c.classList.remove('selected'));
+    dpPlano = null; loadDisparos();
+  } else toast(r.error || 'Erro ao criar.', 'error');
+}
+
+const DP_STATUS = { rascunho:['Rascunho','#8a8d93'], aprovado:['Pronto para enviar','#00cfe8'],
+  em_andamento:['Em andamento','#ff9f43'], concluido:['Concluído','#28c76f'] };
+
+let dpUltimaLista = [];
+// Barra de métricas de um disparo — só aparece quando o webhook do Resend já
+// registrou alguma coisa. "Ignorou" não é um evento: é entregue menos aberto.
+function dpMetricas(m, enviados) {
+  if (!m) return '';
+  const ent = +m.entregues || 0, ab = +m.abertos || 0, cl = +m.clicados || 0;
+  const bo = +m.bounces || 0, sp = +m.spam || 0, fa = +m.falhas || 0;
+  if (!(ent + ab + cl + bo + sp + fa)) return '';
+  const ign = Math.max(0, ent - ab);
+  const pct = (n, base) => base ? Math.round(n * 100 / base) + '%' : '—';
+  const chip = (rot, val, sub, cor) => `<div style="flex:1;min-width:88px;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:8px 10px">
+      <div style="font-size:17px;font-weight:700;color:${cor};line-height:1.2">${val}</div>
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">${rot}</div>
+      <div style="font-size:11px;color:var(--muted)">${sub}</div>
+    </div>`;
+  // Tracking desligado no Resend entrega tudo e não reporta nenhuma abertura —
+  // sem este aviso o painel mostraria 0% e pareceria que ninguém abriu.
+  const semTracking = ent > 20 && ab === 0 && cl === 0;
+  return `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+      ${chip('entregues', ent, pct(ent, enviados) + ' do envio', '#28c76f')}
+      ${chip('abriram', ab, pct(ab, ent) + ' dos entregues', '#00cfe8')}
+      ${chip('clicaram', cl, pct(cl, ent) + ' dos entregues', '#7367f0')}
+      ${chip('ignoraram', ign, pct(ign, ent) + ' dos entregues', '#8a8d93')}
+      ${bo ? chip('não existem', bo, 'bounce', '#ff9f43') : ''}
+      ${sp ? chip('spam', sp, 'reclamação', '#ea5455') : ''}
+      ${fa ? chip('falharam', fa, 'erro no envio', '#ea5455') : ''}
+    </div>
+    ${semTracking ? `<div style="background:rgba(255,159,67,.08);border:1px solid rgba(255,159,67,.3);border-radius:10px;padding:8px 12px;margin-bottom:12px;font-size:11.5px;color:#ffb066">⚠ Entregou mas não registrou nenhuma abertura — provavelmente o Open/Click Tracking está desligado no domínio, no painel do Resend.</div>` : ''}`;
+}
+
+function renderDisparos(lista) {
+  dpUltimaLista = lista;
+  const box = document.getElementById('disparos-lista');
+  if (!lista.length) { box.innerHTML = `<div class="empty-state"><div class="icon">📮</div><p>Nenhum disparo criado ainda.</p></div>`; return; }
+  box.innerHTML = lista.map(d => {
+    const ondas = (d.disparo_ondas || []).sort((a,b) => a.ordem - b.ordem);
+    const [lbl,cor] = DP_STATUS[d.status] || ['—','#8a8d93'];
+    const feitas = ondas.filter(o => o.status === 'concluida').length;
+    const enviados = ondas.reduce((a,o) => a + (o.enviados||0), 0);
+    const falhas = ondas.reduce((a,o) => a + (o.falhas||0), 0);
+    return `<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px">
+        <strong style="font-size:15px">${d.nome}</strong>
+        <span style="padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:${cor}1f;color:${cor};border:1px solid ${cor}44">${lbl}</span>
+        <span style="margin-left:auto;font-size:12px;color:var(--muted)">${feitas}/${ondas.length} ondas · ${enviados} enviados${falhas ? ` · <span style="color:#ea5455">${falhas} falhas</span>` : ''}</span>
+        <button class="btn-icon" title="Editar conteúdo" onclick="dpAbrirEdicao('${d.id}')">✏️</button>
+        <button class="btn-icon" title="Excluir disparo" onclick="dpExcluir('${d.id}','${d.nome.replace(/'/g,"\\'")}')">🗑️</button>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:14px">${d.template_id} · "${d.assunto}" · ${d.total} pessoas</div>
+      ${dpMetricas(d.metricas, enviados)}
+      ${ondas.find(o => o.erro) ? `<div style="background:rgba(234,84,85,.08);border:1px solid rgba(234,84,85,.3);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#ff8a8a">⚠ Última tentativa falhou: ${ondas.find(o => o.erro).erro}</div>` : ''}
+      <div id="dpedit-${d.id}" style="display:none;background:rgba(115,103,240,.05);border:1px solid rgba(115,103,240,.25);border-radius:12px;padding:16px;margin-bottom:14px"></div>
+      <table style="width:100%;font-size:13px">
+        ${ondas.map(o => {
+          const pronta = o.status === 'concluida';
+          const anterior = ondas.find(x => x.ordem === o.ordem - 1);
+          const liberada = !anterior || anterior.status === 'concluida';
+          return `<tr style="border-top:1px solid var(--border)">
+            <td style="padding:9px 0;color:var(--muted);width:70px">Onda ${o.ordem}</td>
+            <td>${o.rotulo}${o.metricas && +o.metricas.entregues ? `<div style="font-size:11px;color:var(--muted)">${o.metricas.entregues} entregues · ${o.metricas.abertos} abriram · ${o.metricas.clicados} clicaram</div>` : ''}</td>
+            <td style="text-align:right;color:var(--muted);width:70px">${o.tamanho}</td>
+            <td style="text-align:right;width:170px">${(() => {
+              const enviados = o.enviados || 0;
+              const faltam = Math.max(0, o.tamanho - enviados);
+              // concluída
+              if (pronta) return `<span style="color:#28c76f;font-size:12px">✓ ${enviados} enviados</span>`;
+              // ainda não liberada (onda anterior não terminou)
+              if (!liberada) return `<span style="color:var(--muted);font-size:11px">aguarda a anterior</span>`;
+              // não validada ainda → primeiro passo
+              if (!o.validada_em) return `<button class="btn-sm accent" onclick="dpEnviarOnda('${o.id}', ${o.tamanho}, false)">✉ Validar primeiro</button>`;
+              // JÁ começou (enviando travado, ou parou no meio) → retomar só o que falta
+              if (o.status === 'enviando' || enviados > 0) return `<button class="btn-sm btn-onda" style="background:#ff9f43;border-color:#ff9f43;color:#241400;font-weight:700" onclick="dpEnviarOnda('${o.id}', ${o.tamanho}, true, this)" title="Continua de onde parou — não repete quem já recebeu">▶ Retomar · faltam ${faltam}</button>`;
+              // validada e nada enviado → envio limpo
+              return `<button class="btn-sm btn-onda" style="background:#28c76f;border-color:#28c76f;color:#08240f;font-weight:700" onclick="dpEnviarOnda('${o.id}', ${o.tamanho}, true, this)">✓ Confirmar envio · ${o.tamanho}</button>`;
+            })()}</td>
+          </tr>`;
+        }).join('')}
+      </table>
+    </div>`;
+  }).join('');
+}
+
+async function dpEnviarOnda(ondaId, tamanho, confirmado, btn) {
+  // 1º clique: manda só para o admin validar. 2º clique: envia de verdade.
+  if (!confirmado) {
+    const r = await apiCall('disparo-executar-onda', { ondaId, confirmado: false });
+    if (r.error) { toast(r.error, 'error'); return; }
+    toast(`Cópia enviada para ${r.enviadoPara}. Confira e volte para confirmar.`, 'success');
+    loadDisparos();
+    return;
+  }
+  if (dpEnviando) { toast('Já tem um envio em andamento — aguarde terminar.', 'error'); return; }
+  if (!confirm(`CONFIRMAR ENVIO REAL\n\n${tamanho} pessoas vão receber este e-mail agora.\n\nVocê já conferiu a cópia que chegou no seu e-mail?`)) return;
+
+  dpEnviando = true;
+  document.querySelectorAll('.btn-onda').forEach(b => { b.disabled = true; b.style.opacity = '.5'; });
+  let enviados = 0;
+  toast('Enviando… não feche esta aba.');
+  try {
+    // O servidor é dono do progresso e é à prova de duplicata (reserva cada
+    // e-mail antes de enviar). Aqui só chamamos em laço até ele dizer "fim".
+    // Um teto de segurança evita laço infinito se algo sair do esperado.
+    for (let i = 0; i < 200; i++) {
+      const r = await apiCall('disparo-executar-onda', { ondaId, confirmado: true });
+      if (r.error)    { toast(r.error, 'error'); break; }
+      if (r.abortado) { toast('Envio interrompido: ' + r.erro, 'error'); break; }
+      enviados += r.enviados || 0;
+      if (r.fim) { toast(`Onda concluída — ${enviados} enviados nesta rodada.`, 'success'); break; }
+    }
+  } finally {
+    dpEnviando = false;
+    loadDisparos();
+  }
+}
+// Editar depois da validação. Salvar zera a validação das ondas pendentes —
+// você precisa conferir de novo antes de liberar.
+function dpAbrirEdicao(id) {
+  const d = (dpUltimaLista || []).find(x => x.id === id);
+  if (!d) return;
+  const box = document.getElementById('dpedit-' + id);
+  if (box.style.display !== 'none') { box.style.display = 'none'; return; }
+
+  const tpl = dpTemplates.find(t => t.id === d.template_id);
+  const vars = (tpl?.vars || []).filter(v => v !== 'PRIMEIRO_NOME');
+  const enviadas = (d.disparo_ondas || []).filter(o => o.status === 'concluida').length;
+
+  box.innerHTML = `
+    ${enviadas ? `<p style="font-size:12px;color:#ffd08a;margin-bottom:12px">⚠ ${enviadas} onda(s) já foram enviadas — a edição vale só para as que faltam.</p>` : ''}
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px">
+      <div><label class="lbl">Nome interno</label><input class="inp dpe-nome" value="${(d.nome||'').replace(/"/g,'&quot;')}"></div>
+      <div><label class="lbl">Assunto</label><input class="inp dpe-assunto" value="${(d.assunto||'').replace(/"/g,'&quot;')}"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:12px">
+      ${vars.map(v => `<div><label class="lbl">${DP_ROTULO_VAR[v] || v}</label>
+        <input class="inp dpe-var" data-var="${v}" value="${((d.vars||{})[v]||'').replace(/"/g,'&quot;')}"></div>`).join('')}
+    </div>
+    <div style="display:flex;gap:8px;margin-top:14px;align-items:center;flex-wrap:wrap">
+      <button class="btn-sm accent" onclick="dpSalvarEdicao('${id}')">💾 Salvar</button>
+      <button class="btn-sm" onclick="dpAbrirEdicao('${id}')">Cancelar</button>
+      <span style="font-size:11.5px;color:var(--muted)">salvar zera a validação — você valida de novo antes de enviar</span>
+    </div>`;
+  box.style.display = '';
+}
+
+async function dpSalvarEdicao(id) {
+  const box = document.getElementById('dpedit-' + id);
+  const vars = {};
+  box.querySelectorAll('.dpe-var').forEach(i => { vars[i.dataset.var] = i.value.trim(); });
+  const r = await apiCall('disparo-atualizar', {
+    id, nome: box.querySelector('.dpe-nome').value.trim(),
+    assunto: box.querySelector('.dpe-assunto').value.trim(), vars,
+  });
+  if (r.ok) {
+    toast(`Salvo. ${r.ondasRevalidar} onda(s) voltaram para "validar primeiro".`);
+    loadDisparos();
+  } else toast(r.error || 'Erro ao salvar.', 'error');
+}
+
+async function dpExcluir(id, nome) {
+  if (!confirm(`Excluir o disparo "${nome}"?\n\nO histórico das ondas some junto. E-mails já enviados não são afetados.`)) return;
+  const r = await apiCall('disparo-excluir', { id });
+  if (r.ok) { toast('Excluído.'); loadDisparos(); } else toast('Erro ao excluir.', 'error');
+}
+
+// ══ CONTATOS — base unificada ═══════════════════════════════
+let allContatos = [];
+let ctFiltros = { relacao: '', produto: '', engajamento: '', tag: '' };
+let ctTotalFiltrado = 0;
+
+const CT_REL = {
+  cliente: { label: '💳 Cliente', cor: '#28c76f' },
+  aluno:   { label: '🎓 Aluno',   cor: '#ff9f43' },
+  lead:    { label: '🔥 Lead',    cor: '#ea5455' },
+};
+const CT_ENG = { quente: '🟢 Quente', morno: '🟡 Morno', frio: '⚪ Frio' };
+
+let ctStatsCarregado = false;
+
+// As contagens do topo são GLOBAIS — não mudam quando você troca o filtro.
+// Então carrego uma vez só; trocar filtro recarrega apenas a lista.
+async function loadContatos(recarregarStats = false) {
+  const tarefas = [apiCall('contatos-list', { filtros: ctFiltros, limite: 300 })];
+  if (recarregarStats || !ctStatsCarregado) tarefas.push(apiCall('contatos-stats'));
+  const [lista, st] = await Promise.all(tarefas);
+  if (st && st.total !== undefined) {
+    ctStatsCarregado = true;
+    const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+    set('ct-total', st.total); set('ct-clientes', st.clientes);
+    set('ct-alunos', st.alunos); set('ct-leads', st.leads);
+    set('ctc-cliente', st.clientes); set('ctc-aluno', st.alunos); set('ctc-lead', st.leads);
+    set('ctc-quente', st.quente); set('ctc-morno', st.morno); set('ctc-frio', st.frio);
+    set('ctc-cenadrop', st.cenadrop); set('ctc-narrativa', st.narrativa); set('ctc-elite', st.elite);
+  }
+  if (lista && lista.contatos) {
+    allContatos = lista.contatos;
+    document.getElementById('ct-selecionado').textContent = lista.total;
+    ctTotalFiltrado = lista.total;
+    renderContatos(allContatos);
+  }
+}
+
+function setCtFiltro(campo, valor) {
+  ctFiltros[campo] = ctFiltros[campo] === valor ? '' : valor;
+  const pref = { relacao: 'ctf-rel-', produto: 'ctf-prod-', engajamento: 'ctf-eng-', tag: 'ctf-tag-' }[campo];
+  document.querySelectorAll(`[id^="${pref}"]`).forEach(b =>
+    b.classList.toggle('active', b.id === pref + ctFiltros[campo]));
+  // descrição legível do público
+  const p = [];
+  if (ctFiltros.relacao)     p.push({ cliente: 'clientes', aluno: 'alunos sem compra', lead: 'leads' }[ctFiltros.relacao]);
+  if (ctFiltros.produto)     p.push('que têm ' + ctFiltros.produto);
+  if (ctFiltros.engajamento) p.push('engajamento ' + ctFiltros.engajamento);
+  if (ctFiltros.tag)         p.push('marcador "' + ctFiltros.tag + '"');
+  document.getElementById('ct-descricao').textContent = p.length ? p.join(' · ') : 'todos os contatos';
+  loadContatos();
+}
+
+function filtrarContatosBusca() {
+  const q = (document.getElementById('search-contatos')?.value || '').toLowerCase();
+  renderContatos(q ? allContatos.filter(c =>
+    (c.nome || '').toLowerCase().includes(q) || (c.email || '').toLowerCase().includes(q)) : allContatos);
+}
+
+function renderContatos(lista) {
+  const tb = document.getElementById('contatos-tbody');
+  if (!lista.length) {
+    tb.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="icon">🎯</div><p>Nenhum contato com esses filtros.</p></div></td></tr>`;
+    return;
+  }
+  // a tabela mostra no máximo 300 — o número que importa é o do topo
+  tb.innerHTML = lista.slice(0, 300).map((c, i) => {
+    const rel = c.cliente ? CT_REL.cliente : c.aluno ? CT_REL.aluno : c.lead ? CT_REL.lead : null;
+    const relCell = rel ? `<span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:${rel.cor}1f;color:${rel.cor};border:1px solid ${rel.cor}44;white-space:nowrap">${rel.label}</span>` : '—';
+    const prods = (c.produtos || []).length ? c.produtos.join(', ') : '<span style="color:var(--muted)">—</span>';
+    const eng = c.engajamento ? `${CT_ENG[c.engajamento] || c.engajamento}${c.progresso != null ? ` <span style="color:var(--muted);font-size:10px">${Math.round(c.progresso)}%</span>` : ''}` : '<span style="color:var(--muted)">—</span>';
+    return `<tr>
+      <td style="color:var(--muted);font-size:12px">${i + 1}</td>
+      <td style="font-weight:600">${c.nome || '<span style="color:var(--muted)">—</span>'}</td>
+      <td style="color:var(--muted);font-size:12.5px">${c.email}</td>
+      <td>${relCell}</td>
+      <td style="font-size:12px">${prods}</td>
+      <td style="font-size:12px">${eng}</td>
+      <td style="font-size:11px;color:var(--muted)">${(c.origens || []).join(', ')}</td>
+      <td><div class="actions">
+        <button class="btn-icon" title="Copiar e-mail" onclick="navigator.clipboard.writeText('${c.email}');toast('E-mail copiado!')">📋</button>
+        <button class="btn-icon" title="${c.contatavel ? 'Parar de enviar (mantém o registro)' : 'Voltar a enviar'}" onclick="ctToggleContatavel('${c.id}', ${!c.contatavel})">${c.contatavel ? '🔕' : '🔔'}</button>
+        <button class="btn-icon" title="Excluir da base definitivamente" onclick="ctDelete('${c.id}','${(c.nome || c.email).replace(/'/g, "\\'")}')">🗑️</button>
+      </div></td>
+    </tr>`;
+  }).join('') + (ctTotalFiltrado > lista.length
+    ? `<tr><td colspan="8" style="text-align:center;color:var(--muted);font-size:12px;padding:14px">exibindo ${lista.length} de ${ctTotalFiltrado} — o CSV traz a lista completa</td></tr>` : '');
+}
+
+async function ctToggleContatavel(id, valor) {
+  const r = await apiCall('contatos-update', { id, contatavel: valor });
+  if (r.ok) { toast(valor ? 'Voltou para a lista.' : 'Removido dos disparos.'); loadContatos(true); }
+  else toast('Erro ao atualizar.', 'error');
+}
+
+async function ctDelete(id, quem) {
+  if (!confirm(`Excluir "${quem}" da base de contatos?\n\nIsso é definitivo. Se a intenção é apenas parar de enviar e-mail, use o sino 🔕 — ele mantém o registro.`)) return;
+  const r = await apiCall('contatos-delete', { id });
+  if (r.ok) { toast('Excluído da base.'); loadContatos(true); }
+  else toast('Erro ao excluir.', 'error');
+}
+
+async function exportContatosCSV() {
+  toast('Preparando o arquivo...');
+  const r = await apiCall('contatos-export', { filtros: ctFiltros });
+  const dados = r.contatos || [];
+  if (!dados.length) { toast('Nada para exportar.', 'error'); return; }
+  const rows = [['Nome','Email','WhatsApp','Relacao','Produtos','Engajamento','Progresso','Origens','Contatavel','Entrou em']];
+  dados.forEach(c => rows.push([
+    c.nome || '', c.email, c.whatsapp || '',
+    c.cliente ? 'cliente' : c.aluno ? 'aluno' : c.lead ? 'lead' : '',
+    (c.produtos || []).join(' '), c.engajamento || '',
+    c.progresso != null ? Math.round(c.progresso) : '',
+    (c.origens || []).join(' '), c.contatavel ? 'sim' : 'nao',
+    c.entrou_em ? fmtDate(c.entrou_em) : '',
+  ]));
+  const csv = rows.map(r => r.map(x => `"${String(x).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const nome = 'contatos' + Object.values(ctFiltros).filter(Boolean).map(v => '-' + v).join('') + '.csv';
+  const a = Object.assign(document.createElement('a'),
+    { href: URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })), download: nome });
+  document.body.appendChild(a); a.click(); a.remove();
+  toast(dados.length + ' contato(s) exportado(s).');
+}
+
 // ── LISTA ESPERA (desistência) ────────────────
 let allListaEspera = [];
+
+let leFilter = '';
 
 const LE_STATUS = {
   pendente:    { label: 'Pendente',   bg: 'rgba(255,159,67,.12)', color: '#ff9f43' },
   contatado:   { label: 'Contatado',  bg: 'rgba(0,207,232,.12)',  color: '#00cfe8' },
   confirmado:  { label: 'Confirmado', bg: 'rgba(40,199,111,.12)', color: '#28c76f' },
   descartado:  { label: 'Descartado', bg: 'rgba(234,84,85,.12)',  color: '#ea5455' },
+};
+
+// Classificação do lead — calculada pelo funil, no servidor.
+// A "ação" é o que fazer com quem cai em cada balde.
+const LE_CLASS = {
+  quente:          { label: '🔥 Quente',      color: '#ea5455', acao: 'Passou nas 3 perguntas e aceitou o valor — recebeu o link do grupo' },
+  preco_nao_coube: { label: '💰 Preço',       color: '#ff9f43', acao: 'É comprador, travou só no valor — candidato a parcelamento ou condição' },
+  indeciso:        { label: '⏳ Indeciso',    color: '#00cfe8', acao: 'Quer, mas precisa de tempo — trabalhar prova social e urgência' },
+  sem_verba:       { label: '🪙 Sem verba',   color: '#7367f0', acao: 'Só consome gratuito — nutrição longa, prioridade baixa' },
+  curioso:         { label: '👀 Curioso',     color: '#8a8d93', acao: 'Sem intenção de compra — lista fria' },
 };
 
 async function loadListaEspera() {
@@ -5617,36 +6930,67 @@ async function loadListaEspera() {
   }
   if (list.lista) {
     allListaEspera = list.lista;
-    renderListaEspera(allListaEspera);
+    updateLeCounts();
+    filterListaEspera();
   }
+}
+
+// Contagem por balde — sai da lista já carregada, sem consulta extra.
+function updateLeCounts() {
+  const el = id => document.getElementById(id);
+  el('le-c-').textContent = allListaEspera.length;
+  Object.keys(LE_CLASS).forEach(k => {
+    const n = allListaEspera.filter(r => r.classificacao === k).length;
+    const c = el('le-c-' + k);
+    if (c) c.textContent = n;
+  });
+  const quentes = allListaEspera.filter(r => r.classificacao === 'quente').length;
+  if (el('le-quentes')) el('le-quentes').textContent = quentes;
+}
+
+function setLeFilter(classificacao) {
+  leFilter = classificacao;
+  ['', ...Object.keys(LE_CLASS)].forEach(k => {
+    const b = document.getElementById('le-f-' + k);
+    if (b) b.classList.toggle('active', k === classificacao);
+  });
+  filterListaEspera();
 }
 
 function filterListaEspera() {
   const q = (document.getElementById('search-lista-espera')?.value || '').toLowerCase();
-  const filtered = q
-    ? allListaEspera.filter(r =>
-        (r.nome||'').toLowerCase().includes(q) ||
-        (r.email||'').toLowerCase().includes(q) ||
-        (r.whatsapp||'').includes(q)
-      )
+  let filtered = leFilter
+    ? allListaEspera.filter(r => r.classificacao === leFilter)
     : allListaEspera;
+  if (q) {
+    filtered = filtered.filter(r =>
+      (r.nome||'').toLowerCase().includes(q) ||
+      (r.email||'').toLowerCase().includes(q) ||
+      (r.whatsapp||'').includes(q)
+    );
+  }
   renderListaEspera(filtered);
 }
 
 function renderListaEspera(list) {
   const tb = document.getElementById('lista-espera-tbody');
   if (!list.length) {
-    tb.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="icon">⏳</div><p>Nenhum inscrito encontrado.</p></div></td></tr>`;
+    tb.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="icon">⏳</div><p>Nenhum inscrito encontrado.</p></div></td></tr>`;
     return;
   }
   tb.innerHTML = list.map((r, i) => {
     const st = LE_STATUS[r.status] || LE_STATUS['pendente'];
-    const q1tip = r.q1 ? ` title="${r.q1}"` : '';
-    const q2tip = r.q2 ? ` title="${r.q2}"` : '';
-    const q3tip = r.q3 ? ` title="${r.q3}"` : '';
+    const cl = LE_CLASS[r.classificacao];
+    // As respostas ficam no tooltip do nome — as 3 de uma vez.
+    const resp = [r.q1, r.q2, r.q3].filter(Boolean)
+      .map((t, n) => `Q${n+1}: ${t}`).join(' | ').replace(/"/g, '&quot;');
+    const clCell = cl
+      ? `<span title="${cl.acao.replace(/"/g,'&quot;')}" style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;cursor:help;background:${cl.color}1f;color:${cl.color};border:1px solid ${cl.color}44;white-space:nowrap">${cl.label}</span>`
+      : `<span style="color:var(--muted);font-size:11px">—</span>`;
     return `<tr>
       <td style="color:var(--muted);font-size:12px">${i + 1}</td>
-      <td style="font-weight:600">${r.nome || '—'} ${r.q1 ? `<span${q1tip} style="font-size:10px;color:var(--muted);cursor:help">Q1 Q2 Q3</span>` : ''}</td>
+      <td style="font-weight:600">${r.nome || '—'} ${resp ? `<span title="${resp}" style="font-size:10px;color:var(--muted);cursor:help">ⓘ</span>` : ''}</td>
+      <td>${clCell}</td>
       <td style="color:var(--muted)">${r.email || '—'}</td>
       <td>${r.whatsapp ? `<a href="https://wa.me/55${r.whatsapp.replace(/\D/g,'')}" target="_blank" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--green);text-decoration:none">📱 ${r.whatsapp}</a>` : '<span style="color:var(--muted)">—</span>'}</td>
       <td><span onclick="cycleLeStatus('${r.id}','${r.status || 'pendente'}')" title="Clique para avançar status" style="display:inline-block;padding:3px 11px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;background:${st.bg};color:${st.color};border:1px solid ${st.color}44;user-select:none">${st.label}</span></td>
@@ -5679,16 +7023,28 @@ async function deleteListaEspera(id, nome) {
 }
 
 function exportListaEsperaCSV() {
-  if (!allListaEspera.length) { toast('Nenhum dado para exportar.', 'error'); return; }
-  const rows = [['Nome','Email','WhatsApp','Status','Inscrito em','Q1','Q2','Q3']];
-  allListaEspera.forEach(r => rows.push([
-    r.nome||'', r.email||'', r.whatsapp||'', r.status||'',
+  // Exporta o que está filtrado na tela — é assim que se tira a lista de um
+  // balde só (ex.: só os "preço não coube") para uma campanha específica.
+  const dados = leFilter
+    ? allListaEspera.filter(r => r.classificacao === leFilter)
+    : allListaEspera;
+  if (!dados.length) { toast('Nenhum dado para exportar.', 'error'); return; }
+
+  const rows = [['Nome','Email','WhatsApp','Classificacao','Status','Origem','Parou em','Aceitou o preco','Preco exibido','Inscrito em','Q1','Q2','Q3']];
+  dados.forEach(r => rows.push([
+    r.nome||'', r.email||'', r.whatsapp||'',
+    (LE_CLASS[r.classificacao]?.label || r.classificacao || '').replace(/^\S+\s/, ''),
+    r.status||'', r.origem||'', r.etapa_saida||'',
+    r.preco_confirmado === true ? 'sim' : r.preco_confirmado === false ? 'nao' : '',
+    r.preco_exibido||'',
     fmtDate(r.created_at), r.q1||'', r.q2||'', r.q3||''
   ]));
   const csv  = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
-  const blob = new Blob([csv], { type:'text/csv' });
-  const a    = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'lista-espera-eda.csv' });
+  const blob = new Blob([csv], { type:'text/csv;charset=utf-8' });
+  const nome = 'lista-espera-eda' + (leFilter ? '-' + leFilter : '') + '.csv';
+  const a    = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: nome });
   document.body.appendChild(a); a.click(); a.remove();
+  toast(dados.length + ' registro(s) exportado(s).');
 }
 
 // ── EDA MEMBROS (Discord) ─────────────────────

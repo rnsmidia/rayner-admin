@@ -5,6 +5,7 @@ const { pbkdf2Sync, randomBytes } = require('crypto');
 const fs = require('fs');
 const path = require('path');
 const { renderEmail } = require('../emails/render');
+const { sendEmail }   = require('../emails/send');
 
 function hashNarrativaPassword(password) {
   const salt = randomBytes(16).toString('hex');
@@ -23,6 +24,19 @@ const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_KEY
 );
+
+// Caderno do Seu Zé (canal Ori) — o app tem banco PRÓPRIO (Supabase da conta do Ori,
+// projeto okqgxotxawbvpbocznxn). O admin só LÊ: a fonte de verdade das vendas é o app,
+// que recebe o webhook da Hotmart e manda o e-mail de acesso. Sem as env vars, o painel
+// avisa que falta configurar em vez de quebrar o admin inteiro.
+let _cadernoDb = null;
+function cadernoDb() {
+  if (_cadernoDb) return _cadernoDb;
+  const url = process.env.CADERNO_SUPABASE_URL, key = process.env.CADERNO_SUPABASE_SERVICE_KEY;
+  if (!url || !key) return null;
+  _cadernoDb = createClient(url, key, { auth: { persistSession: false } });
+  return _cadernoDb;
+}
 
 // ── MÚLTIPLOS ADMINS ─────────────────────────────────────────
 // Para adicionar/remover admins, edite esta lista.
@@ -66,6 +80,8 @@ const RESTRICTED_DENIED = new Set([
   'lista-espera-stats','lista-espera-list','lista-espera-delete','lista-espera-update-status',
   'academy-list','academy-delete','academy-update-status','academy-funnel-stats',
   'equipe-list','equipe-create','equipe-update','equipe-delete',
+  'contatos-stats','contatos-list','contatos-tags','contatos-export','contatos-update','contatos-delete','contatos-blast',
+  'disparo-planejar','disparo-criar','disparo-list','disparo-executar-onda','disparo-excluir','disparo-teste','disparo-atualizar',
 ]);
 
 function findAdmin(login, password) {
@@ -133,7 +149,9 @@ function actionPanel(action) {
   if (a.startsWith('blast-eda')) return 'academy';
   if (a.startsWith('narrativa')) return 'narrativa';
   if (a.startsWith('nexus')) return 'nexus';
+  if (a.startsWith('caderno')) return 'caderno';
   if (a.startsWith('equipe')) return 'equipe';
+  if (a.startsWith('contatos') || a.startsWith('disparo')) return 'contatos';
   if (a.startsWith('academy') || a.startsWith('eda-') || a.startsWith('lista-espera') || a.startsWith('funnel')) return 'academy';
   if (a.startsWith('yt-') || a === 'monitor') return 'monitor';
   if (a === 'links' || a === 'discord-invites') return 'links';
@@ -250,6 +268,36 @@ module.exports = async function handler(req, res) {
     return res.status(403).json({ error: 'Apenas o admin master pode gerenciar acessos.' });
   }
 
+  // BASE DE CONTATOS + DISPAROS — somente o admin master.
+  // Reúne a base inteira de clientes e leads dos produtos e permite disparar
+  // e-mail em massa em nome do domínio. É a coisa mais sensível do painel:
+  // fica restrita a quem responde por ela, não a todo admin "full".
+  if ((String(action).startsWith('contatos-') || String(action).startsWith('disparo-'))
+      && currentAdmin.role !== 'master') {
+    return res.status(403).json({ error: 'A base de contatos é restrita ao admin master.' });
+  }
+
+  // CADERNO DO SEU ZÉ — produto do canal Ori, por enquanto só do master (decisão do
+  // Rayner, 01/10/26). Pra liberar a outros: tirar esta guarda e pôr 'caderno' no AC_PANELS.
+  if (String(action).startsWith('caderno-') && currentAdmin.role !== 'master') {
+    return res.status(403).json({ error: 'O painel do Caderno é restrito ao admin master.' });
+  }
+
+  // QUEM SOU EU — devolve role/permissões ATUAIS do token.
+  // Existe porque o front restaurava as permissões do sessionStorage do navegador:
+  // mudar o perfil de alguém no painel Acessos não surtia efeito enquanto a pessoa
+  // não fechasse a aba. Agora o front pergunta ao servidor a cada carregamento.
+  // Fica ANTES da checagem de painel — todo perfil precisa poder se identificar.
+  if (action === 'me') {
+    return res.status(200).json({
+      ok: true,
+      name: currentAdmin.name,
+      login: currentAdmin.login,
+      role: currentAdmin.role || 'full',
+      permissions: currentAdmin.permissions || null,
+    });
+  }
+
   // PERMISSÕES do admin restrito — painel permitido + somente-leitura
   if (currentAdmin.permissions) {
     const perms   = currentAdmin.permissions;
@@ -331,7 +379,7 @@ module.exports = async function handler(req, res) {
     const key = await generateUniqueKey();
     const { data, error } = await supabase.from('licenses').insert({
       key, email: body.email||null, name: body.name||null, phone: body.phone||null,
-      notes: body.notes||null, status: 'active', source: 'manual', created_at: new Date().toISOString(),
+      notes: body.notes||null, status: 'active', active: true, source: 'manual', created_at: new Date().toISOString(),
       expires_at: body.expires_at || null
     }).select().single();
     if (error) return res.status(500).json({ error: error.message });
@@ -339,10 +387,16 @@ module.exports = async function handler(req, res) {
   }
 
   // TOGGLE
+  // 22/09/26: `status` (lido pelo painel) e `active` (lido pelo verify.js da extensão,
+  // checado ANTES de status) são 2 campos independentes — esse toggle só escrevia
+  // `status`, deixando `active` desincronizado sempre que uma chave desativada pelo
+  // webhook da Hotmart (que escreve os 2 juntos) era reativada por aqui. Resultado:
+  // painel mostra "Ativa" mas a extensão recusa como "Licença desativada". Mesmo
+  // padrão que o `nexus-toggle` já usava certo — replicado aqui.
   if (action === 'toggle') {
     const { data: cur } = await supabase.from('licenses').select('status').eq('key', body.key).single();
     const newStatus = cur?.status === 'active' ? 'inactive' : 'active';
-    await supabase.from('licenses').update({ status: newStatus }).eq('key', body.key);
+    await supabase.from('licenses').update({ status: newStatus, active: newStatus === 'active' }).eq('key', body.key);
     return res.status(200).json({ ok: true, status: newStatus });
   }
 
@@ -381,8 +435,9 @@ module.exports = async function handler(req, res) {
     const hotmart   = (data||[]).filter(l => (l.source||'').startsWith('hotmart')).length;
     const hotmartRN = (data||[]).filter(l => l.source === 'hotmart-RN').length;
     const hotmartMC = (data||[]).filter(l => l.source === 'hotmart-MC').length;
+    const hotmartRNSOLO = (data||[]).filter(l => l.source === 'hotmart-RNSOLO').length;
     const manual    = (data||[]).filter(l => l.source === 'manual').length;
-    return res.status(200).json({ total, active, inactive, hotmart, hotmartRN, hotmartMC, manual });
+    return res.status(200).json({ total, active, inactive, hotmart, hotmartRN, hotmartMC, hotmartRNSOLO, manual });
   }
 
   // RESEND EMAIL
@@ -393,7 +448,7 @@ module.exports = async function handler(req, res) {
     try {
       const resend = new Resend(process.env.RESEND_API_KEY);
       const firstName = (lic.name || 'Cliente').split(' ')[0];
-      await resend.emails.send({
+      await sendEmail(resend, {
         from: 'CenaDrop <contato@cenadrop.com.br>',
         to: lic.email,
         subject: '🔑 Sua chave CenaDrop Flow',
@@ -430,7 +485,7 @@ module.exports = async function handler(req, res) {
     try {
       const resend = new Resend(process.env.RESEND_API_KEY);
       const firstName = name.split(' ')[0];
-      await resend.emails.send({
+      await sendEmail(resend, {
         from: 'Narrativa IA <contato@cenadrop.com.br>',
         to: email.toLowerCase(),
         subject: '✨ Seu acesso ao Narrativa IA Studio',
@@ -472,7 +527,7 @@ module.exports = async function handler(req, res) {
     try {
       const resend = new Resend(process.env.RESEND_API_KEY);
       const firstName = user.name.split(' ')[0];
-      await resend.emails.send({
+      await sendEmail(resend, {
         from: 'Narrativa IA <contato@cenadrop.com.br>',
         to: user.email,
         subject: '🔑 Seus novos dados de acesso — Narrativa IA Studio',
@@ -572,7 +627,7 @@ module.exports = async function handler(req, res) {
       const PLATFORM_URL = 'https://nxsaude.app.br';
       const SENHA_PADRAO = 'protocolo45+';
       const WHATSAPP_URL = 'https://chat.whatsapp.com/CtNvcyiWxT6FGS6iv0fmi0?mode=gi_t';
-      await resend.emails.send({
+      await sendEmail(resend, {
         from: 'NX Saúde <ola@nxsaude.app.br>',
         to: buyer.email,
         subject: `Seus dados de acesso ao Protocolo de Jejum Após os 45, ${firstName}`,
@@ -626,6 +681,33 @@ module.exports = async function handler(req, res) {
     const newStatus = cur?.status === 'active' ? 'inactive' : 'active';
     await supabase.from('licenses').update({ status: newStatus, active: newStatus === 'active' }).eq('key', key);
     return res.status(200).json({ ok: true, status: newStatus });
+  }
+
+  // CADERNO DO SEU ZÉ — devolve os acessos e o log da Hotmart do banco do app.
+  // Só leitura. As contas (vendas, bumps, ativação, reembolso) são feitas no painel,
+  // porque a base é pequena e assim o filtro de período/testes não volta ao servidor.
+  if (action === 'caderno-dados') {
+    const db = cadernoDb();
+    if (!db) return res.status(200).json({ configurado: false });
+    const desdeVisitas = new Date(Date.now() - 365 * 864e5).toISOString();
+    const [ac, ev, vi] = await Promise.all([
+      db.from('acessos')
+        // codigo_hash fica de fora: é o código de login do comprador.
+        .select('*')
+        .order('criado_em', { ascending: false })
+        .limit(5000),
+      db.from('eventos_hotmart')
+        .select('id, evento, transacao, email, produto, recebido_em')
+        .order('recebido_em', { ascending: false })
+        .limit(2000),
+      // Medição por vídeo (?v= nos links). Tabela criada na migração 005; se ainda não existir, segue sem.
+      db.from('visitas').select('video, pagina, criado_em').gte('criado_em', desdeVisitas).order('criado_em', { ascending: false }).limit(50000),
+    ]);
+    if (ac.error) return res.status(500).json({ error: 'Banco do Caderno: ' + ac.error.message });
+    if (ev.error) return res.status(500).json({ error: 'Banco do Caderno: ' + ev.error.message });
+    // codigo_hash fica de fora: é o código de login do comprador (o select('*') pega as colunas novas, como origem).
+    const acessos = (ac.data || []).map(({ codigo_hash, progresso, tentativas_login, ...resto }) => resto);
+    return res.status(200).json({ configurado: true, acessos, eventos: ev.data || [], visitas: vi.error ? [] : (vi.data || []), lido_em: new Date().toISOString() });
   }
 
   // NEXUS VISITS — cliques na página de vendas por vídeo
@@ -831,16 +913,26 @@ module.exports = async function handler(req, res) {
       revoked: false,
     });
 
+    // O convite já está gravado. Se o e-mail falhar, devolve o link mesmo
+    // assim — assim dá para enviar na mão em vez de perder o convite.
     const resend = new Resend(process.env.RESEND_API_KEY);
-    await resend.emails.send({
-      from:    'Elite Dark Academy <noreply@raynern.com.br>',
-      to:      email.toLowerCase(),
-      subject: '💬 Novo convite para o Discord EDA',
-      html: renderEmail('eda/reenvio-discord', {
-        PRIMEIRO_NOME: firstName,
-        LINK_DISCORD: inviteUrl,
-      }),
-    });
+    try {
+      await sendEmail(resend, {
+        from:    'Elite Dark Academy <noreply@raynern.com.br>',
+        to:      email.toLowerCase(),
+        subject: '💬 Novo convite para o Discord EDA',
+        html: renderEmail('eda/reenvio-discord', {
+          PRIMEIRO_NOME: firstName,
+          LINK_DISCORD: inviteUrl,
+        }),
+      });
+    } catch (e) {
+      console.error('❌ [eda-resend-invite]', e.message);
+      return res.status(200).json({
+        ok: true, inviteUrl, emailFalhou: true,
+        aviso: `Convite criado, mas o e-mail não saiu (${e.message}). Envie o link manualmente.`,
+      });
+    }
 
     return res.status(200).json({ ok: true, inviteUrl });
   }
@@ -993,7 +1085,7 @@ module.exports = async function handler(req, res) {
     // 4. Email premium de boas-vindas
     try {
       const resend = new Resend(process.env.RESEND_API_KEY);
-      await resend.emails.send({
+      await sendEmail(resend, {
         from:    'Elite Dark Academy <noreply@raynern.com.br>',
         to:      emailLow,
         subject: `👑 Bem-vindo ao Elite Dark Academy, ${firstName}. Seus acessos estão aqui.`,
@@ -1033,18 +1125,34 @@ module.exports = async function handler(req, res) {
   }
 
   // BLAST RECIPIENTS COUNT — conta por filtro
+  // 30/09/26: o card de blast do CenaDrop mandava o assunto CRU ("{{VERSAO}}" literal),
+  // repetia e-mail de quem tem 2+ licenças (29 pessoas na base) e enviava 1 por vez
+  // (227 envios ≈ 90 s — risco de a função cair no meio). Agora: variáveis no assunto,
+  // 1 e-mail por endereço (sem as chaves-lixo @example.com do teste da Hotmart) e batch de 100.
+  const blastVars = (texto, vars = {}) => String(texto || '').replace(/\{\{([A-Z_]+)\}\}/g, (m, k) => (vars[k] ?? m));
+  async function blastDestinatarios(recipients) {
+    let q = supabase.from('licenses').select('email, name, status')
+      .or('product.is.null,and(product.neq.nxsaude,product.neq.nx_visit)')
+      .not('email', 'is', null).limit(10000);
+    if (recipients === 'active')   q = q.eq('status', 'active');
+    if (recipients === 'inactive') q = q.neq('status', 'active');
+    const { data, error } = await q;
+    if (error) throw new Error(error.message);
+    const vistos = new Map();
+    for (const l of data || []) {
+      const e = String(l.email || '').trim().toLowerCase();
+      if (!e.includes('@') || e.endsWith('@example.com')) continue;
+      if (!vistos.has(e)) vistos.set(e, { email: e, name: l.name });
+    }
+    return { lista: [...vistos.values()], licencas: (data || []).length };
+  }
+
   if (action === 'blast-count') {
     const { recipients = 'all' } = body;
-    let query = supabase
-      .from('licenses')
-      .select('email, status', { count: 'exact' })
-      .or('product.is.null,and(product.neq.nxsaude,product.neq.nx_visit)')
-      .not('email', 'is', null);
-    if (recipients === 'active')   query = query.eq('status', 'active');
-    if (recipients === 'inactive') query = query.neq('status', 'active');
-    const { count, error } = await query;
-    if (error) return res.status(500).json({ error: error.message });
-    return res.status(200).json({ ok: true, count });
+    try {
+      const { lista, licencas } = await blastDestinatarios(recipients);
+      return res.status(200).json({ ok: true, count: lista.length, licencas });
+    } catch (e) { return res.status(500).json({ error: e.message }); }
   }
 
   // EMAIL TEMPLATES — retorna manifest (filtrado por product se informado)
@@ -1070,7 +1178,7 @@ module.exports = async function handler(req, res) {
       if (!tpl) return res.status(404).json({ error: 'Template não encontrado' });
       const html = renderEmail(templateId, { PRIMEIRO_NOME: 'Você', ...templateVars });
       const resend = new Resend(process.env.RESEND_API_KEY);
-      await resend.emails.send({ from: tpl.from, to: testEmail, subject: tpl.subject, html });
+      await sendEmail(resend, { from: tpl.from, to: testEmail, subject: blastVars(tpl.subject, templateVars), html });
       return res.status(200).json({ ok: true, sent: 1 });
     } catch (e) {
       return res.status(500).json({ error: e.message });
@@ -1082,18 +1190,6 @@ module.exports = async function handler(req, res) {
     const { template: templateId, recipients = 'active', vars: templateVars = {} } = body;
     if (!templateId) return res.status(400).json({ error: 'template obrigatório' });
 
-    let query = supabase
-      .from('licenses')
-      .select('email, name, status')
-      .or('product.is.null,and(product.neq.nxsaude,product.neq.nx_visit)')
-      .not('email', 'is', null);
-
-    if (recipients === 'active')   query = query.eq('status', 'active');
-    if (recipients === 'inactive') query = query.neq('status', 'active');
-
-    const { data: licenses, error } = await query;
-    if (error) return res.status(500).json({ error: error.message });
-
     let tpl;
     try {
       const manifest = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'emails', 'manifest.json'), 'utf8'));
@@ -1103,25 +1199,30 @@ module.exports = async function handler(req, res) {
       return res.status(500).json({ error: 'Erro ao carregar manifest: ' + e.message });
     }
 
-    const resend = new Resend(process.env.RESEND_API_KEY);
-    let sent = 0, failed = 0, skipped = 0;
-    const errors = [];
+    let lista, licencas;
+    try { ({ lista, licencas } = await blastDestinatarios(recipients)); }
+    catch (e) { return res.status(500).json({ error: e.message }); }
 
-    for (const lic of licenses) {
-      if (!lic.email || !lic.email.includes('@')) { skipped++; continue; }
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    const subject = blastVars(tpl.subject, templateVars);
+    let sent = 0, failed = 0;
+    const errors = [];
+    for (let k = 0; k < lista.length; k += 100) {
+      const lote = lista.slice(k, k + 100);
       try {
-        const firstName = (lic.name || 'Aluno').split(' ')[0];
-        const html = renderEmail(templateId, { PRIMEIRO_NOME: firstName, ...templateVars });
-        await resend.emails.send({ from: tpl.from, to: lic.email, subject: tpl.subject, html });
-        sent++;
-        await new Promise(r => setTimeout(r, 120));
+        const r = await resend.batch.send(lote.map(l => ({
+          from: tpl.from, to: l.email, subject,
+          html: renderEmail(templateId, { PRIMEIRO_NOME: (l.name || 'Aluno').split(' ')[0], ...templateVars }),
+        })));
+        if (r?.error) throw new Error(r.error.message || JSON.stringify(r.error));
+        sent += lote.length;
       } catch (err) {
-        failed++;
-        errors.push({ email: lic.email, error: err.message });
+        failed += lote.length;
+        errors.push({ lote: k / 100 + 1, emails: lote.length, error: err.message });
       }
     }
 
-    return res.status(200).json({ ok: true, sent, failed, skipped, total: licenses.length, errors });
+    return res.status(200).json({ ok: true, sent, failed, skipped: licencas - lista.length, total: lista.length, licencas, errors });
   }
 
   // BLAST NARRATIVA — contagem de destinatários
@@ -1177,7 +1278,7 @@ module.exports = async function handler(req, res) {
         ...templateVars,
       });
       try {
-        await resend.emails.send({ from: tpl.from, to: u.email, subject: tpl.subject, html });
+        await sendEmail(resend, { from: tpl.from, to: u.email, subject: tpl.subject, html });
         sent++;
         await new Promise(r => setTimeout(r, 120));
       } catch (err) {
@@ -1238,7 +1339,7 @@ module.exports = async function handler(req, res) {
         const subject = tpl.subject
           .replace(/\{\{DATA_ENCONTRO\}\}/g, () => templateVars.DATA_ENCONTRO || '')
           .replace(/\{\{HORA_ENCONTRO\}\}/g, () => templateVars.HORA_ENCONTRO || '');
-        await resend.emails.send({ from: tpl.from, to: m.email, subject, html });
+        await sendEmail(resend, { from: tpl.from, to: m.email, subject, html });
         sent++;
         await new Promise(r => setTimeout(r, 120));
       } catch (err) {
@@ -1246,6 +1347,471 @@ module.exports = async function handler(req, res) {
       }
     }
     return res.status(200).json({ ok: true, sent, failed, skipped, total: targets.length });
+  }
+
+
+  // ══ CONTATOS — base unificada para decidir disparos ═══════════════════════
+  // Junta compradores (licenses/narrativa), alunos da plataforma e leads do
+  // funil numa tabela só. Os filtros abaixo são combináveis: cada um estreita
+  // o público, e o total volta na resposta para o painel mostrar antes de enviar.
+  function filtrarContatos(q, f = {}) {
+    if (f.relacao === 'cliente') q = q.eq('cliente', true);
+    if (f.relacao === 'aluno')   q = q.eq('aluno', true).eq('cliente', false);
+    if (f.relacao === 'lead')    q = q.eq('lead', true).eq('cliente', false);
+    if (f.produto)      q = q.contains('produtos', [f.produto]);
+    if (f.engajamento)  q = q.eq('engajamento', f.engajamento);
+    if (f.origem)       q = q.contains('origens', [f.origem]);
+    if (f.contatavel === true)  q = q.eq('contatavel', true);
+    if (f.contatavel === false) q = q.eq('contatavel', false);
+    if (f.tag) q = q.contains('tags', [f.tag]);
+    if (f.busca) q = q.or(`email.ilike.%${f.busca}%,nome.ilike.%${f.busca}%`);
+    return q;
+  }
+
+  if (action === 'contatos-stats') {
+    // Uma chamada só. Antes eram 11 counts em paralelo (~0,9s); a função
+    // contatos_stats() faz tudo num SELECT com FILTER (~0,15s).
+    const { data, error } = await supabase.rpc('contatos_stats');
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json(data || {});
+  }
+
+  if (action === 'contatos-tags') {
+    const { data, error } = await supabase.rpc('contatos_tags');
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ tags: data || [] });
+  }
+
+  if (action === 'contatos-list') {
+    // A tabela mostra 300 linhas — não faz sentido trazer 3.000 (327 KB) só
+    // para descartar. O TOTAL do público vem do count exato, que é barato.
+    const f = body.filtros || {};
+    const limite = Math.min(Number(body.limite) || 300, 1000);
+    let q = supabase.from('contatos')
+      .select('id, email, nome, cliente, produtos, aluno, progresso, engajamento, lead, origens, contatavel', { count: 'exact' });
+    q = filtrarContatos(q, f).order('cliente', { ascending: false }).order('engajamento').limit(limite);
+    const { data, error, count } = await q;
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ contatos: data || [], total: count || 0, exibindo: (data || []).length });
+  }
+
+  if (action === 'contatos-export') {
+    // Só no clique de exportar. Aqui sim vale trazer tudo e com as colunas
+    // extras (whatsapp, entrou_em) que a tabela não exibe.
+    const f = body.filtros || {};
+    let q = supabase.from('contatos')
+      .select('email, nome, whatsapp, cliente, aluno, lead, produtos, engajamento, progresso, origens, contatavel, entrou_em');
+    q = filtrarContatos(q, f).order('cliente', { ascending: false }).limit(5000);
+    const { data, error } = await q;
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ contatos: data || [] });
+  }
+
+  // ══ DISPAROS EM ONDAS ═════════════════════════════════════════════════════
+  // Por que fatiar: 1.795 contatos da base nunca abriram o curso e muitos são
+  // caixas mortas de 2025. Disparar tudo de uma vez gera rejeição em massa, e a
+  // punição não fica no marketing — cai no DOMÍNIO. Aí a chave do CenaDrop e o
+  // acesso do Elite passam a cair em spam. Mandar primeiro para os engajados
+  // constrói reputação antes de a lista fria chegar.
+  // O ASSUNTO também tem {{VARIAVEIS}} (ex.: "Encontro ao vivo {{DATA_ENCONTRO}}").
+  // Sem isto, a pessoa vê as chaves na caixa de entrada.
+  function aplicarVars(texto, vars = {}) {
+    return String(texto || '').replace(/\{\{([A-Z_]+)\}\}/g, (m, k) => (vars[k] ?? '').toString().trim() || '');
+  }
+
+  // Toda onda passa por aqui ANTES de ir para a lista: o admin recebe o e-mail
+  // exatamente como o cliente receberia, e só então libera o envio real.
+  const EMAIL_VALIDACAO = process.env.EMAIL_VALIDACAO || 'rn.smidia@gmail.com';
+  const ONDA_MAX = 500;        // teto por onda
+  const AMOSTRA_FRIA = 400;    // 1ª leva de frios é menor: testa o terreno
+
+  async function contarPorEngajamento(filtros) {
+    const buckets = ['quente', 'morno', 'frio', null];
+    const out = [];
+    for (const eng of buckets) {
+      let q = supabase.from('contatos').select('*', { count: 'exact', head: true }).eq('contatavel', true);
+      q = filtrarContatos(q, filtros);
+      q = eng ? q.eq('engajamento', eng) : q.is('engajamento', null);
+      const { count } = await q;
+      if (count) out.push({ engajamento: eng, total: count });
+    }
+    return out;
+  }
+
+  // Divide um total em N fatias EQUILIBRADAS em vez de encher até o teto e
+  // deixar migalha (505 com teto 500 daria 500 + 5 — uma onda de 5 é inútil).
+  function fatiar(total, teto) {
+    const n = Math.max(1, Math.ceil(total / teto));
+    const base = Math.floor(total / n), resto = total % n;
+    return Array.from({ length: n }, (_, i) => base + (i < resto ? 1 : 0));
+  }
+
+  function montarOndas(porEngajamento) {
+    const rotulos = { quente: '🟢 quentes', morno: '🟡 mornos', frio: '⚪ frios', null: '· sem dado' };
+    const ondas = [];
+    for (const { engajamento, total } of porEngajamento) {
+      // Frios: a primeira leva é uma amostra menor — descobre o estrago barato,
+      // antes de comprometer o resto da lista.
+      const tamanhos = (engajamento === 'frio' && total > AMOSTRA_FRIA)
+        ? [AMOSTRA_FRIA, ...fatiar(total - AMOSTRA_FRIA, ONDA_MAX)]
+        : fatiar(total, ONDA_MAX);
+      let desloc = 0;
+      tamanhos.forEach((tamanho, i) => {
+        ondas.push({
+          ordem: ondas.length + 1,
+          rotulo: rotulos[engajamento] + (engajamento === 'frio' && i === 0 && tamanhos.length > 1 ? ' (amostra)' : ''),
+          engajamento, desloc, tamanho,
+        });
+        desloc += tamanho;
+      });
+    }
+    return ondas;
+  }
+
+  if (action === 'disparo-planejar') {
+    const filtros = body.filtros || {};
+    const porEng = await contarPorEngajamento(filtros);
+    const ondas = montarOndas(porEng);
+    const total = porEng.reduce((a, b) => a + b.total, 0);
+    return res.status(200).json({ total, porEngajamento: porEng, ondas });
+  }
+
+  if (action === 'disparo-criar') {
+    const { nome, templateId, assunto, remetente, filtros, vars = {} } = body;
+    if (!nome || !templateId) return res.status(400).json({ error: 'nome e templateId são obrigatórios' });
+
+    // Assunto e remetente saem do manifest — os mesmos que os cards de blast
+    // dos produtos usam. Só sobrescreve se o admin digitou algo.
+    let tpl = null;
+    try {
+      const manifest = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'emails', 'manifest.json'), 'utf8'));
+      tpl = manifest.find(t => t.id === templateId);
+    } catch (_) {}
+    if (!tpl) return res.status(400).json({ error: `Template "${templateId}" não está no manifest.` });
+
+    // Variável declarada e não preenchida vira {{VAR}} literal no e-mail do cliente.
+    const noAssunto = [...String(assunto || tpl.subject).matchAll(/\{\{([A-Z_]+)\}\}/g)].map(m => m[1]);
+    const exigidas = [...new Set([...(tpl.vars || []), ...noAssunto])];
+    const faltando = exigidas.filter(v => v !== 'PRIMEIRO_NOME' && !String(vars[v] || '').trim());
+    if (faltando.length) return res.status(400).json({ error: 'Preencha: ' + faltando.join(', ') });
+
+    const assuntoFinal = (assunto || '').trim() || tpl.subject;  // guardado cru; resolvido no envio
+    const fromFinal    = (remetente || '').trim() || tpl.from;
+
+    const porEng = await contarPorEngajamento(filtros || {});
+    const ondas = montarOndas(porEng);
+    if (!ondas.length) return res.status(400).json({ error: 'Nenhum contato nesse público.' });
+    const total = porEng.reduce((a, b) => a + b.total, 0);
+
+    const { data: disp, error: e1 } = await supabase.from('disparos')
+      .insert({ nome, template_id: templateId, assunto: assuntoFinal, remetente: fromFinal,
+                filtros: filtros || {}, vars, total, status: 'aprovado', criado_por: currentAdmin?.login || null })
+      .select().single();
+    if (e1) return res.status(500).json({ error: e1.message });
+
+    const { error: e2 } = await supabase.from('disparo_ondas')
+      .insert(ondas.map(o => ({ ...o, disparo_id: disp.id })));
+    if (e2) return res.status(500).json({ error: e2.message });
+    return res.status(200).json({ ok: true, disparo: disp, ondas: ondas.length });
+  }
+
+  if (action === 'disparo-teste') {
+    const { templateId, assunto, remetente, vars = {}, email } = body;
+    if (!templateId || !email) return res.status(400).json({ error: 'templateId e email obrigatórios' });
+    try {
+      const manifest = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'emails', 'manifest.json'), 'utf8'));
+      const tpl = manifest.find(t => t.id === templateId);
+      if (!tpl) return res.status(404).json({ error: 'Template não encontrado' });
+      const html = renderEmail(templateId, { PRIMEIRO_NOME: 'Você', ...vars });
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      const assuntoCru = (assunto || '').trim() || tpl.subject;
+      await sendEmail(resend, { from: (remetente || '').trim() || tpl.from, to: email,
+                                subject: aplicarVars(assuntoCru, vars), html });
+      return res.status(200).json({ ok: true });
+    } catch (e) { return res.status(500).json({ error: e.message }); }
+  }
+
+  if (action === 'disparo-list') {
+    const { data, error } = await supabase.from('disparos')
+      .select('*, disparo_ondas(id, ordem, rotulo, engajamento, desloc, tamanho, status, enviados, falhas, erro, concluida_em, validada_em)')
+      .order('created_at', { ascending: false }).limit(50);
+    if (error) return res.status(500).json({ error: error.message });
+
+    // Métricas de entrega (o que o webhook do Resend registrou). Duas funções
+    // agregadas no banco em vez de uma contagem por disparo aqui — a tabela de
+    // eventos cresce rápido e não dá para trazer linha a linha.
+    const [{ data: mDisp }, { data: mOnda }] = await Promise.all([
+      supabase.rpc('disparo_metricas'),
+      supabase.rpc('onda_metricas'),
+    ]);
+    const porDisparo = Object.fromEntries((mDisp || []).map(m => [m.disparo_id, m]));
+    const porOnda    = Object.fromEntries((mOnda || []).map(m => [m.onda_id, m]));
+    const disparos = (data || []).map(d => ({
+      ...d,
+      metricas: porDisparo[d.id] || null,
+      disparo_ondas: (d.disparo_ondas || []).map(o => ({ ...o, metricas: porOnda[o.id] || null })),
+    }));
+    return res.status(200).json({ disparos });
+  }
+
+  if (action === 'disparo-executar-onda') {
+    // Envia UMA onda, em lotes de 100 (limite do batch do Resend). O painel
+    // chama de novo enquanto "fim" for false — assim nunca estoura o tempo
+    // da função, mesmo numa onda de 500.
+    const { ondaId, loteOffset = 0 } = body;
+    if (!ondaId) return res.status(400).json({ error: 'ondaId obrigatório' });
+
+    const { data: onda, error: eo } = await supabase.from('disparo_ondas').select('*').eq('id', ondaId).single();
+    if (eo || !onda) return res.status(404).json({ error: 'Onda não encontrada' });
+    if (onda.status === 'concluida') return res.status(200).json({ ok: true, fim: true, jaConcluida: true });
+
+    const { data: disp } = await supabase.from('disparos').select('*').eq('id', onda.disparo_id).single();
+    if (!disp) return res.status(404).json({ error: 'Disparo não encontrado' });
+
+    // ── ETAPA 1: validação ──────────────────────────────────────────────────
+    // Primeiro clique não envia para ninguém da lista. Manda UMA cópia para o
+    // admin e trava a onda aguardando confirmação. Foi a falta disto que deixou
+    // 155 pessoas receberem e-mail com {{VARIAVEL}} em 11/08.
+    if (!body.confirmado && !onda.validada_em) {
+      try {
+        const htmlV = renderEmail(disp.template_id, { PRIMEIRO_NOME: 'Você', ...(disp.vars || {}) });
+        const resendV = new Resend(process.env.RESEND_API_KEY);
+        await sendEmail(resendV, {
+          from: disp.remetente || 'Elite Dark Academy <noreply@raynern.com.br>',
+          to: EMAIL_VALIDACAO,
+          subject: '[VALIDAR] ' + aplicarVars(disp.assunto, disp.vars || {}),
+          html: htmlV,
+        });
+      } catch (e) {
+        return res.status(500).json({ error: 'Não consegui enviar a cópia de validação: ' + e.message });
+      }
+      await supabase.from('disparo_ondas').update({ validada_em: new Date().toISOString() }).eq('id', ondaId);
+      return res.status(200).json({ ok: true, validacao: true, enviadoPara: EMAIL_VALIDACAO, fim: true });
+    }
+
+    // ── ENVIO COM CLAIM ATÔMICO (à prova de duplicata) ──────────────────────
+    // O bug antigo confiava no loteOffset vindo do navegador: se o loop
+    // reiniciasse (2º clique, reconexão do remote-control), voltava do zero e
+    // reenviava os mesmos 100. Agora o SERVIDOR é dono do progresso.
+    //
+    // Como funciona: antes de enviar, RESERVA cada e-mail na tabela
+    // disparo_enviados (UNIQUE em disparo_id+email). O insert com
+    // ignoreDuplicates só devolve os que ESTE processo conseguiu inserir —
+    // se dois cliques correrem juntos, cada e-mail é reservado por um só.
+    // Assim é IMPOSSÍVEL a mesma pessoa receber duas vezes, mesmo com o loop
+    // reiniciando ou duas abas abertas.
+    const LOTE = 100;
+
+    // alvos desta onda (fatia da faixa de engajamento) — a lista COMPLETA dela
+    let q = supabase.from('contatos').select('email, nome').eq('contatavel', true);
+    q = filtrarContatos(q, disp.filtros || {});
+    q = onda.engajamento ? q.eq('engajamento', onda.engajamento) : q.is('engajamento', null);
+    const { data: alvosOnda, error: ea } = await q.order('email').range(onda.desloc, onda.desloc + onda.tamanho - 1);
+    if (ea) return res.status(500).json({ error: ea.message });
+
+    // quem desta onda JÁ recebeu (registrado no envio-log deste disparo)
+    const emailsOnda = (alvosOnda || []).map(c => c.email);
+    const { data: jaLog } = await supabase.from('disparo_enviados')
+      .select('email').eq('disparo_id', disp.id).in('email', emailsOnda.length ? emailsOnda : ['—']);
+    const jaEnviados = new Set((jaLog || []).map(r => r.email));
+    const pendentes = (alvosOnda || []).filter(c => !jaEnviados.has(c.email));
+
+    if (!pendentes.length) {
+      const { count } = await supabase.from('disparo_enviados').select('*', { count: 'exact', head: true }).eq('onda_id', ondaId);
+      await supabase.from('disparo_ondas').update({ status: 'concluida', enviados: count || onda.tamanho, concluida_em: new Date().toISOString() }).eq('id', ondaId);
+      const { data: irmas } = await supabase.from('disparo_ondas').select('status').eq('disparo_id', disp.id);
+      if ((irmas || []).every(o => o.status === 'concluida'))
+        await supabase.from('disparos').update({ status: 'concluido', updated_at: new Date().toISOString() }).eq('id', disp.id);
+      return res.status(200).json({ ok: true, enviados: 0, fim: true });
+    }
+
+    if (onda.status !== 'enviando') {
+      await supabase.from('disparo_ondas').update({ status: 'enviando', iniciada_em: onda.iniciada_em || new Date().toISOString() }).eq('id', ondaId);
+      await supabase.from('disparos').update({ status: 'em_andamento', updated_at: new Date().toISOString() }).eq('id', disp.id);
+    }
+
+    const lote = pendentes.slice(0, LOTE);
+
+    // CLAIM: reserva atômica. Só quem foi de fato inserido é "meu" pra enviar.
+    const { data: claimed, error: ec } = await supabase.from('disparo_enviados')
+      .upsert(lote.map(c => ({ disparo_id: disp.id, onda_id: ondaId, email: c.email })),
+              { onConflict: 'disparo_id,email', ignoreDuplicates: true })
+      .select('email');
+    if (ec) return res.status(500).json({ error: 'Falha ao reservar o lote: ' + ec.message });
+
+    const claimSet = new Set((claimed || []).map(r => r.email));
+    const enviar = lote.filter(c => claimSet.has(c.email));
+    if (!enviar.length) {
+      // outra chamada pegou este lote — nada a fazer, segue
+      return res.status(200).json({ ok: true, enviados: 0, fim: false, proximoLote: 0 });
+    }
+
+    const html = renderEmail(disp.template_id, disp.vars || {});
+    const from = disp.remetente || 'Elite Dark Academy <noreply@raynern.com.br>';
+    const assuntoFinal = aplicarVars(disp.assunto, disp.vars || {});
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    let enviados = 0, erro = null;
+    try {
+      // As tags viajam com o e-mail e voltam em TODO evento do webhook — é o que
+      // permite dizer "esta abertura é da onda 4 do disparo X" sem consultar nada.
+      const marcas = [{ name: 'disparo', value: disp.id }, { name: 'onda', value: ondaId }];
+      const r = await resend.batch.send(enviar.map(c => ({
+        from, to: c.email, subject: assuntoFinal,
+        html: html.replace(/\{\{PRIMEIRO_NOME\}\}/g, () => (c.nome || '').split(' ')[0] || 'tudo bem'),
+        tags: marcas,
+      })));
+      if (r?.error) throw new Error(r.error.message || JSON.stringify(r.error));
+      const ids = r?.data?.data || [];
+      enviados = ids.length || enviar.length;
+
+      // Guarda o id que o Resend deu a cada e-mail. É a chave que liga o envio
+      // ao evento de abertura/clique que chega depois. A resposta do batch vem
+      // na MESMA ordem do payload — se o tamanho não bater, não dá pra confiar
+      // no pareamento e é melhor não gravar nada do que gravar trocado.
+      if (ids.length === enviar.length) {
+        try {
+          await supabase.from('disparo_enviados').upsert(
+            enviar.map((c, i) => ({ disparo_id: disp.id, onda_id: ondaId, email: c.email, resend_id: ids[i]?.id || null })),
+            { onConflict: 'disparo_id,email' }
+          );
+        } catch (e2) {
+          // E-mail já saiu; perder o id só custa precisão na métrica (o webhook
+          // ainda casa pelo endereço). Não é motivo para abortar a onda.
+          console.error('[disparo] não gravei os ids do Resend:', e2.message);
+        }
+      }
+    } catch (e) {
+      erro = e.message;
+      // Envio falhou → LIBERA a reserva (senão ficariam marcados sem receber)
+      await supabase.from('disparo_enviados').delete().eq('disparo_id', disp.id).in('email', enviar.map(c => c.email));
+      await supabase.from('disparo_ondas').update({ status: 'pendente', erro }).eq('id', ondaId);
+      console.error('[disparo] onda', onda.ordem, 'falhou:', e.message);
+      return res.status(200).json({ ok: false, abortado: true, erro, fim: true });
+    }
+
+    // progresso = quantos desta onda já estão no log
+    const { count: totalOnda } = await supabase.from('disparo_enviados').select('*', { count: 'exact', head: true }).eq('onda_id', ondaId);
+    const restantesDepois = pendentes.length - enviar.length;
+    const fim = restantesDepois <= 0;
+    await supabase.from('disparo_ondas').update({
+      enviados: totalOnda || 0, erro: null,
+      ...(fim ? { status: 'concluida', concluida_em: new Date().toISOString() } : {}),
+    }).eq('id', ondaId);
+
+    if (fim) {
+      const { data: irmas } = await supabase.from('disparo_ondas').select('status').eq('disparo_id', disp.id);
+      if ((irmas || []).every(o => o.status === 'concluida'))
+        await supabase.from('disparos').update({ status: 'concluido', updated_at: new Date().toISOString() }).eq('id', disp.id);
+    }
+    return res.status(200).json({ ok: true, enviados, fim, restantes: restantesDepois });
+  }
+
+  if (action === 'disparo-atualizar') {
+    // Editar depois de validar. Qualquer mudança de conteúdo ZERA a validação
+    // das ondas ainda não enviadas — senão você confirmaria um e-mail que
+    // não é o que conferiu. Ondas já enviadas não são afetadas (nem podem ser).
+    const { id, nome, assunto, vars } = body;
+    if (!id) return res.status(400).json({ error: 'id obrigatório' });
+
+    const { data: disp } = await supabase.from('disparos').select('*').eq('id', id).single();
+    if (!disp) return res.status(404).json({ error: 'Disparo não encontrado' });
+
+    let tpl = null;
+    try {
+      const manifest = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'emails', 'manifest.json'), 'utf8'));
+      tpl = manifest.find(t => t.id === disp.template_id);
+    } catch (_) {}
+    const varsFinais = vars ?? disp.vars ?? {};
+    const assuntoFinal = (assunto ?? disp.assunto ?? '').trim() || (tpl?.subject || '');
+    const noAssunto = [...String(assuntoFinal).matchAll(/\{\{([A-Z_]+)\}\}/g)].map(m => m[1]);
+    const exigidas = [...new Set([...(tpl?.vars || []), ...noAssunto])];
+    const faltando = exigidas.filter(v => v !== 'PRIMEIRO_NOME' && !String(varsFinais[v] || '').trim());
+    if (faltando.length) return res.status(400).json({ error: 'Preencha: ' + faltando.join(', ') });
+
+    const { error } = await supabase.from('disparos').update({
+      nome: (nome ?? disp.nome), assunto: assuntoFinal, vars: varsFinais,
+      updated_at: new Date().toISOString(),
+    }).eq('id', id);
+    if (error) return res.status(500).json({ error: error.message });
+
+    const { count } = await supabase.from('disparo_ondas')
+      .update({ validada_em: null }, { count: 'exact' })
+      .eq('disparo_id', id).eq('status', 'pendente');
+    return res.status(200).json({ ok: true, ondasRevalidar: count || 0 });
+  }
+
+  if (action === 'disparo-excluir') {
+    if (!body.id) return res.status(400).json({ error: 'id obrigatório' });
+    const { error } = await supabase.from('disparos').delete().eq('id', body.id);
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ ok: true });
+  }
+
+  if (action === 'contatos-delete') {
+    // Exclusão definitiva. Para "parar de receber" sem perder o histórico,
+    // use contatos-update com contatavel:false — é o que o sino faz.
+    const { id } = body;
+    if (!id) return res.status(400).json({ error: 'id obrigatório' });
+    const { error } = await supabase.from('contatos').delete().eq('id', id);
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ ok: true });
+  }
+
+  if (action === 'contatos-update') {
+    const { id, contatavel, observacao } = body;
+    if (!id) return res.status(400).json({ error: 'id obrigatório' });
+    const upd = { updated_at: new Date().toISOString() };
+    if (typeof contatavel === 'boolean') upd.contatavel = contatavel;
+    if (observacao !== undefined) upd.observacao = observacao;
+    const { error } = await supabase.from('contatos').update(upd).eq('id', id);
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ ok: true });
+  }
+
+  if (action === 'contatos-blast') {
+    // Disparo em FATIAS. 2.7k e-mails a 120ms cada levariam ~5min e estourariam
+    // o limite da função; então o painel chama esta ação várias vezes, avançando
+    // o offset. Cada chamada manda no máximo 100 (limite do batch do Resend).
+    const { filtros = {}, templateId, assunto, remetente, offset = 0 } = body;
+    if (!templateId || !assunto) return res.status(400).json({ error: 'templateId e assunto são obrigatórios' });
+
+    const LOTE = 100;
+    let q = supabase.from('contatos').select('email, nome', { count: 'exact' }).eq('contatavel', true);
+    q = filtrarContatos(q, filtros).order('email').range(offset, offset + LOTE - 1);
+    const { data, error, count } = await q;
+    if (error) return res.status(500).json({ error: error.message });
+
+    const total = count || 0;
+    const fatia = data || [];
+    if (!fatia.length) return res.status(200).json({ ok: true, total, offset, enviados: 0, falhas: 0, fim: true });
+
+    let html;
+    try { html = renderEmail(templateId, {}); }
+    catch (e) { return res.status(400).json({ error: `Template "${templateId}" não encontrado: ${e.message}` }); }
+
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    const from = remetente || 'Elite Dark Academy <noreply@raynern.com.br>';
+    let enviados = 0, falhas = 0;
+    const erros = [];
+    try {
+      const lote = fatia.map(c => ({
+        from, to: c.email, subject: assunto,
+        html: html.replace(/\{\{PRIMEIRO_NOME\}\}/g, () => (c.nome || '').split(' ')[0] || 'tudo bem'),
+      }));
+      const r = await resend.batch.send(lote);
+      if (r?.error) throw new Error(r.error.message || JSON.stringify(r.error));
+      enviados = r?.data?.data?.length ?? lote.length;
+    } catch (e) {
+      falhas = fatia.length;
+      erros.push(e.message);
+      console.error('[contatos-blast] lote falhou:', e.message);
+    }
+
+    const proximo = offset + fatia.length;
+    return res.status(200).json({
+      ok: true, total, offset, enviados, falhas, erros,
+      proximoOffset: proximo, fim: proximo >= total,
+    });
   }
 
   // ── LISTA ESPERA (desistência EDA) ───────────────────────────
@@ -1263,7 +1829,7 @@ module.exports = async function handler(req, res) {
   if (action === 'lista-espera-list') {
     const { data, error } = await supabase
       .from('academyelite_lista_espera')
-      .select('id, nome, email, whatsapp, q1, q2, q3, status, created_at')
+      .select('id, nome, email, whatsapp, q1, q2, q3, status, created_at, classificacao, etapa_saida, preco_confirmado, preco_exibido, origem')
       .order('created_at', { ascending: false });
     if (error) return res.status(500).json({ error: error.message });
     return res.status(200).json({ lista: data || [] });
