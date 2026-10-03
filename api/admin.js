@@ -277,9 +277,12 @@ module.exports = async function handler(req, res) {
     return res.status(403).json({ error: 'A base de contatos é restrita ao admin master.' });
   }
 
-  // CADERNO DO SEU ZÉ — produto do canal Ori, por enquanto só do master (decisão do
-  // Rayner, 01/10/26). Pra liberar a outros: tirar esta guarda e pôr 'caderno' no AC_PANELS.
-  if (String(action).startsWith('caderno-') && currentAdmin.role !== 'master') {
+  // CADERNO DO SEU ZÉ — produto do canal Ori: master + perfis restritos com o painel
+  // 'caderno' marcado no Acessos (03/10/26: liberado p/ caiottrindade@hotmail.com, o amigo
+  // que começou o app). Admins "full" (Marcos/Jaqueline) seguem SEM — decisão de 01/10/26.
+  const cadernoLiberado = currentAdmin.role === 'master'
+    || ((currentAdmin.permissions && currentAdmin.permissions.panels) || []).includes('caderno');
+  if (String(action).startsWith('caderno-') && !cadernoLiberado) {
     return res.status(403).json({ error: 'O painel do Caderno é restrito ao admin master.' });
   }
 

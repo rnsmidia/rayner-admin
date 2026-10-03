@@ -1382,7 +1382,7 @@ select.inp { cursor:pointer; }
           </div>
         </button>
         <!-- subnav Nexus movida para abas no topo (#tabs-nexus) -->
-        <!-- Caderno do Seu Zé (canal Ori) — SOMENTE MASTER por enquanto -->
+        <!-- Caderno do Seu Zé (canal Ori) — master + restritos com o painel 'caderno' (Acessos) -->
         <button class="prod-btn" id="btn-caderno" onclick="switchProduct('caderno')" style="display:none">
           <div class="prod-icon">📿</div>
           <div>
@@ -3926,6 +3926,10 @@ function showApp(login) {
     const el = document.getElementById(id);
     if (el) el.style.display = soMaster;
   });
+  // Caderno: além do master, perfil restrito com o painel 'caderno' marcado no Acessos.
+  if (PERMS && (PERMS.panels || []).includes('caderno')) {
+    const cb = document.getElementById('btn-caderno'); if (cb) cb.style.display = '';
+  }
   applyPermissions(PERMS);
 }
 
@@ -3942,7 +3946,7 @@ function applyPermissions(perms) {
   });
 
   // Se o painel padrão (cenadrop) não é permitido, cai no primeiro permitido
-  const order = ['overview','cenadrop','narrativa','academy','contatos','nexus','links','monitor','equipe'];
+  const order = ['overview','cenadrop','narrativa','academy','contatos','nexus','caderno','links','monitor','equipe'];
   const first = order.find(p => allowed.includes(p));
   if (first) switchProduct(first);
 
@@ -4043,7 +4047,7 @@ function switchProduct(prod) {
 // ── ACESSOS (Admin Master) ────────────────────────────────
 const AC_PANELS = [
   ['overview','Overview'], ['cenadrop','CenaDrop'], ['narrativa','Narrativa IA'],
-  ['academy','Elite Academy'], ['nexus','Nexus'], ['links','Links'],
+  ['academy','Elite Academy'], ['nexus','Nexus'], ['caderno','Caderno do Seu Zé'], ['links','Links'],
   ['monitor','Monitor / Sistema'], ['equipe','Equipe'],
 ];
 let acEditingId = null, acList = [];
