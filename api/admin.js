@@ -143,7 +143,9 @@ async function adminFromToken(token) {
 // Mapeia uma action ao painel a que pertence (p/ gating de admin restrito).
 function actionPanel(action) {
   const a = String(action || '');
-  if (['stats', 'overview', 'funnel-status', 'track-visit', 'list'].includes(a)) return null; // utilitário/dashboard
+  // 'list' NÃO entra aqui: devolve as licenças CenaDrop com e-mail — cai no default 'cenadrop'
+  // (03/10/26: um perfil só-Caderno conseguia listar todas as licenças).
+  if (['stats', 'overview', 'funnel-status', 'track-visit'].includes(a)) return null; // utilitário/dashboard (só contagens)
   if (a.startsWith('acessos')) return 'acessos';
   if (a.startsWith('blast-narrativa')) return 'narrativa';
   if (a.startsWith('blast-eda')) return 'academy';
