@@ -10,7 +10,6 @@ function isValidToken(token) {
     const admins = [
       { login: 'rnadmin', password: process.env.ADMIN_PASSWORD  || '' },
       { login: 'mcadmin', password: process.env.ADMIN2_PASSWORD || '' },
-      { login: 'jnadmin', password: process.env.ADMIN3_PASSWORD || '' },
     ];
     return admins.some(a => a.login === login && a.password === password && password);
   } catch { return false; }

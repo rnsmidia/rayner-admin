@@ -19,7 +19,6 @@ VARIÁVEIS DE AMBIENTE (configurar na Vercel):
   SUPABASE_SERVICE_KEY   — Service Role Key do Supabase
   ADMIN_PASSWORD         — Senha do admin Rayner (fallback)
   ADMIN2_PASSWORD        — Senha do admin Marcos (fallback)
-  ADMIN3_PASSWORD        — Senha do admin Jaqueline (fallback)
   RESEND_API_KEY         — Chave da API do Resend (email transacional)
   HOTMART_HOTTOK         — Token de segurança do webhook Hotmart
 

@@ -48,20 +48,8 @@ function cadernoDb() {
 const ADMINS = [
   { name: 'Rayner',     login: 'rnadmin', role: 'master', password: process.env.ADMIN_PASSWORD  || '' },
   { name: 'Marcos',     login: 'mcadmin', role: 'full',   password: process.env.ADMIN2_PASSWORD || '' },
-  { name: 'Jaqueline',  login: 'jnadmin', role: 'full',   password: process.env.ADMIN3_PASSWORD || '' },
-  {
-    name: 'Suporte01',
-    login: 'suporte01',
-    role: 'restrito',
-    password: process.env.SUPORTE01_PASSWORD || '',
-    permissions: {
-      panels: ['overview', 'cenadrop', 'narrativa', 'academy', 'links'],
-      cenadrop:  { sections: ['dashboard', 'licenses', 'students'], can: { resend: true } },
-      narrativa: { sections: ['dashboard', 'users'],                 can: { resend: true } },
-      academy:   { sections: ['membros'] },
-      links:     { full: true },
-    },
-  },
+  // Jaqueline (jnadmin) e Suporte01 EXCLUÍDOS em 05/10/26 (pedido do Rayner): saíram do banco,
+  // desta lista e das env vars ADMIN3_PASSWORD/SUPORTE01_PASSWORD — senão o fallback ainda os deixava entrar.
 ];
 
 // Actions bloqueadas para admins restritos (qualquer admin com campo `permissions`)
@@ -199,6 +187,71 @@ module.exports = async function handler(req, res) {
     return res.status(401).json({ error: 'Login ou senha incorretos' });
   }
 
+  // CENADROP DIAGNÓSTICO — público (vem da extensão), validado pela CHAVE do aluno (05/10/26).
+  // tipo 'botao' = o aluno clicou em "Enviar diagnóstico" (log completo + código D-XXXX pra citar no Discord);
+  // tipo 'auto'  = só os códigos de erro, mandado sozinho pela extensão (junta na mesma linha por 30 min).
+  // Não dá pra criar função nova na Vercel (12 = teto do plano) → mora aqui. verify.js NÃO é tocado (444).
+  if (action === 'cd-diag') {
+    try {
+      const chave = String(body.key || '').trim().toUpperCase().slice(0, 40);
+      if (!chave) return res.status(400).json({ ok: false, error: 'sem chave' });
+      const { data: lic } = await supabase.from('licenses').select('key,email,name').eq('key', chave).maybeSingle();
+      if (!lic) return res.status(403).json({ ok: false, error: 'chave desconhecida' });
+      const tipo = body.tipo === 'auto' ? 'auto' : 'botao';
+      const corta = (v, n) => String(v == null ? '' : v).slice(0, n);
+      const erros = (Array.isArray(body.erros) ? body.erros : []).slice(0, 40)
+        .map(e => ({ codigo: corta(e && e.codigo, 80), n: Math.max(1, Math.min(9999, parseInt(e && e.n, 10) || 1)) }))
+        .filter(e => e.codigo);
+      const linhas = tipo === 'botao' ? (Array.isArray(body.linhas) ? body.linhas : []).slice(-2500)
+        .map(l => ({ t: Number(l && l.t) || 0, o: corta(l && l.o, 12), n: corta(l && l.n, 6), x: corta(l && l.x, 700) })) : [];
+      const cdResumo = (lista) => {
+        const tem = (re) => lista.some(e => re.test(e.codigo));
+        const out = [];
+        if (tem(/UNUSUAL_ACTIVITY/)) out.push('Bloqueio anti-automação do Google (reCAPTCHA): costuma ser rede/IP/antivírus do aluno — acontece até sem a extensão. Orientar teste no 4G do celular.');
+        if (tem(/RESOURCE_EXHAUSTED|limite|429/i)) out.push('Limite/cota da conta Google atingido.');
+        if (tem(/REFUSED|POLICY|FILTER|SAFETY|pol[ií]tica/i)) out.push('Recusa por política: texto de alguma cena — corrigir a cena (não é bug).');
+        if (tem(/editor|button|bot[aã]o|no editor/i)) out.push('Tela do Flow não estava pronta/mudou na hora do envio (F5 na aba; se repetir, olhar o log).');
+        if (tem(/download/i)) out.push('Falha no download do arquivo pronto.');
+        return out.join(' ');
+      };
+      const meta = {
+        versao: corta(body.versao, 20), plataforma: corta(body.plataforma, 20),
+        navegador: corta(body.navegador, 160), email: lic.email || null, nome: lic.name || null,
+      };
+      // limpeza: diagnósticos somem depois de 30 dias
+      supabase.from('cenadrop_diagnosticos').delete().lt('criado', new Date(Date.now() - 30 * 864e5).toISOString()).then(() => {}, () => {});
+      if (tipo === 'auto') {
+        const desde = new Date(Date.now() - 30 * 60e3).toISOString();
+        const { data: ant } = await supabase.from('cenadrop_diagnosticos').select('id,erros')
+          .eq('chave', chave).eq('tipo', 'auto').gte('criado', desde).order('criado', { ascending: false }).limit(1);
+        if (ant && ant[0]) {
+          const mapa = {};
+          [...(ant[0].erros || []), ...erros].forEach(e => { mapa[e.codigo] = (mapa[e.codigo] || 0) + e.n; });
+          const junt = Object.keys(mapa).map(k => ({ codigo: k, n: mapa[k] }));
+          await supabase.from('cenadrop_diagnosticos').update({ erros: junt, resumo: cdResumo(junt), criado: new Date().toISOString(), ...meta }).eq('id', ant[0].id);
+          return res.status(200).json({ ok: true, juntou: true });
+        }
+        await supabase.from('cenadrop_diagnosticos').insert({ tipo, chave, erros, resumo: cdResumo(erros), ...meta });
+        return res.status(200).json({ ok: true });
+      }
+      const ALF = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let codigo = null;
+      for (let i = 0; i < 6 && !codigo; i++) {
+        const c = 'D-' + Array.from({ length: 4 }, () => ALF[Math.floor(Math.random() * ALF.length)]).join('');
+        const { data: ja } = await supabase.from('cenadrop_diagnosticos').select('id').eq('codigo', c).maybeSingle();
+        if (!ja) codigo = c;
+      }
+      const { error } = await supabase.from('cenadrop_diagnosticos').insert({
+        tipo, codigo, chave, erros, resumo: cdResumo(erros), mensagem: corta(body.mensagem, 1000),
+        linhas, n_linhas: linhas.length, ...meta,
+      });
+      if (error) return res.status(500).json({ ok: false, error: error.message });
+      return res.status(200).json({ ok: true, codigo });
+    } catch (e) {
+      return res.status(500).json({ ok: false, error: e.message });
+    }
+  }
+
   // TRACK VISIT — público, sem autenticação
   if (action === 'track-visit') {
     const raw   = String(body.video || 'direct');
@@ -281,7 +334,7 @@ module.exports = async function handler(req, res) {
 
   // CADERNO DO SEU ZÉ — produto do canal Ori: master + perfis restritos com o painel
   // 'caderno' marcado no Acessos (03/10/26: liberado p/ caiottrindade@hotmail.com, o amigo
-  // que começou o app). Admins "full" (Marcos/Jaqueline) seguem SEM — decisão de 01/10/26.
+  // que começou o app). Admins "full" (Marcos) seguem SEM — decisão de 01/10/26.
   const cadernoLiberado = currentAdmin.role === 'master'
     || ((currentAdmin.permissions && currentAdmin.permissions.panels) || []).includes('caderno');
   if (String(action).startsWith('caderno-') && !cadernoLiberado) {
@@ -1150,6 +1203,25 @@ module.exports = async function handler(req, res) {
       if (!vistos.has(e)) vistos.set(e, { email: e, name: l.name });
     }
     return { lista: [...vistos.values()], licencas: (data || []).length };
+  }
+
+  // DIAGNÓSTICOS DO CENADROP — lista (sem as linhas) e um aberto (com as linhas). Painel 'cenadrop'.
+  if (action === 'diag-list') {
+    let q = supabase.from('cenadrop_diagnosticos')
+      .select('id,codigo,criado,tipo,chave,email,nome,versao,plataforma,erros,resumo,n_linhas,mensagem')
+      .order('criado', { ascending: false }).limit(300);
+    if (body.tipo === 'botao' || body.tipo === 'auto') q = q.eq('tipo', body.tipo);
+    if (body.plataforma) q = q.eq('plataforma', String(body.plataforma));
+    const busca = String(body.busca || '').trim();
+    if (busca) q = q.or(`codigo.ilike.%${busca.replace(/[,()%]/g, '')}%,chave.ilike.%${busca.replace(/[,()%]/g, '')}%,email.ilike.%${busca.replace(/[,()%]/g, '')}%`);
+    const { data, error } = await q;
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ ok: true, itens: data || [] });
+  }
+  if (action === 'diag-get') {
+    const { data, error } = await supabase.from('cenadrop_diagnosticos').select('*').eq('id', String(body.id || '')).maybeSingle();
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ ok: true, item: data });
   }
 
   if (action === 'blast-count') {
