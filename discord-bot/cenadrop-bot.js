@@ -3,6 +3,9 @@
  * - /ativar <chave>        → confere a licença, liga o Discord à chave e dá o cargo Cliente
  * - /minha-chave <e-mail>  → reenvia a chave ativa para o e-mail da compra
  * - Quem sai e volta recupera o cargo sozinho (pelo discord_id gravado na licença)
+ * - A cada 30 min confere quem tem o cargo: chave desativada (reembolso, cancelamento,
+ *   desativada no Admin) perde o cargo; chave reativada recebe de volta.
+ *   `!conferir` no servidor Staff roda na hora.
  * - Tudo fica registrado no #ativacoes do servidor Staff
  *
  * Env: CENADROP_BOT_TOKEN, SUPABASE_URL, SUPABASE_SERVICE_KEY, RESEND_API_KEY
@@ -16,6 +19,7 @@ const { createClient } = require('@supabase/supabase-js');
 
 const APP_ID       = '1555368816140361778';
 const GUILD_ID     = '1555365917578240130';
+const STAFF_GUILD  = '1555367221541208105';
 const ROLE_CLIENTE = '1555372672534454282';
 const CH = {
   geral:    '1555365918278684775',
@@ -26,6 +30,7 @@ const CH = {
 const PLANOS   = 'https://www.cenadrop.com.br/planos';
 const TEMPLATE = 'https://www.cenadrop.com.br/emails/cenadrop/reenvio-chave.html';
 const COR = 0x7C3AED;
+const CONFERIR_A_CADA = 30 * 60 * 1000;
 
 // Linhas da tabela licenses que não são CenaDrop
 const PRODUTOS_FORA = new Set(['nx_visit', 'nxsaude']);
@@ -177,6 +182,73 @@ async function minhaChave(inter) {
   return inter.editReply({ content: resposta });
 }
 
+
+// ── conferência de acesso (reembolso/cancelamento tira o cargo) ─────────────
+let conferindo = false;
+async function conferirAcessos() {
+  if (conferindo) return { ignorado: true };
+  conferindo = true;
+  try {
+    const { data, error } = await db()
+      .from('licenses')
+      .select('key, active, status, product, discord_id')
+      .not('discord_id', 'is', null);
+    if (error) throw error;
+
+    // discord_id → tem alguma chave CenaDrop ativa?
+    const ativo = new Map();
+    for (const l of data.filter(ehCenaDrop)) {
+      ativo.set(l.discord_id, ativo.get(l.discord_id) || ativa(l));
+    }
+
+    const guild = await client.guilds.fetch(GUILD_ID);
+    const membros = await guild.members.fetch();
+
+    // Trava: banco devolveu vazio mas tem gente com cargo → algo errado, não remove ninguém
+    const comCargo = membros.filter((m) => m.roles.cache.has(ROLE_CLIENTE)).size;
+    if (ativo.size === 0 && comCargo > 0) {
+      throw new Error(`banco devolveu 0 licenças ligadas mas ${comCargo} membros têm o cargo — conferência abortada`);
+    }
+    let removidos = 0, devolvidos = 0;
+
+    for (const m of membros.values()) {
+      if (m.user.bot) continue;
+      const temCargo = m.roles.cache.has(ROLE_CLIENTE);
+
+      if (temCargo && !ativo.get(m.id)) {
+        const motivo = ativo.has(m.id) ? 'chave desativada' : 'sem chave ligada';
+        await m.roles.remove(ROLE_CLIENTE, `Conferência: ${motivo}`);
+        removidos++;
+        await logStaff(`🚫 Perdeu o acesso · **${m.user.username}** \`${m.id}\` · ${motivo}`);
+        if (motivo === 'chave desativada') {
+          await m.send({
+            content: '👋 Seu acesso à área de clientes do **CenaDrop** foi encerrado porque a sua chave foi desativada (assinatura cancelada ou reembolso).\nVocê continua no servidor e pode voltar quando quiser: é só escolher um plano e ativar a chave nova com `/ativar`.',
+            components: botaoPlanos(),
+          }).catch(() => {});
+        }
+      } else if (!temCargo && ativo.get(m.id)) {
+        await m.roles.add(ROLE_CLIENTE, 'Conferência: chave ativa');
+        devolvidos++;
+        await logStaff(`♻️ Acesso devolvido (chave ativa de novo) · **${m.user.username}** \`${m.id}\``);
+      }
+    }
+    console.log(`[CenaDrop] conferência: ${membros.size} membros · ${removidos} removidos · ${devolvidos} devolvidos`);
+    return { membros: membros.size, removidos, devolvidos };
+  } finally {
+    conferindo = false;
+  }
+}
+
+async function conferirComAviso() {
+  try {
+    return await conferirAcessos();
+  } catch (err) {
+    console.error('[CenaDrop] erro na conferência:', err);
+    await logStaff(`🔴 Erro na conferência de acessos · ${String(err.message || err).slice(0, 300)}`);
+    return { erro: err.message };
+  }
+}
+
 // ── eventos ─────────────────────────────────────────────────────────────────
 client.once('clientReady', async () => {
   console.log(`✅ CenaDrop Bot online: ${client.user.tag}`);
@@ -187,6 +259,8 @@ client.once('clientReady', async () => {
   } catch (err) {
     console.error('[CenaDrop] erro ao registrar comandos:', err.message);
   }
+  setTimeout(conferirComAviso, 60 * 1000);
+  setInterval(conferirComAviso, CONFERIR_A_CADA);
 });
 
 client.on('interactionCreate', async (inter) => {
@@ -224,6 +298,13 @@ client.on('guildMemberAdd', async (member) => {
 // Chave colada como mensagem comum (sem usar o comando) → apaga na hora
 const PADRAO_CHAVE = /\bCD-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}\b|\bRN-\d{6}\b/i;
 client.on('messageCreate', async (msg) => {
+  // `!conferir` no Staff roda a conferência na hora
+  if (msg.guildId === STAFF_GUILD && !msg.author.bot && msg.content.trim().toLowerCase() === '!conferir') {
+    const r = await conferirComAviso();
+    const txt = r.erro ? `🔴 Erro: ${r.erro}` : r.ignorado ? '⏳ Já tem uma conferência rodando.'
+      : `🔎 Conferência feita · ${r.membros} membros · ${r.removidos} perderam o acesso · ${r.devolvidos} recuperaram`;
+    return msg.reply(txt).catch(() => {});
+  }
   if (msg.guildId !== GUILD_ID || msg.author.bot || !PADRAO_CHAVE.test(msg.content)) return;
   try {
     await msg.delete();
