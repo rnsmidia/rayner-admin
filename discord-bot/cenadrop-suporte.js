@@ -303,9 +303,10 @@ module.exports = function suporte(client, { db, logStaff }) {
         const th = await client.channels.fetch(cid);
         if (th.archived) await th.setArchived(false);
         await th.send({
+          content: `<@${th.ownerId}>`, // marca o cliente: o servidor só notifica menções
           embeds: txt ? [{ author: { name: 'Equipe CenaDrop', icon_url: client.user.displayAvatarURL() }, description: txt.slice(0, 4000), color: COR }] : [],
           files: [...msg.attachments.values()].map((a) => ({ attachment: a.url, name: a.name })),
-          allowedMentions: { parse: [] },
+          allowedMentions: { users: [th.ownerId] },
         });
         await msg.react('✅').catch(() => {});
         const c = chamados.get(cid);

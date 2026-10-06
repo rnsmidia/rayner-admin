@@ -8,6 +8,8 @@
  *   `!conferir` no servidor Staff roda na hora.
  * - Versão nova no version.json → anúncio no #avisos (com @Cliente) + atualiza o fixado.
  *   `!aviso <texto>` no Staff publica no #avisos como Equipe CenaDrop.
+ * - `!geral <texto>` e `!responder <link> <texto>` no Staff: a equipe fala no servidor sem aparecer.
+ * - Botões 🔕 só suporte / 💬 comunidade: tiram/devolvem o cargo Comunidade (#geral e #dicas).
  * - Tudo fica registrado no #ativacoes do servidor Staff
  *
  * Env: CENADROP_BOT_TOKEN, SUPABASE_URL, SUPABASE_SERVICE_KEY, RESEND_API_KEY
@@ -23,6 +25,7 @@ const APP_ID       = '1555368816140361778';
 const GUILD_ID     = '1555365917578240130';
 const STAFF_GUILD  = '1555367221541208105';
 const ROLE_CLIENTE = '1555372672534454282';
+const ROLE_COMUNIDADE = '1557134048491606147'; // vê #geral e #dicas; quem escolhe "só suporte" fica sem
 const CH = {
   geral:    '1555365918278684775',
   suporte:  '1555372720517283931',
@@ -58,6 +61,13 @@ async function logStaff(texto) {
   } catch (err) {
     console.error('[CenaDrop] falha ao registrar no Staff:', err.message);
   }
+}
+
+function botoesPreferencia() {
+  return [new ActionRowBuilder().addComponents(
+    new ButtonBuilder().setCustomId('pref:suporte').setStyle(ButtonStyle.Secondary).setLabel('Só quero suporte e avisos').setEmoji('🔕'),
+    new ButtonBuilder().setCustomId('pref:comunidade').setStyle(ButtonStyle.Secondary).setLabel('Quero participar da comunidade').setEmoji('💬'),
+  )];
 }
 
 function botaoPlanos() {
@@ -120,7 +130,7 @@ async function ativar(inter) {
   }
 
   const membro = await inter.guild.members.fetch(user.id);
-  await membro.roles.add(ROLE_CLIENTE, 'Ativou com chave CenaDrop');
+  await membro.roles.add([ROLE_CLIENTE, ROLE_COMUNIDADE], 'Ativou com chave CenaDrop');
 
   const primeiro = (lic.name || '').split(' ')[0];
   await logStaff(`✅ Ativou · **${user.username}** \`${user.id}\` · ${lic.name || '—'} · ${mascararEmail(lic.email || '')} · ${lic.source || ''}`);
@@ -129,7 +139,9 @@ async function ativar(inter) {
       `✅ **Acesso liberado${primeiro ? `, ${primeiro}` : ''}!** Bem-vindo à comunidade CenaDrop.\n\n` +
       `💬 Apresente-se em <#${CH.geral}>\n` +
       `🛟 Dúvida ou problema? Abra um post em <#${CH.suporte}>\n` +
-      `✨ Mostre suas melhores cenas na <#${CH.vitrine}>`,
+      `✨ Mostre suas melhores cenas na <#${CH.vitrine}>\n\n` +
+      '-# Prefere só o essencial (suporte e avisos), sem a conversa da comunidade? Use o botão abaixo — dá pra voltar quando quiser.',
+    components: botoesPreferencia(),
   });
 }
 
@@ -222,7 +234,7 @@ async function conferirAcessos() {
 
       if (temCargo && !ativo.get(m.id)) {
         const motivo = ativo.has(m.id) ? 'chave desativada' : 'sem chave ligada';
-        await m.roles.remove(ROLE_CLIENTE, `Conferência: ${motivo}`);
+        await m.roles.remove([ROLE_CLIENTE, ROLE_COMUNIDADE].filter((r) => m.roles.cache.has(r)), `Conferência: ${motivo}`);
         removidos++;
         await logStaff(`🚫 Perdeu o acesso · **${m.user.username}** \`${m.id}\` · ${motivo}`);
         if (motivo === 'chave desativada') {
@@ -307,6 +319,52 @@ async function avisoDoStaff(msg) {
   await msg.reply(`✅ Publicado no #avisos: ${m.url}`);
 }
 
+// ── "só suporte" × "comunidade" (cargo Comunidade liga/desliga #geral e #dicas) ──
+async function preferencia(inter) {
+  try {
+    const membro = await inter.guild.members.fetch(inter.user.id);
+    if (!membro.roles.cache.has(ROLE_CLIENTE)) {
+      return inter.reply({ content: '🔑 Primeiro ative seu acesso: digite `/ativar` com a sua chave no <#1555372696383262730>.', flags: MessageFlags.Ephemeral });
+    }
+    if (inter.customId === 'pref:suporte') {
+      await membro.roles.remove(ROLE_COMUNIDADE, 'Escolheu só suporte e avisos');
+      await logStaff(`🔕 Só suporte · **${inter.user.username}** \`${inter.user.id}\``);
+      return inter.reply({ content: '🔕 Pronto! Você vê só o essencial: **#avisos**, **#suporte**, **#perguntas-frequentes** e a vitrine. O #geral e o #dicas saíram da sua lista.\nO Discord só vai te avisar de versão nova, instabilidade do Google e respostas no seu chamado.', flags: MessageFlags.Ephemeral });
+    }
+    await membro.roles.add(ROLE_COMUNIDADE, 'Quer participar da comunidade');
+    return inter.reply({ content: '💬 Bem-vindo de volta à comunidade! O **#geral** e o **#dicas-e-prompts** voltaram pra sua lista.', flags: MessageFlags.Ephemeral });
+  } catch (err) {
+    console.error('[CenaDrop] preferência:', err.message);
+    try { await inter.reply({ content: '😕 Algo deu errado. Tente de novo em instantes.', flags: MessageFlags.Ephemeral }); } catch (_) {}
+  }
+}
+
+// ── !geral / !responder no Staff: a equipe fala no servidor sem aparecer ──
+const GERAL = '1555365918278684775';
+const embedEquipe = (texto) => ({ author: { name: 'Equipe CenaDrop', icon_url: client.user.displayAvatarURL() }, description: texto.slice(0, 4000), color: COR });
+
+async function falarComoEquipe(msg) {
+  const txt = msg.content.trim();
+  const files = [...msg.attachments.values()].map((a) => ({ attachment: a.url, name: a.name }));
+  if (/^!geral\b/i.test(txt)) {
+    const texto = txt.replace(/^!geral\s*/i, '');
+    if (!texto && !files.length) return msg.reply('Escreva a mensagem depois do comando. Ex.: `!geral Bom dia, pessoal! Qual cena vocês geraram hoje?`');
+    const canal = await client.channels.fetch(GERAL);
+    const m = await canal.send({ embeds: texto ? [embedEquipe(texto)] : [], files, allowedMentions: { parse: [] } });
+    return msg.reply(`✅ Postado no #geral: ${m.url}`);
+  }
+  // !responder <link da mensagem> <texto>
+  const r = txt.match(/^!responder\s+https:\/\/(?:\w+\.)?discord(?:app)?\.com\/channels\/(\d+)\/(\d+)\/(\d+)\s*([\s\S]*)$/i);
+  if (!r) return msg.reply('Use assim: `!responder <link da mensagem> <sua resposta>`. Pra pegar o link: botão direito na mensagem do aluno → **Copiar link da mensagem**.');
+  const [, guild, canalId, msgId, texto] = r;
+  if (guild !== GUILD_ID) return msg.reply('Esse link não é do servidor CenaDrop.');
+  if (!texto.trim() && !files.length) return msg.reply('Faltou o texto da resposta depois do link.');
+  const canal = await client.channels.fetch(canalId);
+  const alvo = await canal.messages.fetch(msgId);
+  const m = await alvo.reply({ embeds: texto.trim() ? [embedEquipe(texto.trim())] : [], files, allowedMentions: { users: [alvo.author.id], repliedUser: true } });
+  return msg.reply(`✅ Respondido: ${m.url}`);
+}
+
 // ── eventos ─────────────────────────────────────────────────────────────────
 client.once('clientReady', async () => {
   console.log(`✅ CenaDrop Bot online: ${client.user.tag}`);
@@ -324,6 +382,7 @@ client.once('clientReady', async () => {
 });
 
 client.on('interactionCreate', async (inter) => {
+  if (inter.isButton() && inter.customId.startsWith('pref:')) return preferencia(inter);
   if (!inter.isChatInputCommand() || inter.guildId !== GUILD_ID) return;
   try {
     // Resposta sempre privada: chave e e-mail nunca aparecem pros outros
@@ -347,7 +406,7 @@ client.on('guildMemberAdd', async (member) => {
       .select('key, active, status, product')
       .eq('discord_id', member.id);
     if ((data || []).filter(ehCenaDrop).some(ativa)) {
-      await member.roles.add(ROLE_CLIENTE, 'Voltou ao servidor com chave ativa');
+      await member.roles.add([ROLE_CLIENTE, ROLE_COMUNIDADE], 'Voltou ao servidor com chave ativa');
       await logStaff(`↩️ Voltou e recuperou o cargo · **${member.user.username}** \`${member.id}\``);
     }
   } catch (err) {
@@ -359,6 +418,9 @@ client.on('guildMemberAdd', async (member) => {
 const PADRAO_CHAVE = /\bCD-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}\b|\bRN-\d{6}\b/i;
 client.on('messageCreate', async (msg) => {
   // `!conferir` no Staff roda a conferência na hora
+  if (msg.guildId === STAFF_GUILD && !msg.author.bot && /^!(geral|responder)\b/i.test(msg.content.trim())) {
+    return falarComoEquipe(msg).catch((err) => msg.reply(`🔴 Erro: ${err.message}`).catch(() => {}));
+  }
   if (msg.guildId === STAFF_GUILD && !msg.author.bot && /^!aviso\b/i.test(msg.content.trim())) {
     return avisoDoStaff(msg).catch((err) => msg.reply(`🔴 Erro: ${err.message}`).catch(() => {}));
   }
