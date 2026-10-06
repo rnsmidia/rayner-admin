@@ -42,7 +42,7 @@
    "não abre",
    "pede chave"
   ],
-  "resposta": "1. Clique no ícone do CenaDrop na barra do Chrome (se não aparecer, clique na peça de quebra-cabeça 🧩 e no alfinete 📌 ao lado de **CenaDrop Flow**).\n2. Cole a chave inteira (`CD-XXXX-XXXX-XXXX`, em maiúsculas, sem espaço no começo/fim).\n3. Clique em **Ativar Licença**.\nSó precisa fazer isso uma vez: a extensão guarda a chave. Se aparecer \"chave já em uso\", veja a entrada *licenca-ja-em-uso*.\n📺 Vídeo 001 da playlist.",
+  "resposta": "1. Clique no ícone do CenaDrop na barra do Chrome (se não aparecer, clique na peça de quebra-cabeça 🧩 e no alfinete 📌 ao lado de **CenaDrop Flow**).\n2. Cole a chave inteira (`CD-XXXX-XXXX-XXXX`, em maiúsculas, sem espaço no começo/fim).\n3. Clique em **Ativar Licença**.\nSó precisa fazer isso uma vez: a extensão guarda a chave. Se aparecer \"chave já em uso\", veja a pergunta **\"Essa licença já está em uso\"** no #perguntas-frequentes.\n📺 Vídeo 001 da playlist.",
   "escalar": "aparecer outra mensagem de erro além das listadas nesta base."
  },
  {
@@ -298,7 +298,7 @@
    "projeto errado",
    "tela inicial do flow"
   ],
-  "resposta": "Quase sempre é a aba errada.\n1. O CenaDrop **não funciona na tela inicial do Flow**: abra um **projeto** (o endereço tem que ter `project`).\n2. Deixe essa aba aberta e na frente na hora de clicar em **▶ Iniciar**.\n3. Se o log disser \"não respondeu após recarregar\", aperte **F5** na aba do Flow, espere carregar e clique em Iniciar de novo.\n4. Acabou de atualizar a extensão? Dê F5 na aba do Flow.\n5. Tem mais de uma conta Google logada no Chrome? Veja a entrada *varias-contas-google*.\n📺 Vídeo 002 da playlist.",
+  "resposta": "Quase sempre é a aba errada.\n1. O CenaDrop **não funciona na tela inicial do Flow**: abra um **projeto** (o endereço tem que ter `project`).\n2. Deixe essa aba aberta e na frente na hora de clicar em **▶ Iniciar**.\n3. Se o log disser \"não respondeu após recarregar\", aperte **F5** na aba do Flow, espere carregar e clique em Iniciar de novo.\n4. Acabou de atualizar a extensão? Dê F5 na aba do Flow.\n5. Tem mais de uma conta Google logada no Chrome? Veja a pergunta **\"Tenho mais de uma conta Google no Chrome e não captura\"** no #perguntas-frequentes.\n📺 Vídeo 002 da playlist.",
   "escalar": "dentro do projeto e com F5 continua sem responder — pedir o código de diagnóstico."
  },
  {
@@ -893,7 +893,7 @@
    "🩺",
    "falhas registradas"
   ],
-  "resposta": "O código leva pra equipe o registro técnico do seu lote — você não precisa abrir console nem F12.\n1. Abra o painel do CenaDrop (com a chave ativa).\n2. Clique em **🩺 Diagnóstico**, no rodapé. (Se aparecer o aviso \"⚠️ N falhas registradas neste lote\", pode usar o botão **🩺 Enviar diagnóstico pro suporte** dele.)\n3. Se quiser, escreva o que aconteceu (ex.: \"travou na cena 10\").\n4. Clique em **Enviar diagnóstico**.\n5. Aparece um código `D-XXXX`: clique em **⧉ Copiar código** e cole aqui no seu post.\n**Vai junto:** registro das últimas horas, versão, Flow/Vids, erros do Google, navegador e sistema. **Não vai:** o texto das cenas, imagens/vídeos, senha, outras abas.",
+  "resposta": "O código leva pra equipe o registro técnico do seu lote — você não precisa abrir console nem F12.\n1. Abra o painel do CenaDrop (com a chave ativa).\n2. Clique em **Diagnóstico**, no rodapé. (Se aparecer o aviso \"⚠️ N falhas registradas neste lote\", pode usar o botão **Enviar diagnóstico pro suporte** dele.)\n3. Se quiser, escreva o que aconteceu (ex.: \"travou na cena 10\").\n4. Clique em **Enviar diagnóstico**.\n5. Aparece um código `D-XXXX`: clique em **⧉ Copiar código** e cole aqui no seu post.\n**Vai junto:** registro das últimas horas, versão, Flow/Vids, erros do Google, navegador e sistema. **Não vai:** o texto das cenas, imagens/vídeos, senha, outras abas.",
   "escalar": "o envio falhar (\"Não consegui enviar…\") mesmo com internet funcionando."
  },
  {
@@ -963,7 +963,7 @@
    "não resolveu",
    "manual"
   ],
-  "resposta": "1. Procure seu problema no **#perguntas-frequentes** e no manual: cenadrop.com.br/manual (a Seção 15 \"Deu errado? Ache pelo sintoma\" resolve os mais comuns).\n2. Não resolveu? Crie um post no fórum **#suporte**, escolha a tag certa e conte: **o que aconteceu**, **em qual passo**, **Flow ou Vids**, e a **versão** (selo ⚡ no painel).\n3. Cole o **código de diagnóstico** (`D-XXXX`) — veja a entrada *codigo-diagnostico*.\nNão poste a sua chave inteira em público.",
+  "resposta": "1. Procure seu problema no **#perguntas-frequentes** e no manual: cenadrop.com.br/manual (a Seção 15 \"Deu errado? Ache pelo sintoma\" resolve os mais comuns).\n2. Não resolveu? Crie um post no fórum **#suporte**, escolha a tag certa e conte: **o que aconteceu**, **em qual passo**, **Flow ou Vids**, e a **versão** (selo ⚡ no painel).\n3. Cole o **código de diagnóstico** (`D-XXXX`) — veja a pergunta **\"Como gero o código de diagnóstico (D-XXXX)?\"** no #perguntas-frequentes.\nNão poste a sua chave inteira em público.",
   "escalar": "—"
  }
 ]

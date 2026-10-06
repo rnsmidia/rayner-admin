@@ -37,11 +37,15 @@ const haQuanto = (ms) => {
 // ── busca na base ───────────────────────────────────────────────────────────
 const KB_NORM = KB.map((e) => ({ ...e, _kw: e.palavras.map(norm).filter((k) => k.length >= 3) }));
 
-function procurar(texto, assunto) {
-  const t = norm(texto);
+function procurar(titulo, corpo, assunto) {
+  const tt = norm(titulo), tc = norm(corpo);
   const notas = KB_NORM.map((e) => {
     let n = 0;
-    for (const k of e._kw) if (t.includes(k)) n += k.split(/\s+/).length; // frase pesa mais que palavra solta
+    for (const k of e._kw) {
+      const peso = k.split(/\s+/).length; // frase pesa mais que palavra solta
+      if (tt.includes(k)) n += peso * 3;   // o título resume o problema → vale mais
+      else if (tc.includes(k)) n += peso;
+    }
     if (n > 0 && assunto && e.tag === assunto) n += 2;
     return { e, n };
   }).filter((x) => x.n > 0).sort((a, b) => b.n - a.n);
@@ -78,8 +82,8 @@ module.exports = function suporte(client, { db, logStaff }) {
   )];
 
   const EMBED_DIAG = {
-    title: '🩺 Ajuda a gente a ajudar você',
-    description: 'No painel do CenaDrop, clique em **🩺 Diagnóstico** (rodapé) → **Enviar diagnóstico** → **⧉ Copiar código** e cole o código `D-XXXX` aqui no post. Ele leva o registro técnico do lote, sem o texto das suas cenas.',
+    title: '🧰 Ajuda a gente a ajudar você',
+    description: 'No painel do CenaDrop, clique em **Diagnóstico** (no rodapé) → **Enviar diagnóstico** → **⧉ Copiar código** e cole o código `D-XXXX` aqui no post. Ele leva o registro técnico do lote, sem o texto das suas cenas.',
     color: 0x3B82F6,
   };
 
@@ -94,7 +98,7 @@ module.exports = function suporte(client, { db, logStaff }) {
       }
       if (inicial?.author?.bot) return;
       const assunto = thread.appliedTags.map((id) => nomeTag(thread.parent, id)).find(Boolean);
-      const achados = procurar(`${thread.name}\n${inicial?.content || ''}`, assunto);
+      const achados = procurar(thread.name, inicial?.content || '', assunto);
       const temDiag = PADRAO_DIAG.test(inicial?.content || '');
 
       const embeds = achados.length
@@ -149,7 +153,7 @@ module.exports = function suporte(client, { db, logStaff }) {
   const posicao = (id) => { const i = naFila().findIndex(([k]) => k === id); return i < 0 ? null : i + 1; };
 
   function cartao(status, pos) {
-    if (status === 'fila') return { title: `🎫 Você é o nº ${pos} na fila`, description: 'A equipe responde **em ordem de chegada**. Este cartão se atualiza sozinho conforme a fila anda.\nEnquanto isso, se ainda não mandou, cole aqui o código `D-XXXX` do 🩺 Diagnóstico e qualquer print que ajude.', color: 0xEAB308 };
+    if (status === 'fila') return { title: `🎫 Você é o nº ${pos} na fila`, description: 'A equipe responde **em ordem de chegada**. Este cartão se atualiza sozinho conforme a fila anda.\nEnquanto isso, se ainda não mandou, cole aqui o código `D-XXXX` do Diagnóstico e qualquer print que ajude.', color: 0xEAB308 };
     if (status === 'atendimento') return { title: '💬 Em atendimento', description: 'A equipe está cuidando do seu caso. As respostas aparecem aqui embaixo. Pode responder normalmente neste post.', color: 0x3B82F6 };
     return { title: '✅ Resolvido', description: 'Este chamado foi encerrado. Se voltar a acontecer, é só escrever aqui.', color: 0x22C55E };
   }
@@ -331,7 +335,7 @@ module.exports = function suporte(client, { db, logStaff }) {
           allowedMentions: { parse: [] },
         });
         const codigo = msg.content.match(PADRAO_DIAG)?.[0];
-        if (codigo) await st.send({ embeds: [{ title: '🩺 Diagnóstico enviado', description: textoDiag(await diagnostico(codigo), codigo), color: 0x3B82F6 }] });
+        if (codigo) await st.send({ embeds: [{ title: '🧰 Diagnóstico enviado', description: textoDiag(await diagnostico(codigo), codigo), color: 0x3B82F6 }] });
       }
     } catch (err) {
       console.error('[Suporte] repasse:', err);
