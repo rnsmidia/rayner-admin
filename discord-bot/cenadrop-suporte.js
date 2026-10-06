@@ -241,6 +241,9 @@ module.exports = function suporte(client, { db, logStaff }) {
       name: `${thread.name}`.slice(0, 95),
       appliedTags: [staffTags['Na fila']].filter(Boolean),
       message: {
+        // texto solto = prévia que aparece na lista do fórum
+        content: `🎫 **${user.username}** · ${assunto || 'sem assunto'} · ${(inicial?.content || '').replace(/\s+/g, ' ').slice(0, 140)}`,
+        allowedMentions: { parse: [] },
         embeds: [{
           title: thread.name.slice(0, 256),
           url: linkThread(GUILD_ID, thread.id),
