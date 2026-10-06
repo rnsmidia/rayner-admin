@@ -154,3 +154,6 @@ process.on('uncaughtException', (err) => {
 });
 
 client.login(process.env.DISCORD_BOT_TOKEN);
+
+// Bot do CenaDrop (servidor separado) roda no mesmo processo
+require('./cenadrop-bot');
