@@ -448,6 +448,9 @@ client.on('messageCreate', async (msg) => {
 // Suporte: fórum #suporte, fila e repasse pro Staff (arquivo próprio)
 require('./cenadrop-suporte')(client, { db, logStaff });
 
+// Rascunhos da IA (rodada da comunidade via Elo IA) → ✅/✏️/🗑️ no Staff
+require('./cenadrop-rascunhos')(client, { logStaff });
+
 client.on('error', (err) => console.error('[CenaDrop] client error:', err.message));
 
 if (process.env.CENADROP_BOT_TOKEN) {
