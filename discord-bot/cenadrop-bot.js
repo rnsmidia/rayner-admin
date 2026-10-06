@@ -6,6 +6,8 @@
  * - A cada 30 min confere quem tem o cargo: chave desativada (reembolso, cancelamento,
  *   desativada no Admin) perde o cargo; chave reativada recebe de volta.
  *   `!conferir` no servidor Staff roda na hora.
+ * - Versão nova no version.json → anúncio no #avisos (com @Cliente) + atualiza o fixado.
+ *   `!aviso <texto>` no Staff publica no #avisos como Equipe CenaDrop.
  * - Tudo fica registrado no #ativacoes do servidor Staff
  *
  * Env: CENADROP_BOT_TOKEN, SUPABASE_URL, SUPABASE_SERVICE_KEY, RESEND_API_KEY
@@ -31,6 +33,9 @@ const PLANOS   = 'https://www.cenadrop.com.br/planos';
 const TEMPLATE = 'https://www.cenadrop.com.br/emails/cenadrop/reenvio-chave.html';
 const COR = 0x7C3AED;
 const CONFERIR_A_CADA = 30 * 60 * 1000;
+const AVISOS = '1555372692742340718';
+const MSG_VERSAO_ATUAL = '1556739461893849099'; // embed fixado "Versão atual" no #avisos
+const VERSION_JSON = 'https://darkflow-server.vercel.app/cenadrop/version.json';
 
 // Linhas da tabela licenses que não são CenaDrop
 const PRODUTOS_FORA = new Set(['nx_visit', 'nxsaude']);
@@ -249,6 +254,59 @@ async function conferirComAviso() {
   }
 }
 
+// ── avisos: versão nova (lida do version.json) e !aviso do Staff ────────────
+async function conferirVersao() {
+  try {
+    const info = await (await fetch(`${VERSION_JSON}?t=${Date.now()}`)).json();
+    const v = info.version;
+    const det = (info.versoes || []).find((x) => x.version === v) || {};
+    if (!v || (det.status && det.status !== 'disponivel')) return;
+
+    const canal = await client.channels.fetch(AVISOS);
+    const fixada = await canal.messages.fetch(MSG_VERSAO_ATUAL);
+    const tituloAtual = fixada.embeds[0]?.title || '';
+    if (tituloAtual.includes(`: ${v}`)) return; // já anunciada
+
+    const data = (det.date || info.date || '').split('-').reverse().join('/');
+    const novidades = (det.novidades || []).map((n) => `• ${n}`).join('\n');
+    const botoes = [new ActionRowBuilder().addComponents(
+      new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(`Baixar a versão ${v}`).setEmoji('⬇️').setURL('https://www.cenadrop.com.br/download'),
+      new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel('Como atualizar').setEmoji('📖').setURL('https://www.cenadrop.com.br/manual'),
+    )];
+    await canal.send({
+      content: `<@&${ROLE_CLIENTE}>`,
+      allowedMentions: { roles: [ROLE_CLIENTE] },
+      embeds: [{
+        title: `🚀 Nova versão ${v} disponível`,
+        description: `${det.resumo ? `**${det.resumo}** · ` : ''}lançada em ${data}\n\n${novidades ? `**O que mudou:**\n${novidades}\n\n` : ''}Baixe pelo botão abaixo e troque a pasta da extensão (passo a passo no manual).`,
+        color: COR, footer: { text: 'Equipe CenaDrop' },
+      }],
+      components: botoes,
+    });
+    await fixada.edit({
+      embeds: [{ ...fixada.embeds[0].toJSON(), title: `📢 Versão atual: ${v}`,
+        description: `**${det.resumo || 'CenaDrop'}** · lançada em ${data}\nClientes baixam em **cenadrop.com.br/download**.\n\nVersões novas e avisos de instabilidade do Google aparecem aqui automaticamente.` }],
+      components: [new ActionRowBuilder().addComponents(botoes[0].components[0],
+        new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel('Ver o curso').setEmoji('▶️').setURL('https://www.youtube.com/playlist?list=PLcGnzq_yUExE'))],
+    });
+    await logStaff(`🚀 Versão ${v} anunciada no #avisos`);
+  } catch (err) {
+    console.error('[CenaDrop] erro ao conferir versão:', err.message);
+  }
+}
+
+async function avisoDoStaff(msg) {
+  const texto = msg.content.replace(/^!aviso\s*/i, '').trim();
+  if (!texto) return msg.reply('Escreva o aviso depois do comando. Ex.: `!aviso O Google Flow está instável agora; se der erro, espere 1 hora e tente de novo.`');
+  const canal = await client.channels.fetch(AVISOS);
+  const m = await canal.send({
+    content: `<@&${ROLE_CLIENTE}>`,
+    allowedMentions: { roles: [ROLE_CLIENTE] },
+    embeds: [{ title: '📢 Aviso', description: texto.slice(0, 4000), color: COR, footer: { text: 'Equipe CenaDrop' }, timestamp: new Date().toISOString() }],
+  });
+  await msg.reply(`✅ Publicado no #avisos: ${m.url}`);
+}
+
 // ── eventos ─────────────────────────────────────────────────────────────────
 client.once('clientReady', async () => {
   console.log(`✅ CenaDrop Bot online: ${client.user.tag}`);
@@ -261,6 +319,8 @@ client.once('clientReady', async () => {
   }
   setTimeout(conferirComAviso, 60 * 1000);
   setInterval(conferirComAviso, CONFERIR_A_CADA);
+  setTimeout(conferirVersao, 90 * 1000);
+  setInterval(conferirVersao, CONFERIR_A_CADA);
 });
 
 client.on('interactionCreate', async (inter) => {
@@ -299,6 +359,9 @@ client.on('guildMemberAdd', async (member) => {
 const PADRAO_CHAVE = /\bCD-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}\b|\bRN-\d{6}\b/i;
 client.on('messageCreate', async (msg) => {
   // `!conferir` no Staff roda a conferência na hora
+  if (msg.guildId === STAFF_GUILD && !msg.author.bot && /^!aviso\b/i.test(msg.content.trim())) {
+    return avisoDoStaff(msg).catch((err) => msg.reply(`🔴 Erro: ${err.message}`).catch(() => {}));
+  }
   if (msg.guildId === STAFF_GUILD && !msg.author.bot && msg.content.trim().toLowerCase() === '!conferir') {
     const r = await conferirComAviso();
     const txt = r.erro ? `🔴 Erro: ${r.erro}` : r.ignorado ? '⏳ Já tem uma conferência rodando.'

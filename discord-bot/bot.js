@@ -156,4 +156,7 @@ process.on('uncaughtException', (err) => {
 client.login(process.env.DISCORD_BOT_TOKEN);
 
 // Bot do CenaDrop (servidor separado) roda no mesmo processo
-require('./cenadrop-bot');
+const cenadrop = require('./cenadrop-bot');
+
+// Endereço de saúde dos dois bots pro monitor externo (UptimeRobot)
+require('./saude')({ eda: client, cenadrop: process.env.CENADROP_BOT_TOKEN ? cenadrop : null });
