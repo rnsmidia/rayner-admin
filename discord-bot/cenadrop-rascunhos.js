@@ -7,6 +7,8 @@
  *   ✅ Publicar   → o bot responde/posta no servidor CenaDrop como "Equipe CenaDrop"
  *   ✏️ Editar     → abre uma caixa com o texto; ao enviar, publica a versão editada
  *   🗑️ Descartar  → marca como descartado
+ *   🔁 Reescrever → caixa "como você quer a resposta?"; o rascunho fica marcado `|reescrever`
+ *                   e o Mac (rodada.py --reescritas, a cada 1 min) devolve a nova versão pra aprovar
  */
 
 const {
@@ -17,7 +19,7 @@ const GUILD_ID = '1555365917578240130';
 const COR = 0x7C3AED;
 
 module.exports = function rascunhos(client, { logStaff }) {
-  const alvoDe = (msg) => msg.embeds[0]?.footer?.text?.match(/^alvo:(reply|post):(\d+)(?::(\d+))?/);
+  const alvoDe = (msg) => msg.embeds[0]?.footer?.text?.split('|')[0].match(/^alvo:(reply|post):(\d+)(?::(\d+))?/);
 
   async function publicar(rascunho, texto, quem) {
     const alvo = alvoDe(rascunho);
@@ -54,6 +56,15 @@ module.exports = function rascunhos(client, { logStaff }) {
           const e = msg.embeds[0].toJSON();
           return inter.update({ embeds: [{ ...e, color: 0x6B7280, title: `🗑️ Descartado por ${inter.user.username}` }], components: [] });
         }
+        if (inter.customId === 'rasc:reesc') {
+          const modal = new ModalBuilder().setCustomId(`rasc:reescmodal:${msg.id}`).setTitle('Como você quer a resposta?');
+          modal.addComponents(new ActionRowBuilder().addComponents(
+            new TextInputBuilder().setCustomId('orientacao').setLabel('Escreva do seu jeito; a IA ajusta o tom')
+              .setStyle(TextInputStyle.Paragraph).setMaxLength(1500).setRequired(true)
+              .setPlaceholder('Ex.: agradece, diz que foto de frente ajuda no personagem e manda ver o vídeo 003'),
+          ));
+          return inter.showModal(modal);
+        }
         if (inter.customId === 'rasc:edit') {
           const modal = new ModalBuilder().setCustomId(`rasc:modal:${msg.id}`).setTitle('Editar antes de publicar');
           modal.addComponents(new ActionRowBuilder().addComponents(
@@ -63,6 +74,19 @@ module.exports = function rascunhos(client, { logStaff }) {
           ));
           return inter.showModal(modal);
         }
+      }
+      if (inter.isModalSubmit() && inter.customId.startsWith('rasc:reescmodal:')) {
+        const msg = await inter.channel.messages.fetch(inter.customId.split(':')[2]);
+        const e = msg.embeds[0].toJSON();
+        const alvo = (e.footer?.text || '').split('|')[0];
+        const campos = (e.fields || []).filter((f) => f.name !== 'Sua orientação');
+        await msg.edit({
+          embeds: [{ ...e, color: 0x3B82F6, title: `🔁 Reescrevendo com a orientação de ${inter.user.username}…`,
+            fields: [...campos, { name: 'Sua orientação', value: inter.fields.getTextInputValue('orientacao').slice(0, 1000) }],
+            footer: { text: `${alvo}|reescrever` } }],
+          components: [],
+        });
+        return inter.reply({ content: '🔁 Pedido enviado. A nova versão chega aqui no #rascunhos em 1–2 min (precisa do Mac e do Elo IA ligados).', flags: MessageFlags.Ephemeral });
       }
       if (inter.isModalSubmit() && inter.customId.startsWith('rasc:modal:')) {
         await inter.deferReply({ flags: MessageFlags.Ephemeral });
