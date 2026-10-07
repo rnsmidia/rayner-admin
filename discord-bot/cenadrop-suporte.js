@@ -302,10 +302,12 @@ module.exports = function suporte(client, { db, logStaff }) {
 
   async function abrirChamado(thread, user) {
     const card = await thread.send({ embeds: [cartao('fila', naFila().length + 1)] });
+    // diagnóstico só faz sentido em problema técnico — dúvida de licença/plano não precisa
+    const assuntoTag = thread.appliedTags.map((id) => nomeTag(thread.parent, id)).find((n) => n && !STATUS.includes(n));
+    const tecnico = !['Licença e ativação', 'Planos e outros'].includes(assuntoTag);
     const jaTem = await procurarCodigo(thread);
-    await thread.send({ embeds: [jaTem
-      ? { description: `✅ Recebemos o seu diagnóstico **${jaTem}** — ele já vai junto pra equipe.`, color: 0x22C55E }
-      : EMBED_DIAG] });
+    if (jaTem) await thread.send({ embeds: [{ description: `✅ Recebemos o seu diagnóstico **${jaTem}** — ele já vai junto pra equipe.`, color: 0x22C55E }] });
+    else if (tecnico) await thread.send({ embeds: [EMBED_DIAG] });
     const criado = Date.now();
     const { data: lics } = await db().from('licenses')
       .select('key, active, status, source, product').eq('discord_id', user.id);
