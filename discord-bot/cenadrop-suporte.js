@@ -78,6 +78,11 @@ module.exports = function suporte(client, { db, logStaff }) {
     }
   }
 
+  // botões de link (vídeo da playlist / seção do manual) de cada resposta — 1 linha por resposta
+  const linksDe = (achados) => achados.filter((e) => e.links?.length).map((e) => new ActionRowBuilder().addComponents(
+    ...e.links.slice(0, 5).map((l) => new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(l.label).setEmoji(l.emoji).setURL(l.url)),
+  ));
+
   const botoes = (soFila = false) => [new ActionRowBuilder().addComponents(
     ...(soFila ? [] : [new ButtonBuilder().setCustomId('sup:ok').setStyle(ButtonStyle.Success).setLabel('Resolveu').setEmoji('✅')]),
     new ButtonBuilder().setCustomId('sup:fila').setStyle(ButtonStyle.Primary).setLabel('Ainda preciso de ajuda').setEmoji('🙋'),
@@ -109,14 +114,17 @@ module.exports = function suporte(client, { db, logStaff }) {
       const assunto = thread.appliedTags.map((id) => nomeTag(thread.parent, id)).find(Boolean);
       const achados = procurar(thread.name, inicial?.content || '', assunto);
       const embeds = achados.length
-        ? achados.map((e) => ({ title: `💡 ${e.pergunta}`.slice(0, 256), description: e.resposta.slice(0, 4000), color: COR }))
+        ? achados.map((e) => ({
+          title: `💡 ${e.pergunta}`.slice(0, 256), description: e.resposta.slice(0, 4000), color: COR,
+          ...(e.aprender ? { fields: [{ name: '📚 Pra aprender mais', value: e.aprender.slice(0, 1024) }] } : {}),
+        }))
         : [{ title: '🔎 Ainda não tenho uma resposta pronta pra isso', description: `Dá uma olhada no <#${FAQ}> (dá pra buscar). Se não achar, clique em **🙋 Ainda preciso de ajuda** e você entra na fila da equipe.`, color: COR }];
       if (achados.length) embeds.push({ description: 'Não resolveu? Clique em **🙋 Ainda preciso de ajuda** e você entra na fila da equipe.', color: 0x6B7280 });
 
       await thread.send({
         content: `Oi <@${thread.ownerId}>! ${achados.length ? 'Veja se isso resolve:' : ''}`,
         embeds: embeds.slice(0, 10),
-        components: botoes(!achados.length),
+        components: [...linksDe(achados), ...botoes(!achados.length)],
         allowedMentions: { users: [thread.ownerId] },
       });
       await logStaff(`📝 Post novo no #suporte · ${assunto || 'sem assunto'} · "${thread.name}" · ${achados.length ? `respondido com: ${achados.map((e) => e.id).join(', ')}` : 'sem resposta pronta'}`);
@@ -289,6 +297,27 @@ module.exports = function suporte(client, { db, logStaff }) {
     await atualizarFila();
   }
 
+  // Reposta o cartão da fila no fim da conversa (o antigo some) — pra posição não ficar escondida lá em cima
+  async function descerCartao(th) {
+    const c = chamados.get(th.id);
+    if (!c) return;
+    try {
+      const antigo = await th.messages.fetch(c.cardId).catch(() => null);
+      const pos = c.status === 'fila' ? posicao(th.id) : null;
+      const novo = await th.send({ embeds: [cartao(c.status, pos)] });
+      if (antigo) await antigo.delete().catch(() => {});
+      cartaoTexto.delete(c.cardId);
+      c.cardId = novo.id;
+      cartaoTexto.set(novo.id, cartao(c.status, pos).title);
+      // atualiza o "endereço" no chamado do Staff (sobrevive a reinício)
+      const st = await client.channels.fetch(c.staffId);
+      const ini = await st.fetchStarterMessage().catch(() => null);
+      if (ini?.embeds?.[0]) await ini.edit({ embeds: [{ ...ini.embeds[0].toJSON(), footer: { text: `ref:${th.id}:${novo.id}` } }] });
+    } catch (err) {
+      console.error('[Suporte] descer cartão:', err.message);
+    }
+  }
+
   async function resolver(cid, quem) {
     const c = chamados.get(cid);
     if (!c) return;
@@ -375,6 +404,7 @@ module.exports = function suporte(client, { db, logStaff }) {
         const codigo = msg.content.match(PADRAO_DIAG)?.[0];
         anotarCodigo(msg.channel.id, codigo);
         if (codigo) await msg.reply({ content: `✅ Recebemos o diagnóstico **${codigo}** — já está com a equipe.`, allowedMentions: { parse: [] } }).catch(() => {});
+        if (msg.author.id === msg.channel.ownerId) await descerCartao(msg.channel);
         if (codigo) await st.send({ embeds: [{ title: '🧰 Diagnóstico enviado', description: textoDiag(await diagnostico(codigo), codigo), color: 0x3B82F6 }] });
       }
     } catch (err) {
