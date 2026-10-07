@@ -17,7 +17,7 @@
 
 const {
   Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder,
-  MessageFlags, ActionRowBuilder, ButtonBuilder, ButtonStyle,
+  MessageFlags, ActionRowBuilder, ButtonBuilder, ButtonStyle, ModalBuilder, TextInputBuilder, TextInputStyle,
 } = require('discord.js');
 const { createClient } = require('@supabase/supabase-js');
 
@@ -89,7 +89,7 @@ const comandos = [
 
 // ── /ativar ─────────────────────────────────────────────────────────────────
 async function ativar(inter) {
-  const chave = inter.options.getString('chave').trim().toUpperCase();
+  const chave = (inter.isModalSubmit() ? inter.fields.getTextInputValue('chave') : inter.options.getString('chave')).trim().toUpperCase();
   const user = inter.user;
 
   const { data: lic, error } = await db()
@@ -149,7 +149,7 @@ async function ativar(inter) {
 const pedidos = new Map(); // userId → timestamps (limite de 3 por hora)
 
 async function minhaChave(inter) {
-  const email = inter.options.getString('email').trim().toLowerCase();
+  const email = (inter.isModalSubmit() ? inter.fields.getTextInputValue('email') : inter.options.getString('email')).trim().toLowerCase();
   const user = inter.user;
   const resposta = '📧 **Pronto.** Se esse e-mail tiver uma compra ativa do CenaDrop, a chave foi enviada para ele agora.\nConfira também a caixa de **spam** e a aba **Promoções**.';
 
@@ -381,7 +381,32 @@ client.once('clientReady', async () => {
   setInterval(conferirVersao, CONFERIR_A_CADA);
 });
 
+// Botões "🔑 Ativar meu acesso" / "📧 Não sei minha chave" → caixinha (sem precisar digitar comando)
+function caixa(id, titulo, campo, rotulo, exemplo, max) {
+  return new ModalBuilder().setCustomId(id).setTitle(titulo).addComponents(new ActionRowBuilder().addComponents(
+    new TextInputBuilder().setCustomId(campo).setLabel(rotulo).setStyle(TextInputStyle.Short)
+      .setPlaceholder(exemplo).setRequired(true).setMaxLength(max),
+  ));
+}
+
 client.on('interactionCreate', async (inter) => {
+  if (inter.isButton() && inter.customId === 'acesso:ativar') {
+    return inter.showModal(caixa('acesso:modal-ativar', 'Ativar meu acesso', 'chave', 'Cole aqui a sua chave do CenaDrop', 'CD-XXXX-XXXX-XXXX', 40)).catch(() => {});
+  }
+  if (inter.isButton() && inter.customId === 'acesso:chave') {
+    return inter.showModal(caixa('acesso:modal-chave', 'Reenviar minha chave', 'email', 'E-mail usado na compra', 'seuemail@exemplo.com', 120)).catch(() => {});
+  }
+  if (inter.isModalSubmit() && (inter.customId === 'acesso:modal-ativar' || inter.customId === 'acesso:modal-chave')) {
+    try {
+      await inter.deferReply({ flags: MessageFlags.Ephemeral });
+      if (inter.customId === 'acesso:modal-ativar') await ativar(inter); else await minhaChave(inter);
+    } catch (err) {
+      console.error('[CenaDrop] erro na caixa de acesso:', err);
+      await logStaff(`🔴 Erro na caixa de acesso · **${inter.user.username}** \`${inter.user.id}\` · ${String(err.message || err).slice(0, 300)}`);
+      try { await inter.editReply({ content: '😕 Algo deu errado do nosso lado. Tente de novo em alguns minutos — a equipe já foi avisada.' }); } catch (_) {}
+    }
+    return;
+  }
   if (inter.isButton() && inter.customId.startsWith('pref:')) return preferencia(inter);
   if (!inter.isChatInputCommand() || inter.guildId !== GUILD_ID) return;
   try {
