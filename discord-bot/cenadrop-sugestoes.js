@@ -16,7 +16,10 @@ module.exports = function sugestoes(client, { suporte, logStaff }) {
   async function enviar(inter, msg, texto) {
     const cid = cidDe(msg);
     if (!cid) throw new Error('sugestão sem chamado ligado');
-    await suporte.enviarAoCliente(cid, texto, [], inter.user.username);
+    // leva junto o "📚 Pra aprender mais" e os botões de vídeo/manual da sugestão
+    const aprender = msg.embeds[0]?.fields?.find((f) => f.name === '📚 Pra aprender mais')?.value || null;
+    const links = msg.components.flatMap((r) => r.components).filter((c) => c.url).map((c) => ({ label: c.label, url: c.url, emoji: c.emoji?.name }));
+    await suporte.enviarAoCliente(cid, texto, [], inter.user.username, { aprender, links });
     const e = msg.embeds[0].toJSON();
     await msg.edit({ embeds: [{ ...e, color: 0x22C55E, title: `✅ Enviada ao aluno por ${inter.user.username}`, description: texto.slice(0, 4000) }], components: [] });
     await logStaff(`🤖✅ Sugestão da IA enviada por ${inter.user.username} · <#${msg.channelId}>`);

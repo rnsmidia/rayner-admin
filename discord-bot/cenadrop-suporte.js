@@ -400,12 +400,15 @@ module.exports = function suporte(client, { db, logStaff }) {
   }
 
   // Resposta da equipe → post do cliente (usado pelo relay do Staff e pelo #diagnosticos)
-  async function enviarAoCliente(cid, txt, files = [], quem = 'equipe') {
+  async function enviarAoCliente(cid, txt, files = [], quem = 'equipe', { aprender = null, links = [] } = {}) {
     const th = await client.channels.fetch(cid);
     if (th.archived) await th.setArchived(false);
     await th.send({
       content: `<@${th.ownerId}>`, // marca o cliente: o servidor só notifica menções
-      embeds: txt ? [{ author: { name: 'Equipe CenaDrop', icon_url: client.user.displayAvatarURL() }, description: txt.slice(0, 4000), color: COR }] : [],
+      embeds: txt ? [{ author: { name: 'Equipe CenaDrop', icon_url: client.user.displayAvatarURL() }, description: txt.slice(0, 4000), color: COR,
+        ...(aprender ? { fields: [{ name: '📚 Pra aprender mais', value: aprender.slice(0, 1024) }] } : {}) }] : [],
+      components: links.length ? [new ActionRowBuilder().addComponents(...links.slice(0, 5).map((l) =>
+        new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(l.label).setURL(l.url).setEmoji(l.emoji || '🔗')))] : [],
       files,
       allowedMentions: { users: [th.ownerId] },
     });
