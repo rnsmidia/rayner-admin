@@ -83,9 +83,16 @@ module.exports = function suporte(client, { db, logStaff }) {
     new ButtonBuilder().setCustomId('sup:fila').setStyle(ButtonStyle.Primary).setLabel('Ainda preciso de ajuda').setEmoji('🙋'),
   )];
 
+  // Só aparece DEPOIS do "🙋 Ainda preciso de ajuda" e só se o código ainda não veio
   const EMBED_DIAG = {
-    title: '🧰 Ajuda a gente a ajudar você',
-    description: 'No painel do CenaDrop, clique em **Diagnóstico** (no rodapé) → **Enviar diagnóstico** → **⧉ Copiar código** e cole o código `D-XXXX` aqui no post. Ele leva o registro técnico do lote, sem o texto das suas cenas.',
+    title: '📋 Falta só uma coisa: o código do diagnóstico',
+    description: 'O código mostra pra equipe exatamente o que aconteceu no seu CenaDrop. Sem ele, a gente teria que te pedir prints e a resposta demora mais.\n\n' +
+      '**1.** Abra o Google Flow ou o Vids, no mesmo projeto onde deu o problema.\n' +
+      '**2.** O problema aconteceu **nas últimas horas**? Vá pro passo 3. **Já faz mais tempo, ou você fechou o Flow/Vids?** Rode de novo a cena ou o lote até o erro aparecer.\n' +
+      '**3.** Logo depois do erro, no painel do CenaDrop, clique em **Diagnóstico** (no rodapé do painel).\n' +
+      '**4.** Escreva em uma frase o que aconteceu (ex.: *"parou na cena 10"*) e clique em **Enviar diagnóstico**.\n' +
+      '**5.** Clique em **Copiar código** e **cole aqui neste post** (ex.: `D-4KJ9`).\n\n' +
+      '✅ Você **não perde a sua posição na fila** enquanto faz isso.',
     color: 0x3B82F6,
   };
 
@@ -101,12 +108,10 @@ module.exports = function suporte(client, { db, logStaff }) {
       if (inicial?.author?.bot) return;
       const assunto = thread.appliedTags.map((id) => nomeTag(thread.parent, id)).find(Boolean);
       const achados = procurar(thread.name, inicial?.content || '', assunto);
-      const temDiag = PADRAO_DIAG.test(inicial?.content || '');
-
       const embeds = achados.length
         ? achados.map((e) => ({ title: `💡 ${e.pergunta}`.slice(0, 256), description: e.resposta.slice(0, 4000), color: COR }))
         : [{ title: '🔎 Ainda não tenho uma resposta pronta pra isso', description: `Dá uma olhada no <#${FAQ}> (dá pra buscar). Se não achar, clique em **🙋 Ainda preciso de ajuda** e você entra na fila da equipe.`, color: COR }];
-      if (!temDiag) embeds.push(EMBED_DIAG);
+      if (achados.length) embeds.push({ description: 'Não resolveu? Clique em **🙋 Ainda preciso de ajuda** e você entra na fila da equipe.', color: 0x6B7280 });
 
       await thread.send({
         content: `Oi <@${thread.ownerId}>! ${achados.length ? 'Veja se isso resolve:' : ''}`,
@@ -161,7 +166,7 @@ module.exports = function suporte(client, { db, logStaff }) {
   const posicao = (id) => { const i = naFila().findIndex(([k]) => k === id); return i < 0 ? null : i + 1; };
 
   function cartao(status, pos) {
-    if (status === 'fila') return { title: `🎫 Você é o nº ${pos} na fila`, description: 'A equipe responde **em ordem de chegada**. Este cartão se atualiza sozinho conforme a fila anda.\nEnquanto isso, se ainda não mandou, cole aqui o código `D-XXXX` do Diagnóstico e qualquer print que ajude.', color: 0xEAB308 };
+    if (status === 'fila') return { title: `🎫 Você é o nº ${pos} na fila`, description: 'A equipe responde **em ordem de chegada**. Este cartão se atualiza sozinho conforme a fila anda.', color: 0xEAB308 };
     if (status === 'atendimento') return { title: '💬 Em atendimento', description: 'A equipe está cuidando do seu caso. As respostas aparecem aqui embaixo. Pode responder normalmente neste post.', color: 0x3B82F6 };
     return { title: '✅ Resolvido', description: 'Este chamado foi encerrado. Se voltar a acontecer, é só escrever aqui.', color: 0x22C55E };
   }
@@ -233,6 +238,10 @@ module.exports = function suporte(client, { db, logStaff }) {
 
   async function abrirChamado(thread, user) {
     const card = await thread.send({ embeds: [cartao('fila', naFila().length + 1)] });
+    const jaTem = await procurarCodigo(thread);
+    await thread.send({ embeds: [jaTem
+      ? { description: `✅ Recebemos o seu diagnóstico **${jaTem}** — ele já vai junto pra equipe.`, color: 0x22C55E }
+      : EMBED_DIAG] });
     const criado = Date.now();
     const { data: lics } = await db().from('licenses')
       .select('key, active, status, source, product').eq('discord_id', user.id);
@@ -365,6 +374,7 @@ module.exports = function suporte(client, { db, logStaff }) {
         });
         const codigo = msg.content.match(PADRAO_DIAG)?.[0];
         anotarCodigo(msg.channel.id, codigo);
+        if (codigo) await msg.reply({ content: `✅ Recebemos o diagnóstico **${codigo}** — já está com a equipe.`, allowedMentions: { parse: [] } }).catch(() => {});
         if (codigo) await st.send({ embeds: [{ title: '🧰 Diagnóstico enviado', description: textoDiag(await diagnostico(codigo), codigo), color: 0x3B82F6 }] });
       }
     } catch (err) {

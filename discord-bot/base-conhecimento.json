@@ -669,7 +669,7 @@
    "elenco",
    "Elenco por cena"
   ],
-  "resposta": "O que puxa o personagem é o **começo do prompt**: `Nome,` — **uma palavra só**, com a vírgula logo depois.\n1. O nome tem que ser **idêntico** ao do elenco (Flow: nome do personagem capturado · Vids: nome no 🎬 Elenco). Ex.: `Vítor, medium shot…`\n2. Nome de **duas palavras não funciona**: junte numa só nos dois lugares (ex.: \"Zé Pilintra\" → `Zépilintra`). Na fala/narração pode continuar separado.\n3. Nome que não está no elenco = cena sai sem personagem, **sem aviso**.\n4. No Vids: usou **↺ Nova Sessão**? Escolha as fotos de novo.\n📺 Vídeos 003 e 008 da playlist · Manual Seção 5 e 15.",
+  "resposta": "O que puxa o personagem é o **começo do prompt**: `Nome,` — **uma palavra só**, com a vírgula logo depois.\n1. O nome tem que ser **idêntico** ao do elenco (Flow: nome do personagem capturado · Vids: nome no 🎬 Elenco). Ex.: `Vítor, medium shot…`\n2. Nome de **duas palavras não funciona**: junte numa só nos dois lugares (ex.: \"Maria Clara\" → `Mariaclara`). Na fala/narração pode continuar separado.\n3. Nome que não está no elenco = cena sai sem personagem, **sem aviso**.\n4. No Vids: usou **↺ Nova Sessão**? Escolha as fotos de novo.\n📺 Vídeos 003 e 008 da playlist · Manual Seção 5 e 15.",
   "escalar": "nome conferido letra por letra e ainda sai sem o personagem — pedir o código de diagnóstico."
  },
  {
@@ -893,7 +893,7 @@
    "🩺",
    "falhas registradas"
   ],
-  "resposta": "O código leva pra equipe o registro técnico do seu lote — você não precisa abrir console nem F12.\n1. Abra o painel do CenaDrop (com a chave ativa).\n2. Clique em **Diagnóstico**, no rodapé. (Se aparecer o aviso \"⚠️ N falhas registradas neste lote\", pode usar o botão **Enviar diagnóstico pro suporte** dele.)\n3. Se quiser, escreva o que aconteceu (ex.: \"travou na cena 10\").\n4. Clique em **Enviar diagnóstico**.\n5. Aparece um código `D-XXXX`: clique em **⧉ Copiar código** e cole aqui no seu post.\n**Vai junto:** registro das últimas horas, versão, Flow/Vids, erros do Google, navegador e sistema. **Não vai:** o texto das cenas, imagens/vídeos, senha, outras abas.",
+  "resposta": "O código mostra pra equipe exatamente o que aconteceu no seu CenaDrop — você não precisa abrir console nem mandar print.\n1. Abra o Google Flow ou o Vids, no mesmo projeto onde deu o problema.\n2. O problema aconteceu **nas últimas horas**? Vá pro passo 3. **Já faz mais tempo, ou você fechou o Flow/Vids?** Rode de novo a cena ou o lote até o erro aparecer.\n3. Logo depois do erro, no painel do CenaDrop, clique em **Diagnóstico** (no rodapé do painel). Se aparecer o aviso \"⚠️ N falhas registradas neste lote\", pode usar o botão **Enviar diagnóstico pro suporte** dele.\n4. Escreva em uma frase o que aconteceu (ex.: \"parou na cena 10\") e clique em **Enviar diagnóstico**.\n5. Clique em **⧉ Copiar código** e cole no seu post do #suporte (ex.: `D-4KJ9`).\n**Vai junto:** registro das últimas horas, versão, Flow/Vids, erros do Google, navegador e sistema. **Não vai:** o texto das cenas, imagens/vídeos, senha, outras abas.",
   "escalar": "o envio falhar (\"Não consegui enviar…\") mesmo com internet funcionando."
  },
  {
