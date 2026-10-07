@@ -61,7 +61,7 @@ module.exports = function diagnosticos(client, { db, logStaff, suporte }) {
             { name: 'Aluno', value: `${mascararEmail(d.email || lic?.email)} · ${lic ? (lic.active !== false && lic.status !== 'inactive' ? 'chave ativa ✅' : 'chave DESATIVADA ⛔') : 'chave não encontrada'}`, inline: false },
             { name: 'A resposta vai por', value: destino, inline: false },
           ],
-          footer: { text: `Detalhe completo: Admin › CenaDrop › 🩺 Diagnósticos · diag:${d.id}` },
+          footer: { text: `Detalhe completo: Admin › CenaDrop › Diagnósticos · diag:${d.id}` },
           timestamp: d.criado,
         }],
         components: botoes(d.id),

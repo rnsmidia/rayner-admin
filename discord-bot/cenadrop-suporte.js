@@ -212,7 +212,7 @@ module.exports = function suporte(client, { db, logStaff }) {
     const so = /Windows/.test(d.navegador) ? 'Windows' : /Mac OS/.test(d.navegador) ? 'Mac' : '?';
     return [`\`${d.codigo}\` · v${d.versao} · ${d.plataforma} · ${so} · ${nav} · ${d.n_linhas} linhas`,
       d.resumo ? `Erros: ${d.resumo}` : null, d.mensagem ? `Recado: "${d.mensagem}"` : null,
-      'Abrir em Admin › CenaDrop › 🩺 Diagnósticos'].filter(Boolean).join('\n').slice(0, 1000);
+      'Abrir em Admin › CenaDrop › Diagnósticos'].filter(Boolean).join('\n').slice(0, 1000);
   };
 
   async function procurarCodigo(thread) {
