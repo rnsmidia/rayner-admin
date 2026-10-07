@@ -110,7 +110,7 @@ module.exports = function diagnosticos(client, { db, logStaff, suporte }) {
       <div style="background:#f4f1fb;border-left:4px solid #7C3AED;padding:14px 16px;border-radius:6px;white-space:pre-wrap">${esc(texto)}</div>
       <p style="margin-top:20px">Se precisar continuar, o suporte do CenaDrop agora fica na nossa comunidade no Discord: abra um post no <b>#suporte</b> citando o código <b>${d.codigo}</b>.</p>
       <p><a href="${CONVITE}" style="background:#7C3AED;color:#fff;padding:10px 18px;border-radius:6px;text-decoration:none;display:inline-block">Entrar na comunidade CenaDrop</a></p>
-      <p style="color:#888;font-size:12px;margin-top:24px">Equipe CenaDrop<br>Este e-mail é só de aviso e <b>não recebe respostas</b> — pra falar com a equipe, use o #suporte no Discord.</p></div>`;
+      <p style="color:#888;font-size:12px;margin-top:24px">Equipe CenaDrop<br>Pra continuar a conversa, o caminho mais rápido é o <b>#suporte</b> no Discord.</p></div>`;
     const r = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
