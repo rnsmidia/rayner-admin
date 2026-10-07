@@ -446,7 +446,10 @@ client.on('messageCreate', async (msg) => {
 });
 
 // Suporte: fórum #suporte, fila e repasse pro Staff (arquivo próprio)
-require('./cenadrop-suporte')(client, { db, logStaff });
+const suporte = require('./cenadrop-suporte')(client, { db, logStaff });
+
+// Diagnósticos da extensão → #diagnosticos do Staff (responder no chamado, DM ou e-mail)
+require('./cenadrop-diagnosticos')(client, { db, logStaff, suporte });
 
 // Rascunhos da IA (rodada da comunidade via Elo IA) → ✅/✏️/🗑️ no Staff
 require('./cenadrop-rascunhos')(client, { logStaff });

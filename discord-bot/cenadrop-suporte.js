@@ -59,6 +59,8 @@ module.exports = function suporte(client, { db, logStaff }) {
   const chamados = new Map();
   const doStaff = new Map(); // staffThreadId → customerThreadId
   const cartaoTexto = new Map(); // cardId → último texto (evita editar à toa)
+  const codigosDe = new Map(); // customerThreadId → Set de códigos D-XXXX citados no chamado
+  const anotarCodigo = (cid, codigo) => { if (!codigo) return; if (!codigosDe.has(cid)) codigosDe.set(cid, new Set()); codigosDe.get(cid).add(codigo); };
 
   const tagsDe = (forum) => Object.fromEntries(forum.availableTags.map((t) => [t.name, t.id]));
   const nomeTag = (forum, id) => forum.availableTags.find((t) => t.id === id)?.name;
@@ -262,6 +264,7 @@ module.exports = function suporte(client, { db, logStaff }) {
     });
     const cliente = user.username;
     chamados.set(thread.id, { staffId: staff.id, cardId: card.id, status: 'fila', criado, titulo: thread.name, cliente });
+    anotarCodigo(thread.id, codigo);
     doStaff.set(staff.id, thread.id);
     await marcarStatus(thread, 'Na fila');
     await logStaff(`🎫 Novo chamado na fila · **${cliente}** · "${thread.name}" · <#${staff.id}>`);
@@ -289,6 +292,33 @@ module.exports = function suporte(client, { db, logStaff }) {
     await atualizarFila();
   }
 
+  // Resposta da equipe → post do cliente (usado pelo relay do Staff e pelo #diagnosticos)
+  async function enviarAoCliente(cid, txt, files = [], quem = 'equipe') {
+    const th = await client.channels.fetch(cid);
+    if (th.archived) await th.setArchived(false);
+    await th.send({
+      content: `<@${th.ownerId}>`, // marca o cliente: o servidor só notifica menções
+      embeds: txt ? [{ author: { name: 'Equipe CenaDrop', icon_url: client.user.displayAvatarURL() }, description: txt.slice(0, 4000), color: COR }] : [],
+      files,
+      allowedMentions: { users: [th.ownerId] },
+    });
+    const c = chamados.get(cid);
+    if (c && c.status === 'fila') {
+      c.status = 'atendimento';
+      await marcarStatus(th, 'Em atendimento');
+      const st = await client.channels.fetch(c.staffId).catch(() => null);
+      if (st) await marcarStatus(st, 'Em atendimento');
+      await atualizarFila();
+    }
+    // diagnósticos citados neste chamado passam a "respondido"
+    const codigos = [...(codigosDe.get(cid) || [])];
+    if (codigos.length && txt) {
+      await db().from('cenadrop_diagnosticos')
+        .update({ status: 'respondido', resposta: txt.slice(0, 4000), respondido_em: new Date().toISOString(), respondido_por: quem, respondido_via: 'chamado' })
+        .in('codigo', codigos).or('status.is.null,status.neq.respondido');
+    }
+  }
+
   // ── 3/4. repasse de mensagens ─────────────────────────────────────────────
   client.on('messageCreate', async (msg) => {
     if (msg.author.bot || !msg.channel.isThread?.()) return;
@@ -300,22 +330,8 @@ module.exports = function suporte(client, { db, logStaff }) {
         const txt = msg.content.trim();
         if (txt.startsWith('//')) return msg.react('📝').catch(() => {});
         if (txt.toLowerCase() === '!resolvido') return resolver(cid, 'equipe');
-        const th = await client.channels.fetch(cid);
-        if (th.archived) await th.setArchived(false);
-        await th.send({
-          content: `<@${th.ownerId}>`, // marca o cliente: o servidor só notifica menções
-          embeds: txt ? [{ author: { name: 'Equipe CenaDrop', icon_url: client.user.displayAvatarURL() }, description: txt.slice(0, 4000), color: COR }] : [],
-          files: [...msg.attachments.values()].map((a) => ({ attachment: a.url, name: a.name })),
-          allowedMentions: { users: [th.ownerId] },
-        });
+        await enviarAoCliente(cid, txt, [...msg.attachments.values()].map((a) => ({ attachment: a.url, name: a.name })), msg.author.username);
         await msg.react('✅').catch(() => {});
-        const c = chamados.get(cid);
-        if (c && c.status === 'fila') {
-          c.status = 'atendimento';
-          await marcarStatus(th, 'Em atendimento');
-          await marcarStatus(msg.channel, 'Em atendimento');
-          await atualizarFila();
-        }
         return;
       }
       // cliente → Staff
@@ -339,6 +355,7 @@ module.exports = function suporte(client, { db, logStaff }) {
           allowedMentions: { parse: [] },
         });
         const codigo = msg.content.match(PADRAO_DIAG)?.[0];
+        anotarCodigo(msg.channel.id, codigo);
         if (codigo) await st.send({ embeds: [{ title: '🧰 Diagnóstico enviado', description: textoDiag(await diagnostico(codigo), codigo), color: 0x3B82F6 }] });
       }
     } catch (err) {
@@ -362,6 +379,7 @@ module.exports = function suporte(client, { db, logStaff }) {
       if (!ref) continue;
       const cliente = ini.embeds[0].fields?.find((f) => f.name === 'Cliente')?.value?.match(/\*\*(.+?)\*\*/)?.[1] || '?';
       chamados.set(ref[1], { staffId: st.id, cardId: ref[2], status, criado: st.createdTimestamp, titulo: st.name, cliente });
+      anotarCodigo(ref[1], ini.embeds[0].fields?.find((f) => f.name === 'Diagnóstico')?.value?.match(PADRAO_DIAG)?.[0]);
       doStaff.set(st.id, ref[1]);
     }
     console.log(`[Suporte] fila reconstruída: ${chamados.size} chamado(s) abertos`);
@@ -372,6 +390,12 @@ module.exports = function suporte(client, { db, logStaff }) {
     reconstruir().catch((err) => console.error('[Suporte] reconstruir:', err));
     setInterval(() => atualizarFila(), 10 * 60 * 1000); // "esperando há…" do painel
   });
+
+  // usado pelo #diagnosticos: achar o chamado aberto que citou um código e responder nele
+  return {
+    chamadoComCodigo: (codigo) => [...codigosDe.entries()].find(([cid, set]) => set.has(codigo) && chamados.has(cid))?.[0] || null,
+    enviarAoCliente,
+  };
 };
 
 module.exports.procurar = procurar;
