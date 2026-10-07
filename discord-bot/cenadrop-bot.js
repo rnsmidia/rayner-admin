@@ -530,6 +530,9 @@ const suporte = require('./cenadrop-suporte')(client, { db, logStaff });
 // Diagnósticos da extensão → #diagnosticos do Staff (responder no chamado, DM ou e-mail)
 require('./cenadrop-diagnosticos')(client, { db, logStaff, suporte });
 
+// Sugestão de resposta da IA dentro do chamado (gerada no Mac pelo Elo IA) → ✅/✏️/🔁/🗑️
+require('./cenadrop-sugestoes')(client, { suporte, logStaff });
+
 // Rascunhos da IA (rodada da comunidade via Elo IA) → ✅/✏️/🗑️ no Staff
 require('./cenadrop-rascunhos')(client, { logStaff });
 
