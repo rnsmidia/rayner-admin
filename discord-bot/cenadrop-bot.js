@@ -307,16 +307,38 @@ async function conferirVersao() {
   }
 }
 
-async function avisoDoStaff(msg) {
-  const texto = msg.content.replace(/^!aviso\s*/i, '').trim();
-  if (!texto) return msg.reply('Escreva o aviso depois do comando. Ex.: `!aviso O Google Flow está instável agora; se der erro, espere 1 hora e tente de novo.`');
+async function publicarAviso(texto) {
   const canal = await client.channels.fetch(AVISOS);
   const m = await canal.send({
     content: `<@&${ROLE_CLIENTE}>`,
     allowedMentions: { roles: [ROLE_CLIENTE] },
     embeds: [{ title: '📢 Aviso', description: texto.slice(0, 4000), color: COR, footer: { text: 'Equipe CenaDrop' }, timestamp: new Date().toISOString() }],
   });
-  await msg.reply(`✅ Publicado no #avisos: ${m.url}`);
+  return m.url;
+}
+
+async function postarGeral(texto, files = []) {
+  const canal = await client.channels.fetch(GERAL);
+  const m = await canal.send({ embeds: texto ? [embedEquipe(texto)] : [], files, allowedMentions: { parse: [] } });
+  return m.url;
+}
+
+const LINK_MSG = /https:\/\/(?:\w+\.)?discord(?:app)?\.com\/channels\/(\d+)\/(\d+)\/(\d+)/i;
+async function responderPorLink(link, texto, files = []) {
+  const r = link.match(LINK_MSG);
+  if (!r) throw new Error('link de mensagem inválido. Botão direito na mensagem do aluno → **Copiar link da mensagem**.');
+  const [, guild, canalId, msgId] = r;
+  if (guild !== GUILD_ID) throw new Error('esse link não é do servidor CenaDrop.');
+  const canal = await client.channels.fetch(canalId);
+  const alvo = await canal.messages.fetch(msgId);
+  const m = await alvo.reply({ embeds: texto ? [embedEquipe(texto)] : [], files, allowedMentions: { users: [alvo.author.id], repliedUser: true } });
+  return m.url;
+}
+
+async function avisoDoStaff(msg) {
+  const texto = msg.content.replace(/^!aviso\s*/i, '').trim();
+  if (!texto) return msg.reply('Escreva o aviso depois do comando. Ex.: `!aviso O Google Flow está instável agora; se der erro, espere 1 hora e tente de novo.`');
+  await msg.reply(`✅ Publicado no #avisos: ${await publicarAviso(texto)}`);
 }
 
 // ── "só suporte" × "comunidade" (cargo Comunidade liga/desliga #geral e #dicas) ──
@@ -349,9 +371,7 @@ async function falarComoEquipe(msg) {
   if (/^!geral\b/i.test(txt)) {
     const texto = txt.replace(/^!geral\s*/i, '');
     if (!texto && !files.length) return msg.reply('Escreva a mensagem depois do comando. Ex.: `!geral Bom dia, pessoal! Qual cena vocês geraram hoje?`');
-    const canal = await client.channels.fetch(GERAL);
-    const m = await canal.send({ embeds: texto ? [embedEquipe(texto)] : [], files, allowedMentions: { parse: [] } });
-    return msg.reply(`✅ Postado no #geral: ${m.url}`);
+    return msg.reply(`✅ Postado no #geral: ${await postarGeral(texto, files)}`);
   }
   // !responder <link da mensagem> <texto>
   const r = txt.match(/^!responder\s+https:\/\/(?:\w+\.)?discord(?:app)?\.com\/channels\/(\d+)\/(\d+)\/(\d+)\s*([\s\S]*)$/i);
@@ -389,7 +409,41 @@ function caixa(id, titulo, campo, rotulo, exemplo, max) {
   ));
 }
 
+// ── #painel do Staff: as ações da equipe em botão (os comandos ! continuam valendo) ──
+async function painelStaff(inter) {
+  const caixaLonga = (id, titulo, campos) => new ModalBuilder().setCustomId(id).setTitle(titulo).addComponents(
+    ...campos.map(([cid, rotulo, estilo, exemplo, max]) => new ActionRowBuilder().addComponents(
+      new TextInputBuilder().setCustomId(cid).setLabel(rotulo).setStyle(estilo).setPlaceholder(exemplo).setRequired(true).setMaxLength(max))));
+  if (inter.isButton()) {
+    if (inter.customId === 'staff:aviso') return inter.showModal(caixaLonga('staff:m-aviso', 'Publicar aviso no #avisos', [['texto', 'Aviso (vai com @Cliente CenaDrop)', TextInputStyle.Paragraph, 'O Google Flow está instável agora; se der erro, espere 1 hora e tente de novo.', 4000]]));
+    if (inter.customId === 'staff:geral') return inter.showModal(caixaLonga('staff:m-geral', 'Postar no #geral', [['texto', 'Mensagem (sai como Equipe CenaDrop)', TextInputStyle.Paragraph, 'Bom dia, pessoal! Qual cena vocês geraram hoje?', 4000]]));
+    if (inter.customId === 'staff:responder') return inter.showModal(caixaLonga('staff:m-responder', 'Responder um aluno', [
+      ['link', 'Link da mensagem do aluno', TextInputStyle.Short, 'Botão direito na mensagem → Copiar link da mensagem', 200],
+      ['texto', 'Sua resposta (sai como Equipe CenaDrop)', TextInputStyle.Paragraph, 'Que cena linda! Qual estilo você usou?', 4000]]));
+    if (inter.customId === 'staff:conferir') {
+      await inter.deferReply({ flags: MessageFlags.Ephemeral });
+      const r = await conferirComAviso();
+      return inter.editReply(r.erro ? `🔴 Erro: ${r.erro}` : r.ignorado ? '⏳ Já tem uma conferência rodando.'
+        : `🔎 Conferência feita · ${r.membros} membros · ${r.removidos} perderam o acesso · ${r.devolvidos} recuperaram`);
+    }
+    return;
+  }
+  await inter.deferReply({ flags: MessageFlags.Ephemeral });
+  try {
+    const texto = inter.fields.getTextInputValue('texto').trim();
+    if (inter.customId === 'staff:m-aviso') return inter.editReply(`✅ Publicado no #avisos: ${await publicarAviso(texto)}`);
+    if (inter.customId === 'staff:m-geral') return inter.editReply(`✅ Postado no #geral: ${await postarGeral(texto)}`);
+    if (inter.customId === 'staff:m-responder') return inter.editReply(`✅ Respondido: ${await responderPorLink(inter.fields.getTextInputValue('link'), texto)}`);
+  } catch (err) {
+    return inter.editReply(`🔴 Não consegui: ${err.message}`);
+  }
+}
+
 client.on('interactionCreate', async (inter) => {
+  if ((inter.isButton() || inter.isModalSubmit()) && inter.customId.startsWith('staff:')) {
+    if (inter.guildId !== STAFF_GUILD) return;
+    return painelStaff(inter).catch((err) => console.error('[CenaDrop] painel:', err));
+  }
   if (inter.isButton() && inter.customId === 'acesso:ativar') {
     return inter.showModal(caixa('acesso:modal-ativar', 'Ativar meu acesso', 'chave', 'Cole aqui a sua chave do CenaDrop', 'CD-XXXX-XXXX-XXXX', 40)).catch(() => {});
   }

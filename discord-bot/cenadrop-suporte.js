@@ -125,6 +125,12 @@ module.exports = function suporte(client, { db, logStaff }) {
     if (!inter.isButton() || !inter.customId.startsWith('sup:')) return;
     const thread = inter.channel;
     try {
+      if (inter.customId === 'sup:resolver') { // botão no chamado do Staff
+        const cid = doStaff.get(thread.id);
+        if (!cid) return inter.reply({ content: 'Este chamado já está fechado.', flags: MessageFlags.Ephemeral });
+        await inter.update({ components: [] });
+        return resolver(cid, 'equipe');
+      }
       if (inter.user.id !== thread.ownerId) {
         return inter.reply({ content: 'Só quem abriu este post pode usar esses botões. Se você tem um problema parecido, abra o seu próprio post no #suporte. 🙂', flags: MessageFlags.Ephemeral });
       }
@@ -186,7 +192,7 @@ module.exports = function suporte(client, { db, logStaff }) {
         `**💬 Em atendimento (${atend.length})**`,
         ...(atend.length ? atend.map(([, c]) => `• <#${c.staffId}> · ${c.cliente} · aberto há ${haQuanto(c.criado)}`) : ['—']),
         '',
-        `-# Atualizado <t:${Math.floor(Date.now() / 1000)}:R> · responda dentro do chamado · \`//\` = nota interna · \`!resolvido\` fecha`,
+        `-# Atualizado <t:${Math.floor(Date.now() / 1000)}:R> · responda dentro do chamado · \`//\` = nota interna · ✅ no topo do chamado (ou \`!resolvido\`) fecha`,
       ];
       const embed = { title: '📋 Fila de atendimento', description: linhas.join('\n').slice(0, 4000), color: COR };
       const ultimas = await canal.messages.fetch({ limit: 10 });
@@ -260,6 +266,9 @@ module.exports = function suporte(client, { db, logStaff }) {
           ],
           footer: { text: `ref:${thread.id}:${card.id}` },
         }],
+        components: [new ActionRowBuilder().addComponents(
+          new ButtonBuilder().setCustomId('sup:resolver').setStyle(ButtonStyle.Success).setLabel('Marcar como resolvido').setEmoji('✅'),
+        )],
       },
     });
     const cliente = user.username;
