@@ -14,7 +14,7 @@
  */
 
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags } = require('discord.js');
-const KB = require('./base-conhecimento.json');
+const KB_ARQUIVO = require('./base-conhecimento.json'); // reserva, se o banco não responder
 
 const GUILD_ID    = '1555365917578240130';
 const SUPORTE     = '1555372720517283931';   // fórum dos clientes
@@ -35,7 +35,9 @@ const haQuanto = (ms) => {
 };
 
 // ── busca na base ───────────────────────────────────────────────────────────
-const KB_NORM = KB.map((e) => ({ ...e, _kw: e.palavras.map(norm).filter((k) => k.length >= 3) }));
+// A base mora no banco (tabela suporte_base) desde 07/10/26 — recarregada a cada 5 min
+const prepararBase = (lista) => lista.map((e) => ({ ...e, _kw: (e.palavras || []).map(norm).filter((k) => k.length >= 3) }));
+let KB_NORM = prepararBase(KB_ARQUIVO);
 
 function procurar(titulo, corpo, assunto) {
   const tt = norm(titulo), tc = norm(corpo);
@@ -55,6 +57,60 @@ function procurar(titulo, corpo, assunto) {
 }
 
 module.exports = function suporte(client, { db, logStaff }) {
+  async function carregarBase() {
+    try {
+      const { data, error } = await db().from('suporte_base')
+        .select('id, pergunta, tag, palavras, resposta, aprender, links, escalar').eq('ativo', true);
+      if (error) throw error;
+      if (data?.length) KB_NORM = prepararBase(data);
+    } catch (err) {
+      console.error('[Suporte] base do banco indisponível, sigo com a última carregada:', err.message);
+    }
+  }
+
+  // ── memória de atendimentos: cada post resolvido vira um caso (tabela suporte_casos) ──
+  const idPorPergunta = (titulo) => KB_NORM.find((e) => `💡 ${e.pergunta}`.slice(0, 256) === titulo)?.id;
+  async function salvarCaso(thread, { resolvidoPor, staffId = null }) {
+    try {
+      const msgs = [...(await thread.messages.fetch({ limit: 100 })).values()].reverse();
+      const inicial = await thread.fetchStarterMessage().catch(() => null);
+      const conversa = [];
+      const respostasBot = new Set();
+      for (const m of msgs) {
+        if (inicial && m.id === inicial.id) continue;
+        if (m.author.id === client.user.id) {
+          for (const e of m.embeds) {
+            if (e.author?.name === 'Equipe CenaDrop' && e.description) conversa.push({ quem: 'equipe', texto: e.description, quando: m.createdAt.toISOString() });
+            const id = e.title && idPorPergunta(e.title);
+            if (id) respostasBot.add(id);
+          }
+          continue;
+        }
+        if (m.author.bot) continue;
+        conversa.push({ quem: m.author.id === thread.ownerId ? 'cliente' : 'membro', texto: m.content || '(anexo)', quando: m.createdAt.toISOString() });
+      }
+      const textoTodo = [inicial?.content || '', ...conversa.map((c) => c.texto)].join('\n');
+      const codigos = [...new Set([...(codigosDe.get(thread.id) || []), ...(textoTodo.match(new RegExp(PADRAO_DIAG.source, 'g')) || [])])];
+      let diagResumo = null;
+      if (codigos.length) {
+        const { data } = await db().from('cenadrop_diagnosticos').select('codigo, versao, plataforma, resumo, mensagem').in('codigo', codigos);
+        diagResumo = (data || []).map((d) => `${d.codigo} · v${d.versao} · ${d.plataforma} · erros: ${d.resumo || 'nenhum'}${d.mensagem ? ` · recado: "${d.mensagem}"` : ''}`).join('\n') || null;
+      }
+      const owner = await client.users.fetch(thread.ownerId).catch(() => null);
+      await db().from('suporte_casos').upsert({
+        thread_id: thread.id, staff_thread_id: staffId,
+        aberto_em: thread.createdAt?.toISOString(), resolvido_em: new Date().toISOString(), resolvido_por: resolvidoPor,
+        cliente_discord_id: thread.ownerId, cliente_nome: owner?.username || null,
+        assunto: thread.appliedTags.map((id) => nomeTag(thread.parent, id)).find((n) => n && !STATUS.includes(n)) || null,
+        titulo: thread.name, problema: inicial?.content || null, conversa,
+        resposta_equipe: conversa.filter((c) => c.quem === 'equipe').map((c) => c.texto).join('\n\n') || null,
+        respostas_bot: [...respostasBot], diag_codigos: codigos, diag_resumo: diagResumo,
+      }, { onConflict: 'thread_id' });
+    } catch (err) {
+      console.error('[Suporte] não guardei o caso:', err.message);
+    }
+  }
+
   // customerThreadId → { staffId, cardId, status: 'fila'|'atendimento', criado, titulo, cliente }
   const chamados = new Map();
   const doStaff = new Map(); // staffThreadId → customerThreadId
@@ -150,7 +206,7 @@ module.exports = function suporte(client, { db, logStaff }) {
       if (inter.customId === 'sup:ok') {
         await inter.update({ components: [] });
         if (chamados.has(thread.id)) await resolver(thread.id, 'cliente');
-        else await marcarStatus(thread, 'Resolvido');
+        else { await marcarStatus(thread, 'Resolvido'); await salvarCaso(thread, { resolvidoPor: 'bot' }); }
         await thread.send('✅ Que bom que resolveu! Marquei como **resolvido**. Se voltar a acontecer, é só escrever aqui.');
         await logStaff(`✅ Resolvido pela base (cliente clicou) · "${thread.name}"`);
         return;
@@ -321,6 +377,8 @@ module.exports = function suporte(client, { db, logStaff }) {
   async function resolver(cid, quem) {
     const c = chamados.get(cid);
     if (!c) return;
+    const thCaso = await client.channels.fetch(cid).catch(() => null);
+    if (thCaso) await salvarCaso(thCaso, { resolvidoPor: quem === 'equipe' ? 'equipe' : 'cliente', staffId: c.staffId });
     chamados.delete(cid);
     doStaff.delete(c.staffId);
     try {
@@ -436,6 +494,8 @@ module.exports = function suporte(client, { db, logStaff }) {
   }
 
   client.once('clientReady', () => {
+    carregarBase();
+    setInterval(carregarBase, 5 * 60 * 1000);
     reconstruir().catch((err) => console.error('[Suporte] reconstruir:', err));
     setInterval(() => atualizarFila(), 10 * 60 * 1000); // "esperando há…" do painel
   });
