@@ -46,6 +46,15 @@ const PRODUTOS_FORA = new Set(['nx_visit', 'nxsaude']);
 const db = () => createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 const ativa = (l) => l.active !== false && l.status !== 'inactive';
 const ehCenaDrop = (l) => !PRODUTOS_FORA.has(l.product) && !/test postback/i.test(l.product || '');
+// 13/10/26 — o aluno digita a chave sem hífen, com espaço ou minúscula (caso real: "CD7…D8JE" de uma chave
+// CD-7D5F-V5V4-D8JE ativa → "chave inexistente" 2x). Aceita qualquer separador e monta o formato do banco.
+const normalizarChave = (texto) => {
+  const bruto = String(texto || '').trim().toUpperCase();
+  const so = bruto.replace(/[^A-Z0-9]/g, '');
+  if (/^CD[A-Z0-9]{12}$/.test(so)) return `CD-${so.slice(2, 6)}-${so.slice(6, 10)}-${so.slice(10)}`;
+  if (/^RN\d{6}$/.test(so)) return `RN-${so.slice(2)}`;
+  return bruto;
+};
 const mascarar = (k) => k.length > 8 ? `${k.slice(0, 3)}…${k.slice(-4)}` : '…';
 const mascararEmail = (e) => e.replace(/^(.).*?(.)?@/, (_, a, b) => `${a}***${b || ''}@`);
 
@@ -89,7 +98,7 @@ const comandos = [
 
 // ── /ativar ─────────────────────────────────────────────────────────────────
 async function ativar(inter) {
-  const chave = (inter.isModalSubmit() ? inter.fields.getTextInputValue('chave') : inter.options.getString('chave')).trim().toUpperCase();
+  const chave = normalizarChave(inter.isModalSubmit() ? inter.fields.getTextInputValue('chave') : inter.options.getString('chave'));
   const user = inter.user;
 
   const { data: lic, error } = await db()
@@ -494,7 +503,7 @@ client.on('guildMemberAdd', async (member) => {
 });
 
 // Chave colada como mensagem comum (sem usar o comando) → apaga na hora
-const PADRAO_CHAVE = /\bCD-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}\b|\bRN-\d{6}\b/i;
+const PADRAO_CHAVE = /\bCD[\s-]?[A-Z0-9]{4}[\s-]?[A-Z0-9]{4}[\s-]?[A-Z0-9]{4}\b|\bRN-?\d{6}\b/i;  // com ou sem hífen (13/10)
 client.on('messageCreate', async (msg) => {
   // `!conferir` no Staff roda a conferência na hora
   if (msg.guildId === STAFF_GUILD && !msg.author.bot && /^!(geral|responder)\b/i.test(msg.content.trim())) {
