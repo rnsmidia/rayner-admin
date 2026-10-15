@@ -31,6 +31,7 @@ module.exports = function diagnosticos(client, { db, logStaff, suporte }) {
   const botoes = (id) => [new ActionRowBuilder().addComponents(
     new ButtonBuilder().setCustomId(`diag:resp:${id}`).setStyle(ButtonStyle.Primary).setLabel('Responder').setEmoji('💬'),
     new ButtonBuilder().setCustomId(`diag:visto:${id}`).setStyle(ButtonStyle.Secondary).setLabel('Marcar como visto').setEmoji('👀'),
+    new ButtonBuilder().setCustomId(`diag:encerrar:${id}`).setStyle(ButtonStyle.Secondary).setLabel('Encerrar sem resposta').setEmoji('✔️'),
   )];
 
   async function licencaDe(chave) {
@@ -129,7 +130,19 @@ module.exports = function diagnosticos(client, { db, logStaff, suporte }) {
         if (acao === 'visto') {
           await db().from('cenadrop_diagnosticos').update({ status: 'visto' }).eq('id', id).or('status.is.null,status.neq.respondido');
           const e = inter.message.embeds[0].toJSON();
-          return inter.update({ embeds: [{ ...e, color: 0x3B82F6, title: `👀 ${e.title.replace(/^🩺 /, '')} · visto por ${inter.user.username}` }], components: [new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId(`diag:resp:${id}`).setStyle(ButtonStyle.Primary).setLabel('Responder').setEmoji('💬'))] });
+          return inter.update({ embeds: [{ ...e, color: 0x3B82F6, title: `👀 ${e.title.replace(/^🩺 /, '')} · visto por ${inter.user.username}` }], components: [new ActionRowBuilder().addComponents(
+            new ButtonBuilder().setCustomId(`diag:resp:${id}`).setStyle(ButtonStyle.Primary).setLabel('Responder').setEmoji('💬'),
+            new ButtonBuilder().setCustomId(`diag:encerrar:${id}`).setStyle(ButtonStyle.Secondary).setLabel('Encerrar sem resposta').setEmoji('✔️'))] });
+        }
+        // teste da equipe, diagnóstico sem pedido, aluno que já resolveu → dá baixa sem mandar nada pro aluno
+        if (acao === 'encerrar') {
+          await db().from('cenadrop_diagnosticos').update({
+            status: 'encerrado', respondido_por: inter.user.username, respondido_em: new Date().toISOString(), respondido_via: 'encerrado',
+          }).eq('id', id);
+          const e = inter.message.embeds[0].toJSON();
+          await logStaff(`✔️ Diagnóstico encerrado sem resposta por ${inter.user.username} · ${e.title.replace(/^(🩺|👀) /, '').split(' · ')[0]}`);
+          return inter.update({ embeds: [{ ...e, color: 0x6B7280, title: `✔️ ${e.title.replace(/^(🩺|👀) /, '').split(' · ')[0]} · encerrado sem resposta por ${inter.user.username}`,
+            fields: (e.fields || []).filter((f) => f.name !== 'A resposta vai por') }], components: [] });
         }
         if (acao === 'resp') {
           const modal = new ModalBuilder().setCustomId(`diag:modal:${id}`).setTitle('Resposta pro aluno');

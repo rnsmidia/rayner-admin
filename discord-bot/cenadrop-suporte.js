@@ -304,7 +304,10 @@ module.exports = function suporte(client, { db, logStaff }) {
     const card = await thread.send({ embeds: [cartao('fila', naFila().length + 1)] });
     // diagnóstico só faz sentido em problema técnico — dúvida de licença/plano não precisa
     const assuntoTag = thread.appliedTags.map((id) => nomeTag(thread.parent, id)).find((n) => n && !STATUS.includes(n));
-    const tecnico = !['Licença e ativação', 'Planos e outros'].includes(assuntoTag);
+    // o D-XXXX é da extensão CenaDrop: Elo IA e Narrativa não têm esse diagnóstico
+    const inicialTxt = (await thread.fetchStarterMessage().catch(() => null))?.content || '';
+    const outroProduto = /\belo\b|elo ia|narrativa/i.test(`${thread.name} ${inicialTxt}`);
+    const tecnico = !['Licença e ativação', 'Planos e outros'].includes(assuntoTag) && !outroProduto;
     const jaTem = await procurarCodigo(thread);
     if (jaTem) await thread.send({ embeds: [{ description: `✅ Recebemos o seu diagnóstico **${jaTem}** — ele já vai junto pra equipe.`, color: 0x22C55E }] });
     else if (tecnico) await thread.send({ embeds: [EMBED_DIAG] });
@@ -381,6 +384,14 @@ module.exports = function suporte(client, { db, logStaff }) {
     if (!c) return;
     const thCaso = await client.channels.fetch(cid).catch(() => null);
     if (thCaso) await salvarCaso(thCaso, { resolvidoPor: quem === 'equipe' ? 'equipe' : 'cliente', staffId: c.staffId });
+    // diagnóstico citado e que ninguém respondeu → fecha junto com o chamado
+    const codigosChamado = [...(codigosDe.get(cid) || [])];
+    if (codigosChamado.length) {
+      const { data: fechados } = await db().from('cenadrop_diagnosticos')
+        .update({ status: 'encerrado', respondido_em: new Date().toISOString(), respondido_por: quem, respondido_via: 'chamado-fechado' })
+        .in('codigo', codigosChamado).or('status.is.null,status.not.in.(respondido,encerrado)').select('codigo, staff_msg_id');
+      await atualizarCartoesDiag(fechados, `chamado fechado (${quem === 'equipe' ? 'pela equipe' : 'pelo aluno'})`, 0x6B7280);
+    }
     chamados.delete(cid);
     doStaff.delete(c.staffId);
     try {
@@ -423,9 +434,30 @@ module.exports = function suporte(client, { db, logStaff }) {
     // diagnósticos citados neste chamado passam a "respondido"
     const codigos = [...(codigosDe.get(cid) || [])];
     if (codigos.length && txt) {
-      await db().from('cenadrop_diagnosticos')
+      const { data: marcados } = await db().from('cenadrop_diagnosticos')
         .update({ status: 'respondido', resposta: txt.slice(0, 4000), respondido_em: new Date().toISOString(), respondido_por: quem, respondido_via: 'chamado' })
-        .in('codigo', codigos).or('status.is.null,status.neq.respondido');
+        .in('codigo', codigos).or('status.is.null,status.not.in.(respondido,encerrado)').select('codigo, staff_msg_id');
+      await atualizarCartoesDiag(marcados, `respondido 📌 no chamado por ${quem}`, 0x22C55E, txt);
+    }
+  }
+
+  // O cartão do #diagnosticos acompanha o chamado: respondido ali (verde) ou fechado sem resposta da equipe (cinza)
+  const CANAL_DIAG = '1557199153254105141';
+  async function atualizarCartoesDiag(linhas, situacao, cor, resposta = null) {
+    if (!linhas?.length) return;
+    try {
+      const canal = await client.channels.fetch(CANAL_DIAG);
+      for (const d of linhas) {
+        if (!d.staff_msg_id) continue;
+        const msg = await canal.messages.fetch(d.staff_msg_id).catch(() => null);
+        if (!msg?.embeds?.[0]) continue;
+        const e = msg.embeds[0].toJSON();
+        const fields = (e.fields || []).filter((f) => !['A resposta vai por', 'Resposta'].includes(f.name));
+        if (resposta) fields.push({ name: 'Resposta', value: resposta.slice(0, 1000) });
+        await msg.edit({ embeds: [{ ...e, color: cor, title: `${cor === 0x22C55E ? '✅' : '✔️'} ${d.codigo} · ${situacao}`, fields }], components: [] });
+      }
+    } catch (err) {
+      console.error('[Suporte] cartão do diagnóstico:', err.message);
     }
   }
 

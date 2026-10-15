@@ -344,6 +344,27 @@ async function responderPorLink(link, texto, files = []) {
   return m.url;
 }
 
+// Mensagem direta pro aluno como Equipe CenaDrop (aceita id, @menção ou nome de usuário) — fica no #ativacoes
+async function mandarDM(alvo, texto, quem) {
+  const guild = await client.guilds.fetch(GUILD_ID);
+  const limpo = alvo.trim().replace(/^<@!?(\d+)>$/, '$1').replace(/^@/, '');
+  let membro = /^\d{15,}$/.test(limpo) ? await guild.members.fetch(limpo).catch(() => null) : null;
+  if (!membro) {
+    const achados = await guild.members.search({ query: limpo, limit: 5 });
+    membro = achados.find((m) => m.user.username.toLowerCase() === limpo.toLowerCase()) || (achados.size === 1 ? achados.first() : null);
+    if (!membro && achados.size > 1) throw new Error(`mais de um membro parecido com "${limpo}": ${achados.map((m) => m.user.username).join(', ')} — use o id`);
+  }
+  if (!membro) throw new Error(`não achei "${limpo}" no servidor CenaDrop (a pessoa precisa estar lá dentro)`);
+  await membro.send({
+    embeds: [{ author: { name: 'Equipe CenaDrop', icon_url: client.user.displayAvatarURL() }, description: texto.slice(0, 4000), color: COR,
+      footer: { text: 'Precisa de ajuda? Abra um post no #suporte do servidor CenaDrop.' } }],
+    components: [new ActionRowBuilder().addComponents(
+      new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel('Abrir o #suporte').setEmoji('🛟').setURL(`https://discord.com/channels/${GUILD_ID}/${CH.suporte}`))],
+  }).catch(() => { throw new Error(`${membro.user.username} não recebe mensagem direta (privacidade do Discord dele). Responda pelo post dele no #suporte.`); });
+  await logStaff(`✉️ DM enviada por ${quem} pra **${membro.user.username}** \`${membro.id}\` · "${texto.replace(/\s+/g, ' ').slice(0, 160)}"`);
+  return membro.user.username;
+}
+
 async function avisoDoStaff(msg) {
   const texto = msg.content.replace(/^!aviso\s*/i, '').trim();
   if (!texto) return msg.reply('Escreva o aviso depois do comando. Ex.: `!aviso O Google Flow está instável agora; se der erro, espere 1 hora e tente de novo.`');
@@ -426,6 +447,9 @@ async function painelStaff(inter) {
   if (inter.isButton()) {
     if (inter.customId === 'staff:aviso') return inter.showModal(caixaLonga('staff:m-aviso', 'Publicar aviso no #avisos', [['texto', 'Aviso (vai com @Cliente CenaDrop)', TextInputStyle.Paragraph, 'O Google Flow está instável agora; se der erro, espere 1 hora e tente de novo.', 4000]]));
     if (inter.customId === 'staff:geral') return inter.showModal(caixaLonga('staff:m-geral', 'Postar no #geral', [['texto', 'Mensagem (sai como Equipe CenaDrop)', TextInputStyle.Paragraph, 'Bom dia, pessoal! Qual cena vocês geraram hoje?', 4000]]));
+    if (inter.customId === 'staff:dm') return inter.showModal(caixaLonga('staff:m-dm', 'Mensagem direta pro aluno', [
+      ['quem', 'Nome de usuário ou id do aluno', TextInputStyle.Short, 'Ex.: ademicio (como aparece no #ativacoes)', 100],
+      ['texto', 'Mensagem (sai como Equipe CenaDrop)', TextInputStyle.Paragraph, 'Oi! Vimos que…', 4000]]));
     if (inter.customId === 'staff:responder') return inter.showModal(caixaLonga('staff:m-responder', 'Responder um aluno', [
       ['link', 'Link da mensagem do aluno', TextInputStyle.Short, 'Botão direito na mensagem → Copiar link da mensagem', 200],
       ['texto', 'Sua resposta (sai como Equipe CenaDrop)', TextInputStyle.Paragraph, 'Que cena linda! Qual estilo você usou?', 4000]]));
@@ -443,6 +467,7 @@ async function painelStaff(inter) {
     if (inter.customId === 'staff:m-aviso') return inter.editReply(`✅ Publicado no #avisos: ${await publicarAviso(texto)}`);
     if (inter.customId === 'staff:m-geral') return inter.editReply(`✅ Postado no #geral: ${await postarGeral(texto)}`);
     if (inter.customId === 'staff:m-responder') return inter.editReply(`✅ Respondido: ${await responderPorLink(inter.fields.getTextInputValue('link'), texto)}`);
+    if (inter.customId === 'staff:m-dm') return inter.editReply(`✅ Mensagem enviada pra **${await mandarDM(inter.fields.getTextInputValue('quem'), texto, inter.user.username)}** (registrada no #ativacoes).`);
   } catch (err) {
     return inter.editReply(`🔴 Não consegui: ${err.message}`);
   }
@@ -508,6 +533,12 @@ client.on('messageCreate', async (msg) => {
   // `!conferir` no Staff roda a conferência na hora
   if (msg.guildId === STAFF_GUILD && !msg.author.bot && /^!(geral|responder)\b/i.test(msg.content.trim())) {
     return falarComoEquipe(msg).catch((err) => msg.reply(`🔴 Erro: ${err.message}`).catch(() => {}));
+  }
+  if (msg.guildId === STAFF_GUILD && !msg.author.bot && /^!dm\b/i.test(msg.content.trim())) {
+    const m = msg.content.trim().match(/^!dm\s+(\S+)\s+([\s\S]+)$/i);
+    if (!m) return msg.reply('Use assim: `!dm <id, @menção ou nome de usuário> <texto>`. Ex.: `!dm ademicio Oi! Sua chave já está ativa...`').catch(() => {});
+    return mandarDM(m[1], m[2], msg.author.username).then((u) => msg.reply(`✅ Mensagem enviada pra **${u}** (registrada no #ativacoes).`))
+      .catch((err) => msg.reply(`🔴 Não enviei: ${err.message}`)).catch(() => {});
   }
   if (msg.guildId === STAFF_GUILD && !msg.author.bot && /^!aviso\b/i.test(msg.content.trim())) {
     return avisoDoStaff(msg).catch((err) => msg.reply(`🔴 Erro: ${err.message}`).catch(() => {}));
