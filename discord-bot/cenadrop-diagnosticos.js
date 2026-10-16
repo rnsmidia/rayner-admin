@@ -2,11 +2,12 @@
  * CenaDrop Bot — diagnósticos da extensão no Discord (#diagnosticos do Staff)
  *
  * A cada 2 min: diagnóstico novo enviado pelo BOTÃO do aluno (tipo 'botao', avisado_em vazio)
- * vira um cartão no #diagnosticos com 💬 Responder e 👀 Marcar como visto.
- * A resposta chega no aluno pelo melhor caminho disponível:
- *   1. chamado aberto no #suporte que citou o código → resposta no chamado (marca o aluno)
- *   2. chave ligada ao Discord → mensagem privada do bot + botão pro #suporte
- *   3. senão → e-mail (Resend) com o convite do Discord
+ * vira um cartão no #diagnosticos. Desde 16/10/26 a FILA É ÚNICA: responde-se no #suporte.
+ *   1. aluno já abriu chamado citando o código → cartão ganha 📌 Abrir o chamado
+ *   2. chave ligada ao Discord e nenhum chamado em 10 min → o bot abre o post no #suporte
+ *      em nome do aluno (abrirChamadoDoDiagnostico) e o cartão ganha 📌 Abrir o chamado
+ *   3. sem Discord (ou saiu do servidor) → 📧 Responder por e-mail (Resend, com convite do Discord)
+ * O cartão não tem mais "Responder" pra quem tem Discord: é um lugar só pra responder.
  * O diagnóstico guarda status (visto/respondido), a resposta, quem, quando e por onde.
  */
 
@@ -28,11 +29,15 @@ const resumoNavegador = (ua = '') => {
 };
 
 module.exports = function diagnosticos(client, { db, logStaff, suporte }) {
-  const botoes = (id) => [new ActionRowBuilder().addComponents(
-    new ButtonBuilder().setCustomId(`diag:resp:${id}`).setStyle(ButtonStyle.Primary).setLabel('Responder').setEmoji('💬'),
-    new ButtonBuilder().setCustomId(`diag:visto:${id}`).setStyle(ButtonStyle.Secondary).setLabel('Marcar como visto').setEmoji('👀'),
-    new ButtonBuilder().setCustomId(`diag:encerrar:${id}`).setStyle(ButtonStyle.Secondary).setLabel('Encerrar sem resposta').setEmoji('✔️'),
+  const ESPERA = 10 * 60 * 1000;            // tempo pro aluno abrir o chamado sozinho
+  const JANELA = 6 * 60 * 60 * 1000;        // diagnóstico mais velho que isso não ganha chamado automático
+  const encerrar = (id) => new ButtonBuilder().setCustomId(`diag:encerrar:${id}`).setStyle(ButtonStyle.Secondary).setLabel('Encerrar sem resposta').setEmoji('✔️');
+  const botoesEmail = (id) => [new ActionRowBuilder().addComponents(
+    new ButtonBuilder().setCustomId(`diag:resp:${id}`).setStyle(ButtonStyle.Primary).setLabel('Responder por e-mail').setEmoji('📧'),
+    encerrar(id),
   )];
+  const botoesDiscord = (id) => [new ActionRowBuilder().addComponents(encerrar(id))];
+  const tentados = new Set(); // diagnósticos que já tentaram abrir chamado (não repete se falhar)
 
   async function licencaDe(chave) {
     if (!chave) return null;
@@ -50,7 +55,9 @@ module.exports = function diagnosticos(client, { db, logStaff, suporte }) {
     for (const d of novos) {
       const lic = await licencaDe(d.chave);
       const chamado = suporte.chamadoComCodigo(d.codigo);
-      const destino = chamado ? '📌 tem chamado aberto no #suporte' : lic?.discord_id ? '💬 Discord ligado (vai por mensagem privada)' : '📧 sem Discord (vai por e-mail)';
+      const destino = chamado ? '📌 tem chamado aberto no #suporte'
+        : lic?.discord_id ? '📌 chamado no #suporte (se o aluno não abrir em 10 min, o bot abre por ele)'
+          : '📧 sem Discord ligado → responda por e-mail';
       const m = await canal.send({
         embeds: [{
           title: `🩺 ${d.codigo} · ${d.nome || 'sem nome'}`,
@@ -65,12 +72,50 @@ module.exports = function diagnosticos(client, { db, logStaff, suporte }) {
           footer: { text: `Detalhe completo: Admin › CenaDrop › Diagnósticos · diag:${d.id}` },
           timestamp: d.criado,
         }],
-        components: botoes(d.id),
+        components: lic?.discord_id || chamado ? botoesDiscord(d.id) : botoesEmail(d.id),
       });
       await db().from('cenadrop_diagnosticos')
         .update({ avisado_em: new Date().toISOString(), staff_msg_id: m.id, status: 'novo' }).eq('id', d.id);
+      if (chamado) await suporte.ligarCartaoDiag(d.codigo, suporte.staffDe(chamado));
     }
     await logStaff(`🩺 ${novos.length} diagnóstico(s) novo(s) no #diagnosticos`);
+  }
+
+  // Fila única: diagnóstico sem chamado há 15 min → o bot abre o chamado no #suporte
+  async function abrirPendentes() {
+    const agora = Date.now();
+    const { data, error } = await db().from('cenadrop_diagnosticos')
+      .select('id, codigo, chave, plataforma, staff_msg_id, criado')
+      .eq('tipo', 'botao').not('staff_msg_id', 'is', null)
+      .or('status.is.null,status.not.in.(respondido,encerrado)')
+      .lte('criado', new Date(agora - ESPERA).toISOString())
+      .gte('criado', new Date(agora - JANELA).toISOString());
+    if (error) throw error;
+    for (const d of data || []) {
+      if (tentados.has(d.id) || suporte.chamadoComCodigo(d.codigo)) continue;
+      tentados.add(d.id);
+      const lic = await licencaDe(d.chave);
+      if (!lic?.discord_id) continue;
+      try {
+        const aberto = await suporte.abrirChamadoDoDiagnostico(d, lic.discord_id);
+        if (!aberto) await virarEmail(d, 'saiu do servidor do Discord');
+      } catch (err) {
+        console.error('[Diagnósticos] abrir chamado:', err.message);
+        await virarEmail(d, 'não consegui abrir o chamado');
+        await logStaff(`🔴 Não abri o chamado do diagnóstico ${d.codigo}: ${String(err.message).slice(0, 200)}`);
+      }
+    }
+  }
+
+  // aluno fora do Discord → o cartão volta a ter "Responder por e-mail"
+  async function virarEmail(d, motivo) {
+    try {
+      const canal = await client.channels.fetch(CANAL);
+      const msg = await canal.messages.fetch(d.staff_msg_id);
+      const e = msg.embeds[0].toJSON();
+      const fields = [...(e.fields || []).filter((f) => f.name !== 'A resposta vai por'), { name: 'A resposta vai por', value: `📧 e-mail (${motivo})` }];
+      await msg.edit({ embeds: [{ ...e, fields }], components: botoesEmail(d.id) });
+    } catch (err) { console.error('[Diagnósticos] virar e-mail:', err.message); }
   }
 
   async function entregar(d, texto) {
@@ -181,7 +226,10 @@ module.exports = function diagnosticos(client, { db, logStaff, suporte }) {
   });
 
   client.once('clientReady', () => {
-    const rodar = () => avisarNovos().catch((err) => console.error('[Diagnósticos] aviso:', err.message));
+    const rodar = () => avisarNovos()
+      .catch((err) => console.error('[Diagnósticos] aviso:', err.message))
+      .then(() => abrirPendentes())
+      .catch((err) => console.error('[Diagnósticos] pendentes:', err.message));
     setTimeout(rodar, 45 * 1000);
     setInterval(rodar, INTERVALO);
   });
