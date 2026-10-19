@@ -6,14 +6,15 @@
  *   1. aluno já abriu chamado citando o código → cartão ganha 📌 Abrir o chamado
  *   2. chave ligada ao Discord e nenhum chamado em 10 min → o bot abre o post no #suporte
  *      em nome do aluno (abrirChamadoDoDiagnostico) e o cartão ganha 📌 Abrir o chamado
- *   3. sem Discord (ou saiu do servidor) → 📧 Responder por e-mail (Resend, com convite do Discord)
- * O cartão não tem mais "Responder" pra quem tem Discord: é um lugar só pra responder.
+ *   3. sem Discord (ou saiu do servidor) → chamado 📧 no #chamados (passo 2, 19/10/26): responde lá, sai por e-mail
+ * Desde o passo 2 o cartão daqui é só ARQUIVO técnico (sem botões): tudo se responde no #chamados.
  * O diagnóstico guarda status (visto/respondido), a resposta, quem, quando e por onde.
  */
 
 const {
   ActionRowBuilder, ButtonBuilder, ButtonStyle, ModalBuilder, TextInputBuilder, TextInputStyle, MessageFlags,
 } = require('discord.js');
+const { enviarEmailDiag } = require('./cenadrop-email');
 
 const CANAL = '1557199153254105141';           // #diagnosticos (Staff)
 const SUPORTE_URL = 'https://discord.com/channels/1555365917578240130/1555372720517283931';
@@ -30,7 +31,6 @@ const resumoNavegador = (ua = '') => {
 
 module.exports = function diagnosticos(client, { db, logStaff, suporte }) {
   const ESPERA = 10 * 60 * 1000;            // tempo pro aluno abrir o chamado sozinho
-  const JANELA = 6 * 60 * 60 * 1000;        // diagnóstico mais velho que isso não ganha chamado automático
   const encerrar = (id) => new ButtonBuilder().setCustomId(`diag:encerrar:${id}`).setStyle(ButtonStyle.Secondary).setLabel('Encerrar sem resposta').setEmoji('✔️');
   const botoesEmail = (id) => [new ActionRowBuilder().addComponents(
     new ButtonBuilder().setCustomId(`diag:resp:${id}`).setStyle(ButtonStyle.Primary).setLabel('Responder por e-mail').setEmoji('📧'),
@@ -56,8 +56,8 @@ module.exports = function diagnosticos(client, { db, logStaff, suporte }) {
       const lic = await licencaDe(d.chave);
       const chamado = suporte.chamadoComCodigo(d.codigo);
       const destino = chamado ? '📌 tem chamado aberto no #suporte'
-        : lic?.discord_id ? '📌 chamado no #suporte (se o aluno não abrir em 10 min, o bot abre por ele)'
-          : '📧 sem Discord ligado → responda por e-mail';
+        : lic?.discord_id ? '📌 vai virar chamado no #chamados (se o aluno não abrir post em 10 min, o bot abre por ele)'
+          : '📧 sem Discord → virou chamado 📧 no #chamados (a resposta sai por e-mail)';
       const m = await canal.send({
         embeds: [{
           title: `🩺 ${d.codigo} · ${d.nome || 'sem nome'}`,
@@ -72,11 +72,12 @@ module.exports = function diagnosticos(client, { db, logStaff, suporte }) {
           footer: { text: `Detalhe completo: Admin › CenaDrop › Diagnósticos · diag:${d.id}` },
           timestamp: d.criado,
         }],
-        components: lic?.discord_id || chamado ? botoesDiscord(d.id) : botoesEmail(d.id),
+        components: [],
       });
       await db().from('cenadrop_diagnosticos')
         .update({ avisado_em: new Date().toISOString(), staff_msg_id: m.id, status: 'novo' }).eq('id', d.id);
       if (chamado) await suporte.ligarCartaoDiag(d.codigo, suporte.staffDe(chamado));
+      else if (!lic?.discord_id) await suporte.abrirChamadoEmail(d).catch((e) => console.error('[Diagnósticos] chamado 📧:', e.message));
     }
     await logStaff(`🩺 ${novos.length} diagnóstico(s) novo(s) no #diagnosticos`);
   }
@@ -88,34 +89,21 @@ module.exports = function diagnosticos(client, { db, logStaff, suporte }) {
       .select('id, codigo, chave, plataforma, staff_msg_id, criado')
       .eq('tipo', 'botao').not('staff_msg_id', 'is', null)
       .or('status.is.null,status.not.in.(respondido,encerrado)')
-      .lte('criado', new Date(agora - ESPERA).toISOString())
-      .gte('criado', new Date(agora - JANELA).toISOString());
+      .lte('criado', new Date(agora - ESPERA).toISOString());
     if (error) throw error;
     for (const d of data || []) {
       if (tentados.has(d.id) || suporte.chamadoComCodigo(d.codigo)) continue;
       tentados.add(d.id);
       const lic = await licencaDe(d.chave);
-      if (!lic?.discord_id) continue;
       try {
-        const aberto = await suporte.abrirChamadoDoDiagnostico(d, lic.discord_id);
-        if (!aberto) await virarEmail(d, 'saiu do servidor do Discord');
+        // nada fica órfão: com Discord → post no #suporte em nome do aluno; sem Discord (ou fora do servidor) → chamado 📧
+        const aberto = lic?.discord_id ? await suporte.abrirChamadoDoDiagnostico(d, lic.discord_id) : null;
+        if (!aberto) await suporte.abrirChamadoEmail(d);
       } catch (err) {
         console.error('[Diagnósticos] abrir chamado:', err.message);
-        await virarEmail(d, 'não consegui abrir o chamado');
         await logStaff(`🔴 Não abri o chamado do diagnóstico ${d.codigo}: ${String(err.message).slice(0, 200)}`);
       }
     }
-  }
-
-  // aluno fora do Discord → o cartão volta a ter "Responder por e-mail"
-  async function virarEmail(d, motivo) {
-    try {
-      const canal = await client.channels.fetch(CANAL);
-      const msg = await canal.messages.fetch(d.staff_msg_id);
-      const e = msg.embeds[0].toJSON();
-      const fields = [...(e.fields || []).filter((f) => f.name !== 'A resposta vai por'), { name: 'A resposta vai por', value: `📧 e-mail (${motivo})` }];
-      await msg.edit({ embeds: [{ ...e, fields }], components: botoesEmail(d.id) });
-    } catch (err) { console.error('[Diagnósticos] virar e-mail:', err.message); }
   }
 
   async function entregar(d, texto) {
@@ -145,24 +133,7 @@ module.exports = function diagnosticos(client, { db, logStaff, suporte }) {
       } catch (_) { /* DM fechada → cai pro e-mail */ }
     }
     // 3. e-mail
-    const para = d.email || lic?.email;
-    if (!para) throw new Error('aluno sem Discord ligado e sem e-mail');
-    const primeiro = (d.nome || lic?.name || '').split(' ')[0] || 'tudo bem';
-    const esc = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    const html = `<div style="font-family:Arial,sans-serif;max-width:560px;margin:auto;color:#1f1d2b">
-      <p style="font-size:13px;color:#7C3AED;font-weight:bold;letter-spacing:.5px">CENADROP · SUPORTE</p>
-      <h2 style="margin:4px 0 16px">Analisamos o seu diagnóstico ${d.codigo}</h2>
-      <p>Oi, ${esc(primeiro)}!</p>
-      <div style="background:#f4f1fb;border-left:4px solid #7C3AED;padding:14px 16px;border-radius:6px;white-space:pre-wrap">${esc(texto)}</div>
-      <p style="margin-top:20px">Se precisar continuar, o suporte do CenaDrop agora fica na nossa comunidade no Discord: abra um post no <b>#suporte</b> citando o código <b>${d.codigo}</b>.</p>
-      <p><a href="${CONVITE}" style="background:#7C3AED;color:#fff;padding:10px 18px;border-radius:6px;text-decoration:none;display:inline-block">Entrar na comunidade CenaDrop</a></p>
-      <p style="color:#888;font-size:12px;margin-top:24px">Equipe CenaDrop<br>Pra continuar a conversa, o caminho mais rápido é o <b>#suporte</b> no Discord.</p></div>`;
-    const r = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from: 'CenaDrop <contato@cenadrop.com.br>', to: para, subject: `🩺 Seu diagnóstico ${d.codigo} foi analisado`, html }),
-    });
-    if (!r.ok) throw new Error(`e-mail recusado (${r.status})`);
+    await enviarEmailDiag({ para: d.email || lic?.email, nome: d.nome || lic?.name, codigo: d.codigo, texto });
     return 'email';
   }
 

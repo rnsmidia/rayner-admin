@@ -14,6 +14,9 @@
  *    Vai pra 🟡 Na fila sozinho quando: o aluno clica 🙋, OU escreve de novo no post, OU o post já
  *    chega com código D-XXXX (problema técnico: a base não resolve). Post antigo sem chamado e não
  *    resolvido (ficou "no limbo") é puxado pra fila ao ligar o bot.
+ * 7. PASSO 2 (19/10/26): diagnóstico de aluno SEM Discord (ou que saiu do servidor) vira chamado 📧 no #chamados
+ *    (chave `mail:<id do diagnóstico>`, sem post no #suporte). A resposta da equipe no chamado sai por E-MAIL.
+ *    Mais de um diagnóstico do mesmo aluno entra no MESMO chamado 📧.
  * 5. Diagnóstico enviado sem chamado → o #diagnosticos chama abrirChamadoDoDiagnostico() e o bot
  *    abre o post no #suporte EM NOME do aluno (o dono real fica em `donoDe`, lido da menção do post).
  *    Assim toda resposta sai por um lugar só: o #suporte.
@@ -22,7 +25,8 @@
  */
 
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags } = require('discord.js');
-const KB_ARQUIVO = require('./base-conhecimento.json'); // reserva, se o banco não responder
+const KB_ARQUIVO = require('./base-conhecimento.json');
+const { enviarEmailDiag } = require('./cenadrop-email'); // reserva, se o banco não responder
 
 const GUILD_ID    = '1555365917578240130';
 const SUPORTE     = '1555372720517283931';   // fórum dos clientes
@@ -297,10 +301,10 @@ module.exports = function suporte(client, { db, logStaff }) {
       const doBot = [...chamados.entries()].filter(([, c]) => c.status === 'bot');
       const linhas = [
         `**🟡 Na fila (${fila.length})**`,
-        ...(fila.length ? fila.map(([, c], i) => `${i + 1}. <#${c.staffId}> · ${c.cliente} · esperando há ${haQuanto(c.criado)}`) : ['— ninguém esperando 🎉']),
+        ...(fila.length ? fila.map(([, c], i) => `${i + 1}. <#${c.staffId}> · ${c.email ? '📧 ' : ''}${c.cliente} · esperando há ${haQuanto(c.criado)}`) : ['— ninguém esperando 🎉']),
         '',
         `**💬 Em atendimento (${atend.length})**`,
-        ...(atend.length ? atend.map(([, c]) => `• <#${c.staffId}> · ${c.cliente} · aberto há ${haQuanto(c.criado)}`) : ['—']),
+        ...(atend.length ? atend.map(([, c]) => `• <#${c.staffId}> · ${c.email ? '📧 ' : ''}${c.cliente} · aberto há ${haQuanto(c.criado)}`) : ['—']),
         '',
         `**🤖 Bot respondeu, esperando o aluno (${doBot.length})**`,
         ...(doBot.length ? doBot.map(([, c]) => `• <#${c.staffId}> · ${c.cliente} · há ${haQuanto(c.criado)}`) : ['—']),
@@ -399,6 +403,7 @@ module.exports = function suporte(client, { db, logStaff }) {
       },
     });
     const cliente = user.username;
+    donos.set(thread.id, user.id);
     chamados.set(thread.id, { staffId: staff.id, cardId: card ? card.id : null, status: ehBot ? 'bot' : 'fila', criado, titulo: thread.name, cliente });
     anotarCodigo(thread.id, codigo);
     doStaff.set(staff.id, thread.id);
@@ -461,7 +466,8 @@ module.exports = function suporte(client, { db, logStaff }) {
   async function resolver(cid, quem) {
     const c = chamados.get(cid);
     if (!c) return;
-    const thCaso = await client.channels.fetch(cid).catch(() => null);
+    const ehEmail = cid.startsWith('mail:');
+    const thCaso = ehEmail ? null : await client.channels.fetch(cid).catch(() => null);
     if (thCaso) await salvarCaso(thCaso, { resolvidoPor: quem === 'equipe' ? 'equipe' : quem === 'prazo' ? 'bot' : 'cliente', staffId: c.staffId });
     // diagnóstico citado e que ninguém respondeu → fecha junto com o chamado
     const codigosChamado = [...(codigosDe.get(cid) || [])];
@@ -473,7 +479,7 @@ module.exports = function suporte(client, { db, logStaff }) {
     }
     chamados.delete(cid);
     doStaff.delete(c.staffId);
-    try {
+    if (!ehEmail) try {
       const th = await client.channels.fetch(cid);
       const card = c.cardId ? await th.messages.fetch(c.cardId).catch(() => null) : null;
       if (card) await card.edit({ embeds: [cartao('resolvido')] });
@@ -492,6 +498,7 @@ module.exports = function suporte(client, { db, logStaff }) {
 
   // Resposta da equipe → post do cliente (usado pelo relay do Staff e pelo #diagnosticos)
   async function enviarAoCliente(cid, txt, files = [], quem = 'equipe', { aprender = null, links = [] } = {}) {
+    if (cid.startsWith('mail:')) return responderPorEmail(cid, txt, files, quem);
     const th = await client.channels.fetch(cid);
     if (th.archived) await th.setArchived(false);
     const dono = await donoDe(th);
@@ -552,15 +559,98 @@ module.exports = function suporte(client, { db, logStaff }) {
       const msg = await canal.messages.fetch(d.staff_msg_id).catch(() => null);
       if (!msg?.embeds?.[0]) return;
       const e = msg.embeds[0].toJSON();
-      const fields = [...(e.fields || []).filter((f) => f.name !== 'A resposta vai por'), { name: 'A resposta vai por', value: `📌 chamado no #suporte → responda em <#${staffId}>` }];
-      await msg.edit({ embeds: [{ ...e, color: 0x3B82F6, title: `📌 ${d.codigo} · ${e.title.replace(/^\S+ /, '').split(' · ')[1] || 'aluno'} · chamado aberto no #suporte`, fields }],
+      const fields = [...(e.fields || []).filter((f) => f.name !== 'A resposta vai por'), { name: 'A resposta vai por', value: `📌 responda no chamado <#${staffId}>` }];
+      await msg.edit({ embeds: [{ ...e, color: 0x3B82F6, title: `📌 ${d.codigo} · ${e.title.replace(/^\S+ /, '').split(' · ')[1] || 'aluno'} · no #chamados`, fields }],
         components: [new ActionRowBuilder().addComponents(
           new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel('Abrir o chamado').setEmoji('📌').setURL(linkThread(STAFF_GUILD, staffId)),
-          new ButtonBuilder().setCustomId(`diag:encerrar:${d.id}`).setStyle(ButtonStyle.Secondary).setLabel('Encerrar sem resposta').setEmoji('✔️'),
         )] });
     } catch (err) {
       console.error('[Suporte] ligar cartão do diagnóstico:', err.message);
     }
+  }
+
+  // ── chamado 📧 (aluno sem Discord): resposta sai por e-mail ─────────────────
+  async function dadosDoAlunoEmail(cid) {
+    const codigos = [...(codigosDe.get(cid) || [])];
+    const { data } = await db().from('cenadrop_diagnosticos').select('codigo, email, nome, chave, criado').in('codigo', codigos).order('criado', { ascending: false });
+    const d = (data || [])[0] || {};
+    let email = d.email, nome = d.nome;
+    if ((!email || !nome) && d.chave) {
+      const { data: lic } = await db().from('licenses').select('email, name').eq('key', d.chave).maybeSingle();
+      email = email || lic?.email; nome = nome || lic?.name;
+    }
+    return { email, nome, codigo: d.codigo || codigos[0], codigos };
+  }
+
+  async function responderPorEmail(cid, txt, files, quem) {
+    const c = chamados.get(cid);
+    const a = await dadosDoAlunoEmail(cid);
+    const anexos = files.length ? `\n\n(anexos: ${files.map((f) => f.attachment).join(' ')})` : '';
+    await enviarEmailDiag({ para: a.email, nome: a.nome, codigo: a.codigos.join(', '), texto: `${txt || ''}${anexos}` });
+    if (c && (c.status === 'fila' || c.status === 'bot')) {
+      c.status = 'atendimento';
+      const st = await client.channels.fetch(c.staffId).catch(() => null);
+      if (st) await marcarStatus(st, 'Em atendimento');
+      await atualizarFila();
+    }
+    const { data: marcados } = await db().from('cenadrop_diagnosticos')
+      .update({ status: 'respondido', resposta: (txt || '').slice(0, 4000), respondido_em: new Date().toISOString(), respondido_por: quem, respondido_via: 'email' })
+      .in('codigo', a.codigos).or('status.is.null,status.not.in.(respondido,encerrado)').select('codigo, staff_msg_id');
+    await atualizarCartoesDiag(marcados, `respondido 📧 por e-mail por ${quem}`, 0x22C55E, txt);
+    const st = await client.channels.fetch(c?.staffId).catch(() => null);
+    if (st) await st.send(`📧 Enviado por e-mail pra ${(a.email || '').replace(/^(.).*?@/, '$1***@')}.`);
+  }
+
+  async function abrirChamadoEmail(d) {
+    const { data: dd } = await db().from('cenadrop_diagnosticos')
+      .select('id, codigo, criado, email, nome, chave, versao, plataforma, navegador, mensagem, resumo, n_linhas').eq('codigo', d.codigo).maybeSingle();
+    if (!dd) return null;
+    let email = dd.email, lic = null;
+    if (dd.chave) ({ data: lic } = await db().from('licenses').select('key, email, name, active, status, source').eq('key', dd.chave).maybeSingle());
+    email = email || lic?.email;
+    // mesmo aluno já tem chamado 📧 aberto → junta neste
+    const mesmo = [...chamados.entries()].find(([, c]) => c.email && email && c.email === email.toLowerCase());
+    if (mesmo) {
+      const [cid, c] = mesmo;
+      anotarCodigo(cid, dd.codigo);
+      const st = await client.channels.fetch(c.staffId).catch(() => null);
+      if (st) { if (st.archived) await st.setArchived(false); await st.send({ embeds: [{ title: '🩺 Outro diagnóstico do mesmo aluno', description: textoDiag(dd, dd.codigo), color: 0x3B82F6 }] }); }
+      await ligarCartaoDiag(dd.codigo, c.staffId);
+      return cid;
+    }
+    const cid = `mail:${dd.id}`;
+    const nome = dd.nome || lic?.name || 'aluno';
+    const staffForum = await client.channels.fetch(CHAMADOS);
+    const staffTags = tagsDe(staffForum);
+    const staff = await staffForum.threads.create({
+      name: `📧 ${dd.codigo} · ${nome}`.slice(0, 95),
+      appliedTags: [staffTags['Na fila']].filter(Boolean),
+      message: {
+        content: `📧 **${nome}** · sem Discord · ${(dd.mensagem || 'sem recado').replace(/\s+/g, ' ').slice(0, 140)}`,
+        allowedMentions: { parse: [] },
+        embeds: [{
+          title: `📧 ${dd.codigo} · ${nome}`.slice(0, 256),
+          description: `**Este aluno não está no Discord.** Responda aqui normalmente: **a sua mensagem vai por E-MAIL** pra ele.\n\`//\` no começo = nota interna (não vai).${dd.mensagem ? `\n\n**Recado do aluno:** "${dd.mensagem.slice(0, 1500)}"` : ''}`,
+          color: 0xEAB308,
+          fields: [
+            { name: 'Cliente', value: `**${nome}** \`${(email || '').replace(/^(.).*?@/, '$1***@')}\``, inline: true },
+            { name: 'Licença', value: lic ? `${mascarar(lic.key)} · ${lic.source || '—'} · ${lic.active !== false && lic.status !== 'inactive' ? 'ativa ✅' : 'DESATIVADA ⛔'}` : 'chave não encontrada', inline: false },
+            { name: 'Diagnóstico', value: textoDiag(dd, dd.codigo), inline: false },
+          ],
+          footer: { text: `ref:${cid}:0` },
+        }],
+        components: [new ActionRowBuilder().addComponents(
+          new ButtonBuilder().setCustomId('sup:resolver').setStyle(ButtonStyle.Success).setLabel('Marcar como resolvido').setEmoji('✅'),
+        )],
+      },
+    });
+    chamados.set(cid, { staffId: staff.id, cardId: null, status: 'fila', criado: Date.now(), titulo: staff.name, cliente: nome, email: (email || '').toLowerCase() || null });
+    anotarCodigo(cid, dd.codigo);
+    doStaff.set(staff.id, cid);
+    await ligarCartaoDiag(dd.codigo, staff.id);
+    await logStaff(`📧 Chamado por e-mail na fila · **${nome}** · ${dd.codigo} · <#${staff.id}>`);
+    await atualizarFila();
+    return cid;
   }
 
   // O aluno já citou o código num post do #suporte (mesmo sem ter entrado na fila)? → não abre outro
@@ -580,7 +670,17 @@ module.exports = function suporte(client, { db, logStaff }) {
   async function abrirChamadoDoDiagnostico(d, discordId) {
     const guild = await client.guilds.fetch(GUILD_ID);
     const membro = await guild.members.fetch(discordId).catch(() => null);
-    if (!membro) return null; // saiu do servidor → o #diagnosticos segue pelo e-mail
+    if (!membro) return null; // saiu do servidor → vira chamado 📧
+    // o mesmo aluno já tem chamado aberto → o diagnóstico novo entra nele (não abre 2º post)
+    for (const [cid, c] of chamados) {
+      if (cid.startsWith('mail:') || donos.get(cid) !== discordId) continue;
+      anotarCodigo(cid, d.codigo);
+      const st = await client.channels.fetch(c.staffId).catch(() => null);
+      const { data: dd } = await db().from('cenadrop_diagnosticos').select('codigo, criado, versao, plataforma, navegador, mensagem, resumo, n_linhas').eq('codigo', d.codigo).maybeSingle();
+      if (st) { if (st.archived) await st.setArchived(false); await st.send({ embeds: [{ title: '🩺 Outro diagnóstico do mesmo aluno', description: textoDiag(dd, d.codigo), color: 0x3B82F6 }] }); }
+      await ligarCartaoDiag(d.codigo, c.staffId);
+      return cid;
+    }
     const jaPostou = await postComCodigo(d.codigo);
     if (jaPostou) return jaPostou; // está no post dele; quando pedir ajuda, o chamado leva o código
     const forum = await client.channels.fetch(SUPORTE);
@@ -665,12 +765,16 @@ module.exports = function suporte(client, { db, logStaff }) {
       const status = nomes.includes('Em atendimento') ? 'atendimento' : nomes.includes('Na fila') ? 'fila' : nomes.includes('Bot respondeu') ? 'bot' : null;
       if (!status) continue;
       const ini = await st.fetchStarterMessage().catch(() => null);
-      const ref = ini?.embeds?.[0]?.footer?.text?.match(/^ref:(\d+):(\d+)$/);
+      const ref = ini?.embeds?.[0]?.footer?.text?.match(/^ref:(\d+|mail:[0-9a-f-]+):(\d+)$/);
       if (!ref) continue;
       const cliente = ini.embeds[0].fields?.find((f) => f.name === 'Cliente')?.value?.match(/\*\*(.+?)\*\*/)?.[1] || '?';
       chamados.set(ref[1], { staffId: st.id, cardId: ref[2] === '0' ? null : ref[2], status, criado: st.createdTimestamp, titulo: st.name, cliente });
       const idCliente = ini.embeds[0].fields?.find((f) => f.name === 'Cliente')?.value?.match(/`(\d+)`/)?.[1];
       if (idCliente) donos.set(ref[1], idCliente);
+      if (ref[1].startsWith('mail:')) {   // chamado 📧: guarda o e-mail pra juntar diagnósticos do mesmo aluno
+        const { data: dm } = await db().from('cenadrop_diagnosticos').select('email').eq('id', ref[1].slice(5)).maybeSingle();
+        chamados.get(ref[1]).email = (dm?.email || '').toLowerCase() || null;
+      }
       anotarCodigo(ref[1], ini.embeds[0].fields?.find((f) => f.name === 'Diagnóstico')?.value?.match(PADRAO_DIAG)?.[0]);
       doStaff.set(st.id, ref[1]);
     }
@@ -708,6 +812,7 @@ module.exports = function suporte(client, { db, logStaff }) {
     chamadoComCodigo: (codigo) => [...codigosDe.entries()].find(([cid, set]) => set.has(codigo) && chamados.has(cid))?.[0] || null,
     enviarAoCliente,
     abrirChamadoDoDiagnostico,
+    abrirChamadoEmail,
     ligarCartaoDiag,
     staffDe: (cid) => chamados.get(cid)?.staffId,
   };
