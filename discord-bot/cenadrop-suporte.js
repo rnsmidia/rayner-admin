@@ -9,6 +9,11 @@
  * 3. A equipe responde dentro do chamado no Staff → o bot repassa ao cliente como
  *    "Equipe CenaDrop". `//` no começo = nota interna (não vai). `!resolvido` fecha.
  * 4. O que o cliente escreve no post (com chamado aberto) aparece no chamado do Staff.
+ * 6. FLUXO NOVO (19/10/26 — "um lugar só"): TODO post do #suporte vira chamado no Staff na hora.
+ *    🤖 "Bot respondeu" = o bot deu a resposta da base e espera o aluno (você vê o que ele disse).
+ *    Vai pra 🟡 Na fila sozinho quando: o aluno clica 🙋, OU escreve de novo no post, OU o post já
+ *    chega com código D-XXXX (problema técnico: a base não resolve). Post antigo sem chamado e não
+ *    resolvido (ficou "no limbo") é puxado pra fila ao ligar o bot.
  * 5. Diagnóstico enviado sem chamado → o #diagnosticos chama abrirChamadoDoDiagnostico() e o bot
  *    abre o post no #suporte EM NOME do aluno (o dono real fica em `donoDe`, lido da menção do post).
  *    Assim toda resposta sai por um lugar só: o #suporte.
@@ -126,7 +131,7 @@ module.exports = function suporte(client, { db, logStaff }) {
     return id;
   }
 
-  // customerThreadId → { staffId, cardId, status: 'fila'|'atendimento', criado, titulo, cliente }
+  // customerThreadId → { staffId, cardId, status: 'bot'|'fila'|'atendimento', criado, titulo, cliente }
   const chamados = new Map();
   const doStaff = new Map(); // staffThreadId → customerThreadId
   const cartaoTexto = new Map(); // cardId → último texto (evita editar à toa)
@@ -135,7 +140,7 @@ module.exports = function suporte(client, { db, logStaff }) {
 
   const tagsDe = (forum) => Object.fromEntries(forum.availableTags.map((t) => [t.name, t.id]));
   const nomeTag = (forum, id) => forum.availableTags.find((t) => t.id === id)?.name;
-  const STATUS = ['Na fila', 'Em atendimento', 'Resolvido'];
+  const STATUS = ['Na fila', 'Em atendimento', 'Resolvido', 'Bot respondeu'];
 
   async function marcarStatus(thread, status) {
     try {
@@ -182,6 +187,13 @@ module.exports = function suporte(client, { db, logStaff }) {
         inicial = await thread.fetchStarterMessage().catch(() => null);
       }
       if (inicial?.author?.bot) return;
+      const dono = await client.users.fetch(thread.ownerId);
+      // já veio com o código do diagnóstico → é técnico, a base não resolve: direto pra fila
+      if (PADRAO_DIAG.test(`${thread.name} ${inicial?.content || ''}`)) {
+        await abrirChamado(thread, dono);
+        await logStaff(`📝 Post novo no #suporte com código → direto pra fila · "${thread.name}"`);
+        return;
+      }
       const assunto = thread.appliedTags.map((id) => nomeTag(thread.parent, id)).find(Boolean);
       const achados = procurar(thread.name, inicial?.content || '', assunto);
       const embeds = achados.length
@@ -189,8 +201,8 @@ module.exports = function suporte(client, { db, logStaff }) {
           title: `💡 ${e.pergunta}`.slice(0, 256), description: e.resposta.slice(0, 4000), color: COR,
           ...(e.aprender ? { fields: [{ name: '📚 Pra aprender mais', value: e.aprender.slice(0, 1024) }] } : {}),
         }))
-        : [{ title: '🔎 Ainda não tenho uma resposta pronta pra isso', description: `Dá uma olhada no <#${FAQ}> (dá pra buscar). Se não achar, clique em **🙋 Ainda preciso de ajuda** e você entra na fila da equipe.`, color: COR }];
-      if (achados.length) embeds.push({ description: 'Não resolveu? Clique em **🙋 Ainda preciso de ajuda** e você entra na fila da equipe.', color: 0x6B7280 });
+        : [{ title: '🔎 Ainda não tenho uma resposta pronta pra isso', description: `Dá uma olhada no <#${FAQ}> (dá pra buscar). Se não achar, clique em **🙋 Ainda preciso de ajuda** ou escreva aqui mais detalhes, e você entra na fila da equipe.`, color: COR }];
+      if (achados.length) embeds.push({ description: 'Não resolveu? Clique em **🙋 Ainda preciso de ajuda** ou escreva aqui o que aconteceu, e você entra na fila da equipe.', color: 0x6B7280 });
 
       await thread.send({
         content: `Oi <@${thread.ownerId}>! ${achados.length ? 'Veja se isso resolve:' : ''}`,
@@ -198,6 +210,10 @@ module.exports = function suporte(client, { db, logStaff }) {
         components: [...linksDe(achados), ...botoes(!achados.length)],
         allowedMentions: { users: [thread.ownerId] },
       });
+      const botResumo = achados.length
+        ? achados.map((e) => `💡 **${e.pergunta}**\n${e.resposta.slice(0, 600)}`).join('\n\n')
+        : '🔎 Não achou resposta pronta na base (mandou olhar o FAQ).';
+      await abrirChamado(thread, dono, { modo: 'bot', botResumo });
       await logStaff(`📝 Post novo no #suporte · ${assunto || 'sem assunto'} · "${thread.name}" · ${achados.length ? `respondido com: ${achados.map((e) => e.id).join(', ')}` : 'sem resposta pronta'}`);
     } catch (err) {
       console.error('[Suporte] threadCreate:', err);
@@ -227,6 +243,10 @@ module.exports = function suporte(client, { db, logStaff }) {
         return;
       }
       if (inter.customId === 'sup:fila') {
+        if (chamados.get(thread.id)?.status === 'bot') {
+          await inter.update({ components: [] });
+          return promover(thread.id, 'clicou em 🙋 Ainda preciso de ajuda');
+        }
         if (chamados.has(thread.id)) {
           const pos = posicao(thread.id);
           return inter.reply({ content: pos ? `Você já está na fila: **nº ${pos}**.` : 'A equipe já está cuidando do seu caso. 💬', flags: MessageFlags.Ephemeral });
@@ -250,9 +270,14 @@ module.exports = function suporte(client, { db, logStaff }) {
     return { title: '✅ Resolvido', description: 'Este chamado foi encerrado. Se voltar a acontecer, é só escrever aqui.', color: 0x22C55E };
   }
 
+  const PRAZO_BOT = 3 * 24 * 60 * 60 * 1000;
   async function atualizarFila() {
+    for (const [cid, c] of [...chamados.entries()]) {
+      if (c.status === 'bot' && Date.now() - c.criado > PRAZO_BOT) await resolver(cid, 'prazo');
+    }
     const fila = naFila();
     for (const [cid, c] of chamados) {
+      if (!c.cardId) continue;   // 🤖 bot respondeu: ainda sem cartão no post
       const pos = c.status === 'fila' ? fila.findIndex(([k]) => k === cid) + 1 : null;
       const emb = cartao(c.status, pos);
       if (cartaoTexto.get(c.cardId) === emb.title) continue;
@@ -269,12 +294,17 @@ module.exports = function suporte(client, { db, logStaff }) {
     try {
       const canal = await client.channels.fetch(PAINEL_FILA);
       const atend = [...chamados.entries()].filter(([, c]) => c.status === 'atendimento');
+      const doBot = [...chamados.entries()].filter(([, c]) => c.status === 'bot');
       const linhas = [
         `**🟡 Na fila (${fila.length})**`,
         ...(fila.length ? fila.map(([, c], i) => `${i + 1}. <#${c.staffId}> · ${c.cliente} · esperando há ${haQuanto(c.criado)}`) : ['— ninguém esperando 🎉']),
         '',
         `**💬 Em atendimento (${atend.length})**`,
         ...(atend.length ? atend.map(([, c]) => `• <#${c.staffId}> · ${c.cliente} · aberto há ${haQuanto(c.criado)}`) : ['—']),
+        '',
+        `**🤖 Bot respondeu, esperando o aluno (${doBot.length})**`,
+        ...(doBot.length ? doBot.map(([, c]) => `• <#${c.staffId}> · ${c.cliente} · há ${haQuanto(c.criado)}`) : ['—']),
+        '-# se o aluno escrever de novo ou clicar 🙋, vai sozinho pra fila',
         '',
         `-# Atualizado <t:${Math.floor(Date.now() / 1000)}:R> · responda dentro do chamado · \`//\` = nota interna · ✅ no topo do chamado (ou \`!resolvido\`) fecha`,
       ];
@@ -315,16 +345,18 @@ module.exports = function suporte(client, { db, logStaff }) {
     return null;
   }
 
-  async function abrirChamado(thread, user, { codigoDado = null } = {}) {
-    const card = await thread.send({ embeds: [cartao('fila', naFila().length + 1)] });
+  async function abrirChamado(thread, user, { codigoDado = null, modo = 'fila', botResumo = null } = {}) {
+    const ehBot = modo === 'bot';
+    const card = ehBot ? null : await thread.send({ embeds: [cartao('fila', naFila().length + 1)] });
     // diagnóstico só faz sentido em problema técnico — dúvida de licença/plano não precisa
     const assuntoTag = thread.appliedTags.map((id) => nomeTag(thread.parent, id)).find((n) => n && !STATUS.includes(n));
     // o D-XXXX é da extensão CenaDrop: Elo IA e Narrativa não têm esse diagnóstico
     const inicialTxt = (await thread.fetchStarterMessage().catch(() => null))?.content || '';
     const outroProduto = /\belo\b|elo ia|narrativa/i.test(`${thread.name} ${inicialTxt}`);
     const tecnico = !['Licença e ativação', 'Planos e outros'].includes(assuntoTag) && !outroProduto;
-    const jaTem = codigoDado || await procurarCodigo(thread);
-    if (jaTem && !codigoDado) await thread.send({ embeds: [{ description: `✅ Recebemos o seu diagnóstico **${jaTem}** — ele já vai junto pra equipe.`, color: 0x22C55E }] });
+    const jaTem = codigoDado || await procurarCodigo(thread) || thread.name.match(PADRAO_DIAG)?.[0] || null;
+    if (ehBot) { /* aluno ainda não pediu a equipe: nada de cartão/pedido de código no post */ }
+    else if (jaTem && !codigoDado) await thread.send({ embeds: [{ description: `✅ Recebemos o seu diagnóstico **${jaTem}** — ele já vai junto pra equipe.`, color: 0x22C55E }] });
     else if (tecnico && !jaTem) await thread.send({ embeds: [EMBED_DIAG] });
     const criado = Date.now();
     const { data: lics } = await db().from('licenses')
@@ -341,10 +373,10 @@ module.exports = function suporte(client, { db, logStaff }) {
     const staffTags = tagsDe(staffForum);
     const staff = await staffForum.threads.create({
       name: `${thread.name}`.slice(0, 95),
-      appliedTags: [staffTags['Na fila']].filter(Boolean),
+      appliedTags: [staffTags[ehBot ? 'Bot respondeu' : 'Na fila']].filter(Boolean),
       message: {
         // texto solto = prévia que aparece na lista do fórum
-        content: `🎫 **${user.username}** · ${assunto || 'sem assunto'} · ${(descricao || '').replace(/\s+/g, ' ').slice(0, 140)}`,
+        content: `${ehBot ? '🤖' : '🎫'} **${user.username}** · ${assunto || 'sem assunto'} · ${(descricao || '').replace(/\s+/g, ' ').slice(0, 140)}`,
         allowedMentions: { parse: [] },
         embeds: [{
           title: thread.name.slice(0, 256),
@@ -357,8 +389,9 @@ module.exports = function suporte(client, { db, logStaff }) {
             { name: 'Licença', value: lic ? `${mascarar(lic.key)} · ${lic.source || '—'} · ${lic.active !== false && lic.status !== 'inactive' ? 'ativa ✅' : 'DESATIVADA ⛔'}` : 'sem chave ligada', inline: false },
             { name: 'Diagnóstico', value: textoDiag(diag, codigo), inline: false },
             ...(anexos.length ? [{ name: 'Anexos', value: anexos.slice(0, 5).join('\n').slice(0, 1000) }] : []),
+            ...(botResumo ? [{ name: '🤖 O bot respondeu no post', value: botResumo.slice(0, 1024) }] : []),
           ],
-          footer: { text: `ref:${thread.id}:${card.id}` },
+          footer: { text: `ref:${thread.id}:${card ? card.id : 0}` },
         }],
         components: [new ActionRowBuilder().addComponents(
           new ButtonBuilder().setCustomId('sup:resolver').setStyle(ButtonStyle.Success).setLabel('Marcar como resolvido').setEmoji('✅'),
@@ -366,19 +399,48 @@ module.exports = function suporte(client, { db, logStaff }) {
       },
     });
     const cliente = user.username;
-    chamados.set(thread.id, { staffId: staff.id, cardId: card.id, status: 'fila', criado, titulo: thread.name, cliente });
+    chamados.set(thread.id, { staffId: staff.id, cardId: card ? card.id : null, status: ehBot ? 'bot' : 'fila', criado, titulo: thread.name, cliente });
     anotarCodigo(thread.id, codigo);
     doStaff.set(staff.id, thread.id);
     if (codigo) await ligarCartaoDiag(codigo, staff.id);
+    if (ehBot) { await atualizarFila(); return; }
     await marcarStatus(thread, 'Na fila');
     await logStaff(`🎫 Novo chamado na fila · **${cliente}** · "${thread.name}" · <#${staff.id}>`);
+    await atualizarFila();
+  }
+
+  // 🤖 Bot respondeu → 🟡 Na fila (aluno clicou 🙋, escreveu de novo, ou voltou depois)
+  async function promover(cid, motivo) {
+    const c = chamados.get(cid);
+    if (!c || c.status !== 'bot') return;
+    c.status = 'fila';
+    c.criado = Date.now();   // a ordem da fila conta a partir de quando ele pediu a equipe
+    const th = await client.channels.fetch(cid);
+    const card = await th.send({ embeds: [cartao('fila', posicao(cid))] });
+    c.cardId = card.id;
+    cartaoTexto.set(card.id, cartao('fila', posicao(cid)).title);
+    // pede o código só se for técnico e ainda não veio
+    const assuntoTag = th.appliedTags.map((id) => nomeTag(th.parent, id)).find((n) => n && !STATUS.includes(n));
+    const inicialTxt = (await th.fetchStarterMessage().catch(() => null))?.content || '';
+    const outroProduto = /\belo\b|elo ia|narrativa/i.test(`${th.name} ${inicialTxt}`);
+    const tecnico = !['Licença e ativação', 'Planos e outros'].includes(assuntoTag) && !outroProduto;
+    if (tecnico && !(codigosDe.get(cid)?.size) && !(await procurarCodigo(th))) await th.send({ embeds: [EMBED_DIAG] });
+    await marcarStatus(th, 'Na fila');
+    const st = await client.channels.fetch(c.staffId).catch(() => null);
+    if (st) {
+      await marcarStatus(st, 'Na fila');
+      const ini = await st.fetchStarterMessage().catch(() => null);
+      if (ini?.embeds?.[0]) await ini.edit({ embeds: [{ ...ini.embeds[0].toJSON(), color: 0xEAB308, footer: { text: `ref:${cid}:${card.id}` } }] });
+      await st.send(`🟡 **Entrou na fila:** o aluno ${motivo}.`);
+    }
+    await logStaff(`🎫 Chamado foi pra fila (${motivo}) · **${c.cliente}** · "${c.titulo}" · <#${c.staffId}>`);
     await atualizarFila();
   }
 
   // Reposta o cartão da fila no fim da conversa (o antigo some) — pra posição não ficar escondida lá em cima
   async function descerCartao(th) {
     const c = chamados.get(th.id);
-    if (!c) return;
+    if (!c || !c.cardId) return;
     try {
       const antigo = await th.messages.fetch(c.cardId).catch(() => null);
       const pos = c.status === 'fila' ? posicao(th.id) : null;
@@ -400,7 +462,7 @@ module.exports = function suporte(client, { db, logStaff }) {
     const c = chamados.get(cid);
     if (!c) return;
     const thCaso = await client.channels.fetch(cid).catch(() => null);
-    if (thCaso) await salvarCaso(thCaso, { resolvidoPor: quem === 'equipe' ? 'equipe' : 'cliente', staffId: c.staffId });
+    if (thCaso) await salvarCaso(thCaso, { resolvidoPor: quem === 'equipe' ? 'equipe' : quem === 'prazo' ? 'bot' : 'cliente', staffId: c.staffId });
     // diagnóstico citado e que ninguém respondeu → fecha junto com o chamado
     const codigosChamado = [...(codigosDe.get(cid) || [])];
     if (codigosChamado.length) {
@@ -413,15 +475,16 @@ module.exports = function suporte(client, { db, logStaff }) {
     doStaff.delete(c.staffId);
     try {
       const th = await client.channels.fetch(cid);
-      const card = await th.messages.fetch(c.cardId).catch(() => null);
+      const card = c.cardId ? await th.messages.fetch(c.cardId).catch(() => null) : null;
       if (card) await card.edit({ embeds: [cartao('resolvido')] });
       await marcarStatus(th, 'Resolvido');
       if (quem === 'equipe') await th.send({ embeds: [{ description: '✅ A equipe marcou este chamado como **resolvido**. Se voltar a acontecer, é só escrever aqui.', color: 0x22C55E }] });
+      if (quem === 'prazo') await th.send({ embeds: [{ description: '✅ Como não tivemos retorno, marcamos como **resolvido**. Se ainda precisar, é só escrever aqui que você entra na fila.', color: 0x22C55E }] });
     } catch (err) { console.error('[Suporte] resolver/cliente:', err.message); }
     try {
       const st = await client.channels.fetch(c.staffId);
       await marcarStatus(st, 'Resolvido');
-      await st.send(quem === 'equipe' ? '✅ Fechado.' : '✅ O cliente marcou como resolvido.');
+      await st.send(quem === 'equipe' ? '✅ Fechado.' : quem === 'prazo' ? '✅ Fechado sozinho: o bot respondeu e o aluno não voltou em 3 dias.' : '✅ O cliente marcou como resolvido.');
       await st.setArchived(true);
     } catch (err) { console.error('[Suporte] resolver/staff:', err.message); }
     await atualizarFila();
@@ -442,7 +505,7 @@ module.exports = function suporte(client, { db, logStaff }) {
       allowedMentions: { users: [dono] },
     });
     const c = chamados.get(cid);
-    if (c && c.status === 'fila') {
+    if (c && (c.status === 'fila' || c.status === 'bot')) {
       c.status = 'atendimento';
       await marcarStatus(th, 'Em atendimento');
       const st = await client.channels.fetch(c.staffId).catch(() => null);
@@ -560,8 +623,10 @@ module.exports = function suporte(client, { db, logStaff }) {
           // post já resolvido e o dono voltou a escrever → oferece a fila de novo (uma vez)
           const resolvido = msg.channel.appliedTags.some((id) => nomeTag(msg.channel.parent, id) === 'Resolvido');
           if (resolvido && msg.author.id === await donoDe(msg.channel)) {
-            await marcarStatus(msg.channel, null);
-            await msg.channel.send({ content: 'Voltou a acontecer? Se precisar da equipe, clique abaixo. 👇', components: botoes(true) });
+            await msg.channel.send({ content: 'Voltou a acontecer? Você entrou na fila da equipe de novo. 👇' });
+            await abrirChamado(msg.channel, msg.author);
+            const st = await client.channels.fetch(chamados.get(msg.channel.id)?.staffId).catch(() => null);
+            if (st) await st.send({ content: `**🙋 Cliente (voltou a escrever num post resolvido):** ${msg.content || ''}`.slice(0, 2000), allowedMentions: { parse: [] } });
           }
           return;
         }
@@ -569,6 +634,7 @@ module.exports = function suporte(client, { db, logStaff }) {
         if (st.archived) await st.setArchived(false);
         const dono = await donoDe(msg.channel);
         const quem = msg.author.id === dono ? '🙋 Cliente' : `👥 Outro membro (${msg.author.username})`;
+        if (c.status === 'bot' && msg.author.id === dono) await promover(msg.channel.id, 'escreveu de novo no post');
         await st.send({
           content: `**${quem}:** ${msg.content || ''}`.slice(0, 2000),
           files: [...msg.attachments.values()].map((a) => ({ attachment: a.url, name: a.name })),
@@ -579,7 +645,7 @@ module.exports = function suporte(client, { db, logStaff }) {
         anotarCodigo(msg.channel.id, codigo);
         if (novoCodigo) await ligarCartaoDiag(codigo, c.staffId);
         if (codigo) await msg.reply({ content: `✅ Recebemos o diagnóstico **${codigo}** — já está com a equipe.`, allowedMentions: { parse: [] } }).catch(() => {});
-        if (msg.author.id === dono) await descerCartao(msg.channel);
+        if (msg.author.id === dono && c.status !== 'fila') await descerCartao(msg.channel);
         if (codigo) await st.send({ embeds: [{ title: '🧰 Diagnóstico enviado', description: textoDiag(await diagnostico(codigo), codigo), color: 0x3B82F6 }] });
       }
     } catch (err) {
@@ -596,20 +662,38 @@ module.exports = function suporte(client, { db, logStaff }) {
     const todos = [...ativos.threads.values(), ...arquivados.threads.values()];
     for (const st of todos) {
       const nomes = st.appliedTags.map((id) => nomeTag(forum, id));
-      const status = nomes.includes('Em atendimento') ? 'atendimento' : nomes.includes('Na fila') ? 'fila' : null;
+      const status = nomes.includes('Em atendimento') ? 'atendimento' : nomes.includes('Na fila') ? 'fila' : nomes.includes('Bot respondeu') ? 'bot' : null;
       if (!status) continue;
       const ini = await st.fetchStarterMessage().catch(() => null);
       const ref = ini?.embeds?.[0]?.footer?.text?.match(/^ref:(\d+):(\d+)$/);
       if (!ref) continue;
       const cliente = ini.embeds[0].fields?.find((f) => f.name === 'Cliente')?.value?.match(/\*\*(.+?)\*\*/)?.[1] || '?';
-      chamados.set(ref[1], { staffId: st.id, cardId: ref[2], status, criado: st.createdTimestamp, titulo: st.name, cliente });
+      chamados.set(ref[1], { staffId: st.id, cardId: ref[2] === '0' ? null : ref[2], status, criado: st.createdTimestamp, titulo: st.name, cliente });
       const idCliente = ini.embeds[0].fields?.find((f) => f.name === 'Cliente')?.value?.match(/`(\d+)`/)?.[1];
       if (idCliente) donos.set(ref[1], idCliente);
       anotarCodigo(ref[1], ini.embeds[0].fields?.find((f) => f.name === 'Diagnóstico')?.value?.match(PADRAO_DIAG)?.[0]);
       doStaff.set(st.id, ref[1]);
     }
     console.log(`[Suporte] fila reconstruída: ${chamados.size} chamado(s) abertos`);
+    await puxarDoLimbo();
     await atualizarFila();
+  }
+
+  // Post do #suporte sem chamado e não resolvido (o aluno nunca clicou 🙋) = ficou invisível pra equipe → vai pra fila
+  async function puxarDoLimbo() {
+    try {
+      const forum = await client.channels.fetch(SUPORTE);
+      const ativos = await forum.threads.fetchActive();
+      for (const th of ativos.threads.values()) {
+        if (th.parentId !== SUPORTE || chamados.has(th.id)) continue;
+        if (th.appliedTags.some((id) => nomeTag(forum, id) === 'Resolvido')) continue;
+        const dono = await client.users.fetch(await donoDe(th)).catch(() => null);
+        if (!dono) continue;
+        await th.send({ content: `<@${dono.id}>, seu caso ainda estava sem resposta da equipe: você entrou na fila agora. Se já resolveu, é só escrever aqui avisando. 🙂`, allowedMentions: { users: [dono.id] } });
+        await abrirChamado(th, dono);
+        await logStaff(`🧲 Post parado no #suporte puxado pra fila · "${th.name}"`);
+      }
+    } catch (err) { console.error('[Suporte] limbo:', err.message); }
   }
 
   client.once('clientReady', () => {
