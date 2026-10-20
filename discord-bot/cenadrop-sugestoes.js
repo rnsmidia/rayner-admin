@@ -11,7 +11,9 @@
 const { ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, MessageFlags } = require('discord.js');
 
 module.exports = function sugestoes(client, { suporte, logStaff }) {
-  const cidDe = (msg) => msg.embeds[0]?.footer?.text?.split('|')[0].match(/^sug:(\d+)/)?.[1];
+  // o chamado sabe de quem é (post do aluno ou 📧 e-mail); o rodapé fica só de reserva
+  const cidDe = (msg) => suporte.cidDoStaff(msg.channelId)
+    || msg.embeds[0]?.footer?.text?.split('|')[0].match(/^sug:(\d+|mail:[0-9a-f-]+)/)?.[1];
 
   async function enviar(inter, msg, texto) {
     const cid = cidDe(msg);

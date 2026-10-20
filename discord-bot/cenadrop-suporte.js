@@ -815,6 +815,7 @@ module.exports = function suporte(client, { db, logStaff }) {
     abrirChamadoEmail,
     ligarCartaoDiag,
     staffDe: (cid) => chamados.get(cid)?.staffId,
+    cidDoStaff: (staffId) => doStaff.get(staffId) || null,
   };
 };
 
