@@ -6,9 +6,9 @@
   "aprender": "▶️ **Vídeo 001 · Instalação** (passo 6 — ativar a licença)",
   "links": [
    {
-    "label": "Vídeo 001",
+    "url": "https://www.youtube.com/watch?v=0ZqWlf1yeO0&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=0ZqWlf1yeO0&list=PLcGnzq_yUExE"
+    "label": "Vídeo 001"
    }
   ],
   "palavras": [
@@ -31,7 +31,7 @@
    "key",
    "serial"
   ],
-  "resposta": "A chave chega **no e-mail da compra**, logo depois do pagamento, junto com o link de download.\n1. Procure no e-mail usado na Hotmart (inclusive **Spam** e **Promoções**) por \"CenaDrop\".\n2. O formato é `CD-XXXX-XXXX-XXXX`.\n3. Não achou? No canal **#ativar-acesso** use o comando `/minha-chave`: a chave é reenviada **só para o e-mail da compra**.\n4. Dica: guarde esse e-mail. É ele que devolve seu acesso se você trocar de computador ou reinstalar o Chrome.",
+  "resposta": "A chave chega **no e-mail da compra**, logo depois do pagamento, junto com o link de download.\n1. Procure no e-mail usado na Hotmart (inclusive **Spam** e **Promoções**) por \"CenaDrop\".\n2. O formato é `CD-XXXX-XXXX-XXXX`.\n3. Não achou? No canal **#ativar-acesso**, clique no botão **📧 Não sei minha chave** e digite o e-mail da compra: a chave é reenviada **só para esse e-mail**.\n4. Dica: guarde esse e-mail. É ele que devolve seu acesso se você trocar de computador ou reinstalar o Chrome.",
   "escalar": "o `/minha-chave` não trouxe nada em alguns minutos, ou a pessoa comprou com outro e-mail / não lembra qual usou."
  },
  {
@@ -41,9 +41,9 @@
   "aprender": "▶️ **Vídeo 001 · Instalação**",
   "links": [
    {
-    "label": "Vídeo 001",
+    "url": "https://www.youtube.com/watch?v=0ZqWlf1yeO0&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=0ZqWlf1yeO0&list=PLcGnzq_yUExE"
+    "label": "Vídeo 001"
    }
   ],
   "palavras": [
@@ -65,7 +65,7 @@
   "id": "chave-invalida",
   "pergunta": "Diz \"Chave inválida\" ou \"Chave não encontrada\"",
   "tag": "Licença e ativação",
-  "aprender": "",
+  "aprender": null,
   "links": [],
   "palavras": [
    "chave inválida",
@@ -78,7 +78,7 @@
    "código inválido",
    "licença inválida"
   ],
-  "resposta": "1. Copie a chave **direto do e-mail** (não digite de cabeça). Formato: `CD-XXXX-XXXX-XXXX`, em maiúsculas.\n2. Confira se não foi junto um espaço antes ou depois, ou se faltou algum pedaço.\n3. Cole de novo e clique em **Ativar Licença**.\n4. Se ainda falhar, use `/minha-chave` no #ativar-acesso pra receber a chave certa no e-mail da compra.",
+  "resposta": "1. Copie a chave **direto do e-mail** (não digite de cabeça). Formato: `CD-XXXX-XXXX-XXXX`, em maiúsculas.\n2. Confira se não foi junto um espaço antes ou depois, ou se faltou algum pedaço.\n3. Cole de novo e clique em **Ativar Licença**.\n4. Se ainda falhar, no #ativar-acesso clique em **📧 Não sei minha chave** pra receber a chave certa no e-mail da compra.",
   "escalar": "a chave copiada do próprio e-mail continua dando \"Chave não encontrada\"."
  },
  {
@@ -88,9 +88,9 @@
   "aprender": "▶️ **Vídeo 010 · Atualizar e desvincular chave** (parte 2)",
   "links": [
    {
-    "label": "Vídeo 010",
+    "url": "https://www.youtube.com/watch?v=VHpZD2cDGvU&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=VHpZD2cDGvU&list=PLcGnzq_yUExE"
+    "label": "Vídeo 010"
    }
   ],
   "palavras": [
@@ -116,7 +116,7 @@
   "id": "licenca-desativada",
   "pergunta": "Apareceu \"Licença desativada. Entre em contato com o suporte.\"",
   "tag": "Licença e ativação",
-  "aprender": "",
+  "aprender": null,
   "links": [],
   "palavras": [
    "licença desativada",
@@ -139,14 +139,14 @@
   "aprender": "▶️ **Vídeo 001 · Instalação**\n📖 **Manual · Seção 1 · Instalar a extensão**",
   "links": [
    {
-    "label": "Vídeo 001",
+    "url": "https://www.youtube.com/watch?v=0ZqWlf1yeO0&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=0ZqWlf1yeO0&list=PLcGnzq_yUExE"
+    "label": "Vídeo 001"
    },
    {
-    "label": "Manual · Seção 1",
+    "url": "https://www.cenadrop.com.br/manual#instalacao",
     "emoji": "📖",
-    "url": "https://www.cenadrop.com.br/manual#instalacao"
+    "label": "Manual · Seção 1"
    }
   ],
   "palavras": [
@@ -177,9 +177,9 @@
   "aprender": "▶️ **Vídeo 001 · Instalação**",
   "links": [
    {
-    "label": "Vídeo 001",
+    "url": "https://www.youtube.com/watch?v=0ZqWlf1yeO0&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=0ZqWlf1yeO0&list=PLcGnzq_yUExE"
+    "label": "Vídeo 001"
    }
   ],
   "palavras": [
@@ -204,14 +204,14 @@
   "aprender": "▶️ **Vídeo 001 · Instalação**\n▶️ **Vídeo 010 · Atualizar e desvincular chave**",
   "links": [
    {
-    "label": "Vídeo 001",
+    "url": "https://www.youtube.com/watch?v=0ZqWlf1yeO0&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=0ZqWlf1yeO0&list=PLcGnzq_yUExE"
+    "label": "Vídeo 001"
    },
    {
-    "label": "Vídeo 010",
+    "url": "https://www.youtube.com/watch?v=VHpZD2cDGvU&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=VHpZD2cDGvU&list=PLcGnzq_yUExE"
+    "label": "Vídeo 010"
    }
   ],
   "palavras": [
@@ -236,9 +236,9 @@
   "aprender": "▶️ **Vídeo 010 · Atualizar e desvincular chave**",
   "links": [
    {
-    "label": "Vídeo 010",
+    "url": "https://www.youtube.com/watch?v=VHpZD2cDGvU&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=VHpZD2cDGvU&list=PLcGnzq_yUExE"
+    "label": "Vídeo 010"
    }
   ],
   "palavras": [
@@ -257,7 +257,7 @@
    "como atualiza",
    "perdi minhas configurações"
   ],
-  "resposta": "1. Veja sua versão no selo com o raio (⚡) no painel. Se aparecer **🆕 Atualização disponível** ou **🔧 Correção disponível**, tem versão nova.\n2. Baixe em cenadrop.com.br/download e descompacte.\n3. Coloque a pasta nova **no mesmo lugar da antiga, com o mesmo nome**, e clique em **Substituir**.\n4. Em `chrome://extensions`, clique na setinha ↻ do card do CenaDrop.\n5. Dê **F5 na aba do Flow ou do Vids** que já estava aberta.\nA chave, o elenco e as preferências continuam. Dica: apague os .zip antigos de Downloads antes, pra não descompactar o errado por engano.",
+  "resposta": "1. Veja sua versão no selo com o raio (⚡) no painel. Se aparecer **🆕 Atualização disponível** ou **🔧 Correção disponível**, tem versão nova.\n2. Em `chrome://extensions`, veja no card do CenaDrop **onde a pasta está** (anote o caminho e o nome).\n3. **Apague a pasta antiga inteira.** ⚠️ Não copie a nova por cima: no Windows isso mistura as duas versões.\n4. Baixe em cenadrop.com.br/download, descompacte e coloque a pasta nova **no mesmo lugar e com o mesmo nome** da antiga.\n5. Em `chrome://extensions`, clique na setinha ↻ do card do CenaDrop e confira a versão.\n6. Dê **F5 na aba do Flow ou do Vids** que já estava aberta.\nA chave, o elenco e as preferências continuam (ficam no Chrome, não na pasta).",
   "escalar": "o selo não mudou de versão depois dos passos."
  },
  {
@@ -267,9 +267,9 @@
   "aprender": "▶️ **Vídeo 010 · Atualizar e desvincular chave**",
   "links": [
    {
-    "label": "Vídeo 010",
+    "url": "https://www.youtube.com/watch?v=VHpZD2cDGvU&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=VHpZD2cDGvU&list=PLcGnzq_yUExE"
+    "label": "Vídeo 010"
    }
   ],
   "palavras": [
@@ -294,9 +294,9 @@
   "aprender": "▶️ **Vídeo 001 · Instalação**",
   "links": [
    {
-    "label": "Vídeo 001",
+    "url": "https://www.youtube.com/watch?v=0ZqWlf1yeO0&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=0ZqWlf1yeO0&list=PLcGnzq_yUExE"
+    "label": "Vídeo 001"
    }
   ],
   "palavras": [
@@ -319,7 +319,7 @@
   "id": "funciona-celular",
   "pergunta": "Funciona no celular, tablet ou outro navegador?",
   "tag": "Instalar e atualizar",
-  "aprender": "",
+  "aprender": null,
   "links": [],
   "palavras": [
    "celular",
@@ -350,14 +350,14 @@
   "aprender": "▶️ **Vídeo 002 · Configurar o Google Flow**\n📖 **Manual · Seção 3 · Configurar o Google Flow**",
   "links": [
    {
-    "label": "Vídeo 002",
+    "url": "https://www.youtube.com/watch?v=w3Iz2PZ_GVs&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=w3Iz2PZ_GVs&list=PLcGnzq_yUExE"
+    "label": "Vídeo 002"
    },
    {
-    "label": "Manual · Seção 3",
+    "url": "https://www.cenadrop.com.br/manual#preparacao",
     "emoji": "📖",
-    "url": "https://www.cenadrop.com.br/manual#preparacao"
+    "label": "Manual · Seção 3"
    }
   ],
   "palavras": [
@@ -387,9 +387,9 @@
   "aprender": "▶️ **Vídeo 002 · Configurar o Google Flow**",
   "links": [
    {
-    "label": "Vídeo 002",
+    "url": "https://www.youtube.com/watch?v=w3Iz2PZ_GVs&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=w3Iz2PZ_GVs&list=PLcGnzq_yUExE"
+    "label": "Vídeo 002"
    }
   ],
   "palavras": [
@@ -417,19 +417,19 @@
   "aprender": "▶️ **Vídeo 002 · Configurar o Google Flow**\n▶️ **Vídeo 009 · Automação de imagem**\n📖 **Manual · Seção 11 · Criar imagens**",
   "links": [
    {
-    "label": "Vídeo 002",
+    "url": "https://www.youtube.com/watch?v=w3Iz2PZ_GVs&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=w3Iz2PZ_GVs&list=PLcGnzq_yUExE"
+    "label": "Vídeo 002"
    },
    {
-    "label": "Vídeo 009",
+    "url": "https://www.youtube.com/watch?v=2C8fiWM2zsU&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=2C8fiWM2zsU&list=PLcGnzq_yUExE"
+    "label": "Vídeo 009"
    },
    {
-    "label": "Manual · Seção 11",
+    "url": "https://www.cenadrop.com.br/manual#cenabanana",
     "emoji": "📖",
-    "url": "https://www.cenadrop.com.br/manual#cenabanana"
+    "label": "Manual · Seção 11"
    }
   ],
   "palavras": [
@@ -455,19 +455,19 @@
   "aprender": "▶️ **Vídeo 008 · Automação de vídeo**\n📖 **Manual · Seção 6 · Enviar as cenas**\n📖 **Manual · Seção 8 · Reenvio automático de falhas**",
   "links": [
    {
-    "label": "Vídeo 008",
+    "url": "https://www.youtube.com/watch?v=729Myx6gc0g&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=729Myx6gc0g&list=PLcGnzq_yUExE"
+    "label": "Vídeo 008"
    },
    {
-    "label": "Manual · Seção 6",
+    "url": "https://www.cenadrop.com.br/manual#envio",
     "emoji": "📖",
-    "url": "https://www.cenadrop.com.br/manual#envio"
+    "label": "Manual · Seção 6"
    },
    {
-    "label": "Manual · Seção 8",
+    "url": "https://www.cenadrop.com.br/manual#reenvio",
     "emoji": "📖",
-    "url": "https://www.cenadrop.com.br/manual#reenvio"
+    "label": "Manual · Seção 8"
    }
   ],
   "palavras": [
@@ -485,14 +485,14 @@
    "carregando para sempre",
    "lote parou"
   ],
-  "resposta": "Às vezes o Google \"esquece\" uma cena no meio da geração (ela fica em 99% e nunca termina). Isso vem do Flow.\n1. Espere alguns minutos: cada vídeo leva de 1 a 3 minutos, e lotes grandes demoram mesmo.\n2. Se uma cena ficou parada muito mais que isso, **não clique em Parar**: use o botão **⬇ Baixar manualmente (fallback)**, que aparece logo abaixo de Iniciar/Parar. Ele baixa o que já ficou pronto e destrava o lote.\n3. Se ainda faltar alguma cena no fim, marque **só as que faltaram** na lista e clique em **▶ Iniciar** de novo.\nEnquanto roda: não clique nos vídeos nem role a lista do Flow.",
+  "resposta": "Às vezes o Google segura uma cena e ela demora muito (ou não termina). Isso vem do Flow, não é a extensão travada.\n1. Espere alguns minutos: cada vídeo leva de 1 a 3 minutos, e quando o Google está lento o CenaDrop mostra \"⏸ O Google está segurando as cenas\" e espera sozinho.\n2. Se a cena ficou parada muito mais que isso, clique em **Parar**. Pode clicar sem medo: o Parar **guarda tudo o que já foi feito**, e o que ficar pronto depois ainda é baixado com o número certo (deixe a aba do Flow aberta).\n3. **Antes de iniciar de novo, confira a lista de cenas:** o CenaDrop já deixa marcadas só as que faltaram (as baixadas aparecem com ✅ e desmarcadas). Veja se está marcado só o que você precisa — cada cena enviada gasta crédito.\n4. Clique em **▶ Iniciar**.\nEnquanto roda: não clique nos vídeos nem role a lista do Flow.",
   "escalar": "acontecer em várias cenas seguidas ou em todo lote — pedir o código de diagnóstico."
  },
  {
   "id": "prompt-nao-entra-2a-cena",
   "pergunta": "Da 2ª cena em diante o prompt fica na caixa e não envia / sai personagem errado",
   "tag": "Google Flow",
-  "aprender": "",
+  "aprender": null,
   "links": [],
   "palavras": [
    "prompt não entra",
@@ -517,7 +517,7 @@
   "id": "atividade-incomum",
   "pergunta": "\"Atividade incomum\" / \"unusual activity\" / o Google recusa tudo",
   "tag": "Google Flow",
-  "aprender": "",
+  "aprender": null,
   "links": [],
   "palavras": [
    "atividade incomum",
@@ -538,14 +538,14 @@
    "rede",
    "internet da empresa"
   ],
-  "resposta": "Confira nesta ordem:\n1. **Navegador:** use o **Google Chrome**. No Brave (leão laranja ao lado do endereço) o escudo esconde sinais que o Google usa e ele recusa as gerações — num caso real, no Chrome funcionou na hora. Se ficar no Brave, desligue o escudo (Shields) na aba do Flow/Vids.\n2. **Antivírus / bloqueadores:** pause bloqueador de anúncios ou proteção web do antivírus nessa aba.\n3. **Rede:** VPN, rede de empresa ou outra internet podem influenciar.\nTeste: se **gerando à mão no Flow** também aparece \"atividade incomum\", é da conta/rede, não do CenaDrop.",
+  "resposta": "Confira nesta ordem:\n1. **Navegador:** use o **Google Chrome**. No Brave (leão laranja ao lado do endereço) o escudo esconde sinais que o Google usa e ele recusa as gerações — num caso real, no Chrome funcionou na hora. Se ficar no Brave, desligue o escudo (Shields) na aba do Flow/Vids.\n2. **Antivírus / bloqueadores:** pause bloqueador de anúncios ou proteção web do antivírus nessa aba.\n3. **Rede:** VPN, rede de empresa ou outra internet podem influenciar.\nTeste: se **gerando à mão no Flow** também aparece \"atividade incomum\", é da conta/rede, não do CenaDrop.\n4. **Mais de uma conta Google no Chrome:** se o endereço do Flow tiver `/u/1/` (ou `/u/2/`), você está numa conta que não é a principal desse Chrome. Use a conta principal, ou abra a outra num **perfil separado do Chrome** (ícone do seu rosto no canto → Adicionar perfil). Conta nova ou secundária costuma ser bloqueada mais rápido.",
   "escalar": "no Chrome, sem bloqueador e sem VPN, continua — mande o código de diagnóstico."
  },
  {
   "id": "debugger-barra-amarela",
   "pergunta": "Aparece uma barra amarela \"começou a depurar este navegador\" / \"Seu Chrome está bloqueando uma permissão\"",
   "tag": "Google Flow",
-  "aprender": "",
+  "aprender": null,
   "links": [],
   "palavras": [
    "barra amarela",
@@ -571,14 +571,14 @@
   "aprender": "▶️ **Vídeo 008 · Automação de vídeo**\n📖 **Manual · Seção 6 · Enviar as cenas**",
   "links": [
    {
-    "label": "Vídeo 008",
+    "url": "https://www.youtube.com/watch?v=729Myx6gc0g&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=729Myx6gc0g&list=PLcGnzq_yUExE"
+    "label": "Vídeo 008"
    },
    {
-    "label": "Manual · Seção 6",
+    "url": "https://www.cenadrop.com.br/manual#envio",
     "emoji": "📖",
-    "url": "https://www.cenadrop.com.br/manual#envio"
+    "label": "Manual · Seção 6"
    }
   ],
   "palavras": [
@@ -604,7 +604,7 @@
   "id": "varias-contas-google",
   "pergunta": "Tenho mais de uma conta Google no Chrome e não captura / não baixa",
   "tag": "Google Flow",
-  "aprender": "",
+  "aprender": null,
   "links": [],
   "palavras": [
    "duas contas",
@@ -630,14 +630,14 @@
   "aprender": "▶️ **Vídeo 008 · Automação de vídeo**\n📖 **Manual · Seção 8 · Reenvio automático de falhas**",
   "links": [
    {
-    "label": "Vídeo 008",
+    "url": "https://www.youtube.com/watch?v=729Myx6gc0g&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=729Myx6gc0g&list=PLcGnzq_yUExE"
+    "label": "Vídeo 008"
    },
    {
-    "label": "Manual · Seção 8",
+    "url": "https://www.cenadrop.com.br/manual#reenvio",
     "emoji": "📖",
-    "url": "https://www.cenadrop.com.br/manual#reenvio"
+    "label": "Manual · Seção 8"
    }
   ],
   "palavras": [
@@ -660,7 +660,7 @@
    "prompt de correção",
    "Copiar prompt de correção"
   ],
-  "resposta": "O Google barra algumas cenas (nome real, pessoa reconhecível, **menor de idade**, ferimento/arma no corpo, termos sensíveis). Essas não são reenviadas sozinhas: dariam o mesmo bloqueio. O lote segue.\n1. No fim, o CenaDrop lista as bloqueadas com **📋 Copiar prompt de correção**.\n2. Cole no Gemini ou ChatGPT; a IA reescreve só o que bateu na política.\n3. Cole a resposta no campo que abre e clique em **↗ Usar na aba**.\n4. Marque só as corrigidas e clique em **▶ Iniciar**.\nDica: o bloqueio tem algo de aleatório — às vezes passa só tentando de novo. No Vids, cena recusada **não gasta cota**.",
+  "resposta": "O Google barra algumas cenas (nome real, pessoa reconhecível, **menor de idade**, ferimento/arma no corpo, termos sensíveis). Essas não são reenviadas sozinhas: dariam o mesmo bloqueio. O lote segue.\n1. No fim, o CenaDrop mostra as cenas recusadas (🚫 política).\n2. Com o **Elo IA** conectado: clique em **✨ Corrigir as cenas com IA**. A IA reescreve só o que bateu na política.\n3. Sem o Elo: clique em **📋 Copiar pedido de correção**, cole no ChatGPT, Gemini ou Claude junto com o seu CSV, traga a resposta, cole no campo e clique em **Usar**.\n4. Marque só as corrigidas e clique em **▶ Iniciar**.\nDica: o bloqueio tem algo de aleatório — às vezes passa só tentando de novo. No Vids, cena recusada **não gasta cota**.\n**Antes de reenviar, confira a lista:** deixe marcadas só as cenas que você corrigiu — cada cena enviada gasta crédito.",
   "escalar": "a mesma cena continua bloqueada depois de corrigida e tentada mais de uma vez."
  },
  {
@@ -670,9 +670,9 @@
   "aprender": "▶️ **Vídeo 002 · Configurar o Google Flow** (duração de 8 s)",
   "links": [
    {
-    "label": "Vídeo 002",
+    "url": "https://www.youtube.com/watch?v=w3Iz2PZ_GVs&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=w3Iz2PZ_GVs&list=PLcGnzq_yUExE"
+    "label": "Vídeo 002"
    }
   ],
   "palavras": [
@@ -698,19 +698,19 @@
   "aprender": "▶️ **Vídeo 002 · Configurar o Google Flow**\n▶️ **Vídeo 011 · Automação no Google Vids**",
   "links": [
    {
-    "label": "Vídeo 002",
+    "url": "https://www.youtube.com/watch?v=w3Iz2PZ_GVs&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=w3Iz2PZ_GVs&list=PLcGnzq_yUExE"
+    "label": "Vídeo 002"
    },
    {
-    "label": "Vídeo 011",
+    "url": "https://www.youtube.com/watch?v=oXXF6xw48Ic&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=oXXF6xw48Ic&list=PLcGnzq_yUExE"
+    "label": "Vídeo 011"
    },
    {
-    "label": "Ver planos",
+    "url": "https://www.cenadrop.com.br/planos",
     "emoji": "🛒",
-    "url": "https://www.cenadrop.com.br/planos"
+    "label": "Ver planos"
    }
   ],
   "palavras": [
@@ -742,14 +742,14 @@
   "aprender": "▶️ **Vídeo 011 · Automação no Google Vids**\n📖 **Manual · Seção 9 · Gerar no Google Vids**",
   "links": [
    {
-    "label": "Vídeo 011",
+    "url": "https://www.youtube.com/watch?v=oXXF6xw48Ic&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=oXXF6xw48Ic&list=PLcGnzq_yUExE"
+    "label": "Vídeo 011"
    },
    {
-    "label": "Manual · Seção 9",
+    "url": "https://www.cenadrop.com.br/manual#vids",
     "emoji": "📖",
-    "url": "https://www.cenadrop.com.br/manual#vids"
+    "label": "Manual · Seção 9"
    }
   ],
   "palavras": [
@@ -775,9 +775,9 @@
   "aprender": "▶️ **Vídeo 011 · Automação no Google Vids**",
   "links": [
    {
-    "label": "Vídeo 011",
+    "url": "https://www.youtube.com/watch?v=oXXF6xw48Ic&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=oXXF6xw48Ic&list=PLcGnzq_yUExE"
+    "label": "Vídeo 011"
    }
   ],
   "palavras": [
@@ -802,9 +802,9 @@
   "aprender": "▶️ **Vídeo 011 · Automação no Google Vids**",
   "links": [
    {
-    "label": "Vídeo 011",
+    "url": "https://www.youtube.com/watch?v=oXXF6xw48Ic&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=oXXF6xw48Ic&list=PLcGnzq_yUExE"
+    "label": "Vídeo 011"
    }
   ],
   "palavras": [
@@ -830,9 +830,9 @@
   "aprender": "▶️ **Vídeo 011 · Automação no Google Vids**",
   "links": [
    {
-    "label": "Vídeo 011",
+    "url": "https://www.youtube.com/watch?v=oXXF6xw48Ic&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=oXXF6xw48Ic&list=PLcGnzq_yUExE"
+    "label": "Vídeo 011"
    }
   ],
   "palavras": [
@@ -860,9 +860,9 @@
   "aprender": "▶️ **Vídeo 011 · Automação no Google Vids** (passo 4)",
   "links": [
    {
-    "label": "Vídeo 011",
+    "url": "https://www.youtube.com/watch?v=oXXF6xw48Ic&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=oXXF6xw48Ic&list=PLcGnzq_yUExE"
+    "label": "Vídeo 011"
    }
   ],
   "palavras": [
@@ -890,14 +890,14 @@
   "aprender": "▶️ **Vídeo 011 · Automação no Google Vids** (passo 8)\n📖 **Manual · Seção 9 · Gerar no Google Vids**",
   "links": [
    {
-    "label": "Vídeo 011",
+    "url": "https://www.youtube.com/watch?v=oXXF6xw48Ic&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=oXXF6xw48Ic&list=PLcGnzq_yUExE"
+    "label": "Vídeo 011"
    },
    {
-    "label": "Manual · Seção 9",
+    "url": "https://www.cenadrop.com.br/manual#vids",
     "emoji": "📖",
-    "url": "https://www.cenadrop.com.br/manual#vids"
+    "label": "Manual · Seção 9"
    }
   ],
   "palavras": [
@@ -920,24 +920,24 @@
   "aprender": "▶️ **Vídeo 003 · Personagem e voz**\n▶️ **Vídeo 008 · Automação de vídeo**\n📖 **Manual · Seção 5 · Personagem e voz**\n📖 **Manual · Seção 15 · Deu errado? Ache pelo sintoma**",
   "links": [
    {
-    "label": "Vídeo 003",
+    "url": "https://www.youtube.com/watch?v=b_1bOdEk2RE&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=b_1bOdEk2RE&list=PLcGnzq_yUExE"
+    "label": "Vídeo 003"
    },
    {
-    "label": "Vídeo 008",
+    "url": "https://www.youtube.com/watch?v=729Myx6gc0g&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=729Myx6gc0g&list=PLcGnzq_yUExE"
+    "label": "Vídeo 008"
    },
    {
-    "label": "Manual · Seção 5",
+    "url": "https://www.cenadrop.com.br/manual#personagem",
     "emoji": "📖",
-    "url": "https://www.cenadrop.com.br/manual#personagem"
+    "label": "Manual · Seção 5"
    },
    {
-    "label": "Manual · Seção 15",
+    "url": "https://www.cenadrop.com.br/manual#problemas",
     "emoji": "📖",
-    "url": "https://www.cenadrop.com.br/manual#problemas"
+    "label": "Manual · Seção 15"
    }
   ],
   "palavras": [
@@ -965,24 +965,24 @@
   "aprender": "▶️ **Vídeo 008 · Automação de vídeo**\n▶️ **Vídeo 011 · Automação no Google Vids**\n📖 **Manual · Seção 9 · Gerar no Google Vids**\n📖 **Manual · Seção 14 · Dicas e boas práticas**",
   "links": [
    {
-    "label": "Vídeo 008",
+    "url": "https://www.youtube.com/watch?v=729Myx6gc0g&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=729Myx6gc0g&list=PLcGnzq_yUExE"
+    "label": "Vídeo 008"
    },
    {
-    "label": "Vídeo 011",
+    "url": "https://www.youtube.com/watch?v=oXXF6xw48Ic&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=oXXF6xw48Ic&list=PLcGnzq_yUExE"
+    "label": "Vídeo 011"
    },
    {
-    "label": "Manual · Seção 9",
+    "url": "https://www.cenadrop.com.br/manual#vids",
     "emoji": "📖",
-    "url": "https://www.cenadrop.com.br/manual#vids"
+    "label": "Manual · Seção 9"
    },
    {
-    "label": "Manual · Seção 14",
+    "url": "https://www.cenadrop.com.br/manual#dicas",
     "emoji": "📖",
-    "url": "https://www.cenadrop.com.br/manual#dicas"
+    "label": "Manual · Seção 14"
    }
   ],
   "palavras": [
@@ -1007,24 +1007,24 @@
   "aprender": "▶️ **Vídeo 003 · Personagem e voz**\n▶️ **Vídeo 004 · Personagem e voz com metaprompt**\n▶️ **Vídeo 008 · Automação de vídeo**\n📖 **Manual · Seção 5 · Personagem e voz**",
   "links": [
    {
-    "label": "Vídeo 003",
+    "url": "https://www.youtube.com/watch?v=b_1bOdEk2RE&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=b_1bOdEk2RE&list=PLcGnzq_yUExE"
+    "label": "Vídeo 003"
    },
    {
-    "label": "Vídeo 004",
+    "url": "https://www.youtube.com/watch?v=LOX4L7Cn6n0&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=LOX4L7Cn6n0&list=PLcGnzq_yUExE"
+    "label": "Vídeo 004"
    },
    {
-    "label": "Vídeo 008",
+    "url": "https://www.youtube.com/watch?v=729Myx6gc0g&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=729Myx6gc0g&list=PLcGnzq_yUExE"
+    "label": "Vídeo 008"
    },
    {
-    "label": "Manual · Seção 5",
+    "url": "https://www.cenadrop.com.br/manual#personagem",
     "emoji": "📖",
-    "url": "https://www.cenadrop.com.br/manual#personagem"
+    "label": "Manual · Seção 5"
    }
   ],
   "palavras": [
@@ -1051,19 +1051,19 @@
   "aprender": "▶️ **Vídeo 003 · Personagem e voz**\n▶️ **Vídeo 005 · Tour pela ferramenta**\n📖 **Manual · Seção 12 · Nova sessão**",
   "links": [
    {
-    "label": "Vídeo 003",
+    "url": "https://www.youtube.com/watch?v=b_1bOdEk2RE&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=b_1bOdEk2RE&list=PLcGnzq_yUExE"
+    "label": "Vídeo 003"
    },
    {
-    "label": "Vídeo 005",
+    "url": "https://www.youtube.com/watch?v=aVjZPoSsawk&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=aVjZPoSsawk&list=PLcGnzq_yUExE"
+    "label": "Vídeo 005"
    },
    {
-    "label": "Manual · Seção 12",
+    "url": "https://www.cenadrop.com.br/manual#sessao",
     "emoji": "📖",
-    "url": "https://www.cenadrop.com.br/manual#sessao"
+    "label": "Manual · Seção 12"
    }
   ],
   "palavras": [
@@ -1088,9 +1088,9 @@
   "aprender": "▶️ **Vídeo 011 · Automação no Google Vids** (passo 5)",
   "links": [
    {
-    "label": "Vídeo 011",
+    "url": "https://www.youtube.com/watch?v=oXXF6xw48Ic&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=oXXF6xw48Ic&list=PLcGnzq_yUExE"
+    "label": "Vídeo 011"
    }
   ],
   "palavras": [
@@ -1114,24 +1114,24 @@
   "aprender": "▶️ **Vídeo 007 · Gerar CSV (Fase 2)**\n▶️ **Vídeo 008 · Automação de vídeo**\n📖 **Manual · Seção 4 · Carregar o arquivo de cenas**\n📖 **Manual · Seção 10 · Criar o roteiro e o arquivo de cenas**",
   "links": [
    {
-    "label": "Vídeo 007",
+    "url": "https://www.youtube.com/watch?v=bkpPQ7Spe0M&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=bkpPQ7Spe0M&list=PLcGnzq_yUExE"
+    "label": "Vídeo 007"
    },
    {
-    "label": "Vídeo 008",
+    "url": "https://www.youtube.com/watch?v=729Myx6gc0g&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=729Myx6gc0g&list=PLcGnzq_yUExE"
+    "label": "Vídeo 008"
    },
    {
-    "label": "Manual · Seção 4",
+    "url": "https://www.cenadrop.com.br/manual#arquivo",
     "emoji": "📖",
-    "url": "https://www.cenadrop.com.br/manual#arquivo"
+    "label": "Manual · Seção 4"
    },
    {
-    "label": "Manual · Seção 10",
+    "url": "https://www.cenadrop.com.br/manual#gerarsem",
     "emoji": "📖",
-    "url": "https://www.cenadrop.com.br/manual#gerarsem"
+    "label": "Manual · Seção 10"
    }
   ],
   "palavras": [
@@ -1158,19 +1158,19 @@
   "aprender": "▶️ **Vídeo 006 · Gerar Roteiro (Fase 1)**\n▶️ **Vídeo 007 · Gerar CSV (Fase 2)**\n📖 **Manual · Seção 10 · Criar o roteiro e o arquivo de cenas**",
   "links": [
    {
-    "label": "Vídeo 006",
+    "url": "https://www.youtube.com/watch?v=PJ6G2bJ_Dq0&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=PJ6G2bJ_Dq0&list=PLcGnzq_yUExE"
+    "label": "Vídeo 006"
    },
    {
-    "label": "Vídeo 007",
+    "url": "https://www.youtube.com/watch?v=bkpPQ7Spe0M&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=bkpPQ7Spe0M&list=PLcGnzq_yUExE"
+    "label": "Vídeo 007"
    },
    {
-    "label": "Manual · Seção 10",
+    "url": "https://www.cenadrop.com.br/manual#gerarsem",
     "emoji": "📖",
-    "url": "https://www.cenadrop.com.br/manual#gerarsem"
+    "label": "Manual · Seção 10"
    }
   ],
   "palavras": [
@@ -1197,19 +1197,19 @@
   "aprender": "▶️ **Vídeo 006 · Gerar Roteiro (Fase 1)**\n▶️ **Vídeo 007 · Gerar CSV (Fase 2)**\n📖 **Manual · Seção 10 · Criar o roteiro e o arquivo de cenas**",
   "links": [
    {
-    "label": "Vídeo 006",
+    "url": "https://www.youtube.com/watch?v=PJ6G2bJ_Dq0&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=PJ6G2bJ_Dq0&list=PLcGnzq_yUExE"
+    "label": "Vídeo 006"
    },
    {
-    "label": "Vídeo 007",
+    "url": "https://www.youtube.com/watch?v=bkpPQ7Spe0M&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=bkpPQ7Spe0M&list=PLcGnzq_yUExE"
+    "label": "Vídeo 007"
    },
    {
-    "label": "Manual · Seção 10",
+    "url": "https://www.cenadrop.com.br/manual#gerarsem",
     "emoji": "📖",
-    "url": "https://www.cenadrop.com.br/manual#gerarsem"
+    "label": "Manual · Seção 10"
    }
   ],
   "palavras": [
@@ -1237,14 +1237,14 @@
   "aprender": "▶️ **Vídeo 008 · Automação de vídeo**\n📖 **Manual · Seção 7 · Os vídeos baixam sozinhos**",
   "links": [
    {
-    "label": "Vídeo 008",
+    "url": "https://www.youtube.com/watch?v=729Myx6gc0g&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=729Myx6gc0g&list=PLcGnzq_yUExE"
+    "label": "Vídeo 008"
    },
    {
-    "label": "Manual · Seção 7",
+    "url": "https://www.cenadrop.com.br/manual#download",
     "emoji": "📖",
-    "url": "https://www.cenadrop.com.br/manual#download"
+    "label": "Manual · Seção 7"
    }
   ],
   "palavras": [
@@ -1270,19 +1270,19 @@
   "aprender": "▶️ **Vídeo 008 · Automação de vídeo**\n▶️ **Vídeo 009 · Automação de imagem**\n📖 **Manual · Seção 8 · Reenvio automático de falhas**",
   "links": [
    {
-    "label": "Vídeo 008",
+    "url": "https://www.youtube.com/watch?v=729Myx6gc0g&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=729Myx6gc0g&list=PLcGnzq_yUExE"
+    "label": "Vídeo 008"
    },
    {
-    "label": "Vídeo 009",
+    "url": "https://www.youtube.com/watch?v=2C8fiWM2zsU&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=2C8fiWM2zsU&list=PLcGnzq_yUExE"
+    "label": "Vídeo 009"
    },
    {
-    "label": "Manual · Seção 8",
+    "url": "https://www.cenadrop.com.br/manual#reenvio",
     "emoji": "📖",
-    "url": "https://www.cenadrop.com.br/manual#reenvio"
+    "label": "Manual · Seção 8"
    }
   ],
   "palavras": [
@@ -1300,7 +1300,7 @@
    "Todos baixados",
    "falta vídeo"
   ],
-  "resposta": "O CenaDrop já tenta de novo sozinho (até 2 vezes) os vídeos que não baixaram.\n1. Se ainda sobrou algum, ele aparece no log com o número (ex.: #03, #07).\n2. Se estava gerando ainda, espere alguns minutos e clique em **⬇ Baixar Vídeos** — ele baixa só o que falta, sem duplicar.\n3. Se não vier, baixe direto do Flow.\n4. Na aba **🍌 Imagem** não há reenvio: o que falhar vai pra tela \"N imagens que falharam\", com **📋 Copiar prompt de correção**.",
+  "resposta": "O CenaDrop já tenta de novo sozinho (até 2 vezes) os vídeos que não baixaram.\n1. Se ainda sobrou algum, ele aparece no log com o número (ex.: #03, #07).\n2. Se estava gerando ainda, espere alguns minutos e clique em **⬇ Baixar Vídeos** — ele baixa só o que falta, sem duplicar.\n3. Se não vier, baixe direto do Flow.\n4. Na aba **🍌 Imagem**, a imagem que falha é tentada **até 3 vezes**. Se ainda assim não voltar (bloqueio ou falha, o conserto é o mesmo), ela aparece na tela do fim: use **✨ Corrigir as cenas com IA** (com o Elo) ou **📋 Copiar pedido de correção**.",
   "escalar": "muitas cenas ficam sem baixar em todo lote — pedir o código de diagnóstico."
  },
  {
@@ -1310,14 +1310,14 @@
   "aprender": "▶️ **Vídeo 008 · Automação de vídeo**\n📖 **Manual · Seção 7 · Os vídeos baixam sozinhos**",
   "links": [
    {
-    "label": "Vídeo 008",
+    "url": "https://www.youtube.com/watch?v=729Myx6gc0g&list=PLcGnzq_yUExE",
     "emoji": "▶️",
-    "url": "https://www.youtube.com/watch?v=729Myx6gc0g&list=PLcGnzq_yUExE"
+    "label": "Vídeo 008"
    },
    {
-    "label": "Manual · Seção 7",
+    "url": "https://www.cenadrop.com.br/manual#download",
     "emoji": "📖",
-    "url": "https://www.cenadrop.com.br/manual#download"
+    "label": "Manual · Seção 7"
    }
   ],
   "palavras": [
@@ -1340,7 +1340,7 @@
   "id": "codigo-diagnostico",
   "pergunta": "Como gero o código de diagnóstico (D-XXXX)?",
   "tag": "Planos e outros",
-  "aprender": "",
+  "aprender": null,
   "links": [],
   "palavras": [
    "diagnóstico",
@@ -1363,7 +1363,7 @@
   "id": "reembolso-cancelar",
   "pergunta": "Quero cancelar / pedir reembolso",
   "tag": "Planos e outros",
-  "aprender": "",
+  "aprender": null,
   "links": [],
   "palavras": [
    "reembolso",
@@ -1388,7 +1388,7 @@
   "id": "planos-precos",
   "pergunta": "Quais são os planos e o que está incluído?",
   "tag": "Planos e outros",
-  "aprender": "",
+  "aprender": null,
   "links": [],
   "palavras": [
    "planos",
@@ -1415,7 +1415,7 @@
   "id": "onde-pedir-ajuda",
   "pergunta": "Onde peço ajuda / como falar com a equipe?",
   "tag": "Planos e outros",
-  "aprender": "",
+  "aprender": null,
   "links": [],
   "palavras": [
    "suporte",
@@ -1434,5 +1434,80 @@
   ],
   "resposta": "1. Procure seu problema no **#perguntas-frequentes** e no manual: cenadrop.com.br/manual (a Seção 15 \"Deu errado? Ache pelo sintoma\" resolve os mais comuns).\n2. Não resolveu? Crie um post no fórum **#suporte**, escolha a tag certa e conte: **o que aconteceu**, **em qual passo**, **Flow ou Vids**, e a **versão** (selo ⚡ no painel).\n3. Cole o **código de diagnóstico** (`D-XXXX`) — veja a pergunta **\"Como gero o código de diagnóstico (D-XXXX)?\"** no #perguntas-frequentes.\nNão poste a sua chave inteira em público.",
   "escalar": "—"
+ },
+ {
+  "id": "cena-falhou-mas-baixou",
+  "pergunta": "Apareceu \"Cena N falhou\" em vermelho, mas no fim baixou tudo",
+  "tag": "Google Flow",
+  "aprender": "",
+  "links": [],
+  "palavras": [
+   "cena falhou",
+   "falhou em vermelho",
+   "com falha",
+   "download falhou",
+   "mas baixou",
+   "baixou tudo",
+   "HIGH_TRAFFIC",
+   "tráfego alto",
+   "trafego alto",
+   "aviso vermelho"
+  ],
+  "resposta": "Quando o Google não consegue gerar uma cena na primeira vez (tráfego alto no servidor dele ou filtro de áudio — falha dele, sem custo), o CenaDrop mostra \"⚠️ Cena N falhou\" e **reenvia sozinho** logo em seguida.\nSe no fim a cena aparece baixada (✅ na lista e o arquivo na pasta com o número certo), está tudo certo — o aviso veio antes do reenvio.\nSó precisa agir se a cena aparecer em \"Não baixadas\" ou \"Refazer\" na janela final: aí confira a lista (só as que faltam marcadas, cada cena gasta crédito) e clique em ▶ Iniciar.",
+  "escalar": "a cena aparece como falha na janela final e não está na pasta."
+ },
+ {
+  "id": "elo-windows-claude-nao-reconhecido",
+  "pergunta": "Elo IA (Windows): erro \"claude.exe não é reconhecido\" ao clicar em Entrar no Claude Code",
+  "tag": "Instalar e atualizar",
+  "aprender": "",
+  "links": [],
+  "palavras": [
+   "não é reconhecido como nome de cmdlet",
+   "nao e reconhecido",
+   "CommandNotFoundException",
+   "node_modules",
+   "@anthropic-ai",
+   "claude-code",
+   "claude.ps1",
+   "claude.exe",
+   "login do claude",
+   "entrar no claude",
+   "elo ia",
+   "elo windows",
+   "sem login",
+   "janela azul",
+   "powershell erro",
+   "não consigo fazer login no claude"
+  ],
+  "resposta": "Esse erro vem de uma instalação **antiga e incompleta** do Claude Code no seu computador (feita pelo Node.js/npm). O Elo encontra essa instalação, mas ela não funciona.\n**Pra resolver:**\n1. Abra o **PowerShell** (menu Iniciar → digite *PowerShell* → abrir).\n2. Cole este comando e aperte **Enter**:\n`irm https://claude.ai/install.ps1 | iex`\n(é o instalador oficial da Anthropic, o mesmo do botão Instalar do Elo)\n3. Espere terminar (no fim aparece *Installation complete*). Linhas vermelhas ou amarelas no meio são normais se no fim disser que instalou.\n4. **Feche o Elo** (ícone perto do relógio → **Sair**) e abra de novo.\n5. No Claude Code, clique em **Entrar** e faça o login no navegador.\nNão precisa desinstalar a versão antiga: o Elo passa a usar a oficial sozinho.",
+  "escalar": "depois do instalador oficial o painel continua mostrando o caminho só \"claude\", ou o Entrar continua dando erro (mandar print da janela)."
+ },
+ {
+  "id": "pasta-misturada-versao",
+  "pergunta": "Atualizei e o CenaDrop ficou estranho / mostra versão antiga / trava no \"Enviando 1/N\" (pasta misturada)",
+  "tag": "Instalar e atualizar",
+  "aprender": "",
+  "links": [],
+  "palavras": [
+   "versão antiga",
+   "versao antiga",
+   "mostra 8",
+   "continua na versão",
+   "não atualizou",
+   "nao atualizou",
+   "substituí a pasta",
+   "substitui a pasta",
+   "copiei por cima",
+   "colei por cima",
+   "travou no enviando",
+   "Enviando 1/",
+   "parou em enviando",
+   "0 enviadas",
+   "depois de atualizar travou",
+   "atualizei e travou"
+  ],
+  "resposta": "Isso acontece quando a versão nova é copiada **por cima** da pasta antiga: no Windows, o computador junta as duas pastas e o CenaDrop fica com um pouco de cada versão.\n**Pra resolver (a chave e o elenco continuam salvos, ficam no Chrome e não na pasta):**\n1. Em `chrome://extensions`, veja no card do CenaDrop **onde a pasta está** (anote o caminho e o nome da pasta).\n2. **Apague a pasta antiga inteira** (ou renomeie pra \"CenaDrop antigo\" e tire do lugar).\n3. Baixe a versão nova em cenadrop.com.br/download e descompacte (botão direito → **Extrair tudo**).\n4. Coloque a pasta nova **no mesmo lugar e com o mesmo nome** da antiga (ela tem que ter o `manifest.json` direto dentro).\n5. Volte em `chrome://extensions` e clique na setinha **↻** do card do CenaDrop. Confira a versão no card.\n6. Dê **F5** na aba do Flow ou do Vids e inicie de novo.\nImportante: **nunca copie a versão nova por cima da antiga.** Sempre apague a antiga primeiro.",
+  "escalar": "depois de apagar a pasta antiga e colocar a nova, o card ainda mostra a versão antiga, ou o lote continua parado no \"Enviando\"."
  }
 ]
