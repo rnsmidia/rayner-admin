@@ -15,7 +15,7 @@ module.exports = function sugestoes(client, { suporte, logStaff }) {
   const cidDe = (msg) => suporte.cidDoStaff(msg.channelId)
     || msg.embeds[0]?.footer?.text?.split('|')[0].match(/^sug:(\d+|mail:[0-9a-f-]+)/)?.[1];
 
-  async function enviar(inter, msg, texto) {
+  async function enviar(inter, msg, texto, editada = false) {
     const cid = cidDe(msg);
     if (!cid) throw new Error('sugestão sem chamado ligado');
     // leva junto o "📚 Pra aprender mais" e os botões de vídeo/manual da sugestão
@@ -23,7 +23,7 @@ module.exports = function sugestoes(client, { suporte, logStaff }) {
     const links = msg.components.flatMap((r) => r.components).filter((c) => c.url).map((c) => ({ label: c.label, url: c.url, emoji: c.emoji?.name }));
     await suporte.enviarAoCliente(cid, texto, [], inter.user.username, { aprender, links });
     const e = msg.embeds[0].toJSON();
-    await msg.edit({ embeds: [{ ...e, color: 0x22C55E, title: `✅ Enviada ao aluno por ${inter.user.username}`, description: texto.slice(0, 4000) }], components: [] });
+    await msg.edit({ embeds: [{ ...e, color: 0x22C55E, title: `✅ Enviada ao aluno${editada ? ' (editada)' : ''} por ${inter.user.username}`, description: texto.slice(0, 4000) }], components: [] });
     await logStaff(`🤖✅ Sugestão da IA enviada por ${inter.user.username} · <#${msg.channelId}>`);
   }
 
@@ -54,7 +54,7 @@ module.exports = function sugestoes(client, { suporte, logStaff }) {
         const msg = await inter.channel.messages.fetch(id);
         if (tipo === 'm-edit') {
           await inter.deferReply({ flags: MessageFlags.Ephemeral });
-          await enviar(inter, msg, inter.fields.getTextInputValue('texto'));
+          await enviar(inter, msg, inter.fields.getTextInputValue('texto'), true);
           return inter.editReply('✅ Enviada ao aluno com a sua edição.');
         }
         if (tipo === 'm-reesc') {

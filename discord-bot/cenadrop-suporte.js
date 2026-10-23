@@ -80,7 +80,50 @@ module.exports = function suporte(client, { db, logStaff }) {
     }
   }
 
-  // ── memória de atendimentos: cada post resolvido vira um caso (tabela suporte_casos) ──
+  // ── memória de atendimentos: cada chamado resolvido vira um caso (tabela suporte_casos) ──
+  // TRI-010 (23/10/26): guarda também o que a equipe fez com cada sugestão da IA (enviada / editada / descartada /
+  // reescrita) — é o par "sugestão errada → resposta certa" que a próxima sugestão usa — e os chamados 📧 (e-mail).
+  async function sugestoesDoChamado(staffId) {
+    const st = staffId ? await client.channels.fetch(staffId).catch(() => null) : null;
+    if (!st) return { sugestoes: [], equipe: [] };
+    const msgs = [...(await st.messages.fetch({ limit: 100 })).values()].reverse();
+    const sugestoes = [], equipe = [];
+    for (const m of msgs) {
+      if (m.author.id === client.user.id) {
+        const e = m.embeds[0];
+        const t = e?.title || '';
+        const situacao = t.startsWith('✅ Enviada ao aluno (editada)') ? 'editada' : t.startsWith('✅ Enviada ao aluno') ? 'enviada'
+          : t.startsWith('🗑️ Descartada') ? 'descartada' : t.startsWith('↪️ Reescrita') ? 'reescrita' : null;
+        if (situacao && e.description) sugestoes.push({ situacao, texto: e.description.slice(0, 3000) });
+        continue;
+      }
+      if (m.author.bot || !m.content || m.content.startsWith('//') || m.content.startsWith('!')) continue;
+      equipe.push({ quem: 'equipe', texto: m.content, quando: m.createdAt.toISOString() });
+    }
+    return { sugestoes, equipe };
+  }
+
+  async function salvarCasoEmail(cid, c, quem) {
+    try {
+      const { sugestoes, equipe } = await sugestoesDoChamado(c.staffId);
+      const codigos = [...(codigosDe.get(cid) || [])];
+      const { data: dd } = await db().from('cenadrop_diagnosticos').select('codigo, versao, plataforma, resumo, mensagem, criado').in('codigo', codigos.length ? codigos : ['-']);
+      const enviadas = sugestoes.filter((x) => x.situacao === 'enviada' || x.situacao === 'editada').map((x) => x.texto);
+      await db().from('suporte_casos').upsert({
+        thread_id: cid, staff_thread_id: c.staffId, canal: 'email',
+        aberto_em: new Date(c.criado).toISOString(), resolvido_em: new Date().toISOString(), resolvido_por: quem === 'equipe' ? 'equipe' : quem,
+        cliente_nome: c.cliente, titulo: c.titulo,
+        problema: (dd || []).map((d) => d.mensagem).filter(Boolean).join(' / ') || null,
+        conversa: [...equipe, ...enviadas.map((t) => ({ quem: 'equipe', texto: t }))],
+        resposta_equipe: [...enviadas, ...equipe.map((x) => x.texto)].join('\n\n') || null,
+        diag_codigos: codigos,
+        diag_resumo: (dd || []).map((d) => `${d.codigo} · v${d.versao} · ${d.plataforma} · erros: ${d.resumo || 'nenhum'}${d.mensagem ? ` · recado: "${d.mensagem}"` : ''}`).join('\n') || null,
+        sugestoes_ia: sugestoes,
+      }, { onConflict: 'thread_id' });
+    } catch (err) {
+      console.error('[Suporte] não guardei o caso 📧:', err.message);
+    }
+  }
   const idPorPergunta = (titulo) => KB_NORM.find((e) => `💡 ${e.pergunta}`.slice(0, 256) === titulo)?.id;
   async function salvarCaso(thread, { resolvidoPor, staffId = null }) {
     try {
@@ -110,8 +153,9 @@ module.exports = function suporte(client, { db, logStaff }) {
         diagResumo = (data || []).map((d) => `${d.codigo} · v${d.versao} · ${d.plataforma} · erros: ${d.resumo || 'nenhum'}${d.mensagem ? ` · recado: "${d.mensagem}"` : ''}`).join('\n') || null;
       }
       const owner = await client.users.fetch(dono).catch(() => null);
+      const { sugestoes } = await sugestoesDoChamado(staffId);
       await db().from('suporte_casos').upsert({
-        thread_id: thread.id, staff_thread_id: staffId,
+        thread_id: thread.id, staff_thread_id: staffId, canal: 'discord', sugestoes_ia: sugestoes,
         aberto_em: thread.createdAt?.toISOString(), resolvido_em: new Date().toISOString(), resolvido_por: resolvidoPor,
         cliente_discord_id: dono, cliente_nome: owner?.username || null,
         assunto: thread.appliedTags.map((id) => nomeTag(thread.parent, id)).find((n) => n && !STATUS.includes(n)) || null,
@@ -468,6 +512,7 @@ module.exports = function suporte(client, { db, logStaff }) {
     if (!c) return;
     const ehEmail = cid.startsWith('mail:');
     const thCaso = ehEmail ? null : await client.channels.fetch(cid).catch(() => null);
+    if (ehEmail) await salvarCasoEmail(cid, c, quem);
     if (thCaso) await salvarCaso(thCaso, { resolvidoPor: quem === 'equipe' ? 'equipe' : quem === 'prazo' ? 'bot' : 'cliente', staffId: c.staffId });
     // diagnóstico citado e que ninguém respondeu → fecha junto com o chamado
     const codigosChamado = [...(codigosDe.get(cid) || [])];
