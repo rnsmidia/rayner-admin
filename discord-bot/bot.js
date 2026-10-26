@@ -158,5 +158,12 @@ client.login(process.env.DISCORD_BOT_TOKEN);
 // Bot do CenaDrop (servidor separado) roda no mesmo processo
 const cenadrop = require('./cenadrop-bot');
 
-// Endereço de saúde dos dois bots pro monitor externo (UptimeRobot)
-require('./saude')({ eda: client, cenadrop: process.env.CENADROP_BOT_TOKEN ? cenadrop : null });
+// Bot do Narrativa IA (servidor separado, 22/10/26) — mesmo processo
+const narrativa = require('./narrativa-bot');
+
+// Endereço de saúde dos bots pro monitor externo (UptimeRobot)
+require('./saude')({
+  eda: client,
+  cenadrop: process.env.CENADROP_BOT_TOKEN ? cenadrop : null,
+  narrativa: process.env.NARRATIVA_BOT_TOKEN ? narrativa : null,
+});
