@@ -354,6 +354,39 @@ client.on('messageCreate', async (msg) => {
   }
 });
 
+// ── suporte (F3/E4, 26/10/26): o MESMO motor do CenaDrop (cenadrop-suporte.js) com o cfg do Narrativa ──
+// Desligado até o Rayner ligar a env NARRATIVA_SUPORTE=1 no Railway. Sem diagnóstico N-XXXX por enquanto (E7) e base
+// de respostas vazia até a E5 (o bot responde "ainda não tenho resposta pronta" e o post vira chamado no Estagiário).
+const STAFF_SUP = { chamados: '1562683808803725312', fila: '1562683811118973029', diag: '1562683817611755530' };
+if (process.env.NARRATIVA_SUPORTE === '1') {
+  require('./cenadrop-suporte')(client, {
+    db, logStaff,
+    cfg: {
+      produto: 'narrativa',
+      guild: GUILD_ID,
+      staffGuild: STAFF_GUILD,
+      canais: { suporte: CH.suporte, faq: CH.faq, ...STAFF_SUP },
+      cor: COR,
+      equipe: 'Equipe Narrativa',
+      padraoDiag: /\bN-[A-Z2-9]{4}\b/,
+      diag: false,
+      pedirDiag: false,
+      kbArquivo: [],
+      assuntosNaoTecnicos: ['Conta e acesso', 'Planos e outros'],
+      outroProduto: null,
+      etiquetasExtras: (assunto) => (assunto === 'Elo IA' ? ['Elo IA'] : []),
+      contaDoDiscord: async (discordId) => {
+        const { data: u } = await db().from('narrativa_users')
+          .select('name, email, origin, active, expires_at').eq('discord_id', discordId).maybeSingle();
+        if (!u) return { campo: 'Conta', texto: 'Discord não ligado a nenhuma conta do Narrativa' };
+        const vence = u.expires_at ? ` · vence ${new Date(u.expires_at).toLocaleDateString('pt-BR')}` : '';
+        return { campo: 'Conta', texto: `${u.name || '—'} · ${mascararEmail(u.email)} · ${u.origin || '—'}${vence} · ${contaAtiva(u) ? 'ativa ✅' : 'SEM ACESSO ⛔'}` };
+      },
+    },
+  });
+  console.log('[Narrativa] suporte ligado (NARRATIVA_SUPORTE=1)');
+}
+
 client.on('error', (err) => console.error('[Narrativa] client error:', err.message));
 
 if (process.env.NARRATIVA_BOT_TOKEN) {

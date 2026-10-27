@@ -28,13 +28,31 @@ const { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags } = require('
 const KB_ARQUIVO = require('./base-conhecimento.json');
 const { enviarEmailDiag } = require('./cenadrop-email'); // reserva, se o banco não responder
 
-const GUILD_ID    = '1555365917578240130';
-const SUPORTE     = '1555372720517283931';   // fórum dos clientes
-const CHAMADOS    = '1555372737915134092';   // fórum do Staff
-const PAINEL_FILA = '1557072944176439318';   // #fila do Staff
-const FAQ         = '1557072936119308338';
-const COR = 0x7C3AED;
-const PADRAO_DIAG = /\bD-[A-Z2-9]{4}\b/;
+// F3 (26/10/26): o motor atende 2 produtos. Tudo que era do CenaDrop virou o PADRÃO do cfg (CenaDrop chama sem cfg
+// e nada muda pra ele); o Narrativa passa o dele (narrativa-bot.js). Cada produto roda com o PRÓPRIO client do Discord.
+const PADRAO = {
+  produto: 'cenadrop',                     // filtra suporte_base (produto|'ambos') e marca suporte_casos
+  guild: '1555365917578240130',
+  staffGuild: '1555367221541208105',
+  canais: {
+    suporte: '1555372720517283931',        // fórum dos clientes
+    chamados: '1555372737915134092',       // fórum do Staff
+    fila: '1557072944176439318',           // #fila do Staff
+    faq: '1557072936119308338',
+    diag: '1557199153254105141',           // #diagnosticos do Staff
+  },
+  cor: 0x7C3AED,
+  equipe: 'Equipe CenaDrop',               // autor das respostas no post (o salvarCaso lê esse mesmo nome de volta)
+  padraoDiag: /\bD-[A-Z2-9]{4}\b/,
+  diag: true,                              // false = sem diagnóstico ligado ao suporte (Narrativa até a E7)
+  pedirDiag: true,                         // mostra o "Falta só uma coisa: o código" depois do 🙋
+  kbArquivo: KB_ARQUIVO,                   // reserva se o banco não responder (Narrativa: [])
+  assuntosNaoTecnicos: ['Licença e ativação', 'Planos e outros'],
+  outroProduto: /\belo\b|elo ia|narrativa/i, // o D-XXXX é da extensão: Elo/Narrativa não têm esse diagnóstico
+  etiquetasExtras: () => [],               // ex.: Narrativa marca "Elo IA" no chamado do Staff
+  // conta do aluno no cabeçalho do chamado: { nome do campo, texto }
+  contaDoDiscord: null,                    // null = licença do CenaDrop (licenses.discord_id)
+};
 
 const norm = (s) => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 const mascarar = (k) => (k && k.length > 8 ? `${k.slice(0, 3)}…${k.slice(-4)}` : '—');
@@ -49,9 +67,8 @@ const haQuanto = (ms) => {
 // ── busca na base ───────────────────────────────────────────────────────────
 // A base mora no banco (tabela suporte_base) desde 07/10/26 — recarregada a cada 5 min
 const prepararBase = (lista) => lista.map((e) => ({ ...e, _kw: (e.palavras || []).map(norm).filter((k) => k.length >= 3) }));
-let KB_NORM = prepararBase(KB_ARQUIVO);
 
-function procurar(titulo, corpo, assunto) {
+function procurarEm(KB_NORM, titulo, corpo, assunto) {
   const tt = norm(titulo), tc = norm(corpo);
   const notas = KB_NORM.map((e) => {
     let n = 0;
@@ -68,15 +85,23 @@ function procurar(titulo, corpo, assunto) {
   return b && b.n >= a.n * 0.6 ? [a.e, b.e] : [a.e];
 }
 
-module.exports = function suporte(client, { db, logStaff }) {
+module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
+  const cfg = { ...PADRAO, ...cfgDado, canais: { ...PADRAO.canais, ...(cfgDado.canais || {}) } };
+  const GUILD_ID = cfg.guild, STAFF_GUILD = cfg.staffGuild, COR = cfg.cor, PADRAO_DIAG = cfg.padraoDiag;
+  const { suporte: SUPORTE, chamados: CHAMADOS, fila: PAINEL_FILA, faq: FAQ, diag: CANAL_DIAG } = cfg.canais;
+  const TAG = cfg.produto === 'cenadrop' ? '[Suporte]' : `[Suporte ${cfg.produto}]`;
+  let KB_NORM = prepararBase(cfg.kbArquivo || []);
+  const procurar = (titulo, corpo, assunto) => procurarEm(KB_NORM, titulo, corpo, assunto);
+  const ehTecnico = (assuntoTag, texto) => !cfg.assuntosNaoTecnicos.includes(assuntoTag) && !(cfg.outroProduto && cfg.outroProduto.test(texto));
+
   async function carregarBase() {
     try {
       const { data, error } = await db().from('suporte_base')
-        .select('id, pergunta, tag, palavras, resposta, aprender, links, escalar').eq('ativo', true);
+        .select('id, pergunta, tag, palavras, resposta, aprender, links, escalar').eq('ativo', true).in('produto', [cfg.produto, 'ambos']);
       if (error) throw error;
       if (data?.length) KB_NORM = prepararBase(data);
     } catch (err) {
-      console.error('[Suporte] base do banco indisponível, sigo com a última carregada:', err.message);
+      console.error(`${TAG} base do banco indisponível, sigo com a última carregada:`, err.message);
     }
   }
 
@@ -110,7 +135,7 @@ module.exports = function suporte(client, { db, logStaff }) {
       const { data: dd } = await db().from('cenadrop_diagnosticos').select('codigo, versao, plataforma, resumo, mensagem, criado').in('codigo', codigos.length ? codigos : ['-']);
       const enviadas = sugestoes.filter((x) => x.situacao === 'enviada' || x.situacao === 'editada').map((x) => x.texto);
       await db().from('suporte_casos').upsert({
-        thread_id: cid, staff_thread_id: c.staffId, canal: 'email',
+        thread_id: cid, staff_thread_id: c.staffId, canal: 'email', produto: cfg.produto,
         aberto_em: new Date(c.criado).toISOString(), resolvido_em: new Date().toISOString(), resolvido_por: quem === 'equipe' ? 'equipe' : quem,
         cliente_nome: c.cliente, titulo: c.titulo,
         problema: (dd || []).map((d) => d.mensagem).filter(Boolean).join(' / ') || null,
@@ -121,7 +146,7 @@ module.exports = function suporte(client, { db, logStaff }) {
         sugestoes_ia: sugestoes,
       }, { onConflict: 'thread_id' });
     } catch (err) {
-      console.error('[Suporte] não guardei o caso 📧:', err.message);
+      console.error(`${TAG} não guardei o caso 📧:`, err.message);
     }
   }
   const idPorPergunta = (titulo) => KB_NORM.find((e) => `💡 ${e.pergunta}`.slice(0, 256) === titulo)?.id;
@@ -136,7 +161,7 @@ module.exports = function suporte(client, { db, logStaff }) {
         if (inicial && m.id === inicial.id) continue;
         if (m.author.id === client.user.id) {
           for (const e of m.embeds) {
-            if (e.author?.name === 'Equipe CenaDrop' && e.description) conversa.push({ quem: 'equipe', texto: e.description, quando: m.createdAt.toISOString() });
+            if (e.author?.name === cfg.equipe && e.description) conversa.push({ quem: 'equipe', texto: e.description, quando: m.createdAt.toISOString() });
             const id = e.title && idPorPergunta(e.title);
             if (id) respostasBot.add(id);
           }
@@ -148,14 +173,14 @@ module.exports = function suporte(client, { db, logStaff }) {
       const textoTodo = [inicial?.content || '', ...conversa.map((c) => c.texto)].join('\n');
       const codigos = [...new Set([...(codigosDe.get(thread.id) || []), ...(textoTodo.match(new RegExp(PADRAO_DIAG.source, 'g')) || [])])];
       let diagResumo = null;
-      if (codigos.length) {
+      if (codigos.length && cfg.diag) {
         const { data } = await db().from('cenadrop_diagnosticos').select('codigo, versao, plataforma, resumo, mensagem').in('codigo', codigos);
         diagResumo = (data || []).map((d) => `${d.codigo} · v${d.versao} · ${d.plataforma} · erros: ${d.resumo || 'nenhum'}${d.mensagem ? ` · recado: "${d.mensagem}"` : ''}`).join('\n') || null;
       }
       const owner = await client.users.fetch(dono).catch(() => null);
       const { sugestoes } = await sugestoesDoChamado(staffId);
       await db().from('suporte_casos').upsert({
-        thread_id: thread.id, staff_thread_id: staffId, canal: 'discord', sugestoes_ia: sugestoes,
+        thread_id: thread.id, staff_thread_id: staffId, canal: 'discord', produto: cfg.produto, sugestoes_ia: sugestoes,
         aberto_em: thread.createdAt?.toISOString(), resolvido_em: new Date().toISOString(), resolvido_por: resolvidoPor,
         cliente_discord_id: dono, cliente_nome: owner?.username || null,
         assunto: thread.appliedTags.map((id) => nomeTag(thread.parent, id)).find((n) => n && !STATUS.includes(n)) || null,
@@ -164,7 +189,7 @@ module.exports = function suporte(client, { db, logStaff }) {
         respostas_bot: [...respostasBot], diag_codigos: codigos, diag_resumo: diagResumo,
       }, { onConflict: 'thread_id' });
     } catch (err) {
-      console.error('[Suporte] não guardei o caso:', err.message);
+      console.error(`${TAG} não guardei o caso:`, err.message);
     }
   }
 
@@ -198,7 +223,7 @@ module.exports = function suporte(client, { db, logStaff }) {
       if (thread.archived) await thread.setArchived(false);
       await thread.setAppliedTags(novas);
     } catch (err) {
-      console.error('[Suporte] etiqueta:', err.message);
+      console.error(`${TAG} etiqueta:`, err.message);
     }
   }
 
@@ -213,7 +238,7 @@ module.exports = function suporte(client, { db, logStaff }) {
   )];
 
   // Só aparece DEPOIS do "🙋 Ainda preciso de ajuda" e só se o código ainda não veio
-  const EMBED_DIAG = {
+  const EMBED_DIAG = cfg.embedDiag || {
     title: '📋 Falta só uma coisa: o código do diagnóstico',
     description: 'O código mostra pra equipe exatamente o que aconteceu no seu CenaDrop. Sem ele, a gente teria que te pedir prints e a resposta demora mais.\n\n' +
       '**1.** Abra o Google Flow ou o Vids, no mesmo projeto onde deu o problema.\n' +
@@ -224,6 +249,15 @@ module.exports = function suporte(client, { db, logStaff }) {
       '✅ Você **não perde a sua posição na fila** enquanto faz isso.',
     color: 0x3B82F6,
   };
+
+  // Conta do aluno no cabeçalho do chamado. Padrão = licença do CenaDrop (igual era); o Narrativa passa contaDoDiscord.
+  async function contaDoAluno(discordId) {
+    if (cfg.contaDoDiscord) return cfg.contaDoDiscord(discordId, db);
+    const { data: lics } = await db().from('licenses')
+      .select('key, active, status, source, product').eq('discord_id', discordId);
+    const lic = (lics || []).find((l) => l.active !== false && l.status !== 'inactive') || (lics || [])[0];
+    return { campo: 'Licença', texto: lic ? `${mascarar(lic.key)} · ${lic.source || '—'} · ${lic.active !== false && lic.status !== 'inactive' ? 'ativa ✅' : 'DESATIVADA ⛔'}` : 'sem chave ligada' };
+  }
 
   // ── 1. post novo no #suporte ──────────────────────────────────────────────
   client.on('threadCreate', async (thread, novo) => {
@@ -237,7 +271,7 @@ module.exports = function suporte(client, { db, logStaff }) {
       if (inicial?.author?.bot) return;
       const dono = await client.users.fetch(thread.ownerId);
       // já veio com o código do diagnóstico → é técnico, a base não resolve: direto pra fila
-      if (PADRAO_DIAG.test(`${thread.name} ${inicial?.content || ''}`)) {
+      if (cfg.diag && PADRAO_DIAG.test(`${thread.name} ${inicial?.content || ''}`)) {
         await abrirChamado(thread, dono);
         await logStaff(`📝 Post novo no #suporte com código → direto pra fila · "${thread.name}"`);
         return;
@@ -264,7 +298,7 @@ module.exports = function suporte(client, { db, logStaff }) {
       await abrirChamado(thread, dono, { modo: 'bot', botResumo });
       await logStaff(`📝 Post novo no #suporte · ${assunto || 'sem assunto'} · "${thread.name}" · ${achados.length ? `respondido com: ${achados.map((e) => e.id).join(', ')}` : 'sem resposta pronta'}`);
     } catch (err) {
-      console.error('[Suporte] threadCreate:', err);
+      console.error(`${TAG} threadCreate:`, err);
     }
   });
 
@@ -303,7 +337,7 @@ module.exports = function suporte(client, { db, logStaff }) {
         await abrirChamado(thread, inter.user);
       }
     } catch (err) {
-      console.error('[Suporte] botão:', err);
+      console.error(`${TAG} botão:`, err);
       try { await inter.reply({ content: '😕 Algo deu errado. Tente de novo em instantes.', flags: MessageFlags.Ephemeral }); } catch (_) {}
     }
   });
@@ -335,7 +369,7 @@ module.exports = function suporte(client, { db, logStaff }) {
         await msg.edit({ embeds: [emb] });
         cartaoTexto.set(c.cardId, emb.title);
       } catch (err) {
-        console.error('[Suporte] cartão:', err.message);
+        console.error(`${TAG} cartão:`, err.message);
       }
     }
     // painel do Staff
@@ -361,12 +395,12 @@ module.exports = function suporte(client, { db, logStaff }) {
       const meu = ultimas.find((m) => m.author.id === client.user.id);
       if (meu) await meu.edit({ embeds: [embed] }); else await canal.send({ embeds: [embed] });
     } catch (err) {
-      console.error('[Suporte] painel:', err.message);
+      console.error(`${TAG} painel:`, err.message);
     }
   }
 
   async function diagnostico(codigo) {
-    if (!codigo) return null;
+    if (!codigo || !cfg.diag) return null;
     const { data } = await db().from('cenadrop_diagnosticos')
       .select('codigo, criado, versao, plataforma, navegador, mensagem, resumo, n_linhas')
       .eq('codigo', codigo).maybeSingle();
@@ -400,16 +434,13 @@ module.exports = function suporte(client, { db, logStaff }) {
     const assuntoTag = thread.appliedTags.map((id) => nomeTag(thread.parent, id)).find((n) => n && !STATUS.includes(n));
     // o D-XXXX é da extensão CenaDrop: Elo IA e Narrativa não têm esse diagnóstico
     const inicialTxt = (await thread.fetchStarterMessage().catch(() => null))?.content || '';
-    const outroProduto = /\belo\b|elo ia|narrativa/i.test(`${thread.name} ${inicialTxt}`);
-    const tecnico = !['Licença e ativação', 'Planos e outros'].includes(assuntoTag) && !outroProduto;
-    const jaTem = codigoDado || await procurarCodigo(thread) || thread.name.match(PADRAO_DIAG)?.[0] || null;
+    const tecnico = ehTecnico(assuntoTag, `${thread.name} ${inicialTxt}`);
+    const jaTem = codigoDado || (cfg.diag ? await procurarCodigo(thread) || thread.name.match(PADRAO_DIAG)?.[0] || null : null);
     if (ehBot) { /* aluno ainda não pediu a equipe: nada de cartão/pedido de código no post */ }
     else if (jaTem && !codigoDado) await thread.send({ embeds: [{ description: `✅ Recebemos o seu diagnóstico **${jaTem}** — ele já vai junto pra equipe.`, color: 0x22C55E }] });
-    else if (tecnico && !jaTem) await thread.send({ embeds: [EMBED_DIAG] });
+    else if (tecnico && !jaTem && cfg.diag && cfg.pedirDiag) await thread.send({ embeds: [EMBED_DIAG] });
     const criado = Date.now();
-    const { data: lics } = await db().from('licenses')
-      .select('key, active, status, source, product').eq('discord_id', user.id);
-    const lic = (lics || []).find((l) => l.active !== false && l.status !== 'inactive') || (lics || [])[0];
+    const conta = await contaDoAluno(user.id);
     const codigo = jaTem;
     const diag = await diagnostico(codigo);
     const inicial = await thread.fetchStarterMessage().catch(() => null);
@@ -421,7 +452,7 @@ module.exports = function suporte(client, { db, logStaff }) {
     const staffTags = tagsDe(staffForum);
     const staff = await staffForum.threads.create({
       name: `${thread.name}`.slice(0, 95),
-      appliedTags: [staffTags[ehBot ? 'Bot respondeu' : 'Na fila']].filter(Boolean),
+      appliedTags: [staffTags[ehBot ? 'Bot respondeu' : 'Na fila'], ...cfg.etiquetasExtras(assunto).map((n) => staffTags[n])].filter(Boolean).slice(0, 5),
       message: {
         // texto solto = prévia que aparece na lista do fórum
         content: `${ehBot ? '🤖' : '🎫'} **${user.username}** · ${assunto || 'sem assunto'} · ${(descricao || '').replace(/\s+/g, ' ').slice(0, 140)}`,
@@ -434,8 +465,8 @@ module.exports = function suporte(client, { db, logStaff }) {
           fields: [
             { name: 'Cliente', value: `**${user.username}** \`${user.id}\``, inline: true },
             { name: 'Assunto', value: assunto || '—', inline: true },
-            { name: 'Licença', value: lic ? `${mascarar(lic.key)} · ${lic.source || '—'} · ${lic.active !== false && lic.status !== 'inactive' ? 'ativa ✅' : 'DESATIVADA ⛔'}` : 'sem chave ligada', inline: false },
-            { name: 'Diagnóstico', value: textoDiag(diag, codigo), inline: false },
+            { name: conta.campo, value: conta.texto, inline: false },
+            ...(cfg.diag ? [{ name: 'Diagnóstico', value: textoDiag(diag, codigo), inline: false }] : []),
             ...(anexos.length ? [{ name: 'Anexos', value: anexos.slice(0, 5).join('\n').slice(0, 1000) }] : []),
             ...(botResumo ? [{ name: '🤖 O bot respondeu no post', value: botResumo.slice(0, 1024) }] : []),
           ],
@@ -451,7 +482,7 @@ module.exports = function suporte(client, { db, logStaff }) {
     chamados.set(thread.id, { staffId: staff.id, cardId: card ? card.id : null, status: ehBot ? 'bot' : 'fila', criado, titulo: thread.name, cliente });
     anotarCodigo(thread.id, codigo);
     doStaff.set(staff.id, thread.id);
-    if (codigo) await ligarCartaoDiag(codigo, staff.id);
+    if (codigo && cfg.diag) await ligarCartaoDiag(codigo, staff.id);
     if (ehBot) { await atualizarFila(); return; }
     await marcarStatus(thread, 'Na fila');
     await logStaff(`🎫 Novo chamado na fila · **${cliente}** · "${thread.name}" · <#${staff.id}>`);
@@ -471,9 +502,8 @@ module.exports = function suporte(client, { db, logStaff }) {
     // pede o código só se for técnico e ainda não veio
     const assuntoTag = th.appliedTags.map((id) => nomeTag(th.parent, id)).find((n) => n && !STATUS.includes(n));
     const inicialTxt = (await th.fetchStarterMessage().catch(() => null))?.content || '';
-    const outroProduto = /\belo\b|elo ia|narrativa/i.test(`${th.name} ${inicialTxt}`);
-    const tecnico = !['Licença e ativação', 'Planos e outros'].includes(assuntoTag) && !outroProduto;
-    if (tecnico && !(codigosDe.get(cid)?.size) && !(await procurarCodigo(th))) await th.send({ embeds: [EMBED_DIAG] });
+    const tecnico = ehTecnico(assuntoTag, `${th.name} ${inicialTxt}`);
+    if (tecnico && cfg.diag && cfg.pedirDiag && !(codigosDe.get(cid)?.size) && !(await procurarCodigo(th))) await th.send({ embeds: [EMBED_DIAG] });
     await marcarStatus(th, 'Na fila');
     const st = await client.channels.fetch(c.staffId).catch(() => null);
     if (st) {
@@ -503,7 +533,7 @@ module.exports = function suporte(client, { db, logStaff }) {
       const ini = await st.fetchStarterMessage().catch(() => null);
       if (ini?.embeds?.[0]) await ini.edit({ embeds: [{ ...ini.embeds[0].toJSON(), footer: { text: `ref:${th.id}:${novo.id}` } }] });
     } catch (err) {
-      console.error('[Suporte] descer cartão:', err.message);
+      console.error(`${TAG} descer cartão:`, err.message);
     }
   }
 
@@ -516,7 +546,7 @@ module.exports = function suporte(client, { db, logStaff }) {
     if (thCaso) await salvarCaso(thCaso, { resolvidoPor: quem === 'equipe' ? 'equipe' : quem === 'prazo' ? 'bot' : 'cliente', staffId: c.staffId });
     // diagnóstico citado e que ninguém respondeu → fecha junto com o chamado
     const codigosChamado = [...(codigosDe.get(cid) || [])];
-    if (codigosChamado.length) {
+    if (codigosChamado.length && cfg.diag) {
       const { data: fechados } = await db().from('cenadrop_diagnosticos')
         .update({ status: 'encerrado', respondido_em: new Date().toISOString(), respondido_por: quem, respondido_via: 'chamado-fechado' })
         .in('codigo', codigosChamado).or('status.is.null,status.not.in.(respondido,encerrado)').select('codigo, staff_msg_id');
@@ -531,13 +561,13 @@ module.exports = function suporte(client, { db, logStaff }) {
       await marcarStatus(th, 'Resolvido');
       if (quem === 'equipe') await th.send({ embeds: [{ description: '✅ A equipe marcou este chamado como **resolvido**. Se voltar a acontecer, é só escrever aqui.', color: 0x22C55E }] });
       if (quem === 'prazo') await th.send({ embeds: [{ description: '✅ Como não tivemos retorno, marcamos como **resolvido**. Se ainda precisar, é só escrever aqui que você entra na fila.', color: 0x22C55E }] });
-    } catch (err) { console.error('[Suporte] resolver/cliente:', err.message); }
+    } catch (err) { console.error(`${TAG} resolver/cliente:`, err.message); }
     try {
       const st = await client.channels.fetch(c.staffId);
       await marcarStatus(st, 'Resolvido');
       await st.send(quem === 'equipe' ? '✅ Fechado.' : quem === 'prazo' ? '✅ Fechado sozinho: o bot respondeu e o aluno não voltou em 3 dias.' : '✅ O cliente marcou como resolvido.');
       await st.setArchived(true);
-    } catch (err) { console.error('[Suporte] resolver/staff:', err.message); }
+    } catch (err) { console.error(`${TAG} resolver/staff:`, err.message); }
     await atualizarFila();
   }
 
@@ -549,7 +579,7 @@ module.exports = function suporte(client, { db, logStaff }) {
     const dono = await donoDe(th);
     await th.send({
       content: `<@${dono}>`, // marca o cliente: o servidor só notifica menções
-      embeds: txt ? [{ author: { name: 'Equipe CenaDrop', icon_url: client.user.displayAvatarURL() }, description: txt.slice(0, 4000), color: COR,
+      embeds: txt ? [{ author: { name: cfg.equipe, icon_url: client.user.displayAvatarURL() }, description: txt.slice(0, 4000), color: COR,
         ...(aprender ? { fields: [{ name: '📚 Pra aprender mais', value: aprender.slice(0, 1024) }] } : {}) }] : [],
       components: links.length ? [new ActionRowBuilder().addComponents(...links.slice(0, 5).map((l) =>
         new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(l.label).setURL(l.url).setEmoji(l.emoji || '🔗')))] : [],
@@ -566,7 +596,7 @@ module.exports = function suporte(client, { db, logStaff }) {
     }
     // diagnósticos citados neste chamado passam a "respondido"
     const codigos = [...(codigosDe.get(cid) || [])];
-    if (codigos.length && txt) {
+    if (codigos.length && txt && cfg.diag) {
       const { data: marcados } = await db().from('cenadrop_diagnosticos')
         .update({ status: 'respondido', resposta: txt.slice(0, 4000), respondido_em: new Date().toISOString(), respondido_por: quem, respondido_via: 'chamado' })
         .in('codigo', codigos).or('status.is.null,status.not.in.(respondido,encerrado)').select('codigo, staff_msg_id');
@@ -575,7 +605,6 @@ module.exports = function suporte(client, { db, logStaff }) {
   }
 
   // O cartão do #diagnosticos acompanha o chamado: respondido ali (verde) ou fechado sem resposta da equipe (cinza)
-  const CANAL_DIAG = '1557199153254105141';
   async function atualizarCartoesDiag(linhas, situacao, cor, resposta = null) {
     if (!linhas?.length) return;
     try {
@@ -590,12 +619,11 @@ module.exports = function suporte(client, { db, logStaff }) {
         await msg.edit({ embeds: [{ ...e, color: cor, title: `${cor === 0x22C55E ? '✅' : '✔️'} ${d.codigo} · ${situacao}`, fields }], components: [] });
       }
     } catch (err) {
-      console.error('[Suporte] cartão do diagnóstico:', err.message);
+      console.error(`${TAG} cartão do diagnóstico:`, err.message);
     }
   }
 
   // Cartão do #diagnosticos ganha o atalho pro chamado: a resposta passa a ser dada lá
-  const STAFF_GUILD = '1555367221541208105';
   async function ligarCartaoDiag(codigo, staffId) {
     try {
       const { data: d } = await db().from('cenadrop_diagnosticos').select('id, codigo, staff_msg_id, status').eq('codigo', codigo).maybeSingle();
@@ -610,7 +638,7 @@ module.exports = function suporte(client, { db, logStaff }) {
           new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel('Abrir o chamado').setEmoji('📌').setURL(linkThread(STAFF_GUILD, staffId)),
         )] });
     } catch (err) {
-      console.error('[Suporte] ligar cartão do diagnóstico:', err.message);
+      console.error(`${TAG} ligar cartão do diagnóstico:`, err.message);
     }
   }
 
@@ -785,7 +813,7 @@ module.exports = function suporte(client, { db, logStaff }) {
           files: [...msg.attachments.values()].map((a) => ({ attachment: a.url, name: a.name })),
           allowedMentions: { parse: [] },
         });
-        const codigo = msg.content.match(PADRAO_DIAG)?.[0];
+        const codigo = cfg.diag ? msg.content.match(PADRAO_DIAG)?.[0] : null;
         const novoCodigo = codigo && !codigosDe.get(msg.channel.id)?.has(codigo);
         anotarCodigo(msg.channel.id, codigo);
         if (novoCodigo) await ligarCartaoDiag(codigo, c.staffId);
@@ -794,7 +822,7 @@ module.exports = function suporte(client, { db, logStaff }) {
         if (codigo) await st.send({ embeds: [{ title: '🧰 Diagnóstico enviado', description: textoDiag(await diagnostico(codigo), codigo), color: 0x3B82F6 }] });
       }
     } catch (err) {
-      console.error('[Suporte] repasse:', err);
+      console.error(`${TAG} repasse:`, err);
       await logStaff(`🔴 Erro no repasse do suporte · ${String(err.message || err).slice(0, 300)}`);
     }
   });
@@ -816,14 +844,14 @@ module.exports = function suporte(client, { db, logStaff }) {
       chamados.set(ref[1], { staffId: st.id, cardId: ref[2] === '0' ? null : ref[2], status, criado: st.createdTimestamp, titulo: st.name, cliente });
       const idCliente = ini.embeds[0].fields?.find((f) => f.name === 'Cliente')?.value?.match(/`(\d+)`/)?.[1];
       if (idCliente) donos.set(ref[1], idCliente);
-      if (ref[1].startsWith('mail:')) {   // chamado 📧: guarda o e-mail pra juntar diagnósticos do mesmo aluno
+      if (ref[1].startsWith('mail:') && cfg.diag) {   // chamado 📧: guarda o e-mail pra juntar diagnósticos do mesmo aluno
         const { data: dm } = await db().from('cenadrop_diagnosticos').select('email').eq('id', ref[1].slice(5)).maybeSingle();
         chamados.get(ref[1]).email = (dm?.email || '').toLowerCase() || null;
       }
       anotarCodigo(ref[1], ini.embeds[0].fields?.find((f) => f.name === 'Diagnóstico')?.value?.match(PADRAO_DIAG)?.[0]);
       doStaff.set(st.id, ref[1]);
     }
-    console.log(`[Suporte] fila reconstruída: ${chamados.size} chamado(s) abertos`);
+    console.log(`${TAG} fila reconstruída: ${chamados.size} chamado(s) abertos`);
     await puxarDoLimbo();
     await atualizarFila();
   }
@@ -842,13 +870,13 @@ module.exports = function suporte(client, { db, logStaff }) {
         await abrirChamado(th, dono);
         await logStaff(`🧲 Post parado no #suporte puxado pra fila · "${th.name}"`);
       }
-    } catch (err) { console.error('[Suporte] limbo:', err.message); }
+    } catch (err) { console.error(`${TAG} limbo:`, err.message); }
   }
 
   client.once('clientReady', () => {
     carregarBase();
     setInterval(carregarBase, 5 * 60 * 1000);
-    reconstruir().catch((err) => console.error('[Suporte] reconstruir:', err));
+    reconstruir().catch((err) => console.error(`${TAG} reconstruir:`, err));
     setInterval(() => atualizarFila(), 10 * 60 * 1000); // "esperando há…" do painel
   });
 
@@ -864,4 +892,5 @@ module.exports = function suporte(client, { db, logStaff }) {
   };
 };
 
-module.exports.procurar = procurar;
+// compat: busca na base do arquivo (sem banco) — ninguém usa hoje, mantido por segurança
+module.exports.procurar = (titulo, corpo, assunto) => procurarEm(prepararBase(KB_ARQUIVO), titulo, corpo, assunto);
