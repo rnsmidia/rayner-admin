@@ -6,7 +6,11 @@
  * do Staff, por webhook (sai com o nome e a foto de quem escreveu; vídeo/imagem anexados tocam ali).
  * Edição e exclusão acompanham (enquanto o bot estiver ligado desde a mensagem). Canais só leitura.
  * Ao ligar, recupera o que chegou com o bot desligado (depois da última cópia; espelho vazio = últimas 30).
- * Pra responder lá: !geral / !responder e os ✅ do #rascunhos — o espelho é só pra ver.
+ *
+ * RESPONDER PELO ESPELHO (29/10/26): o que a equipe escreve em #espelho-geral, #espelho-dicas ou #espelho-vitrine
+ * vai pra aba de verdade como "Equipe CenaDrop". Usou o "Responder" do Discord numa mensagem do espelho → sai como
+ * resposta àquela mensagem lá (marca o aluno). `//` no começo = nota interna (não vai). ✅ = entregue.
+ * #espelho-avisos e #espelho-aulas continuam só leitura (aviso é pelo !aviso).
  */
 
 const GUILD = '1555365917578240130';
@@ -21,10 +25,13 @@ const PARES = {                                  // origem (CenaDrop) → espelh
 const NOME_HOOK = 'Espelho CenaDrop';
 const LIMITE_ANEXO = 9.5 * 1024 * 1024;          // acima disso vai como link
 const HISTORICO = 30;
+const RESPONDE = { '1560645413785305248': '1555365918278684775', '1560645422530429042': '1555372711763513364', '1560645420773019829': '1555372703131766795' };   // espelho → aba (geral, dicas, vitrine)
+const SO_LEITURA = new Set(['1560645416062816286', '1560645418730266634']);   // avisos, aulas
 
 module.exports = function espelho(client) {
   const hooks = new Map();     // canal do espelho → webhook
   const copias = new Map();    // id da mensagem original → { hook, id da cópia }
+  const origemDaCopia = new Map();   // id da cópia (Staff) → { canal, id } da mensagem original
 
   const origemDe = (msg) => {
     if (msg.guildId !== GUILD) return null;
@@ -85,9 +92,64 @@ module.exports = function espelho(client) {
     const hook = await hookDe(PARES[origem]);
     const enviada = await hook.send(dados);
     copias.set(msg.id, { hook, id: enviada.id });
+    origemDaCopia.set(enviada.id, { canal: msg.channelId, id: msg.id });
   }
 
-  client.on('messageCreate', (msg) => { copiar(msg).catch((e) => console.error('[Espelho] copiar:', e.message)); });
+  // a cópia é de antes do bot ligar (o mapa se perdeu) → acha a original pelo texto/anexos nas últimas 100 da aba
+  async function acharOriginal(copia, canalOrigem) {
+    if (origemDaCopia.has(copia.id)) return origemDaCopia.get(copia.id);
+    const canal = await client.channels.fetch(canalOrigem);
+    const recentes = await canal.messages.fetch({ limit: 100 });
+    const anexos = [...copia.attachments.values()].map((a) => a.name).join('|');
+    const achada = [...recentes.values()].find((m) => {
+      const d = textoLegivel(m);
+      const mesmoTexto = d && copia.content && copia.content.includes(d.slice(0, 200));
+      const mesmosAnexos = anexos && [...m.attachments.values()].map((a) => a.name).join('|') === anexos;
+      return mesmoTexto || mesmosAnexos;
+    });
+    return achada ? { canal: canalOrigem, id: achada.id } : null;
+  }
+
+  // a equipe responde pelo espelho → vai pra aba de verdade como "Equipe CenaDrop"
+  async function responderPeloEspelho(msg) {
+    if (msg.author.bot || msg.webhookId) return;
+    if (SO_LEITURA.has(msg.channelId)) {
+      return msg.reply('ℹ️ Este espelho é só pra ler. Pra publicar no #avisos use `!aviso <texto>`; pra falar com a turma, escreva no #espelho-geral.');
+    }
+    const destinoId = RESPONDE[msg.channelId];
+    if (!destinoId) return;
+    const txt = (msg.content || '').trim();
+    if (txt.startsWith('//')) return msg.react('📝').catch(() => {});
+    const files = [...msg.attachments.values()].map((a) => ({ attachment: a.url, name: a.name }));
+    if (!txt && !files.length) return;
+    try {
+      let alvo = null;
+      if (msg.reference?.messageId) {
+        const copia = await msg.fetchReference().catch(() => null);
+        if (copia) alvo = await acharOriginal(copia, destinoId);
+        if (!alvo) await msg.reply('⚠️ Não achei a mensagem original pra responder em cima — mandei solta no canal.').catch(() => {});
+      }
+      const destino = await client.channels.fetch(destinoId);
+      const original = alvo ? await destino.messages.fetch(alvo.id).catch(() => null) : null;
+      const quem = original && !original.author.bot ? original.author.id : null;
+      await destino.send({
+        content: quem ? `<@${quem}>` : undefined,
+        embeds: txt ? [{ author: { name: 'Equipe CenaDrop', icon_url: client.user.displayAvatarURL() }, description: txt.slice(0, 4000), color: 0x7C3AED }] : [],
+        files,
+        ...(original ? { reply: { messageReference: original.id, failIfNotExists: false } } : {}),
+        allowedMentions: { users: quem ? [quem] : [], repliedUser: !!quem },
+      });
+      await msg.react('✅').catch(() => {});
+    } catch (e) {
+      console.error('[Espelho] responder:', e.message);
+      await msg.reply(`🔴 Não consegui mandar: ${e.message}`).catch(() => {});
+    }
+  }
+
+  client.on('messageCreate', (msg) => {
+    if (RESPONDE[msg.channelId] || SO_LEITURA.has(msg.channelId)) return responderPeloEspelho(msg);
+    copiar(msg).catch((e) => console.error('[Espelho] copiar:', e.message));
+  });
   client.on('messageUpdate', async (_antes, depois) => {
     const c = copias.get(depois.id);
     if (!c) return;
@@ -112,7 +174,7 @@ module.exports = function espelho(client) {
       try {
         // recupera o que chegou enquanto o bot estava desligado: tudo depois da última cópia (ou as últimas 30, se vazio)
         const alvo = await client.channels.fetch(destino);
-        const ultima = (await alvo.messages.fetch({ limit: 1 })).first();
+        const ultima = [...(await alvo.messages.fetch({ limit: 30 })).values()].find((m) => m.webhookId);
         const desde = ultima ? ultima.createdTimestamp : 0;
         let msgs = [];
         if (origem === AULAS) {
