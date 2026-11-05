@@ -355,13 +355,16 @@ client.on('messageCreate', async (msg) => {
 });
 
 // ── suporte (F3/E4, 26/10/26): o MESMO motor do CenaDrop (cenadrop-suporte.js) com o cfg do Narrativa ──
-// Desligado até o Rayner ligar a env NARRATIVA_SUPORTE=1 no Railway. Sem diagnóstico N-XXXX por enquanto (E7) e base
-// de respostas vazia até a E5 (o bot responde "ainda não tenho resposta pronta" e o post vira chamado no Estagiário).
+// Ligado pela env NARRATIVA_SUPORTE=1 no Railway (05/11/26). Diagnóstico N-XXXX: narrativa-diagnosticos.js (E7). Base de
+// respostas vazia até a E5 (o bot responde "ainda não tenho resposta pronta" e o post vira chamado no Estagiário).
 const STAFF_SUP = { chamados: '1562683808803725312', fila: '1562683811118973029', diag: '1562683817611755530' };
 if (process.env.NARRATIVA_SUPORTE === '1') {
-  require('./cenadrop-suporte')(client, {
+  const { diagnosticos, cfg: cfgDiag } = require('./narrativa-diagnosticos');
+  const { contaDoUsuario, ...diagDoSuporte } = cfgDiag(db, contaAtiva);
+  const suporte = require('./cenadrop-suporte')(client, {
     db, logStaff,
     cfg: {
+      ...diagDoSuporte,
       produto: 'narrativa',
       guild: GUILD_ID,
       staffGuild: STAFF_GUILD,
@@ -369,8 +372,6 @@ if (process.env.NARRATIVA_SUPORTE === '1') {
       cor: COR,
       equipe: 'Equipe Narrativa',
       padraoDiag: /\bN-[A-Z2-9]{4}\b/,
-      diag: false,
-      pedirDiag: false,
       kbArquivo: [],
       assuntosNaoTecnicos: ['Conta e acesso', 'Planos e outros'],
       outroProduto: null,
@@ -384,6 +385,7 @@ if (process.env.NARRATIVA_SUPORTE === '1') {
       },
     },
   });
+  diagnosticos(client, { db, logStaff, suporte, canal: STAFF_SUP.diag, contaDoUsuario, contaAtiva });
   console.log('[Narrativa] suporte ligado (NARRATIVA_SUPORTE=1)');
 }
 
