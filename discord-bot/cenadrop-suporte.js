@@ -686,6 +686,73 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
     if (st) await st.send(`📧 Enviado por e-mail pra ${(a.email || '').replace(/^(.).*?@/, '$1***@')}.`);
   }
 
+  // ── 📧 → Discord (11/11/26): o aluno sem Discord ativou a chave no servidor DEPOIS do diagnóstico → o mesmo
+  //    chamado passa a responder pelo post dele no #suporte (posição na fila e histórico mantidos). Roda a cada 2 min.
+  const migracaoFalhou = new Set();
+  async function emailParaDiscord() {
+    if (cfg.produto !== 'cenadrop') return;   // usa licenses.discord_id (conta do CenaDrop); o Narrativa liga a conta por outro caminho
+    for (const [cid, c] of [...chamados.entries()]) {
+      if (!cid.startsWith('mail:') || migracaoFalhou.has(cid)) continue;
+      try {
+        const codigos = [...(codigosDe.get(cid) || [])];
+        if (!codigos.length) continue;
+        const { data: dd } = await db().from(cfg.tabelaDiag).select('codigo, chave, plataforma, criado').in('codigo', codigos).order('criado', { ascending: false });
+        const chaves = [...new Set((dd || []).map((x) => x.chave).filter(Boolean))];
+        if (!chaves.length) continue;
+        const { data: lics } = await db().from('licenses').select('discord_id').in('key', chaves).not('discord_id', 'is', null);
+        const discordId = lics?.[0]?.discord_id;
+        if (!discordId) continue;
+        const guild = await client.guilds.fetch(GUILD_ID);
+        const membro = await guild.members.fetch(discordId).catch(() => null);
+        if (!membro) continue;
+
+        const jaRespondido = c.status === 'atendimento';
+        const forum = await client.channels.fetch(SUPORTE);
+        const tags = tagsDe(forum);
+        const thread = await forum.threads.create({
+          name: `🩺 Diagnóstico ${codigos.join(' · ')}`.slice(0, 95),
+          appliedTags: [cfg.tagDoDiag(dd[0] || {}, tags)].filter(Boolean),
+          message: {
+            content: `<@${discordId}>, que bom te ver aqui! 🙂 O seu diagnóstico **${codigos.join(', ')}** estava com a equipe ` +
+              (jaRespondido ? 'e já te respondemos por e-mail. Daqui pra frente a conversa segue **aqui**.' : 'e a resposta vai sair **aqui**, em ordem de chegada (o cartão abaixo mostra a sua posição).'),
+            allowedMentions: { users: [discordId] },
+          },
+        });
+        donos.set(thread.id, discordId);
+        const pos = c.status === 'fila' ? posicao(cid) : null;
+        const card = await thread.send({ embeds: [cartao(c.status, pos)] });
+        cartaoTexto.set(card.id, cartao(c.status, pos).title);
+        await marcarStatus(thread, c.status === 'fila' ? 'Na fila' : 'Em atendimento');
+
+        // o mesmo chamado do Staff passa a apontar pro post (chave nova = id do post)
+        chamados.delete(cid);
+        chamados.set(thread.id, { ...c, cardId: card.id, email: null });
+        doStaff.set(c.staffId, thread.id);
+        codigosDe.set(thread.id, new Set(codigos));
+        codigosDe.delete(cid);
+        const st = await client.channels.fetch(c.staffId);
+        if (st.archived) await st.setArchived(false);
+        const ini = await st.fetchStarterMessage().catch(() => null);
+        if (ini?.embeds?.[0]) {
+          const e = ini.embeds[0].toJSON();
+          const fields = (e.fields || []).map((f) => (f.name === 'Cliente' ? { ...f, value: `**${membro.user.username}** \`${discordId}\`` } : f));
+          await ini.edit({ embeds: [{ ...e, title: (e.title || '').replace(/^📧 /, '💬 '), url: linkThread(GUILD_ID, thread.id),
+            description: '**O aluno entrou no Discord:** a sua resposta aqui agora vai pelo post dele no #suporte (não mais por e-mail).',
+            fields, footer: { text: `ref:${thread.id}:${card.id}` } }] });
+        }
+        await st.setName(st.name.replace(/^📧 /, '💬 ').slice(0, 100)).catch(() => {});
+        await st.send(`🔁 **${membro.user.username} entrou no Discord.** A partir de agora o que você escrever aqui vai pro post dele: <#${thread.id}>${jaRespondido ? ' (a 1ª resposta já tinha ido por e-mail)' : ''}.`);
+        await ligarCartaoDiag(codigos[0], c.staffId);
+        await logStaff(`🔁 Chamado 📧 virou Discord · **${membro.user.username}** · ${codigos.join(', ')} · <#${c.staffId}>`);
+        await atualizarFila();
+      } catch (err) {
+        migracaoFalhou.add(cid);
+        console.error(`${TAG} 📧→Discord:`, err.message);
+        await logStaff(`🔴 Não consegui passar o chamado 📧 pro Discord (${cid}): ${String(err.message).slice(0, 200)}`).catch(() => {});
+      }
+    }
+  }
+
   async function abrirChamadoEmail(d) {
     const { data: dd } = await db().from(cfg.tabelaDiag)
       .select(`id, email, nome, ${cfg.camposAluno}, ${cfg.camposDiag}`).eq('codigo', d.codigo).maybeSingle();
@@ -888,6 +955,7 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
   }
 
   client.once('clientReady', () => {
+    setInterval(() => emailParaDiscord().catch((err) => console.error(`${TAG} 📧→Discord:`, err.message)), 2 * 60 * 1000);
     carregarBase();
     setInterval(carregarBase, 5 * 60 * 1000);
     reconstruir().catch((err) => console.error(`${TAG} reconstruir:`, err));
