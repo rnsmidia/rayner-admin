@@ -198,7 +198,7 @@ async function minhaChave(inter) {
     body: JSON.stringify({
       from: 'CenaDrop <contato@cenadrop.com.br>',
       to: lic.email,
-      subject: '🔑 Sua chave CenaDrop Flow',
+      subject: '🔑 Sua chave CenaDrop One',
       html,
     }),
   });
