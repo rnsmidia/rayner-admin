@@ -115,6 +115,9 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
     for (const [f, cs] of grupos) { const r = await monta(db().from(f.tabela), f, cs); if (r?.error) error = r.error; data.push(...(r?.data || [])); }
     return { data, error };
   }
+  // 16/11/26: de qual ferramenta é o caso (one / multi / narrativa) — separa o aprendizado (base, casos, descartes)
+  const ferramentaDe = (codigos) => (cfg.produto !== 'cenadrop' ? cfg.produto
+    : (codigos || []).some((c) => /^M-/.test(c)) ? 'multi' : 'one');
   const maisNovoPrimeiro = (lista) => lista.sort((a, b) => String(b.criado || '').localeCompare(String(a.criado || '')));
   const GUILD_ID = cfg.guild, STAFF_GUILD = cfg.staffGuild, COR = cfg.cor;
   const PADRAO_DIAG = FONTES.length === 1 ? FONTES[0].padrao : new RegExp(FONTES.map((f) => f.padrao.source).join('|'));
@@ -127,7 +130,8 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
   async function carregarBase() {
     try {
       const { data, error } = await db().from('suporte_base')
-        .select('id, pergunta, tag, palavras, resposta, aprender, links, escalar').eq('ativo', true).in('produto', [cfg.produto, 'ambos']);
+        .select('id, pergunta, tag, palavras, resposta, aprender, links, escalar, ferramenta').eq('ativo', true).in('produto', [cfg.produto, 'ambos']);
+      if (data?.length && cfg.produto === 'cenadrop') data.splice(0, data.length, ...data.filter((e) => !e.ferramenta || e.ferramenta !== 'multi'));
       if (error) throw error;
       if (data?.length) KB_NORM = prepararBase(data);
     } catch (err) {
@@ -165,7 +169,7 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
       const { data: dd } = await porFonte(codigos, (q, f, cs) => q.select(f.campos).in('codigo', cs));
       const enviadas = sugestoes.filter((x) => x.situacao === 'enviada' || x.situacao === 'editada').map((x) => x.texto);
       await db().from('suporte_casos').upsert({
-        thread_id: cid, staff_thread_id: c.staffId, canal: 'email', produto: cfg.produto,
+        thread_id: cid, staff_thread_id: c.staffId, canal: 'email', produto: cfg.produto, ferramenta: ferramentaDe(codigos),
         aberto_em: new Date(c.criado).toISOString(), resolvido_em: new Date().toISOString(), resolvido_por: quem === 'equipe' ? 'equipe' : quem,
         cliente_nome: c.cliente, titulo: c.titulo,
         problema: (dd || []).map((d) => d.mensagem).filter(Boolean).join(' / ') || null,
@@ -210,7 +214,7 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
       const owner = await client.users.fetch(dono).catch(() => null);
       const { sugestoes } = await sugestoesDoChamado(staffId);
       await db().from('suporte_casos').upsert({
-        thread_id: thread.id, staff_thread_id: staffId, canal: 'discord', produto: cfg.produto, sugestoes_ia: sugestoes,
+        thread_id: thread.id, staff_thread_id: staffId, canal: 'discord', produto: cfg.produto, ferramenta: ferramentaDe(codigos), sugestoes_ia: sugestoes,
         aberto_em: thread.createdAt?.toISOString(), resolvido_em: new Date().toISOString(), resolvido_por: resolvidoPor,
         cliente_discord_id: dono, cliente_nome: owner?.username || null,
         assunto: thread.appliedTags.map((id) => nomeTag(thread.parent, id)).find((n) => n && !STATUS.includes(n)) || null,
