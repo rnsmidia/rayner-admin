@@ -9,6 +9,8 @@
  *   3. sem Discord (ou saiu do servidor) → chamado 📧 no #chamados (passo 2, 19/10/26): responde lá, sai por e-mail
  * Desde o passo 2 o cartão daqui é só ARQUIVO técnico (sem botões): tudo se responde no #chamados.
  * O diagnóstico guarda status (visto/respondido), a resposta, quem, quando e por onde.
+ * 15/11/26: vigia também o CenaDrop Multi (programa instalado, M-XXXX, tabela multi_diagnosticos): cartão com o selo
+ * "🖥️ CenaDrop Multi" e o mesmo fluxo (chamado / post em nome do aluno / 📧). O Multi só manda pelo botão (sem 'tipo').
  */
 
 const {
@@ -21,6 +23,14 @@ const SUPORTE_URL = 'https://discord.com/channels/1555365917578240130/1555372720
 const CONVITE = 'https://discord.gg/SGEVxaurAw';
 const INTERVALO = 2 * 60 * 1000;
 const COR = 0x7C3AED;
+const FONTES = [
+  { tabela: 'cenadrop_diagnosticos', selo: null, soBotao: true, admin: 'Admin › CenaDrop › Diagnósticos',
+    campos: 'id, codigo, criado, chave, email, nome, versao, plataforma, navegador, mensagem, resumo, n_linhas',
+    ambiente: (d) => `v${d.versao || '?'} · ${d.plataforma || '?'} · ${resumoNavegador(d.navegador)} · ${d.n_linhas || 0} linhas de registro` },
+  { tabela: 'multi_diagnosticos', selo: '🖥️ CenaDrop Multi', soBotao: false, admin: 'Admin › CenaDrop › Diagnósticos Multi',
+    campos: 'id, codigo, criado, chave, email, nome, versao, plataforma, sistema, mensagem, resumo, n_linhas',
+    ambiente: (d) => `programa v${d.versao || '?'} · ${d.plataforma || '?'} · ${/Windows/i.test(d.sistema || '') ? 'Windows' : /Darwin|Mac/i.test(d.sistema || '') ? 'Mac' : '?'} · ${d.n_linhas || 0} linhas de registro` },
+];
 
 const mascararEmail = (e) => (e || '').replace(/^(.).*?(.)?@/, (_, a, b) => `${a}***${b || ''}@`);
 const resumoNavegador = (ua = '') => {
@@ -46,9 +56,13 @@ module.exports = function diagnosticos(client, { db, logStaff, suporte }) {
   }
 
   async function avisarNovos() {
-    const { data: novos, error } = await db().from('cenadrop_diagnosticos')
-      .select('id, codigo, criado, chave, email, nome, versao, plataforma, navegador, mensagem, resumo, n_linhas')
-      .eq('tipo', 'botao').is('avisado_em', null).order('criado').limit(20);
+    for (const fonte of FONTES) await avisarNovosDe(fonte);
+  }
+
+  async function avisarNovosDe(fonte) {
+    let q = db().from(fonte.tabela).select(fonte.campos).is('avisado_em', null).order('criado').limit(20);
+    if (fonte.soBotao) q = q.eq('tipo', 'botao');
+    const { data: novos, error } = await q;
     if (error) throw error;
     if (!novos?.length) return;
     const canal = await client.channels.fetch(CANAL);
@@ -61,35 +75,41 @@ module.exports = function diagnosticos(client, { db, logStaff, suporte }) {
       const m = await canal.send({
         embeds: [{
           title: `🩺 ${d.codigo} · ${d.nome || 'sem nome'}`,
-          description: d.mensagem ? `**Recado do aluno:** "${d.mensagem.slice(0, 1500)}"` : '_(sem recado)_',
+          description: (fonte.selo ? `**${fonte.selo}** (programa instalado)\n` : '') + (d.mensagem ? `**Recado do aluno:** "${d.mensagem.slice(0, 1500)}"` : '_(sem recado)_'),
           color: 0xEAB308,
           fields: [
-            { name: 'Ambiente', value: `v${d.versao || '?'} · ${d.plataforma || '?'} · ${resumoNavegador(d.navegador)} · ${d.n_linhas || 0} linhas de registro`, inline: false },
+            { name: 'Ambiente', value: fonte.ambiente(d), inline: false },
             { name: 'Erros', value: (d.resumo || 'nenhum registrado').slice(0, 1000), inline: false },
             { name: 'Aluno', value: `${mascararEmail(d.email || lic?.email)} · ${lic ? (lic.active !== false && lic.status !== 'inactive' ? 'chave ativa ✅' : 'chave DESATIVADA ⛔') : 'chave não encontrada'}`, inline: false },
             { name: 'A resposta vai por', value: destino, inline: false },
           ],
-          footer: { text: `Detalhe completo: Admin › CenaDrop › Diagnósticos · diag:${d.id}` },
+          footer: { text: `Detalhe completo: ${fonte.admin} · diag:${d.id}` },
           timestamp: d.criado,
         }],
         components: [],
       });
-      await db().from('cenadrop_diagnosticos')
+      await db().from(fonte.tabela)
         .update({ avisado_em: new Date().toISOString(), staff_msg_id: m.id, status: 'novo' }).eq('id', d.id);
       if (chamado) await suporte.ligarCartaoDiag(d.codigo, suporte.staffDe(chamado));
       else if (!lic?.discord_id) await suporte.abrirChamadoEmail(d).catch((e) => console.error('[Diagnósticos] chamado 📧:', e.message));
     }
-    await logStaff(`🩺 ${novos.length} diagnóstico(s) novo(s) no #diagnosticos`);
+    await logStaff(`🩺 ${novos.length} diagnóstico(s) novo(s)${fonte.selo ? ` do ${fonte.selo}` : ''} no #diagnosticos`);
   }
 
   // Fila única: diagnóstico sem chamado há 15 min → o bot abre o chamado no #suporte
   async function abrirPendentes() {
+    for (const fonte of FONTES) await abrirPendentesDe(fonte);
+  }
+
+  async function abrirPendentesDe(fonte) {
     const agora = Date.now();
-    const { data, error } = await db().from('cenadrop_diagnosticos')
+    let q = db().from(fonte.tabela)
       .select('id, codigo, chave, plataforma, staff_msg_id, criado')
-      .eq('tipo', 'botao').not('staff_msg_id', 'is', null)
+      .not('staff_msg_id', 'is', null)
       .or('status.is.null,status.not.in.(respondido,encerrado)')
       .lte('criado', new Date(agora - ESPERA).toISOString());
+    if (fonte.soBotao) q = q.eq('tipo', 'botao');
+    const { data, error } = await q;
     if (error) throw error;
     for (const d of data || []) {
       if (tentados.has(d.id) || suporte.chamadoComCodigo(d.codigo)) continue;

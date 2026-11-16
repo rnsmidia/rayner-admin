@@ -95,9 +95,29 @@ function procurarEm(KB_NORM, titulo, corpo, assunto) {
   return b && b.n >= a.n * 0.6 ? [a.e, b.e] : [a.e];
 }
 
+// 15/11/26: o CenaDrop tem 2 diagnósticos — D-XXXX (extensão) e M-XXXX (CenaDrop Multi, programa instalado).
+// Cada código lê a SUA tabela. Quem passa só padraoDiag/tabelaDiag (o Narrativa, N-XXXX) continua com 1 fonte.
+const FONTES_CENADROP = [
+  { padrao: /\bD-[A-Z2-9]{4}\b/, tabela: 'cenadrop_diagnosticos', campos: 'codigo, criado, versao, plataforma, navegador, mensagem, resumo, n_linhas', selo: null },
+  { padrao: /\bM-[A-Z2-9]{4}\b/, tabela: 'multi_diagnosticos', campos: 'codigo, criado, versao, plataforma, sistema, mensagem, resumo, n_linhas', selo: 'CenaDrop Multi' },
+];
+
 module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
   const cfg = { ...PADRAO, ...cfgDado, canais: { ...PADRAO.canais, ...(cfgDado.canais || {}) } };
-  const GUILD_ID = cfg.guild, STAFF_GUILD = cfg.staffGuild, COR = cfg.cor, PADRAO_DIAG = cfg.padraoDiag;
+  const FONTES = cfgDado.fontesDiag || (cfg.produto === 'cenadrop' && !cfgDado.tabelaDiag ? FONTES_CENADROP
+    : [{ padrao: cfg.padraoDiag, tabela: cfg.tabelaDiag, campos: cfg.camposDiag, selo: null }]);
+  const fonteDe = (codigo) => FONTES.find((f) => f.padrao.test(codigo || '')) || FONTES[0];
+  // a mesma consulta em cada tabela dos códigos, juntando o resultado: monta(query, fonte, códigosDessaFonte)
+  async function porFonte(codigos, monta) {
+    const grupos = new Map();
+    for (const c of codigos || []) { const f = fonteDe(c); if (!grupos.has(f)) grupos.set(f, []); grupos.get(f).push(c); }
+    const data = []; let error = null;
+    for (const [f, cs] of grupos) { const r = await monta(db().from(f.tabela), f, cs); if (r?.error) error = r.error; data.push(...(r?.data || [])); }
+    return { data, error };
+  }
+  const maisNovoPrimeiro = (lista) => lista.sort((a, b) => String(b.criado || '').localeCompare(String(a.criado || '')));
+  const GUILD_ID = cfg.guild, STAFF_GUILD = cfg.staffGuild, COR = cfg.cor;
+  const PADRAO_DIAG = FONTES.length === 1 ? FONTES[0].padrao : new RegExp(FONTES.map((f) => f.padrao.source).join('|'));
   const { suporte: SUPORTE, chamados: CHAMADOS, fila: PAINEL_FILA, faq: FAQ, diag: CANAL_DIAG } = cfg.canais;
   const TAG = cfg.produto === 'cenadrop' ? '[Suporte]' : `[Suporte ${cfg.produto}]`;
   let KB_NORM = prepararBase(cfg.kbArquivo || []);
@@ -142,7 +162,7 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
     try {
       const { sugestoes, equipe } = await sugestoesDoChamado(c.staffId);
       const codigos = [...(codigosDe.get(cid) || [])];
-      const { data: dd } = await db().from(cfg.tabelaDiag).select(cfg.camposDiag).in('codigo', codigos.length ? codigos : ['-']);
+      const { data: dd } = await porFonte(codigos, (q, f, cs) => q.select(f.campos).in('codigo', cs));
       const enviadas = sugestoes.filter((x) => x.situacao === 'enviada' || x.situacao === 'editada').map((x) => x.texto);
       await db().from('suporte_casos').upsert({
         thread_id: cid, staff_thread_id: c.staffId, canal: 'email', produto: cfg.produto,
@@ -184,7 +204,7 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
       const codigos = [...new Set([...(codigosDe.get(thread.id) || []), ...(textoTodo.match(new RegExp(PADRAO_DIAG.source, 'g')) || [])])];
       let diagResumo = null;
       if (codigos.length && cfg.diag) {
-        const { data } = await db().from(cfg.tabelaDiag).select(cfg.camposDiag).in('codigo', codigos);
+        const { data } = await porFonte(codigos, (q, f, cs) => q.select(f.campos).in('codigo', cs));
         diagResumo = (data || []).map(cfg.linhaCaso).join('\n') || null;
       }
       const owner = await client.users.fetch(dono).catch(() => null);
@@ -411,18 +431,19 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
 
   async function diagnostico(codigo) {
     if (!codigo || !cfg.diag) return null;
-    const { data } = await db().from(cfg.tabelaDiag)
-      .select(cfg.camposDiag)
-      .eq('codigo', codigo).maybeSingle();
+    const f = fonteDe(codigo);
+    const { data } = await db().from(f.tabela).select(f.campos).eq('codigo', codigo).maybeSingle();
     return data;
   }
 
   const textoDiag = cfg.textoDiag || ((d, codigo) => {
     if (!codigo) return '⚠️ Não mandou o código ainda';
     if (!d) return `\`${codigo}\` (não encontrado no Admin)`;
-    const nav = (d.navegador || '').match(/(Edg|OPR|Brave|Chrome|Firefox|Safari)\/[\d.]+/)?.[0] || '?';
-    const so = /Windows/.test(d.navegador) ? 'Windows' : /Mac OS/.test(d.navegador) ? 'Mac' : '?';
-    return [`\`${d.codigo}\` · v${d.versao} · ${d.plataforma} · ${so} · ${nav} · ${d.n_linhas} linhas`,
+    const selo = fonteDe(d.codigo).selo;
+    const nav = selo ? selo : (d.navegador || '').match(/(Edg|OPR|Brave|Chrome|Firefox|Safari)\/[\d.]+/)?.[0] || '?';
+    const ambiente = d.sistema || d.navegador || '';
+    const so = /Windows/.test(ambiente) ? 'Windows' : /Mac OS|Darwin/.test(ambiente) ? 'Mac' : '?';
+    return [`${selo ? '🖥️ ' : ''}\`${d.codigo}\` · v${d.versao} · ${d.plataforma} · ${so} · ${nav} · ${d.n_linhas} linhas`,
       d.resumo ? `Erros: ${d.resumo}` : null, d.mensagem ? `Recado: "${d.mensagem}"` : null,
       'Abrir em Admin › CenaDrop › Diagnósticos'].filter(Boolean).join('\n').slice(0, 1000);
   });
@@ -559,9 +580,9 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
     // diagnóstico citado e que ninguém respondeu → fecha junto com o chamado
     const codigosChamado = [...(codigosDe.get(cid) || [])];
     if (codigosChamado.length && cfg.diag) {
-      const { data: fechados } = await db().from(cfg.tabelaDiag)
+      const { data: fechados } = await porFonte(codigosChamado, (q, f, cs) => q
         .update({ status: 'encerrado', respondido_em: new Date().toISOString(), respondido_por: quem, respondido_via: 'chamado-fechado' })
-        .in('codigo', codigosChamado).or('status.is.null,status.not.in.(respondido,encerrado)').select('codigo, staff_msg_id');
+        .in('codigo', cs).or('status.is.null,status.not.in.(respondido,encerrado)').select('codigo, staff_msg_id'));
       await atualizarCartoesDiag(fechados, `chamado fechado (${quem === 'equipe' ? 'pela equipe' : 'pelo aluno'})`, 0x6B7280);
     }
     chamados.delete(cid);
@@ -609,9 +630,9 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
     // diagnósticos citados neste chamado passam a "respondido"
     const codigos = [...(codigosDe.get(cid) || [])];
     if (codigos.length && txt && cfg.diag) {
-      const { data: marcados } = await db().from(cfg.tabelaDiag)
+      const { data: marcados } = await porFonte(codigos, (q, f, cs) => q
         .update({ status: 'respondido', resposta: txt.slice(0, 4000), respondido_em: new Date().toISOString(), respondido_por: quem, respondido_via: 'chamado' })
-        .in('codigo', codigos).or('status.is.null,status.not.in.(respondido,encerrado)').select('codigo, staff_msg_id');
+        .in('codigo', cs).or('status.is.null,status.not.in.(respondido,encerrado)').select('codigo, staff_msg_id'));
       await atualizarCartoesDiag(marcados, `respondido 📌 no chamado por ${quem}`, 0x22C55E, txt);
     }
   }
@@ -638,7 +659,7 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
   // Cartão do #diagnosticos ganha o atalho pro chamado: a resposta passa a ser dada lá
   async function ligarCartaoDiag(codigo, staffId) {
     try {
-      const { data: d } = await db().from(cfg.tabelaDiag).select('id, codigo, staff_msg_id, status').eq('codigo', codigo).maybeSingle();
+      const { data: d } = await db().from(fonteDe(codigo).tabela).select('id, codigo, staff_msg_id, status').eq('codigo', codigo).maybeSingle();
       if (!d?.staff_msg_id || ['respondido', 'encerrado'].includes(d.status)) return;
       const canal = await client.channels.fetch(CANAL_DIAG);
       const msg = await canal.messages.fetch(d.staff_msg_id).catch(() => null);
@@ -657,8 +678,8 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
   // ── chamado 📧 (aluno sem Discord): resposta sai por e-mail ─────────────────
   async function dadosDoAlunoEmail(cid) {
     const codigos = [...(codigosDe.get(cid) || [])];
-    const { data } = await db().from(cfg.tabelaDiag).select(`codigo, email, nome, criado, ${cfg.camposAluno}`).in('codigo', codigos).order('criado', { ascending: false });
-    const d = (data || [])[0] || {};
+    const { data } = await porFonte(codigos, (q, f, cs) => q.select(`codigo, email, nome, criado, ${cfg.camposAluno}`).in('codigo', cs));
+    const d = maisNovoPrimeiro(data || [])[0] || {};
     let email = d.email, nome = d.nome;
     if ((!email || !nome) && d.chave) {
       const { data: lic } = await db().from('licenses').select('email, name').eq('key', d.chave).maybeSingle();
@@ -678,9 +699,9 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
       if (st) await marcarStatus(st, 'Em atendimento');
       await atualizarFila();
     }
-    const { data: marcados } = await db().from(cfg.tabelaDiag)
+    const { data: marcados } = await porFonte(a.codigos, (q, f, cs) => q
       .update({ status: 'respondido', resposta: (txt || '').slice(0, 4000), respondido_em: new Date().toISOString(), respondido_por: quem, respondido_via: 'email' })
-      .in('codigo', a.codigos).or('status.is.null,status.not.in.(respondido,encerrado)').select('codigo, staff_msg_id');
+      .in('codigo', cs).or('status.is.null,status.not.in.(respondido,encerrado)').select('codigo, staff_msg_id'));
     await atualizarCartoesDiag(marcados, `respondido 📧 por e-mail por ${quem}`, 0x22C55E, txt);
     const st = await client.channels.fetch(c?.staffId).catch(() => null);
     if (st) await st.send(`📧 Enviado por e-mail pra ${(a.email || '').replace(/^(.).*?@/, '$1***@')}.`);
@@ -696,7 +717,8 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
       try {
         const codigos = [...(codigosDe.get(cid) || [])];
         if (!codigos.length) continue;
-        const { data: dd } = await db().from(cfg.tabelaDiag).select('codigo, chave, plataforma, criado').in('codigo', codigos).order('criado', { ascending: false });
+        const { data: ddBruto } = await porFonte(codigos, (q, f, cs) => q.select('codigo, chave, plataforma, criado').in('codigo', cs));
+        const dd = maisNovoPrimeiro(ddBruto || []);
         const chaves = [...new Set((dd || []).map((x) => x.chave).filter(Boolean))];
         if (!chaves.length) continue;
         const { data: lics } = await db().from('licenses').select('discord_id').in('key', chaves).not('discord_id', 'is', null);
@@ -754,8 +776,9 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
   }
 
   async function abrirChamadoEmail(d) {
-    const { data: dd } = await db().from(cfg.tabelaDiag)
-      .select(`id, email, nome, ${cfg.camposAluno}, ${cfg.camposDiag}`).eq('codigo', d.codigo).maybeSingle();
+    const fonte = fonteDe(d.codigo);
+    const { data: dd } = await db().from(fonte.tabela)
+      .select(`id, email, nome, ${cfg.camposAluno}, ${fonte.campos}`).eq('codigo', d.codigo).maybeSingle();
     if (!dd) return null;
     let email = dd.email, lic = null;
     if (dd.chave) ({ data: lic } = await db().from('licenses').select('key, email, name, active, status, source').eq('key', dd.chave).maybeSingle());
@@ -830,7 +853,7 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
       if (cid.startsWith('mail:') || donos.get(cid) !== discordId) continue;
       anotarCodigo(cid, d.codigo);
       const st = await client.channels.fetch(c.staffId).catch(() => null);
-      const { data: dd } = await db().from(cfg.tabelaDiag).select(cfg.camposDiag).eq('codigo', d.codigo).maybeSingle();
+      const { data: dd } = await db().from(fonteDe(d.codigo).tabela).select(fonteDe(d.codigo).campos).eq('codigo', d.codigo).maybeSingle();
       if (st) { if (st.archived) await st.setArchived(false); await st.send({ embeds: [{ title: '🩺 Outro diagnóstico do mesmo aluno', description: textoDiag(dd, d.codigo), color: 0x3B82F6 }] }); }
       await ligarCartaoDiag(d.codigo, c.staffId);
       return cid;
@@ -926,7 +949,8 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
       const idCliente = ini.embeds[0].fields?.find((f) => f.name === 'Cliente')?.value?.match(/`(\d+)`/)?.[1];
       if (idCliente) donos.set(ref[1], idCliente);
       if (ref[1].startsWith('mail:') && cfg.diag) {   // chamado 📧: guarda o e-mail pra juntar diagnósticos do mesmo aluno
-        const { data: dm } = await db().from(cfg.tabelaDiag).select('email').eq('id', ref[1].slice(5)).maybeSingle();
+        let dm = null;   // o id do chamado 📧 é o id do diagnóstico; não diz de qual tabela → procura nas fontes
+        for (const f of FONTES) { if (!dm) ({ data: dm } = await db().from(f.tabela).select('email').eq('id', ref[1].slice(5)).maybeSingle()); }
         chamados.get(ref[1]).email = (dm?.email || '').toLowerCase() || null;
       }
       anotarCodigo(ref[1], ini.embeds[0].fields?.find((f) => f.name === 'Diagnóstico')?.value?.match(PADRAO_DIAG)?.[0]);
