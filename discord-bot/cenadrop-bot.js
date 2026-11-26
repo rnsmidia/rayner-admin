@@ -149,6 +149,7 @@ async function ativar(inter) {
       `💬 Apresente-se em <#${CH.geral}>\n` +
       `🛟 Dúvida ou problema? Abra um post em <#${CH.suporte}>\n` +
       `✨ Mostre suas melhores cenas na <#${CH.vitrine}>\n\n` +
+      'Usa o CenaDrop Multi? Volte ao programa e clique em **Já ativei, conferir**.\n\n' +
       '-# Prefere só o essencial (suporte e avisos), sem a conversa da comunidade? Use o botão abaixo — dá pra voltar quando quiser.',
     components: botoesPreferencia(),
   });
