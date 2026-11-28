@@ -2,13 +2,13 @@
  * CenaDrop Bot — ESPELHO das abas públicas do servidor CenaDrop dentro do Staff (16/10/26)
  *
  * O Rayner nunca entra no servidor CenaDrop com a conta pessoal (regra). Pra ele VER a comunidade
- * como o aluno vê, cada mensagem das abas abaixo é copiada ao vivo pra categoria 📡 ESPELHO CENADROP
+ * como o aluno vê, cada mensagem das abas abaixo é copiada ao vivo pra categoria 📡 ESPELHO A SALA (ex-ESPELHO CENADROP)
  * do Staff, por webhook (sai com o nome e a foto de quem escreveu; vídeo/imagem anexados tocam ali).
  * Edição e exclusão acompanham (enquanto o bot estiver ligado desde a mensagem). Canais só leitura.
  * Ao ligar, recupera o que chegou com o bot desligado (depois da última cópia; espelho vazio = últimas 30).
  *
  * RESPONDER PELO ESPELHO (29/10/26): o que a equipe escreve em #espelho-geral, #espelho-dicas ou #espelho-vitrine
- * vai pra aba de verdade como "Equipe CenaDrop". Usou o "Responder" do Discord numa mensagem do espelho → sai como
+ * vai pra aba de verdade como "Equipe A Sala". Usou o "Responder" do Discord numa mensagem do espelho → sai como
  * resposta àquela mensagem lá (marca o aluno). `//` no começo = nota interna (não vai). ✅ = entregue.
  * #espelho-avisos e #espelho-aulas continuam só leitura (aviso é pelo !aviso).
  */
@@ -78,7 +78,7 @@ module.exports = function espelho(client) {
     if (!content && !embeds.length && !files.length) return null;
     const eBot = msg.author.id === client.user.id;
     return {
-      username: (msg.type === 7 ? 'CenaDrop' : eBot ? 'Equipe A Sala' : (msg.member?.displayName || msg.author.globalName || msg.author.username)).slice(0, 80),
+      username: (msg.type === 7 ? 'A SALA' : eBot ? 'Equipe A Sala' : (msg.member?.displayName || msg.author.globalName || msg.author.username)).slice(0, 80),
       avatarURL: eBot || msg.type === 7 ? client.user.displayAvatarURL() : (msg.member?.displayAvatarURL() || msg.author.displayAvatarURL()),
       content: content || undefined, embeds, files, allowedMentions: { parse: [] },
     };
@@ -110,7 +110,7 @@ module.exports = function espelho(client) {
     return achada ? { canal: canalOrigem, id: achada.id } : null;
   }
 
-  // a equipe responde pelo espelho → vai pra aba de verdade como "Equipe CenaDrop"
+  // a equipe responde pelo espelho → vai pra aba de verdade como "Equipe A Sala"
   async function responderPeloEspelho(msg) {
     if (msg.author.bot || msg.webhookId) return;
     if (SO_LEITURA.has(msg.channelId)) {
