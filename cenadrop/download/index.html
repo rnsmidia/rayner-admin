@@ -3,235 +3,1005 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CenaDrop Flow — Download</title>
-<link rel="icon" href="/cenadrop/icon128.png">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<title>CenaDrop — Download</title>
+<meta name="description" content="Baixe o CenaDrop: automação de cenas em lote no Google Flow e no Google Vids.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="CenaDrop — Download">
+<meta property="og:description" content="Baixe o CenaDrop One (extensão para Chrome) e o CenaDrop Multi (Windows e Mac): cenas em lote no Google Flow e no Google Vids.">
+<meta property="og:url" content="https://www.cenadrop.com.br/download">
+<meta property="og:image" content="https://www.cenadrop.com.br/cenadrop/marca/compartilhar-1200x630.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/cenadrop/marca/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/cenadrop/marca/favicon.ico" sizes="48x48">
+<link rel="apple-touch-icon" href="/cenadrop/marca/apple-touch-icon-180.png">
+<meta name="theme-color" content="#0A0814">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200;12..96,400;12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0a0813; --surface:#100b22; --card:#14102a; --card2:#0d0a1c;
-  --border:#221a45; --border2:#2e2358;
-  --el:#6727CE; --lav:#9B7FFF; --lil:#D2A6E9; --blue:#4169FF;
-  --green:#4ade80; --amber:#ffb43a; --pink:#ff6f91;
-  --text:#eae8f6; --muted:#7a7398;
+  --bg:#07070f; --bg-2:#0c0b18; --surface:rgba(255,255,255,.035); --surface-2:rgba(255,255,255,.06);
+  --line:rgba(255,255,255,.08); --line-2:rgba(255,255,255,.14);
+  --flow:#8b5cf6; --flow-2:#b39dff; --vids:#f59e0b; --vids-2:#fde68a;
+  --ok:#4ade80; --text:#f4f3ff; --muted:#aaa7c6; --dim:#6f6c8e;
+  --font-display:"Bricolage Grotesque",sans-serif; --font-text:"Instrument Sans",sans-serif; --font-mono:"IBM Plex Mono",monospace;
+  --r:16px; --wrap:1280px;
 }
-*{box-sizing:border-box;margin:0;padding:0;}
-html{scroll-behavior:smooth;}
-body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
-a{color:inherit;text-decoration:none;}
-#particles-canvas{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.6;}
-.grid-bg{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(124,92,248,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(124,92,248,.03) 1px,transparent 1px);background-size:60px 60px;}
-.ambient-orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
-.a-orb{position:absolute;border-radius:50%;filter:blur(70px);}
-.a1{width:600px;height:400px;top:-10%;left:-10%;background:radial-gradient(ellipse,rgba(103,39,206,.13),transparent 70%);animation:orbdrift 22s ease-in-out infinite;}
-.a2{width:500px;height:500px;bottom:0;right:-8%;background:radial-gradient(ellipse,rgba(65,105,255,.08),transparent 70%);animation:orbdrift 28s ease-in-out infinite reverse;}
-@keyframes orbdrift{0%,100%{transform:translate(0,0);}50%{transform:translate(30px,-30px);}}
-.page{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:56px 24px 70px;}
-.logo-wrap{margin-bottom:26px;}
-.logo-box{width:80px;height:80px;border-radius:20px;overflow:hidden;box-shadow:0 0 0 1px rgba(124,92,248,.28),0 0 40px rgba(103,39,206,.22);animation:logopulse 4s ease-in-out infinite;}
-.logo-box img{width:100%;height:100%;object-fit:cover;display:block;}
-@keyframes logopulse{0%,100%{box-shadow:0 0 0 1px rgba(124,92,248,.25),0 0 30px rgba(103,39,206,.15);}50%{box-shadow:0 0 0 1px rgba(124,92,248,.45),0 0 50px rgba(103,39,206,.32);}}
-.hero{text-align:center;max-width:600px;width:100%;}
-.version-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(124,92,248,.08);border:1px solid rgba(124,92,248,.22);border-radius:100px;padding:6px 18px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--lav);margin-bottom:24px;}
-.pulse-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulsedot 2s infinite;}
-@keyframes pulsedot{0%{box-shadow:0 0 0 0 rgba(74,222,128,.4);}70%{box-shadow:0 0 0 8px rgba(74,222,128,0);}100%{box-shadow:0 0 0 0 rgba(74,222,128,0);}}
-.hero h1{font-size:clamp(32px,5vw,52px);font-weight:700;letter-spacing:-1.5px;line-height:1.05;margin-bottom:12px;}
-.hero h1 .hl{background:linear-gradient(135deg,var(--el),var(--lav),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.hero-sub{font-size:15px;color:var(--muted);line-height:1.7;margin-bottom:30px;max-width:460px;margin-inline:auto;}
-.btn-download{display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--el),var(--blue));color:#fff;font-weight:700;font-size:17px;padding:18px 40px;border-radius:14px;box-shadow:0 8px 30px rgba(103,39,206,.42);transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden;}
-.btn-download::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);transform:translateX(-100%);transition:transform .5s;}
-.btn-download:hover{transform:translateY(-3px);box-shadow:0 12px 42px rgba(103,39,206,.55);}
-.btn-download:hover::after{transform:translateX(100%);}
-.btn-icon{font-size:20px;}
-.desktop-note{margin-top:14px;font-size:12.5px;color:var(--muted);}
-.desktop-note b{color:var(--lil);}
-.trust-row{display:flex;background:var(--card);border:1px solid var(--border2);border-radius:14px;margin-top:30px;overflow:hidden;width:100%;max-width:600px;}
-.trust-item{flex:1;padding:14px 16px;text-align:center;border-right:1px solid var(--border);}
-.trust-item:last-child{border-right:none;}
-.trust-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-bottom:4px;}
-.trust-val{font-size:13px;font-weight:700;}
-.trust-val.green{color:var(--green);} .trust-val.accent{color:var(--lav);}
-.divider{width:100%;max-width:600px;height:1px;margin:48px 0 40px;background:linear-gradient(90deg,transparent,rgba(124,92,248,.3),transparent);}
-.section{width:100%;max-width:600px;}
-.section-title{font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-family:'JetBrains Mono',monospace;text-align:center;margin-bottom:24px;}
-.steps{display:flex;flex-direction:column;gap:12px;}
-.step-card{display:flex;gap:16px;align-items:flex-start;background:linear-gradient(160deg,var(--card),var(--card2));border:1px solid var(--border);border-radius:14px;padding:20px 22px;transition:border-color .25s;}
-.step-card:hover{border-color:rgba(124,92,248,.35);}
-.step-num{width:36px;height:36px;border-radius:10px;flex-shrink:0;background:rgba(103,39,206,.14);border:1px solid rgba(124,92,248,.3);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--lav);}
-.step-body{flex:1;}
-.step-body strong{display:block;font-size:14.5px;font-weight:700;color:var(--text);margin-bottom:5px;}
-.step-body span{font-size:13px;color:var(--muted);line-height:1.65;}
-.step-body code{font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(103,39,206,.1);border:1px solid rgba(124,92,248,.2);border-radius:5px;padding:1px 7px;color:var(--lav);}
-.os-line{display:flex;gap:10px;margin-top:9px;flex-wrap:wrap;}
-.os-pill{flex:1;min-width:180px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:9px;padding:9px 12px;font-size:12px;color:var(--muted);line-height:1.5;}
-.os-pill b{color:#c7c1e6;}
-.warn{margin-top:11px;background:rgba(255,180,58,.07);border:1px solid rgba(255,180,58,.24);border-radius:9px;padding:10px 13px;font-size:12.5px;color:#e9c98f;line-height:1.6;}
-.warn b{color:var(--amber);}
-.tag-ok{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2);border-radius:5px;padding:1px 7px;color:var(--green);}
-.keyfmt{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:1px;color:var(--lil);background:rgba(103,39,206,.1);border:1px solid rgba(124,92,248,.2);border-radius:5px;padding:2px 8px;}
-/* troubleshooting */
-.faq{display:flex;flex-direction:column;gap:10px;}
-.faq details{background:linear-gradient(160deg,var(--card),var(--card2));border:1px solid var(--border);border-radius:12px;overflow:hidden;}
-.faq summary{list-style:none;cursor:pointer;padding:15px 18px;font-size:13.5px;font-weight:600;color:#d6d1ee;display:flex;align-items:center;justify-content:space-between;gap:10px;}
-.faq summary::-webkit-details-marker{display:none;}
-.faq summary::after{content:'+';font-size:18px;color:var(--lav);font-weight:400;}
-.faq details[open] summary::after{content:'–';}
-.faq .ans{padding:0 18px 16px;font-size:13px;color:var(--muted);line-height:1.7;}
-.faq .ans code{font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(103,39,206,.1);border:1px solid rgba(124,92,248,.2);border-radius:5px;padding:1px 6px;color:var(--lav);}
-/* support */
-.support{margin-top:44px;width:100%;max-width:600px;background:linear-gradient(160deg,var(--card),var(--card2));border:1px solid var(--border);border-radius:16px;padding:26px;text-align:center;}
-.support h3{font-size:17px;font-weight:700;margin-bottom:6px;}
-.support p{font-size:13.5px;color:var(--muted);margin-bottom:18px;}
-.support-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
-.sbtn{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:700;padding:12px 24px;border-radius:12px;}
-.sbtn.wa{background:#25D366;color:#052e16;}
-.sbtn.mail{background:rgba(124,92,248,.1);border:1px solid rgba(124,92,248,.32);color:var(--lav);}
-.footer{margin-top:40px;text-align:center;font-size:12px;color:var(--muted);line-height:1.8;width:100%;max-width:600px;}
-.footer-brand{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(124,92,248,.4);margin-top:12px;}
-@media(max-width:520px){.trust-row{flex-direction:column;}.trust-item{border-right:none;border-bottom:1px solid var(--border);}.trust-item:last-child{border-bottom:none;}}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{font-family:var(--font-text);background:var(--bg);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+code{font-family:var(--font-mono);font-size:.86em;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);border-radius:6px;padding:1px 7px;color:var(--flow-2);white-space:nowrap}
+[data-reveal]{opacity:0;transform:translateY(18px)}
+@media (prefers-reduced-motion:reduce){[data-reveal]{opacity:1;transform:none}}
+
+/* ── fundo em 3 camadas ── */
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bg__glow{position:absolute;inset:-20%;background:
+  radial-gradient(34% 30% at 20% 6%,rgba(139,92,246,.38),transparent 62%),
+  radial-gradient(28% 26% at 84% 14%,rgba(245,158,11,.20),transparent 62%),
+  radial-gradient(40% 30% at 50% 100%,rgba(139,92,246,.10),transparent 70%);
+  animation:drift 24s ease-in-out infinite alternate}
+@keyframes drift{to{transform:translate3d(2%,3%,0) scale(1.05)}}
+.bg__grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:64px 64px;-webkit-mask-image:radial-gradient(60% 50% at 50% 0%,#000 20%,transparent 100%);mask-image:radial-gradient(60% 50% at 50% 0%,#000 20%,transparent 100%)}
+.bg__noise{position:absolute;inset:0;opacity:.3;mix-blend-mode:overlay;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.35 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+
+/* ── nav ── */
+.nav{position:sticky;top:0;z-index:20;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);background:rgba(7,7,15,.62);border-bottom:1px solid var(--line)}
+.nav__in{max-width:var(--wrap);margin:0 auto;height:64px;padding:0 24px;display:flex;align-items:center;gap:28px}
+.brand{display:flex;align-items:center;gap:10px;font-family:"Syne","Arial Black",system-ui,sans-serif;font-weight:800;font-size:19px;letter-spacing:-.01em;color:#EFEDF8}
+.brand img{width:30px;height:30px;display:block}
+.nav__links{display:flex;gap:22px;margin-left:auto;font-size:14px;color:var(--muted)}
+.nav__links a:hover{color:var(--text)}
+.nav__cta{font-size:13.5px;font-weight:700;padding:9px 16px;border-radius:10px;background:var(--text);color:#0a0913}
+.nav__yt{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700;padding:8px 14px;border-radius:10px;border:1px solid var(--line-2);background:rgba(255,255,255,.04);color:var(--text);transition:border-color .2s,background .2s;margin-right:-16px}
+.nav__yt:hover{border-color:rgba(255,0,0,.55);background:rgba(255,0,0,.08)}
+.nav__yt svg{width:18px;height:13px;flex:none}
+.nav__yt .curto{display:none}
+@media(max-width:760px){.nav__links{display:none}.nav__yt{margin-left:auto;margin-right:-18px;padding:8px 11px}.nav__yt .longo{display:none}.nav__yt .curto{display:inline}}
+@media(max-width:480px){.nav__in{gap:16px;padding:0 16px}.brand{font-size:16px;gap:8px}.brand img{width:26px;height:26px}}
+
+.wrap{position:relative;z-index:1;max-width:var(--wrap);margin:0 auto;padding:0 24px}
+section{position:relative;z-index:1}
+
+/* ── hero ── */
+.hero{display:grid;grid-template-columns:minmax(0,.72fr) minmax(0,1.28fr);gap:48px;align-items:center;padding:72px 0 88px}
+@media(max-width:980px){.hero{grid-template-columns:minmax(0,1fr);gap:44px;padding:48px 0 64px}}
+.badge{display:inline-flex;align-items:center;gap:9px;font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line-2);background:var(--surface);border-radius:100px;padding:7px 14px;margin-bottom:26px}
+.badge b{color:var(--text);font-weight:600}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 0 rgba(74,222,128,.5);animation:pulse 2s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 8px rgba(74,222,128,0)}100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}}
+.h1{font-family:var(--font-display);font-size:clamp(44px,5.2vw,72px);line-height:.94;letter-spacing:-.045em;font-weight:200}
+.h1 strong{font-weight:800;display:block}
+.h1 .fl{color:var(--flow-2)} .h1 .vd{background:linear-gradient(120deg,var(--vids),var(--vids-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{margin-top:24px;font-size:18px;line-height:1.6;color:var(--muted);max-width:480px}
+.lead b{color:var(--text);font-weight:600}
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:34px;align-items:center}
+.btn-dl{display:inline-flex;align-items:center;gap:12px;font-weight:700;font-size:16.5px;padding:17px 28px;border-radius:14px;color:#140c02;background:linear-gradient(135deg,#fbbf24,#f59e0b 55%,#d97706);box-shadow:0 10px 40px -8px rgba(245,158,11,.55),inset 0 1px 0 rgba(255,255,255,.4);will-change:transform}
+.btn-dl svg{width:20px;height:20px}
+.btn-dl small{font-family:var(--font-mono);font-weight:500;font-size:12px;opacity:.7}
+.btn-ghost{display:inline-flex;align-items:center;gap:9px;font-weight:600;font-size:15px;padding:16px 22px;border-radius:14px;border:1px solid var(--line-2);background:var(--surface);transition:border-color .2s,background .2s}
+.btn-ghost:hover{border-color:rgba(255,255,255,.3);background:var(--surface-2)}
+.note{margin-top:18px;font-size:13.5px;color:var(--dim)}
+.note b{color:var(--muted);font-weight:600}
+
+.btn-soon{display:inline-flex;align-items:center;gap:12px;font-weight:700;font-size:16.5px;padding:16px 26px;border-radius:14px;color:var(--vids-2);border:1.5px dashed rgba(251,191,36,.55);background:rgba(245,158,11,.08);cursor:default}
+.btn-soon i{font-style:normal;font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;padding:3px 8px;border-radius:6px;background:#f59e0b;color:#140c02;animation:soon 2.4s ease-in-out infinite}
+@keyframes soon{50%{box-shadow:0 0 0 6px rgba(245,158,11,0),0 0 18px rgba(245,158,11,.55)}}
+.badge.soon .dot{background:#f59e0b;animation:none;box-shadow:0 0 10px rgba(245,158,11,.8)}
+.badge .st-lbl{color:var(--vids-2)}
+/* versões lado a lado */
+.vers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:40px}
+@media(max-width:820px){.vers{grid-template-columns:minmax(0,1fr)}}
+.ver{border-radius:22px;padding:26px 28px;border:1px solid var(--line);background:rgba(255,255,255,.02);display:flex;flex-direction:column;gap:14px}
+.ver.atual{border-color:rgba(245,158,11,.35);background:radial-gradient(80% 90% at 100% 0%,rgba(245,158,11,.14),transparent 60%),rgba(255,255,255,.02)}
+.ver .vt{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ver .pill{font-family:var(--font-mono);font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:7px;border:1px solid var(--line-2);color:var(--muted)}
+.ver .pill.soon{background:#f59e0b;border-color:#f59e0b;color:#140c02}
+.ver .pill.ok{background:rgba(74,222,128,.12);border-color:rgba(74,222,128,.35);color:#bbf7d0}
+.ver .vn{font-family:var(--font-display);font-weight:800;font-size:44px;letter-spacing:-1.5px;line-height:1}
+.ver .vd{font-size:14px;color:var(--muted);line-height:1.55}
+.ver .vd b{color:var(--text);font-weight:600}
+.ver .va{margin-top:auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.ver .va .btn-dl,.ver .va .btn-soon{font-size:15px;padding:13px 20px}
+.ver .va .btn-ghost{font-size:14.5px;padding:13px 18px}
+.ver .va small{font-size:12.5px;color:var(--dim)}
+
+/* ── palco (880×540 fixo, escalado) ── */
+.palco-wrap{position:relative;width:100%}
+.palco-scaler{width:880px;height:540px;transform-origin:top left}
+.palco-scaler.compacto{width:620px}
+.pc{width:100%;height:100%;border-radius:18px;overflow:hidden;background:#0d0c16;border:1px solid var(--line-2);box-shadow:0 40px 90px -30px rgba(0,0,0,.9),0 0 0 1px rgba(255,255,255,.03),0 0 80px -20px rgba(245,158,11,.25);display:flex;flex-direction:column;position:relative;font-family:var(--font-text)}
+.pc__bar{height:42px;flex:none;display:flex;align-items:center;gap:14px;padding:0 14px;background:#15131f;border-bottom:1px solid var(--line)}
+.dots{display:flex;gap:6px}.dots i{width:10px;height:10px;border-radius:50%;background:#2d2a3d}
+.tabs{display:flex;gap:4px;height:100%;align-items:flex-end}
+.tab{position:relative;height:32px;width:150px;border-radius:9px 9px 0 0;padding:0 12px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--dim);overflow:hidden}
+.tab .on{position:absolute;inset:0;background:#0d0c16;border:1px solid var(--line);border-bottom:0;border-radius:9px 9px 0 0;opacity:0}
+.tab span,.tab em{position:relative}
+.tab em{width:14px;height:14px;border-radius:4px;flex:none}
+.tab.f em{background:linear-gradient(135deg,#8b5cf6,#4169ff)} .tab.v em{background:linear-gradient(135deg,#fbbf24,#f59e0b)}
+.url{flex:1;height:26px;border-radius:8px;background:#0d0c16;border:1px solid var(--line);position:relative;font-family:var(--font-mono);font-size:11.5px;color:var(--muted)}
+.url span{position:absolute;left:12px;top:50%;transform:translateY(-50%)}
+.pc__body{flex:1;display:grid;grid-template-columns:minmax(0,1fr) 300px;min-height:0}
+.compacto .pc__body{grid-template-columns:minmax(0,1fr) 290px}
+/* página (esquerda) */
+.pg{position:relative;overflow:hidden}
+.pg-flow,.pg-vids{position:absolute;inset:0;padding:18px}
+.pg-flow{background:radial-gradient(60% 50% at 50% 30%,rgba(139,92,246,.14),transparent),#0b0a13;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+.pg-flow .logo-g{font-family:var(--font-display);font-weight:600;font-size:22px;color:#ddd6fe;letter-spacing:-.4px}
+.pg-flow .comp{width:78%;height:46px;border-radius:14px;border:1px solid rgba(139,92,246,.35);background:rgba(255,255,255,.03);display:flex;align-items:center;padding:0 14px;font-size:12px;color:var(--dim)}
+.pg-vids{background:#f7f6f3;color:#1f1d2b;opacity:0}
+.pg-vids h4{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.pg-vids h4 i{width:16px;height:16px;border-radius:4px;background:linear-gradient(135deg,#fbbf24,#f59e0b)}
+.slots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.compacto .slot{height:62px}
+.slot{position:relative;height:96px;border-radius:9px;overflow:hidden;background:#e7e4dc}
+.slot .shim{position:absolute;inset:0;opacity:0;background:linear-gradient(100deg,#e7e4dc 30%,#f3f0e9 50%,#e7e4dc 70%);background-size:220% 100%;animation:shim 1.3s linear infinite}
+@keyframes shim{from{background-position:120% 0}to{background-position:-120% 0}}
+.slot video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0}
+.slot .n{position:absolute;left:6px;top:6px;font-family:var(--font-mono);font-size:10px;font-weight:600;padding:1px 6px;border-radius:5px;background:rgba(255,255,255,.85);color:#1f1d2b}
+.slot .pb{position:absolute;left:0;bottom:0;height:3px;width:100%;background:#f59e0b;transform-origin:left;transform:scaleX(0)}
+.slot.vazio{display:flex;align-items:center;justify-content:center;color:#b7b2a6;font-size:22px;background:transparent;border:1.5px dashed #d8d3c7}
+.vids-foot{margin-top:12px;display:flex;align-items:center;gap:8px;font-size:11.5px;color:#6b6778}
+.vids-foot b{color:#1f1d2b}
+/* painel CenaDrop (direita) */
+.cd{position:relative;border-left:1px solid var(--line);background:#0f0e19;padding:12px 12px 10px;display:flex;flex-direction:column;gap:8px;overflow:hidden;font-size:11.5px}
+.cd .skin{position:absolute;inset:0;pointer-events:none}
+.cd .skin.f{background:linear-gradient(180deg,rgba(139,92,246,.12),transparent 30%)}
+.cd .skin.v{background:linear-gradient(180deg,rgba(251,191,36,.12),transparent 30%);opacity:0}
+.cd > *:not(.skin){position:relative}
+.cd-h{display:flex;align-items:center;gap:8px}
+.cd-h img{width:24px;height:24px;display:block}
+.cd-t{font-family:"Syne","Arial Black",system-ui,sans-serif;font-weight:800;font-size:14px;letter-spacing:-.01em;color:#EFEDF8;display:flex;gap:5px;white-space:nowrap}
+.swap{position:relative;display:inline-block}
+.swap > *{display:inline-block;white-space:nowrap}
+.swap > .sb{position:absolute;left:0;top:0;opacity:0}
+.acc-f{background:linear-gradient(100deg,#9B78FF,#D59BFF);-webkit-background-clip:text;background-clip:text;color:transparent} .acc-v{background:linear-gradient(135deg,#f59e0b,#fde68a);-webkit-background-clip:text;background-clip:text;color:transparent}
+.vb{margin-left:auto;font-family:var(--font-mono);font-size:9.5px;font-weight:600;padding:2px 7px;border-radius:6px;border:1px solid var(--line-2);color:var(--muted)}
+.conn{display:flex;align-items:center;gap:7px;padding:6px 9px;border-radius:8px;background:rgba(74,222,128,.07);border:1px solid rgba(74,222,128,.2);color:#bbf7d0;font-size:11px}
+.conn i{width:6px;height:6px;border-radius:50%;background:var(--ok)}
+.card{border:1px solid var(--line);background:rgba(255,255,255,.025);border-radius:9px;padding:8px 10px}
+.cota .row{display:flex;justify-content:space-between;align-items:baseline}
+.cota .lab{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.cota .num{font-family:var(--font-mono);font-weight:600;color:var(--vids-2)}
+.cota .bar{margin-top:6px;height:4px;border-radius:4px;background:rgba(255,255,255,.07);overflow:hidden}
+.cota .bar i{display:block;height:100%;width:98.5%;background:linear-gradient(90deg,#f59e0b,#fde68a)}
+.cota .sub{margin-top:5px;font-size:10px;color:var(--dim)}
+.csv{display:flex;align-items:center;gap:8px}
+.csv .ic{width:24px;height:24px;border-radius:6px;display:grid;place-items:center;background:rgba(245,158,11,.14);color:var(--vids-2);font-size:10px;font-family:var(--font-mono);font-weight:600}
+.csv .fn{font-family:var(--font-mono);font-size:11px;min-height:14px}
+.csv .ct{margin-left:auto;color:var(--dim);font-size:10.5px}
+.eln{display:flex;align-items:center;gap:8px}
+.eln img{width:26px;height:26px;border-radius:50%;object-fit:cover;border:1.5px solid rgba(251,191,36,.6)}
+.eln .avs{display:flex}
+.eln .avs img{margin-left:-7px;box-shadow:0 0 0 2px #0f0e19}
+.eln .avs img:first-child{margin-left:0}
+.eln .k{font-size:10px;color:var(--dim)}
+.eln .tag{margin-left:auto;font-size:10px;color:var(--vids-2);border:1px solid rgba(251,191,36,.3);border-radius:6px;padding:1px 6px}
+.par{display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--muted)}
+.par .pills{margin-left:auto;display:flex;gap:3px}
+.par .pills i{width:17px;height:17px;border-radius:5px;display:grid;place-items:center;font-style:normal;font-family:var(--font-mono);font-size:9.5px;border:1px solid var(--line-2);color:var(--dim);position:relative;overflow:hidden}
+.par .pills i u{position:absolute;inset:0;background:#f59e0b;opacity:0}
+.par .pills i b{position:relative;font-weight:600}
+.go{position:relative;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#140c02;background:linear-gradient(135deg,#fbbf24,#f59e0b);overflow:hidden}
+.go .swap > *{white-space:nowrap}
+.go .swap > .sb{left:50%;transform:translateX(-50%)}
+.q{position:relative;max-height:134px;overflow:hidden}
+.q__in{display:flex;flex-direction:column;gap:4px}
+.qr{display:flex;align-items:center;gap:7px;padding:4px 7px;border-radius:7px;background:rgba(255,255,255,.025);border:1px solid var(--line);opacity:0;position:relative;overflow:hidden}
+.qr .qn{font-family:var(--font-mono);font-size:10px;color:var(--vids-2)}
+.qr .qt{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10.5px;color:var(--muted)}
+.qr .qt b{color:var(--text);font-weight:600}
+.qr .st{font-size:9.5px;font-family:var(--font-mono);width:58px;text-align:right}
+.qr .st .sa{color:var(--vids-2)} .qr .st .sb{color:var(--ok);right:0;left:auto}
+.qr .qb{position:absolute;left:0;bottom:0;height:2px;width:100%;background:#f59e0b;transform-origin:left;transform:scaleX(0)}
+.tot{margin-top:auto;display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:10px;color:var(--dim)}
+.tot b{color:var(--text)}
+.pc__shelf{height:36px;flex:none;border-top:1px solid var(--line);background:#15131f;display:flex;align-items:center;gap:6px;padding:0 12px;overflow:hidden}
+.pc__shelf .lab{font-size:10.5px;color:var(--dim);margin-right:4px;white-space:nowrap}
+.shelf__vp{flex:1;min-width:0;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 12px);mask-image:linear-gradient(90deg,transparent,#000 12px);padding-left:4px}
+.shelf__in{display:flex;gap:6px}
+.chip{display:flex;align-items:center;gap:5px;font-family:var(--font-mono);font-size:10px;padding:4px 8px;border-radius:7px;background:rgba(255,255,255,.05);border:1px solid var(--line);white-space:nowrap;opacity:0}
+.chip i{color:var(--ok);font-style:normal}
+
+.cursor{position:absolute;left:0;top:0;width:18px;height:18px;z-index:5;pointer-events:none;opacity:0}
+.cursor svg{width:18px;height:18px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.6))}
+.cursor .rip{position:absolute;left:-9px;top:-9px;width:36px;height:36px;border-radius:50%;border:2px solid rgba(253,230,138,.9);opacity:0;transform:scale(.3)}
+.palco-cap{margin-top:16px;text-align:center;font-size:12.5px;color:var(--dim)}
+.palco-cap b{color:var(--muted);font-weight:600}
+
+/* ── seções ── */
+.sec{padding:96px 0}
+.eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--vids)}
+.h2{font-family:var(--font-display);font-size:clamp(34px,4.6vw,58px);line-height:1;letter-spacing:-.04em;font-weight:200;margin-top:14px;max-width:760px}
+.h2 strong{font-weight:800}
+.intro{margin-top:18px;font-size:17px;line-height:1.65;color:var(--muted);max-width:620px}
+
+/* bento */
+.bento{margin-top:48px;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px}
+.b{border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.015));border-radius:20px;padding:26px;position:relative;overflow:hidden}
+.b h3{font-family:var(--font-display);font-weight:600;font-size:21px;letter-spacing:-.4px;margin-top:10px}
+.b p{margin-top:8px;font-size:14.5px;line-height:1.6;color:var(--muted)}
+.b .big{font-family:var(--font-display);font-weight:800;font-size:clamp(64px,8vw,104px);line-height:.85;letter-spacing:-.05em}
+.b .big small{font-size:.32em;font-weight:400;letter-spacing:-.02em;color:var(--muted);margin-left:6px}
+.b1{grid-column:span 3;background:radial-gradient(80% 70% at 100% 0%,rgba(245,158,11,.16),transparent 60%),linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.015))}
+.b1 .big{background:linear-gradient(135deg,#fbbf24,#fde68a);-webkit-background-clip:text;background-clip:text;color:transparent}
+.b2{grid-column:span 3}
+.b3,.b4,.b5{grid-column:span 2}
+.lanes{display:flex;gap:6px;margin-top:18px}
+.lanes i{flex:1;height:34px;border-radius:8px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.22);position:relative;overflow:hidden}
+.lanes i::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(253,230,138,.35),transparent);transform:translateX(-100%);animation:lane 2.4s ease-in-out infinite}
+.lanes i:nth-child(2)::after{animation-delay:.3s}.lanes i:nth-child(3)::after{animation-delay:.6s}.lanes i:nth-child(4)::after{animation-delay:.9s}.lanes i:nth-child(5)::after{animation-delay:1.2s}
+@keyframes lane{to{transform:translateX(100%)}}
+.prompt{margin-top:16px;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:rgba(0,0,0,.3);border:1px solid var(--line);font-family:var(--font-mono);font-size:12px;color:var(--muted)}
+.prompt img{width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid rgba(251,191,36,.7)}
+.prompt mark{background:rgba(245,158,11,.2);color:var(--vids-2);border-radius:4px;padding:0 4px}
+.meter{margin-top:18px}
+.meter .row{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:12px;color:var(--muted)}
+.meter .row b{color:var(--vids-2);font-weight:600}
+.meter .bar{margin-top:8px;height:8px;border-radius:8px;background:rgba(255,255,255,.07);overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#f59e0b,#fde68a)}
+.swatch{display:flex;gap:10px;margin-top:18px}
+.swatch div{flex:1;border-radius:12px;padding:12px;font-size:12.5px;font-weight:600;border:1px solid}
+.swatch .sf{border-color:rgba(139,92,246,.4);background:rgba(139,92,246,.12);color:#ddd6fe}
+.swatch .sv{border-color:rgba(245,158,11,.4);background:rgba(245,158,11,.12);color:#fde68a}
+.swatch small{display:block;font-weight:400;color:var(--muted);margin-top:3px;font-size:11.5px}
+@media(max-width:900px){.b1,.b2{grid-column:span 6}.b3,.b4,.b5{grid-column:span 3}}
+@media(max-width:620px){.bento{grid-template-columns:minmax(0,1fr)}.b1,.b2,.b3,.b4,.b5{grid-column:auto}}
+
+/* Flow × Vids */
+.duo{margin-top:48px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media(max-width:820px){.duo{grid-template-columns:minmax(0,1fr)}}
+.lane{border-radius:22px;padding:30px;border:1px solid;position:relative;overflow:hidden}
+.lane.f{border-color:rgba(139,92,246,.3);background:radial-gradient(90% 60% at 0% 0%,rgba(139,92,246,.18),transparent 60%),rgba(255,255,255,.02)}
+.lane.v{border-color:rgba(245,158,11,.3);background:radial-gradient(90% 60% at 100% 0%,rgba(245,158,11,.16),transparent 60%),rgba(255,255,255,.02)}
+.lane .top{display:flex;align-items:center;gap:12px}
+.lane .sq{width:40px;height:40px;border-radius:11px}
+.lane.f .sq{background:linear-gradient(135deg,#8b5cf6,#4169ff)} .lane.v .sq{background:linear-gradient(135deg,#fbbf24,#f59e0b)}
+.lane h3{font-family:var(--font-display);font-size:28px;font-weight:800;letter-spacing:-.6px}
+.lane .where{font-family:var(--font-mono);font-size:12px;color:var(--dim)}
+.lane ul{list-style:none;margin-top:22px;display:flex;flex-direction:column;gap:11px}
+.lane li{display:flex;gap:11px;font-size:15px;line-height:1.5;color:#dcd9ef}
+.lane li::before{content:"";flex:none;width:7px;height:7px;border-radius:50%;margin-top:8px}
+.lane.f li::before{background:var(--flow-2)} .lane.v li::before{background:var(--vids)}
+.lane .open{margin-top:24px;display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;padding:11px 16px;border-radius:11px;border:1px solid var(--line-2);background:var(--surface)}
+.lane .open:hover{background:var(--surface-2)}
+.plans{margin-top:14px;border:1px solid var(--line);border-radius:22px;padding:24px 28px;display:grid;grid-template-columns:auto repeat(3,minmax(0,1fr));gap:26px;align-items:center;background:rgba(255,255,255,.02)}
+.plans .t{font-family:var(--font-display);font-weight:600;font-size:17px;max-width:210px;line-height:1.3}
+.plans .t small{display:block;font-family:var(--font-text);font-weight:400;font-size:12.5px;color:var(--dim);margin-top:6px}
+.plan .pn{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.plan .pv{font-family:var(--font-display);font-weight:800;font-size:34px;letter-spacing:-1px;margin-top:4px}
+.plan .pv small{font-size:14px;font-weight:400;color:var(--muted);letter-spacing:0}
+.plan.ultra .pv{color:var(--vids-2)}
+@media(max-width:820px){.plans{grid-template-columns:repeat(3,minmax(0,1fr))}.plans .t{grid-column:1/-1;max-width:none}}
+
+/* instalação */
+.switch{margin-top:40px;display:inline-flex;padding:5px;border-radius:14px;border:1px solid var(--line-2);background:var(--surface);position:relative}
+.switch button{position:relative;z-index:1;padding:11px 18px;border-radius:10px;font-size:14.5px;font-weight:600;color:var(--muted);transition:color .25s}
+.switch button.on{color:#140c02}
+.switch .knob{position:absolute;top:5px;bottom:5px;left:5px;border-radius:10px;background:linear-gradient(135deg,#fbbf24,#f59e0b);transition:transform .35s cubic-bezier(.6,0,.2,1),width .35s cubic-bezier(.6,0,.2,1)}
+.steps{margin-top:22px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.steps[hidden]{display:none}
+@media(min-width:981px){#atualizar.steps{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:980px){.steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.steps{grid-template-columns:minmax(0,1fr)}}
+.st-card{border:1px solid var(--line);border-radius:18px;padding:22px;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.012));display:flex;flex-direction:column}
+.st-num{font-family:var(--font-display);font-weight:800;font-size:44px;line-height:1;letter-spacing:-2px;color:transparent;-webkit-text-stroke:1.2px rgba(253,230,138,.55)}
+.st-card h4{margin-top:14px;font-size:16.5px;font-weight:700;line-height:1.35}
+.st-card p{margin-top:8px;font-size:14px;line-height:1.6;color:var(--muted)}
+.st-card p b{color:var(--text);font-weight:600}
+.st-card .os{margin-top:12px;display:flex;flex-direction:column;gap:6px}
+.st-card .os span{font-size:12.5px;color:var(--muted);padding:7px 10px;border-radius:9px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
+.st-card .os b{color:#e6e3f5}
+.st-card .warn{margin-top:12px;font-size:12.5px;line-height:1.55;color:#f3d9a4;padding:9px 11px;border-radius:10px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25)}
+.st-card .mini-dl{margin-top:auto;padding-top:14px}
+.st-card .mini-dl a{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700;padding:10px 14px;border-radius:10px;color:#140c02;background:linear-gradient(135deg,#fbbf24,#f59e0b)}
+.keyfmt{font-family:var(--font-mono);font-size:12.5px;letter-spacing:1px;color:var(--vids-2)}
+.keep{margin-top:16px;display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:14px;border:1px solid rgba(74,222,128,.22);background:rgba(74,222,128,.06);font-size:14.5px;color:#cdf5da}
+.keep[hidden]{display:none}
+
+/* aula */
+.aula{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr);gap:40px;align-items:center}
+@media(max-width:900px){.aula{grid-template-columns:minmax(0,1fr)}}
+.yt{position:relative;aspect-ratio:16/9;border-radius:20px;overflow:hidden;border:1px solid var(--line-2);background:#000;box-shadow:0 40px 80px -30px rgba(0,0,0,.8)}
+.yt img,.yt iframe{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border:0}
+.yt button{position:absolute;inset:0;display:grid;place-items:center;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,.55))}
+.yt .play{width:78px;height:78px;border-radius:50%;background:linear-gradient(135deg,#fbbf24,#f59e0b);display:grid;place-items:center;box-shadow:0 10px 40px rgba(245,158,11,.5);transition:transform .25s}
+.yt button:hover .play{transform:scale(1.07)}
+.yt .play svg{width:30px;height:30px;margin-left:5px}
+.yt .lbl{position:absolute;left:20px;bottom:18px;font-weight:600;font-size:15px;text-align:left}
+.yt .lbl small{display:block;font-family:var(--font-mono);font-weight:400;font-size:11.5px;color:#d7d3e8;letter-spacing:.06em;text-transform:uppercase}
+.reel{margin-top:14px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.reel figure{position:relative;aspect-ratio:16/9;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+.reel video{width:100%;height:100%;object-fit:cover;display:block}
+.reel figcaption{position:absolute;left:5px;top:5px;font-family:var(--font-mono);font-size:10px;padding:1px 6px;border-radius:5px;background:rgba(0,0,0,.6)}
+.aula-txt .h2{font-size:clamp(30px,3.6vw,46px)}
+.aula-txt ol{margin-top:22px;list-style:none;counter-reset:a;display:flex;flex-direction:column;gap:12px}
+.aula-txt li{counter-increment:a;display:flex;gap:12px;font-size:15px;line-height:1.5;color:#dcd9ef}
+.aula-txt li::before{content:counter(a,decimal-leading-zero);font-family:var(--font-mono);font-size:12px;color:var(--vids);padding-top:3px}
+
+/* faq */
+.faq{margin-top:40px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}
+@media(max-width:820px){.faq{grid-template-columns:minmax(0,1fr)}}
+.faq details{border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.025);overflow:hidden}
+.faq summary{list-style:none;cursor:pointer;padding:18px 20px;font-weight:600;font-size:15px;display:flex;justify-content:space-between;gap:14px;align-items:center}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";font-size:22px;font-weight:300;color:var(--vids);transition:transform .25s}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq .ans{padding:0 20px 18px;font-size:14.5px;line-height:1.65;color:var(--muted)}
+.faq .ans b{color:var(--text);font-weight:600}
+.tag-new{font-family:var(--font-mono);font-size:10px;font-weight:600;letter-spacing:.08em;padding:2px 7px;border-radius:6px;background:rgba(245,158,11,.15);color:var(--vids-2);margin-right:8px;vertical-align:2px}
+
+/* suporte */
+.help{margin:0 auto;max-width:880px;text-align:center;border-radius:28px;padding:56px 32px;border:1px solid var(--line-2);background:radial-gradient(70% 90% at 50% 0%,rgba(139,92,246,.2),transparent 60%),radial-gradient(60% 80% at 50% 100%,rgba(245,158,11,.12),transparent 60%),rgba(255,255,255,.02)}
+.help .h2{margin:0 auto;font-size:clamp(30px,4vw,48px)}
+.help p{margin-top:14px;color:var(--muted);font-size:16px}
+.help .btns{margin-top:28px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.dc{display:inline-flex;align-items:center;gap:10px;font-weight:700;padding:15px 22px;border-radius:13px;background:#5865F2;color:#fff;cursor:pointer;transition:transform .2s,box-shadow .2s}.dc:hover{transform:translateY(-2px);box-shadow:0 12px 30px -10px rgba(88,101,242,.8)}
+.dc svg{width:22px;height:22px;flex:none}
+.dc em{font-style:normal;font-family:var(--font-mono);font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:7px;background:rgba(255,255,255,.18)}
+footer{position:relative;z-index:1;text-align:center;padding:56px 24px 64px;font-size:13px;color:var(--dim);line-height:1.9}
+footer a{color:var(--muted)}
+footer .sig{font-family:var(--font-mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;margin-top:10px;color:rgba(253,230,138,.35)}
+
+
+/* ── topo: os dois CenaDrops ── */
+.dupla{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;margin-top:28px;max-width:480px}
+.dupla .actions .btn-dl{width:100%;justify-content:center}
+.dupla__c{display:block;padding:18px 18px 16px;border-radius:16px;border:1px solid var(--line-2);background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015))}
+.dupla__c--one{border-color:rgba(245,158,11,.35);background:radial-gradient(80% 120% at 0% 0%,rgba(245,158,11,.10),transparent 60%),linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015))}
+.dupla__c--multi{border-color:rgba(74,222,128,.32);background:radial-gradient(80% 120% at 100% 0%,rgba(74,222,128,.10),transparent 60%),linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015));transition:border-color .2s,transform .2s}
+.dupla__c--multi:hover{border-color:rgba(74,222,128,.6);transform:translateY(-2px)}
+.dupla__h{display:grid;grid-template-columns:40px minmax(0,1fr);gap:12px;align-items:center}
+.dupla__ic{width:40px;height:40px;display:grid;place-items:center}
+.dupla__ic img{width:40px;height:40px;display:block}
+.dupla__h b{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-family:var(--font-display);font-weight:800;font-size:21px;letter-spacing:-.5px;line-height:1.1}
+.dupla__c--one .dupla__h b em{font-style:normal;color:#fbbf24}
+.dupla__c--multi .dupla__h b em{font-style:normal;color:#86efac}
+.dupla__h small{display:block;margin-top:3px;font-size:13px;color:var(--muted);line-height:1.4}
+.dupla__novo{font-family:var(--font-mono);font-size:10px;font-weight:600;letter-spacing:.1em;padding:2px 7px;border-radius:6px;background:linear-gradient(135deg,#22c55e,#4ade80);color:#052e16}
+.dupla .actions{margin-top:14px}
+.dupla .note{margin-top:10px}
+.dupla .note:empty{display:none}
+.dupla__go{display:inline-block;margin-top:12px;font-size:14px;font-weight:600;color:#86efac}
+
+.nvs{margin-top:26px;padding:20px 24px;border-radius:16px;border:1px solid rgba(245,158,11,.28);background:rgba(245,158,11,.05)}
+.nvs[hidden]{display:none}
+.nvs h4{font-size:16px;font-weight:700}
+.nvs ul{margin-top:10px;padding-left:18px;display:grid;gap:8px;font-size:15px;line-height:1.55;color:var(--muted)}
+/* ── CenaDrop Multi (bloco abaixo das versões) ── */
+.nav__links a.nv{color:#86efac}
+.note a.multi-lk{color:#86efac;border-bottom:1px dashed rgba(134,239,172,.5)}
+.mt{margin-top:22px;padding:30px 30px 26px;border-radius:20px;border:1px solid rgba(74,222,128,.3);background:radial-gradient(60% 90% at 100% 0%,rgba(74,222,128,.11),transparent 70%),linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.01))}
+.mt__top{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px}
+.mt .pill{font-family:var(--font-mono);font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:7px}
+.mt .pill.novo{background:linear-gradient(135deg,#22c55e,#4ade80);color:#052e16}
+.mt .pill.breve{background:#f59e0b;color:#140c02}
+.mt .pill.ver{border:1px solid var(--line-2);color:var(--muted)}
+.mt [hidden]{display:none!important}
+.mt h3{font-family:var(--font-display);font-weight:800;font-size:34px;letter-spacing:-1px;line-height:1.05;margin-top:12px}
+.mt h3 em{font-style:normal;color:#86efac}
+.mt__lead{margin-top:8px;font-size:15.5px;line-height:1.6;color:var(--muted);max-width:760px}
+.mt__lead b{color:var(--text);font-weight:600}
+.mt__os{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:22px}
+.os{display:flex;flex-direction:column;gap:6px;padding:18px;border-radius:14px;border:1px solid var(--line);background:rgba(0,0,0,.22)}
+.os.seu{border-color:rgba(74,222,128,.45)}
+.os .tag{align-self:flex-start;font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#86efac;border:1px solid rgba(74,222,128,.35);border-radius:6px;padding:1px 7px;display:none}
+.os.seu .tag{display:inline-block}
+.os h4{font-size:17px;font-weight:700}
+.os p{font-size:13.5px;color:var(--muted);line-height:1.5;min-height:40px}
+.os .bm{margin-top:6px;display:flex;align-items:center;justify-content:center;gap:9px;font-weight:700;font-size:15px;padding:13px 16px;border-radius:12px;color:#052e16;background:linear-gradient(135deg,#86efac,#22c55e);box-shadow:0 10px 30px -10px rgba(34,197,94,.55)}
+.os .bm[aria-disabled=true]{cursor:not-allowed;color:var(--dim);background:rgba(255,255,255,.04);border:1px dashed var(--line-2);box-shadow:none}
+.os small{text-align:center;font-size:12px;color:var(--dim)}
+.mt__inst{margin-top:18px;border-top:1px solid var(--line);padding-top:14px}
+.mt__inst summary{cursor:pointer;list-style:none;font-weight:600;font-size:15px;color:var(--muted)}
+.mt__inst summary::-webkit-details-marker{display:none}
+.mt__inst summary::before{content:"＋ ";color:#86efac}
+.mt__inst[open] summary::before{content:"－ "}
+.mt__cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:14px}
+.mt__cols div{padding:16px 18px;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.2)}
+.mt__cols h5{font-size:15px;margin-bottom:8px}
+.mt__cols ol{padding-left:18px;display:grid;gap:7px;font-size:14px;line-height:1.55;color:var(--muted)}
+.mt__cols b{color:var(--text);font-weight:600}
+.mt__pe{margin-top:14px;font-size:13.5px;color:var(--dim);line-height:1.55}
+.mt__pe b{color:var(--muted)}
+@media (max-width:860px){.mt{padding:22px 18px}.mt h3{font-size:28px}.mt__os,.mt__cols{grid-template-columns:minmax(0,1fr)}.os p{min-height:0}}
 </style>
 </head>
 <body>
-<canvas id="particles-canvas"></canvas>
-<div class="grid-bg"></div>
-<div class="ambient-orbs" aria-hidden="true"><div class="a-orb a1"></div><div class="a-orb a2"></div></div>
+<div class="bg" aria-hidden="true"><div class="bg__glow"></div><div class="bg__grid"></div><div class="bg__noise"></div></div>
 
-<div class="page">
-  <div class="logo-wrap"><div class="logo-box"><img src="/cenadrop/icon128.png" alt="CenaDrop"></div></div>
-
-  <div class="hero">
-    <div class="version-badge"><span class="pulse-dot"></span> <span id="badge-ver">v8.5.2</span> · <span id="badge-date">14/09/2026</span> · Disponível</div>
-    <h1>CenaDrop <span class="hl">Flow</span></h1>
-    <p class="hero-sub">Automatize o envio de cenas e a geração de imagens no Google Flow — sem tocar no teclado.</p>
-    <a class="btn-download" id="dl-btn" href="https://github.com/rnsmidia/rayner-admin/releases/download/v8.5.2/CenaDrop-Flow-v8.5.2.zip" download>
-      <span class="btn-icon">⬇</span> <span id="dl-label">Baixar CenaDrop Flow v8.5.2</span>
-    </a>
-    <div class="desktop-note">💻 Instale no <b>computador</b> (Windows ou Mac) com o Google Chrome. Não funciona no celular.</div>
+<header class="nav">
+  <div class="nav__in">
+    <a class="brand" href="#topo" aria-label="Cenadrop"><img src="/cenadrop/marca/simbolo.svg" alt="">Cenadrop</a>
+    <nav class="nav__links">
+      <a href="#novidades">O que chegou</a><a href="#ferramentas">Flow × Vids</a><a href="#instalar">Instalar</a><a class="nv" href="#multi">Multi</a><a href="#ajuda">Ajuda</a>
+    </nav>
+    <a class="nav__yt" href="https://www.youtube.com/playlist?list=PLcGnzq_yUExE" target="_blank" rel="noopener" aria-label="Tutoriais em vídeo no YouTube"><svg viewBox="0 0 28 20" aria-hidden="true"><rect width="28" height="20" rx="5" fill="#FF0000"/><path d="M11 5.5v9l8-4.5z" fill="#fff"/></svg><span class="longo">Tutoriais no YouTube</span><span class="curto">Tutoriais</span></a>
+    <a class="nav__cta" href="#versoes">Baixar</a>
   </div>
+</header>
 
-  <div class="trust-row">
-    <div class="trust-item"><div class="trust-label">Versão</div><div class="trust-val accent" id="trust-ver">8.5.2</div></div>
-    <div class="trust-item"><div class="trust-label">Plataforma</div><div class="trust-val">Google Chrome</div></div>
-    <div class="trust-item"><div class="trust-label">Compatível com</div><div class="trust-val">Google Flow</div></div>
-    <div class="trust-item"><div class="trust-label">Status</div><div class="trust-val green">● Disponível</div></div>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- INSTALL -->
-  <div class="section">
-    <div class="section-title">Como instalar — 4 passos</div>
-    <div class="steps">
-
-      <div class="step-card">
-        <div class="step-num">1</div>
-        <div class="step-body">
-          <strong>Baixe e descompacte o arquivo</strong>
-          <span>Clique no botão acima para baixar o <code>.zip</code>. Depois descompacte numa pasta permanente (não mova a pasta depois de instalar).</span>
-          <div class="os-line">
-            <div class="os-pill"><b>Windows:</b> botão direito no .zip → <b>Extrair tudo</b>.</div>
-            <div class="os-pill"><b>Mac:</b> dê <b>dois cliques</b> no .zip.</div>
+<main id="topo">
+  <!-- HERO -->
+  <div class="wrap">
+    <section class="hero">
+      <div>
+        <div class="badge" id="badge" data-reveal><span class="dot"></span><b class="js-ver">v11.0.1</b> · <span id="badgeRest">disponível</span></div>
+        <h1 class="h1" data-reveal>Cenas em lote,<strong>no <span class="fl">Flow</span> e no <span class="vd">Vids</span>.</strong></h1>
+        <p class="lead" data-reveal>Na sua assinatura vêm <b>dois CenaDrops</b>, com a mesma chave: um para começar com a sua conta e outro para dividir o lote entre <b>várias contas</b>.</p>
+        <div class="dupla" data-reveal>
+          <div class="dupla__c dupla__c--one">
+            <div class="dupla__h"><span class="dupla__ic"><img src="/cenadrop/marca/icone-one-128.png" alt=""></span><div><b>CenaDrop <em>One</em></b><small>Extensão do Google Chrome · Flow e Vids</small></div></div>
+            <div class="actions" id="heroAcoes"></div>
+            <p class="note" id="heroNota"></p>
+          </div>
+          <a class="dupla__c dupla__c--multi" href="#multi">
+            <div class="dupla__h"><span class="dupla__ic"><img src="/cenadrop/marca/icone-multi-128.png" alt=""></span><div><b>CenaDrop <em>Multi</em> <span class="dupla__novo">NOVO</span></b><small>Programa · Flow e Vids · até 10 contas</small></div></div>
+            <span class="dupla__go">⬇ Baixar para Windows ou Mac</span>
+          </a>
+        </div>
+        <p class="note" data-reveal>💻 Os dois são para <b>computador</b> (Windows ou Mac). Não funcionam no celular.</p>
+      </div>
+      <div data-reveal>
+        <div class="palco-wrap" id="palcoWrap">
+          <div class="palco-scaler" id="palcoScaler">
+            <div class="pc" id="pc">
+              <div class="pc__bar">
+                <div class="dots"><i></i><i></i><i></i></div>
+                <div class="tabs">
+                  <div class="tab f"><div class="on" id="onF" style="opacity:1"></div><em></em><span>Google Flow</span></div>
+                  <div class="tab v" id="tabV"><div class="on" id="onV"></div><em></em><span>Google Vids</span></div>
+                </div>
+                <div class="url"><span id="urlF">flow.google.com</span><span id="urlV" style="opacity:0">docs.google.com/videos</span></div>
+              </div>
+              <div class="pc__body">
+                <div class="pg">
+                  <div class="pg-flow" id="pgF"><div class="logo-g">Google Flow</div><div class="comp">O que você quer criar?</div></div>
+                  <div class="pg-vids" id="pgV">
+                    <h4><i></i>Clipes de vídeo gerados com IA</h4>
+                    <div class="slots" id="slots"></div>
+                    <div class="vids-foot">Veo · 720p · <b>cenas chegando sozinhas na pasta de Downloads</b></div>
+                  </div>
+                </div>
+                <aside class="cd">
+                  <div class="skin f" id="skF"></div><div class="skin v" id="skV"></div>
+                  <div class="cd-h"><img src="/cenadrop/marca/simbolo.svg" alt=""><div class="cd-t">Cenadrop <span class="swap"><span class="sa acc-f" id="acF">One</span><span class="sb acc-v" id="acV">One</span></span></div><span class="vb js-bver">v11.0.1</span></div>
+                  <div class="conn"><i></i><span class="swap"><span class="sa" id="cnF">Conectado: <b>Google Flow</b></span><span class="sb" id="cnV">Conectado: <b>Google Vids</b></span></span></div>
+                  <div class="card cota" id="cota" style="opacity:0">
+                    <div class="row"><span class="lab">Cota de vídeo</span><span class="num"><span id="cotaN">9.850</span> / 10.000</span></div>
+                    <div class="bar"><i id="cotaB"></i></div>
+                    <div class="sub">renova em 01/10 · 1 ponto por segundo de vídeo</div>
+                  </div>
+                  <div class="card csv" id="csv" style="opacity:0"><span class="ic">CSV</span><span class="fn" id="csvFn"></span><span class="ct" id="csvCt" style="opacity:0"></span></div>
+                  <div class="card eln" id="eln" style="opacity:0"><span class="avs" id="elnAvs"></span><div><div id="elnN"></div><div class="k">Elenco do Google Vids</div></div><span class="tag">fotos</span></div>
+                  <div class="par" id="par" style="opacity:0">Cenas ao mesmo tempo<span class="pills" id="pills"></span></div>
+                  <div class="go" id="go" style="opacity:.45"><span class="swap"><span class="sa" id="g1">▶ Iniciar lote</span><span class="sb" id="g2"></span><span class="sb" id="g3"></span></span></div>
+                  <div class="q"><div class="q__in" id="q"></div></div>
+                  <div class="tot"><span>no ar: <b id="noAr">0</b>/5</span><span>baixadas: <b id="baix">0</b>/<span id="baixT"></span></span></div>
+                </aside>
+              </div>
+              <div class="pc__shelf"><span class="lab">Downloads</span><span class="shelf__vp"><span class="shelf__in" id="shelf"></span></span></div>
+              <div class="cursor" id="cur"><div class="rip" id="rip"></div><svg viewBox="0 0 24 24"><path d="M4 2l16 9.5-7 1.5-3.5 7z" fill="#fff" stroke="#111" stroke-width="1.2"/></svg></div>
+            </div>
           </div>
         </div>
+        <p class="palco-cap">Reprise de um lote real: as <b>8 cenas do curta de exemplo</b>, com 5 personagens, geradas no Google Vids.</p>
       </div>
+    </section>
+  </div>
 
-      <div class="step-card">
-        <div class="step-num">2</div>
-        <div class="step-body">
-          <strong>Abra o gerenciador de extensões</strong>
-          <span>No Chrome, digite <code>chrome://extensions</code> na barra de endereço e ative o <code>Modo Desenvolvedor</code> no canto superior direito.</span>
+  <!-- VERSÕES -->
+  <section class="sec" id="versoes" style="padding:24px 0 40px">
+    <div class="wrap">
+      <div class="eyebrow" data-rv>Downloads</div>
+      <h2 class="h2" data-rv>Escolha a sua <strong>versão.</strong></h2>
+      <div class="vers" id="vers"></div>
+
+      <!-- CENADROP MULTI: liberado em 25/11/26. Os 3 botões leem a versão atual do versao.json (script do fim). -->
+      <div class="mt" id="multi" data-rv>
+        <div class="mt__top"><span class="pill novo">Novo</span><span class="pill ver" id="mtVer" hidden></span></div>
+        <h3>CenaDrop <em>Multi</em> · Windows e Mac</h3>
+        <p class="mt__lead">O CenaDrop como programa de computador, usando <b>até 10 contas Google no mesmo lote</b>, no <b>Flow</b> ou no <b>Vids</b>. O roteiro é dividido entre as contas e tudo chega numerado numa pasta só. Ativa com a <b>mesma chave CD-</b> da extensão, liberada uma vez no Discord da comunidade.</p>
+        <div class="mt__os">
+          <div class="os" data-os="mac-arm"><span class="tag">seu computador</span><h4>Mac com chip Apple</h4><p>M1, M2, M3, M4… (a maioria dos Macs de 2021 pra cá).</p><a class="bm" href="https://cenadrop-instalado-downloads.vercel.app/" data-mlink="mac-arm">⬇ Baixar para Mac (Apple)</a><small data-mtam="mac-arm">≈ 134 MB</small></div>
+          <div class="os" data-os="win"><span class="tag">seu computador</span><h4>Windows</h4><p>Windows 10 ou 11 (64 bits).</p><a class="bm" href="https://cenadrop-instalado-downloads.vercel.app/" data-mlink="win">⬇ Baixar para Windows</a><small data-mtam="win">≈ 112 MB</small></div>
+          <div class="os" data-os="mac-intel"><span class="tag">seu computador</span><h4>Mac com Intel</h4><p>Macs mais antigos com processador Intel.</p><a class="bm" href="https://cenadrop-instalado-downloads.vercel.app/" data-mlink="mac-intel">⬇ Baixar para Mac (Intel)</a><small data-mtam="mac-intel">≈ 141 MB</small></div>
         </div>
-      </div>
-
-      <div class="step-card">
-        <div class="step-num">3</div>
-        <div class="step-body">
-          <strong>Carregue a pasta extraída</strong>
-          <span>Clique em <code>Carregar sem compactação</code> e selecione a pasta que você extraiu no passo 1.</span>
-          <div class="warn"><b>⚠️ Atenção (erro mais comum):</b> se ao extrair aparecer uma <b>subpasta</b> dentro de outra, selecione a que <b>contém o arquivo</b> <code>manifest.json</code> — não a pasta de fora. É isso que evita o erro "Manifest file is missing".</div>
-        </div>
-      </div>
-
-      <div class="step-card">
-        <div class="step-num">4</div>
-        <div class="step-body">
-          <strong>Fixe e ative sua licença</strong>
-          <span>Fixe o CenaDrop na barra do Chrome (ícone de peça 🧩 → alfinete), abra a extensão, cole a sua chave e clique em <b>Ativar</b>. <span class="tag-ok">Pronto</span></span>
-          <div class="os-line">
-            <div class="os-pill">Formato da chave: <span class="keyfmt">CD-XXXX-XXXX-XXXX</span></div>
-            <div class="os-pill">📩 Ela chegou no <b>email da sua compra</b>.</div>
+        <details class="mt__inst">
+          <summary>Como instalar o Multi</summary>
+          <div class="mt__cols">
+            <div><h5>🍎 No Mac</h5><ol>
+              <li>Não sabe qual Mac é o seu? Menu  › <b>Sobre este Mac</b> › linha <b>Chip</b> (Apple M…) ou <b>Processador</b> (Intel).</li>
+              <li>Abra o arquivo baixado e arraste o <b>CenaDrop Multi</b> para a pasta <b>Aplicativos</b>.</li>
+              <li>Na 1ª vez o Mac avisa que não reconhece o programa: clique em <b>Concluído</b> (não em “Mover para o Lixo”), vá em <b>Ajustes do Sistema › Privacidade e Segurança</b>, desça até o fim e clique em <b>Abrir Mesmo Assim</b>, digite a senha do Mac e confirme em <b>Abrir</b>.</li>
+              <li>Cole a sua chave <code>CD-</code> e clique em <b>Ativar</b>. Na 1ª vez, o programa pede para ativar a mesma chave no <a href="https://discord.gg/SGEVxaurAw" style="color:#c4b5fd">Discord do CenaDrop</a> (uma vez só): siga os passos da tela e clique em <b>Já ativei, conferir</b>.</li>
+            </ol></div>
+            <div><h5>🪟 No Windows</h5><ol>
+              <li>Abra o arquivo baixado. Se aparecer <b>"O Windows protegeu o computador"</b>, clique em <b>Mais informações</b> e depois em <b>Executar assim mesmo</b>.</li>
+              <li>Siga o instalador (Avançar › Instalar › Concluir). O atalho aparece na Área de Trabalho.</li>
+              <li>Cole a sua chave <code>CD-</code> e clique em <b>Ativar</b>. Na 1ª vez, o programa pede para ativar a mesma chave no <a href="https://discord.gg/SGEVxaurAw" style="color:#c4b5fd">Discord do CenaDrop</a> (uma vez só): siga os passos da tela e clique em <b>Já ativei, conferir</b>.</li>
+            </ol></div>
           </div>
+          <p class="mt__pe">🔄 Depois de instalado, o Multi <b>avisa quando sai versão nova e se atualiza com um clique</b>: não precisa voltar aqui. As contas Google precisam estar <b>em português (Brasil)</b>. O passo a passo até o primeiro lote está no <a href="/manual#multi" style="color:#86efac">manual do Multi</a>. Deu problema? No programa, clique em <b>Diagnóstico</b> e cole o código no #suporte do Discord.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- NOVIDADES -->
+  <section class="sec" id="novidades">
+    <div class="wrap">
+      <div class="eyebrow" data-rv>CenaDrop One · <span class="js-ver">v11.0.1</span></div>
+      <h2 class="h2" data-rv>O que a extensão <strong>faz por você.</strong></h2>
+      <p class="intro" data-rv>Dois caminhos no mesmo painel: o Google Flow e o Google Vids, cada um com os próprios créditos. Estes são os destaques do Vids.</p>
+      <div class="nvs" id="nvs" data-rv hidden><h4>Novo na <span class="js-ver">v11.0.1</span></h4><ul id="nvsL"></ul></div>
+      <div class="bento">
+        <div class="b b1" data-rv>
+          <div class="eyebrow">Em paralelo</div>
+          <div class="big"><span id="k5">0</span><small>cenas ao mesmo tempo</small></div>
+          <p>No Vids, o CenaDrop mantém até 5 cenas gerando juntas (é o limite do próprio Vids) e vai baixando conforme ficam prontas.</p>
+          <div class="lanes"><i></i><i></i><i></i><i></i><i></i></div>
+        </div>
+        <div class="b b2" data-rv>
+          <div class="eyebrow">Medido num lote real</div>
+          <div class="big"><span id="k93">0</span><small>cenas em 21 min</small></div>
+          <p>93 cenas geradas e baixadas sem ninguém tocar no computador. A velocidade muda conforme o dia e a conta — quem manda é o Google.</p>
+        </div>
+        <div class="b b3" data-rv>
+          <div class="eyebrow">Personagem</div>
+          <h3>Pela foto, sozinho</h3>
+          <p>Cadastre o nome e a foto. A cena que começa com o nome recebe a foto nos Ingredientes do Vids.</p>
+          <div class="prompt" id="promptEx"></div>
+        </div>
+        <div class="b b4" data-rv>
+          <div class="eyebrow">Cota</div>
+          <h3>Seu saldo à vista</h3>
+          <p>O painel mostra quanto sobrou da cota do Vids e o dia em que ela renova.</p>
+          <div class="meter"><div class="row"><span>cota de vídeo</span><b>9.800 / 10.000</b></div><div class="bar"><i id="meterB"></i></div></div>
+        </div>
+        <div class="b b5" data-rv>
+          <div class="eyebrow">Painel</div>
+          <h3>Uma cor por ferramenta</h3>
+          <p>O CenaDrop segue a aba aberta e troca sozinho de modo.</p>
+          <div class="swatch"><div class="sf">Flow<small>roxo</small></div><div class="sv">Vids<small>laranja</small></div></div>
         </div>
       </div>
-
     </div>
-  </div>
+  </section>
 
-  <div class="divider"></div>
-
-  <!-- TROUBLESHOOTING -->
-  <div class="section">
-    <div class="section-title">Deu erro? Resolva aqui</div>
-    <div class="faq">
-      <details>
-        <summary>Apareceu "Manifest file is missing or unreadable"</summary>
-        <div class="ans">Você apontou o Chrome para a pasta errada. Volte no <code>Carregar sem compactação</code> e escolha a pasta que tem o arquivo <code>manifest.json</code> dentro (às vezes é uma subpasta). Só isso resolve.</div>
-      </details>
-      <details>
-        <summary>O Chrome pede pra "desativar extensões em modo de desenvolvedor"</summary>
-        <div class="ans">É um aviso normal do Chrome, não é erro nem vírus. É só fechar/cancelar esse aviso — <b>não desinstale</b> a extensão. O CenaDrop continua funcionando.</div>
-      </details>
-      <details>
-        <summary>Minha chave aparece como inválida</summary>
-        <div class="ans">Confira se colou a chave completa (formato <code>CD-XXXX-XXXX-XXXX</code>, em maiúsculas). Se ela já foi ativada em outro computador, fale com o suporte para transferir/liberar.</div>
-      </details>
-      <details>
-        <summary>Movi a pasta e a extensão parou</summary>
-        <div class="ans">O Chrome carrega a extensão a partir do local da pasta. Se você moveu ou apagou, é só reinstalar: <code>Carregar sem compactação</code> apontando para o novo local. Por isso deixe a pasta num lugar fixo.</div>
-      </details>
+  <!-- FLOW × VIDS -->
+  <section class="sec" id="ferramentas" style="padding-top:24px">
+    <div class="wrap">
+      <div class="eyebrow" data-rv>Duas ferramentas, uma extensão</div>
+      <h2 class="h2" data-rv>Flow ou Vids? <strong>Você escolhe por lote.</strong></h2>
+      <div class="duo">
+        <div class="lane f" data-rv>
+          <div class="top"><div class="sq"></div><div><h3>Google Flow</h3><div class="where">flow.google.com</div></div></div>
+          <ul>
+            <li>Tudo o que você já usa continua igual: vídeo e imagem em lote.</li>
+            <li>Personagem capturado da própria aba do Flow (Base Fixa e Elenco).</li>
+            <li>Ótimo para imagens: o Flow segue sendo o melhor lugar pra gerar imagem em volume.</li>
+          </ul>
+          <a class="open" href="https://flow.google.com/" target="_blank" rel="noopener">Abrir o Flow ↗</a>
+        </div>
+        <div class="lane v" data-rv>
+          <div class="top"><div class="sq"></div><div><h3>Google Vids</h3><div class="where">docs.google.com/videos</div></div></div>
+          <ul>
+            <li>Vídeo e imagem em lote, com até 5 cenas gerando ao mesmo tempo.</li>
+            <li>Personagem pela foto, no Elenco do Google Vids.</li>
+            <li>Cota e data de renovação aparecendo no painel.</li>
+          </ul>
+          <a class="open" href="https://workspace.google.com/intl/pt-BR/products/vids/" target="_blank" rel="noopener">Abrir o Vids ↗</a>
+        </div>
+      </div>
+      <div class="plans" data-rv>
+        <div class="t">O Vids pede conta Google com assinatura<small>Pelo que medimos, por mês. Limites do Google — podem mudar.</small></div>
+        <div class="plan ultra"><div class="pn">Ultra</div><div class="pv">~1.000 <small>vídeos</small></div></div>
+        <div class="plan"><div class="pn">Pro</div><div class="pv">~50 <small>vídeos</small></div></div>
+        <div class="plan"><div class="pn">Gratuita</div><div class="pv">poucos <small>pra testar</small></div></div>
+      </div>
     </div>
-  </div>
+  </section>
 
-  <!-- SUPPORT -->
-  <div class="support">
-    <h3>Precisa de ajuda?</h3>
-    <p>Travou em algum passo? A gente te ajuda a instalar e ativar.</p>
-    <div class="support-btns">
-      <a class="sbtn wa" href="https://wa.me/5527996990242">💬 Suporte no WhatsApp</a>
-      <a class="sbtn mail" href="https://cenadrop.com.br/manual">📖 Ver o manual completo</a>
+  <!-- INSTALAR -->
+  <section class="sec" id="instalar">
+    <div class="wrap">
+      <div class="eyebrow" data-rv>Instalação</div>
+      <h2 class="h2" data-rv>Em poucos minutos, <strong>pronto pra rodar.</strong></h2>
+      <div class="switch" id="sw" data-rv>
+        <span class="knob" id="knob"></span>
+        <button class="on" data-alvo="atualizar">Já tenho o CenaDrop</button>
+        <button data-alvo="primeira">Primeira instalação</button>
+      </div>
+
+      <div class="steps" id="atualizar">
+        <div class="st-card"><div class="st-num">01</div><h4>Baixe a versão nova</h4><p>O arquivo <code>.zip</code> da <b class="js-bver">v11.0.1</b>. Ainda não descompacte: primeiro veja onde está a pasta antiga.</p><div class="mini-dl"><a class="js-dl" href="#">⬇ Baixar <span class="js-dlver"></span></a></div></div>
+        <div class="st-card"><div class="st-num">02</div><h4>Veja onde a pasta está</h4><p>Em <code>chrome://extensions</code>, clique em <b>Detalhes</b> no card do CenaDrop. Lá aparece o caminho da pasta que o Chrome usa. Anote o lugar e o nome.</p></div>
+        <div class="st-card"><div class="st-num">03</div><h4>Apague a pasta antiga inteira</h4><p>Vá até esse lugar e apague a pasta antiga do CenaDrop.</p><div class="warn">Não copie a nova por cima (“Substituir” ou “Mesclar”): os arquivos das duas versões se misturam.</div></div>
+        <div class="st-card"><div class="st-num">04</div><h4>Ponha a nova no mesmo lugar</h4><p>Descompacte (Windows: botão direito → <b>Extrair tudo</b> · Mac: dois cliques) e coloque a pasta nova <b>no mesmo lugar e com o mesmo nome</b>. A pasta certa tem o <b>manifest.json</b> direto dentro dela.</p></div>
+        <div class="st-card"><div class="st-num">05</div><h4>Clique no ↻ e confira</h4><p>Em <code>chrome://extensions</code>, clique na setinha ↻ do card do CenaDrop. A versão muda para <b class="js-bver">v11.0.1</b>.</p></div>
+        <div class="st-card"><div class="st-num">06</div><h4>Dê F5 na aba de trabalho</h4><p>A aba do Flow ou do Vids que já estava aberta precisa ser recarregada <b>uma vez</b>. Sem isso, o CenaDrop não conversa com ela.</p></div>
+      </div>
+      <div class="keep" id="keep">🔑 A chave e o Elenco ficam guardados no Chrome, não na pasta. Por isso continuam, desde que a pasta nova fique no mesmo lugar e com o mesmo nome.</div>
+
+      <div class="steps" id="primeira" hidden>
+        <div class="st-card"><div class="st-num">01</div><h4>Baixe e descompacte</h4><p>Descompacte numa pasta <b>permanente</b> — não mova a pasta depois de instalar.</p><div class="os"><span><b>Windows:</b> botão direito → Extrair tudo</span><span><b>Mac:</b> dois cliques no .zip</span></div><div class="mini-dl"><a class="js-dl" href="#">⬇ Baixar <span class="js-dlver"></span></a></div></div>
+        <div class="st-card"><div class="st-num">02</div><h4>Ative o Modo Desenvolvedor</h4><p>No Chrome, abra <code>chrome://extensions</code> e ligue o <b>Modo do desenvolvedor</b>, no canto superior direito.</p></div>
+        <div class="st-card"><div class="st-num">03</div><h4>Carregue a pasta</h4><p>Clique em <b>Carregar sem compactação</b> e escolha a pasta do passo 1.</p><div class="warn">⚠️ Erro mais comum: se houver uma subpasta, escolha a que tem o <b>manifest.json</b> dentro — não a de fora.</div></div>
+        <div class="st-card"><div class="st-num">04</div><h4>Ative a sua chave</h4><p>Fixe o CenaDrop na barra (🧩 → alfinete), abra, cole a chave e clique em <b>Ativar</b>.</p><div class="os"><span>Formato: <span class="keyfmt">CD-XXXX-XXXX-XXXX</span></span><span>📩 Chegou no e-mail da sua compra.</span></div></div>
+      </div>
     </div>
-  </div>
+  </section>
 
-  <div class="footer">
-    Dúvidas? Fale com a gente pelo email <a href="mailto:contato@cenadrop.com.br" style="color:var(--lav);font-weight:600;">contato@cenadrop.com.br</a>
-    <div class="footer-brand">© 2026 CenaDrop · cenadrop.com.br · Crie mais. Clique menos.</div>
-  </div>
-</div>
+  <!-- AULA -->
+  <section class="sec" style="padding-top:24px">
+    <div class="wrap aula">
+      <div data-rv>
+        <div class="yt" id="yt">
+          <img src="https://i.ytimg.com/vi/oXXF6xw48Ic/maxresdefault.jpg" alt="Aula: Automação no Google Vids" loading="lazy">
+          <button aria-label="Assistir a aula"><span class="play"><svg viewBox="0 0 24 24" fill="#140c02"><path d="M7 4.5v15l12.5-7.5z"/></svg></span><span class="lbl"><small>Aula 11 · passo a passo</small>Automação no Google Vids</span></button>
+        </div>
+        <div class="reel" id="reel"></div>
+      </div>
+      <div class="aula-txt">
+        <div class="eyebrow" data-rv>Veja funcionando</div>
+        <h2 class="h2" data-rv>Da conta do Google <strong>ao lote rodando.</strong></h2>
+        <ol data-rv>
+          <li>Qual plano do Google usar e quanto cada um gera</li>
+          <li>Como o CenaDrop escolhe modelo, resolução e duração</li>
+          <li>Personagem pela foto no Elenco do Vids</li>
+          <li>O lote de 5 cenas da Clara, do começo ao fim</li>
+        </ol>
+      </div>
+    </div>
+  </section>
 
+  <!-- FAQ -->
+  <section class="sec" id="ajuda" style="padding-top:24px">
+    <div class="wrap">
+      <div class="eyebrow" data-rv>Deu erro?</div>
+      <h2 class="h2" data-rv>Resolva aqui <strong>em um minuto.</strong></h2>
+      <div class="faq">
+        <details data-rv><summary><span><span class="tag-new">NOVO</span>Atualizei e o CenaDrop não responde na aba</span></summary><div class="ans">Recarregar a extensão não atualiza as abas que já estavam abertas. Dê <b>F5 na aba do Flow ou do Vids</b> e tente de novo.</div></details>
+        <details data-rv><summary><span><span class="tag-new">NOVO</span>O painel diz "limite atingido" no Vids</span></summary><div class="ans">Foi o próprio Google Vids que bloqueou novas gerações nessa conta. O CenaDrop para o lote e avisa. Espere a renovação (a data aparece no painel) ou use outra conta.</div></details>
+        <details data-rv><summary><span><span class="tag-new">NOVO</span>Preciso pagar o Google Vids?</span></summary><div class="ans">Para lotes, sim: a conta gratuita gera só alguns vídeos, que servem pra testar. No <b>Ultra</b> medimos por volta de 1.000 vídeos por mês; no <b>Pro</b>, uns 50. O Flow continua funcionando como antes.</div></details>
+        <details data-rv><summary><span>Apareceu "Manifest file is missing or unreadable"</span></summary><div class="ans">Você apontou o Chrome para a pasta errada. Em <b>Carregar sem compactação</b>, escolha a pasta que tem o <b>manifest.json</b> dentro (às vezes é uma subpasta).</div></details>
+        <details data-rv><summary><span>O Chrome pede pra desativar extensões de desenvolvedor</span></summary><div class="ans">É um aviso normal do Chrome, não é erro nem vírus. Feche o aviso — <b>não desinstale</b>. O CenaDrop continua funcionando.</div></details>
+        <details data-rv><summary><span>Minha chave aparece como inválida</span></summary><div class="ans">Confira se colou a chave completa (<b>CD-XXXX-XXXX-XXXX</b>, em maiúsculas). Se ela já foi ativada em outro computador, use o <b>🔄</b> da tela da chave (“Trocar dispositivo” / “Liberar este computador”) e libere — não tem limite de trocas.</div></details>
+        <details data-rv><summary><span>Movi a pasta e a extensão parou</span></summary><div class="ans">O Chrome carrega a extensão do lugar da pasta. Se moveu, é só <b>Carregar sem compactação</b> de novo apontando pro novo lugar — e deixe ela fixa.</div></details>
+        <details data-rv><summary><span>Onde ficam os vídeos gerados?</span></summary><div class="ans">Na pasta de <b>Downloads</b> do Chrome, numerados pela cena (001, 002…). É só mover para a pasta do seu projeto.</div></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" style="padding-top:16px">
+    <div class="wrap">
+      <div class="help" data-rv style="margin-bottom:22px;border-color:rgba(110,139,255,.45);background:linear-gradient(135deg,rgba(103,39,206,.22),rgba(65,105,255,.08))">
+        <div class="eyebrow" style="color:#c9d4ff">✨ Opcional · Elo IA</div>
+        <h2 class="h2">Gere e corrija com a <strong>sua IA, sem API.</strong></h2>
+        <p>O Elo IA liga o CenaDrop ao Claude, ChatGPT ou Google que você já assina. Com ele aberto, aparecem o <b>✨ Gerar com IA</b> no Roteiro e o <b>✨ Corrigir as cenas com IA</b> no fim do lote — 1 clique, sem copiar e colar. Mac e Windows.</p>
+        <div class="btns">
+          <a class="dc" href="https://narrativaia.com.br/elo" target="_blank" rel="noopener" style="background:linear-gradient(135deg,#6727CE,#4169FF)">⬇ Baixar o Elo IA</a>
+        </div>
+      </div>
+      <div class="help" data-rv style="border-color:rgba(88,101,242,.6);background:linear-gradient(160deg,rgba(88,101,242,.30),rgba(88,101,242,.06))">
+        <div class="eyebrow" style="color:#c9cdfb">💬 Comunidade CenaDrop · Discord</div>
+        <h2 class="h2">Você não cria sozinho. <strong>Entre na comunidade.</strong></h2>
+        <p>É onde os clientes do CenaDrop trocam o que funciona — e onde você fica sabendo de tudo primeiro.</p>
+        <ul style="list-style:none;padding:0;margin:14px auto 4px;max-width:620px;text-align:left;display:grid;gap:8px;font-size:15px;line-height:1.5"><li>📣 <b>Avisos em primeira mão</b> — versões novas do CenaDrop e o que mudou no Google Flow e no Vids.</li><li>💡 <b>Dicas e prompts</b> — prompts, CSVs e truques que deram certo pra outros criadores.</li><li>🎬 <b>Vitrine</b> — veja as cenas que a comunidade está fazendo e mostre as suas.</li><li>🗳️ <b>Sugestões</b> — diga o que quer ver no CenaDrop. A equipe lê tudo.</li><li>🛟 <b>Suporte</b> — abra um chamado e acompanhe a resposta no mesmo lugar.</li></ul>
+        <div class="btns">
+          <a class="dc" href="https://discord.gg/SGEVxaurAw" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.6 5.2A17 17 0 0 0 15.4 4l-.5 1a15.6 15.6 0 0 0-5.8 0L8.6 4a17 17 0 0 0-4.2 1.3C1.7 9.3 1 13.2 1.3 17a17 17 0 0 0 5.2 2.6l1.1-1.8a11 11 0 0 1-1.7-.8l.4-.3a12.2 12.2 0 0 0 11.4 0l.4.3c-.5.3-1.1.6-1.7.8l1.1 1.8a17 17 0 0 0 5.2-2.6c.4-4.4-.7-8.3-3.1-11.8ZM8.5 14.7c-1 0-1.9-1-1.9-2.1s.8-2.1 1.9-2.1 1.9 1 1.9 2.1-.8 2.1-1.9 2.1Zm7 0c-1 0-1.9-1-1.9-2.1s.8-2.1 1.9-2.1 1.9 1 1.9 2.1-.8 2.1-1.9 2.1Z"/></svg>Entrar na comunidade</a>
+          <a class="btn-ghost" href="https://cenadrop.com.br/manual">📖 Manual completo</a>
+        </div>
+        <p style="font-size:13.5px;margin-top:12px">Como liberar: ao entrar, vá em <b>#ativar-acesso</b>, clique em 🔑 Ativar meu acesso e cole a sua chave <b>CD-</b>.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <a href="https://discord.gg/SGEVxaurAw" target="_blank" rel="noopener" style="color:#a5b4fc">Comunidade CenaDrop no Discord: avisos, dicas, vitrine e suporte →</a>
+  <div class="sig">© 2026 CenaDrop · Crie mais. Clique menos.</div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script>
-// Versão dinâmica do version.json (fallback: valores atuais embutidos)
-(function(){
-  fetch('/cenadrop/version.json',{cache:'no-store'}).then(r=>r.json()).then(v=>{
-    if(!v||!v.version) return;
-    var ver='v'+v.version, d=v.date? v.date.split('-').reverse().join('/'):'';
-    document.getElementById('badge-ver').textContent=ver;
-    if(d) document.getElementById('badge-date').textContent=d;
-    document.getElementById('trust-ver').textContent=v.version;
-    document.getElementById('dl-label').textContent='Baixar CenaDrop Flow '+ver;
-    if(v.zipUrl) document.getElementById('dl-btn').href=v.zipUrl;
-    document.title='CenaDrop Flow — Download '+ver;
-  }).catch(function(){});
-})();
-// partículas
-(function(){
-  var canvas=document.getElementById('particles-canvas'),ctx=canvas.getContext('2d'),W,H;
-  function resize(){W=canvas.width=innerWidth;H=canvas.height=innerHeight;} resize();
-  addEventListener('resize',resize,{passive:true});
-  var COLS=['rgba(103,39,206,','rgba(155,127,255,','rgba(65,105,255,'];
-  var pts=Array.from({length:45},function(){return{x:Math.random()*3000,y:Math.random()*3000,r:Math.random()*1.5+.3,vx:(Math.random()-.5)*.1,vy:(Math.random()-.5)*.1,c:COLS[Math.floor(Math.random()*COLS.length)],a:Math.random()*.4+.1};});
-  var last=0,INT=1000/30;
-  function draw(now){requestAnimationFrame(draw);if(now-last<INT)return;last=now;ctx.clearRect(0,0,W,H);pts.forEach(function(p){p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=p.c+p.a+')';ctx.fill();});}
-  requestAnimationFrame(draw);
+(function () {
+  // ── VERSÕES: vêm do version.json ──
+  // Regra (Rayner, 30/09/26): a página mostra SEMPRE 2 versões — a atual (versoes[0]) e a anterior (versoes[1]).
+  // O texto da página fala da atual. Atual "em-breve" → selo EM BREVE e o download fica com a anterior.
+  // O campo "version" do topo continua = última BAIXÁVEL (manual e vendas leem ele).
+  var GH = 'https://github.com/rnsmidia/rayner-admin/releases/download/';
+  var PADRAO = { version: '11.0.0', date: '2026-11-20', zipUrl: GH + 'v11.0.0/CenaDrop-v11.0.0-20.11-13h20.zip', versoes: [
+    { version: '11.0.0', status: 'disponivel', date: '2026-11-20', resumo: 'CenaDrop Flow agora é CenaDrop One — mais estável com as mudanças do Google', zipUrl: GH + 'v11.0.0/CenaDrop-v11.0.0-20.11-13h20.zip' },
+    { version: '10.0.4', status: 'disponivel', date: '2026-11-13', resumo: '', zipUrl: GH + 'v10.0.4/CenaDrop-v10.0.4-13.11-22h36.zip' } ] };
+  var ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19.5h14"/></svg>';
+  var qsa = function (sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); };
+  var dataBR = function (d) { return d ? d.split('-').reverse().join('/') : ''; };
+  var ultimo = '';
+  function renderVersoes(v) {
+    var chave = JSON.stringify(v); if (chave === ultimo) return; ultimo = chave;
+    var L = (v.versoes && v.versoes.length) ? v.versoes.slice(0, 2)
+      : [{ version: v.version, date: v.date, zipUrl: v.zipUrl, status: 'disponivel' }];
+    var atual = L[0], ant = L[1] || null, breve = atual.status === 'em-breve';
+    var baixavel = breve ? (ant && ant.status !== 'em-breve' ? ant : null) : atual;
+
+    qsa('.js-ver').forEach(function (e) { e.textContent = 'v' + atual.version; });
+    qsa('.js-vnum').forEach(function (e) { e.textContent = atual.version; });
+    document.getElementById('badge').classList.toggle('soon', breve);
+    document.getElementById('badgeRest').innerHTML = breve ? '<span class="st-lbl">em breve</span>' : dataBR(atual.date) + ' · disponível';
+
+    var h = '', nota = '';
+    if (breve) {
+      h = '<span class="btn-soon"><i>EM BREVE</i>CenaDrop v' + atual.version + '</span>';
+      if (baixavel) {
+        h += '<a class="btn-ghost" href="' + baixavel.zipUrl + '" download>⬇ Baixar a v' + baixavel.version + '</a>';
+        nota = 'Enquanto isso, baixe a <b>v' + baixavel.version + '</b>' + (baixavel.resumo ? ' (' + baixavel.resumo + ')' : '') + ' — é a versão no ar hoje.';
+      }
+    } else {
+      h = '<a class="btn-dl js-mag" href="' + atual.zipUrl + '" download>' + ICON + '<span>Baixar o CenaDrop <small>v' + atual.version + '</small></span></a>'
+        + '<a class="btn-ghost" href="#instalar">Já tenho — como atualizar</a>';
+    }
+    document.getElementById('heroAcoes').innerHTML = h;
+    var hn = document.getElementById('heroNota'); hn.innerHTML = nota; hn.style.display = nota ? '' : 'none';
+
+    document.getElementById('vers').innerHTML = L.map(function (x, k) {
+      var soon = x.status === 'em-breve';
+      var pill = soon ? '<span class="pill soon">Em breve</span>'
+        : k === 0 ? '<span class="pill ok">Atual</span>'
+        : breve ? '<span class="pill ok">Disponível agora</span>' : '<span class="pill">Anterior</span>';
+      var info = (x.resumo ? '<b>' + x.resumo + '</b>' : '') + (x.date ? (x.resumo ? ' · ' : '') + 'lançada em ' + dataBR(x.date) : '');
+      var obs = soon ? 'O download abre aqui mesmo, assim que ela sair.'
+        : k === 0 ? 'A versão recomendada.'
+        : breve ? 'É a versão no ar hoje.' : 'Use só se a v' + atual.version + ' der problema no seu computador.';
+      var acao = soon ? '<small>Em preparação — acompanhe por aqui.</small>'
+        : k === 0 || breve ? '<a class="btn-dl" href="' + x.zipUrl + '" download>' + ICON + '<span>Baixar v' + x.version + '</span></a>'
+        : '<a class="btn-ghost" href="' + x.zipUrl + '" download>⬇ Baixar v' + x.version + '</a>';
+      return '<div class="ver' + (k === 0 ? ' atual' : '') + '"><div class="vt">' + pill + '</div><div class="vn">v' + x.version + '</div>'
+        + '<div class="vd">' + info + '<br>' + obs + '</div><div class="va">' + acao + '</div></div>';
+    }).join('');
+
+    qsa('.js-dl').forEach(function (a) { if (baixavel) { a.href = baixavel.zipUrl; a.setAttribute('download', ''); } a.parentNode.style.display = baixavel ? '' : 'none'; });
+    qsa('.js-dlver').forEach(function (e) { if (baixavel) e.textContent = 'v' + baixavel.version; });
+    qsa('.js-bver').forEach(function (e) { if (baixavel) e.textContent = 'v' + baixavel.version; });
+    var nv = atual.novidades || [], cx = document.getElementById('nvs'), ul = document.getElementById('nvsL');
+    ul.textContent = ''; nv.slice(0, 4).forEach(function (t) { var li = document.createElement('li'); li.textContent = t; ul.appendChild(li); }); cx.hidden = !nv.length;
+    document.title = 'CenaDrop — Download v' + atual.version + (breve ? ' (em breve)' : '');
+    if (window.__mag) window.__mag();
+  }
+  renderVersoes(PADRAO);
+  fetch('/cenadrop/version.json', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (v) {
+    if (v && (v.version || (v.versoes && v.versoes.length))) renderVersoes(v);
+  }).catch(function () {});
+
+  // ── dados do lote: o curta de exemplo (gerado por PRODUTOS/CenaDrop Flow/pagina-vendas/scripts/atualizar-download.py) ──
+  /*DEMO:INICIO*/var EX = {"csv": "curta-exemplo.csv", "personagens": [{"nome": "Vera", "foto": "elenco-vera.jpg"}, {"nome": "Teo", "foto": "elenco-teo.jpg"}, {"nome": "Duda", "foto": "elenco-duda.jpg"}, {"nome": "Rubens", "foto": "elenco-rubens.jpg"}, {"nome": "Silas", "foto": "elenco-silas.jpg"}], "cenas": [{"n": "001", "nome": "Silas", "t": "seated in the leather armchair facing the camera as if on a video call, speaks slowly and…", "d": 2.9}, {"n": "002", "nome": null, "t": "the phone screen in Vera's hand goes dark; she squeezes it, her jaw tightens, a tear runs down…", "d": 3.5}, {"n": "003", "nome": "Teo", "t": "looks up from the laptop toward the front seat and speaks low and urgent; on 'Vera...' he…", "d": 3.1}, {"n": "004", "nome": "Duda", "t": "keeps holding Vera's forearm and speaks with a brave half-smile while her eyes show fear; she…", "d": 3.9}, {"n": "005", "nome": "Vera", "t": "alone in the rising elevator, looks at the old photograph, her lips tremble, she closes her…", "d": 3.3}, {"n": "006", "nome": "Silas", "t": "relaxed in the armchair, looks toward the open elevator and speaks with mock politeness,…", "d": 3.0}, {"n": "007", "nome": "Rubens", "t": "seated, looks at his daughter with tears in his eyes and speaks softly but firmly, his voice…", "d": 3.6}, {"n": "008", "nome": "Vera", "t": "releases the flash drive on the glass table and looks up at Silas with a calm half-smile while…", "d": 3.2}]};/*DEMO:FIM*/
+  var M = '/cenadrop/download/midia/', MX = M + 'exemplo/';
+  var CENAS = EX.cenas;
+  // a aula 11 mostra o lote da Clara: a faixa embaixo dela continua com esses clipes
+  var AULA = ['001', '002', '003', '004', '005'];
+  var $ = function (id) { return document.getElementById(id); };
+  var slots = $('slots'), q = $('q'), shelf = $('shelf'), pills = $('pills'), reel = $('reel');
+  var fotoDe = {};
+  EX.personagens.forEach(function (p) { fotoDe[p.nome] = MX + p.foto; $('elnAvs').insertAdjacentHTML('beforeend', '<img src="' + MX + p.foto + '" alt="">'); });
+  $('elnN').textContent = EX.personagens.length + ' personagens';
+  $('csvCt').textContent = CENAS.length + ' cenas';
+  $('g2').textContent = 'Gerando ' + CENAS.length + ' cenas…';
+  $('g3').textContent = '✓ ' + CENAS.length + ' de ' + CENAS.length + ' baixadas';
+  $('baixT').textContent = CENAS.length;
+  var c0 = CENAS.filter(function (c) { return c.nome; })[0];
+  $('promptEx').innerHTML = '<img src="' + fotoDe[c0.nome] + '" alt=""><span><mark>' + c0.nome + ',</mark> ' + c0.t + '</span>';
+  CENAS.forEach(function (c) {
+    slots.insertAdjacentHTML('beforeend', '<div class="slot"><div class="shim"></div><video muted loop playsinline autoplay preload="metadata" poster="' + MX + 'cena' + c.n + '.jpg" src="' + MX + 'cena' + c.n + '.mp4"></video><span class="n">' + c.n + '</span><i class="pb"></i></div>');
+    q.insertAdjacentHTML('beforeend', '<div class="qr"><span class="qn">' + c.n + '</span><span class="qt">' + (c.nome ? '<b>' + c.nome + ',</b> ' : '') + c.t + '</span><span class="st swap"><span class="sa">gerando</span><span class="sb">✓ baixada</span></span><i class="qb"></i></div>');
+    shelf.insertAdjacentHTML('beforeend', '<span class="chip"><i>✓</i>' + c.n + '_Flow_Video.mp4</span>');
+  });
+  AULA.forEach(function (n) {
+    reel.insertAdjacentHTML('beforeend', '<figure><video muted loop playsinline autoplay preload="none" poster="' + M + 'cena' + n + '.jpg" src="' + M + 'cena' + n + '.mp4"></video><figcaption>' + n + '</figcaption></figure>');
+  });
+  slots.insertAdjacentHTML('beforeend', '<div class="slot vazio">+</div>');
+  for (var i = 1; i <= 5; i++) pills.insertAdjacentHTML('beforeend', '<i><u></u><b>' + i + '</b></i>');
+
+  // ── aula: só carrega o YouTube no clique ──
+  $('yt').querySelector('button').addEventListener('click', function () {
+    $('yt').innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/oXXF6xw48Ic?autoplay=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen title="Automação no Google Vids"></iframe>';
+  });
+
+  // ── troca Atualizar × Primeira instalação ──
+  var sw = $('sw'), knob = $('knob');
+  function posKnob() { var on = sw.querySelector('.on'); knob.style.width = on.offsetWidth + 'px'; knob.style.transform = 'translateX(' + (on.offsetLeft - 5) + 'px)'; }
+  sw.querySelectorAll('button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      sw.querySelectorAll('button').forEach(function (x) { x.classList.toggle('on', x === b); });
+      var up = b.dataset.alvo === 'atualizar';
+      $('atualizar').hidden = !up; $('keep').hidden = !up; $('primeira').hidden = up;
+      posKnob();
+      if (window.gsap && !reduz()) gsap.from('#' + b.dataset.alvo + ' .st-card', { opacity: 0, y: 16, duration: .5, stagger: .07, ease: 'power3.out' });
+    });
+  });
+  posKnob(); addEventListener('resize', posKnob);
+  document.fonts && document.fonts.ready.then(posKnob);
+
+  function reduz() { return matchMedia('(prefers-reduced-motion: reduce)').matches; }
+
+  // ── palco de tamanho fixo, escalado ──
+  (function escalar() {
+    var sc = $('palcoScaler'), wrap = $('palcoWrap');
+    function aplicar() {
+      var w = wrap.clientWidth, comp = w < 560; sc.classList.toggle('compacto', comp);
+      var base = comp ? 620 : 880, s = Math.min(1, w / base);
+      sc.style.transform = 'scale(' + s + ')'; wrap.style.height = (540 * s) + 'px';
+      sc.style.marginLeft = Math.max(0, (w - base * s) / 2) + 'px';
+    }
+    aplicar(); new ResizeObserver(aplicar).observe(wrap); addEventListener('resize', aplicar);
+  })();
+
+  if (!window.gsap) { document.querySelectorAll('[data-reveal],[data-rv]').forEach(function (e) { e.style.opacity = 1; e.style.transform = 'none'; }); return; }
+  gsap.registerPlugin(ScrollTrigger);
+
+  // ── revelação na carga + ao rolar ──
+  if (reduz()) gsap.set('[data-reveal]', { clearProps: 'all' });
+  else gsap.to('[data-reveal]', { opacity: 1, y: 0, duration: .9, ease: 'power3.out', stagger: .09, delay: .1 });
+  document.querySelectorAll('[data-rv]').forEach(function (el) {
+    if (reduz()) return;
+    gsap.from(el, { opacity: 0, y: 26, duration: .8, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
+  });
+  function contador(el, alvo, dur) {
+    var o = { v: 0 };
+    ScrollTrigger.create({ trigger: el, start: 'top 90%', once: true, onEnter: function () {
+      gsap.to(o, { v: alvo, duration: dur || 1.4, ease: 'power2.out', onUpdate: function () { el.textContent = Math.round(o.v); } });
+    } });
+  }
+  contador($('k5'), 5, 1); contador($('k93'), 93, 1.8);
+  ScrollTrigger.create({ trigger: '#meterB', start: 'top 92%', once: true, onEnter: function () { gsap.to('#meterB', { width: '98%', duration: 1.4, ease: 'power2.out' }); } });
+
+  // ── botão magnético + inclinação do palco ──
+  if (!reduz() && !matchMedia('(hover: none)').matches) {
+    window.__mag = function () { document.querySelectorAll('.js-mag:not([data-mag])').forEach(function (b) {
+      b.setAttribute('data-mag', '1');
+      var x = gsap.quickTo(b, 'x', { duration: .5, ease: 'power3.out' }), y = gsap.quickTo(b, 'y', { duration: .5, ease: 'power3.out' });
+      b.addEventListener('mousemove', function (e) { var r = b.getBoundingClientRect(); x((e.clientX - r.left - r.width / 2) * .25); y((e.clientY - r.top - r.height / 2) * .35); });
+      b.addEventListener('mouseleave', function () { x(0); y(0); });
+    }); };
+    window.__mag();
+    var pc = $('pc'), area = $('palcoWrap');
+    gsap.set(pc, { transformPerspective: 1400 });
+    var rx = gsap.quickTo(pc, 'rotationX', { duration: .8, ease: 'power3.out' }), ry = gsap.quickTo(pc, 'rotationY', { duration: .8, ease: 'power3.out' });
+    area.addEventListener('mousemove', function (e) { var r = area.getBoundingClientRect(); rx(-((e.clientY - r.top) / r.height - .5) * 5); ry(((e.clientX - r.left) / r.width - .5) * 5); });
+    area.addEventListener('mouseleave', function () { rx(0); ry(0); });
+  }
+
+  // ── A DEMO: uma timeline só, feita de tweens (toca em loop; volta ao zero sozinha) ──
+  var tl = gsap.timeline({ paused: true });
+  var fmt = function (n) { return Math.round(n).toLocaleString('pt-BR'); };
+  function digitar(el, texto, porChar, pos) {
+    var o = { n: 0 }, dur = Math.max(.25, texto.length * porChar);
+    tl.fromTo(o, { n: 0 }, { n: texto.length, duration: dur, ease: 'none', immediateRender: false,
+      onUpdate: function () { el.textContent = texto.slice(0, Math.round(o.n)); } }, pos);
+  }
+  function numero(el, de, ate, dur, pos) {
+    var o = { v: de };
+    tl.fromTo(o, { v: de }, { v: ate, duration: dur, ease: 'power1.out', immediateRender: false,
+      onUpdate: function () { el.textContent = fmt(o.v); } }, pos);
+  }
+  function cursorPara(alvo, pos) {
+    var pr = $('pc').getBoundingClientRect(), r = alvo.getBoundingClientRect(), s = pr.width / $('pc').offsetWidth;
+    tl.to('#cur', { x: (r.left - pr.left) / s + r.width * .55, y: (r.top - pr.top) / s + r.height * .55, duration: .7, ease: 'power2.inOut' }, pos);
+  }
+  function clique(pos) {
+    tl.fromTo('#rip', { opacity: .9, scale: .3 }, { opacity: 0, scale: 1.3, duration: .45, ease: 'power2.out', immediateRender: false }, pos);
+  }
+
+  function montar() {
+    tl.clear();
+    tl.set('#cur', { x: 520, y: 260 }, 0);
+    tl.to('#cur', { opacity: 1, duration: .3 }, .3);
+    // 1. troca pro Vids
+    cursorPara($('tabV'), .5); clique(1.25);
+    tl.to('#onF', { opacity: 0, duration: .3 }, 1.35).to('#onV', { opacity: 1, duration: .3 }, 1.35)
+      .to('#urlF', { opacity: 0, duration: .3 }, 1.35).to('#urlV', { opacity: 1, duration: .3 }, 1.4)
+      .to('#pgF', { opacity: 0, duration: .45 }, 1.4).to('#pgV', { opacity: 1, duration: .45 }, 1.4)
+      .to('#skF', { opacity: 0, duration: .5 }, 1.5).to('#skV', { opacity: 1, duration: .5 }, 1.5)
+      .to('#acF', { opacity: 0, duration: .3 }, 1.5).to('#acV', { opacity: 1, duration: .3 }, 1.6)
+      .to('#cnF', { opacity: 0, duration: .25 }, 1.55).to('#cnV', { opacity: 1, duration: .25 }, 1.65);
+    // 2. cota, CSV, elenco, paralelo
+    tl.fromTo('#cota', { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: .4, immediateRender: false }, 2.1);
+    tl.fromTo('#csv', { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: .35, immediateRender: false }, 2.6);
+    digitar($('csvFn'), EX.csv, .035, 2.8);
+    tl.to('#csvCt', { opacity: 1, duration: .3 }, 3.35);
+    tl.fromTo('#eln', { opacity: 0, x: 14 }, { opacity: 1, x: 0, duration: .4, immediateRender: false }, 3.5);
+    tl.fromTo('#par', { opacity: 0 }, { opacity: 1, duration: .3, immediateRender: false }, 3.95);
+    tl.to('#pills u', { opacity: 1, duration: .12, stagger: .08 }, 4.1);
+    tl.to('#pills b', { color: '#140c02', duration: .12, stagger: .08 }, 4.1);
+    tl.to('#go', { opacity: 1, duration: .3 }, 4.4);
+    // 3. Iniciar
+    cursorPara($('go'), 4.45); clique(5.15);
+    tl.to('#go', { scale: .95, duration: .1, yoyo: true, repeat: 1 }, 5.15);
+    tl.to('#g1', { opacity: 0, duration: .2 }, 5.25).to('#g2', { opacity: 1, duration: .2 }, 5.3);
+    tl.to('#cur', { opacity: 0, x: '+=40', y: '+=30', duration: .5 }, 5.5);
+    var t0 = 5.4, fim = 0;
+    var rows = q.querySelectorAll('.qr'), sl = slots.querySelectorAll('.slot:not(.vazio)'), chips = shelf.querySelectorAll('.chip');
+    var noAr = { v: 0 }, noArEl = $('noAr'), MAX = 5, ends = [], ev = [], passo = rows[0].offsetHeight + 4, cabem = Math.max(1, Math.floor((q.parentNode.clientHeight + 4) / passo)), chipW = chips[0].offsetWidth + 6;
+    CENAS.forEach(function (c, i) {
+      var ini = i < MAX ? t0 + i * .16 : ends.slice().sort(function (a, b) { return a - b; })[i - MAX] + .12;
+      var fimC = ini + c.d; ends.push(fimC); fim = Math.max(fim, fimC);
+      ev.push([ini, 1], [fimC, -1]);
+      tl.fromTo(rows[i], { opacity: 0, x: 10 }, { opacity: 1, x: 0, duration: .25, immediateRender: false }, ini);
+      if (i + 1 > cabem) tl.to(q, { y: -(i + 1 - cabem) * passo, duration: .35, ease: 'power2.inOut' }, ini);
+      tl.to(sl[i].querySelector('.shim'), { opacity: 1, duration: .2 }, ini);
+      tl.fromTo([rows[i].querySelector('.qb'), sl[i].querySelector('.pb')], { scaleX: 0 }, { scaleX: 1, duration: c.d, ease: 'power1.inOut', immediateRender: false }, ini);
+      tl.to(sl[i].querySelector('video'), { opacity: 1, duration: .45 }, fimC);
+      tl.to([sl[i].querySelector('.shim'), sl[i].querySelector('.pb'), rows[i].querySelector('.qb')], { opacity: 0, duration: .3 }, fimC);
+      tl.to(rows[i].querySelector('.st .sa'), { opacity: 0, duration: .15 }, fimC);
+      tl.to(rows[i].querySelector('.st .sb'), { opacity: 1, duration: .2 }, fimC + .1);
+      tl.fromTo(chips[i], { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: .3, immediateRender: false }, fimC + .1);
+    });
+    // contadores: "no ar" sobe e desce com cada início/fim; baixadas sobe; cota desce 1 ponto por segundo (cena de 8 s)
+    var vivo = 0;
+    ev.sort(function (a, b) { return a[0] - b[0]; }).forEach(function (e) {
+      var de = vivo; vivo += e[1];
+      tl.fromTo(noAr, { v: de }, { v: vivo, duration: .12, immediateRender: false, onUpdate: function () { noArEl.textContent = Math.round(noAr.v); } }, e[0]);
+    });
+    var ordem = ends.slice().sort(function (a, b) { return a - b; });
+    ordem.forEach(function (t, k) {
+      numero($('baix'), k, k + 1, .2, t);
+      numero($('cotaN'), 9850 - k * 8, 9842 - k * 8, .35, t);
+      if (k >= 3) tl.to(shelf, { x: -(k - 2) * chipW, duration: .35, ease: 'power2.inOut' }, t + .1);
+    });
+    tl.fromTo('#cotaB', { width: '98.5%' }, { width: '98%', duration: fim - t0, ease: 'none', immediateRender: false }, t0);
+    tl.to('#g2', { opacity: 0, duration: .2 }, fim + .2).to('#g3', { opacity: 1, duration: .25 }, fim + .25);
+    tl.to({}, { duration: 3.2 }, fim + .5);
+  }
+
+  function iniciar() {
+    montar();
+    if (reduz()) { tl.progress(.999); return; }
+    tl.eventCallback('onComplete', function () { gsap.delayedCall(.2, function () { tl.progress(0).play(); }); });
+    gsap.delayedCall(1.1, function () { tl.play(); });
+  }
+  // o cursor mede posições reais: espera fontes e layout
+  (document.fonts ? document.fonts.ready : Promise.resolve()).then(function () { requestAnimationFrame(iniciar); });
 })();
 </script>
+<script>
+/* ═══ CenaDrop Multi ═══
+   Liberado em 25/11/26. Lê o versao.json do site do Multi (o mesmo que o atualizador do programa usa) e liga os
+   3 botões na versão atual. Publicar versão nova do Multi NÃO exige mexer nesta página. Se o versao.json não
+   responder, os botões abrem a página de downloads do Multi (que tem os mesmos 3 instaladores). */
+(function () {
+  var FONTE = 'https://cenadrop-instalado-downloads.vercel.app/versao.json';
+
+  // destaca o computador de quem está vendo (Mac Apple × Intel só é certeiro no Chrome; senão fica Apple)
+  function marcar(os) { var c = document.querySelector('.os[data-os="' + os + '"]'); if (c) c.classList.add('seu'); }
+  var ua = navigator.userAgent || '';
+  if (/Windows/i.test(ua)) marcar('win');
+  else if (/Mac/i.test(ua)) {
+    if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
+      navigator.userAgentData.getHighEntropyValues(['architecture']).then(function (h) { marcar(h.architecture === 'x86' ? 'mac-intel' : 'mac-arm'); }).catch(function () { marcar('mac-arm'); });
+    } else marcar('mac-arm');
+  }
+
+  var ORIGEM = new URL(FONTE).origin + '/';
+  fetch(FONTE, { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (v) {
+    var links = { 'mac-arm': v.mac && v.mac.arm64 && v.mac.arm64.url, 'mac-intel': v.mac && v.mac.x64 && v.mac.x64.url, 'win': v.win && v.win.url };
+    var nomes = { 'mac-arm': 'Baixar para Mac (Apple)', 'mac-intel': 'Baixar para Mac (Intel)', 'win': 'Baixar para Windows' };
+    var ok = 0;
+    Object.keys(links).forEach(function (k) {
+      var a = document.querySelector('[data-mlink="' + k + '"]'), u = links[k];
+      if (!a || !u || u.indexOf(ORIGEM) !== 0) return;
+      a.href = u; a.removeAttribute('aria-disabled'); a.removeAttribute('role'); a.setAttribute('download', '');
+      a.textContent = '⬇ ' + nomes[k]; ok++;
+    });
+    if (!ok) return;
+    var ver = document.getElementById('mtVer'); ver.textContent = 'versão ' + v.versao; ver.hidden = false;
+  }).catch(function () {});
+})();
+</script>
+
 </body>
 </html>
