@@ -78,7 +78,7 @@ module.exports = function espelho(client) {
     if (!content && !embeds.length && !files.length) return null;
     const eBot = msg.author.id === client.user.id;
     return {
-      username: (msg.type === 7 ? 'CenaDrop' : eBot ? 'Equipe CenaDrop' : (msg.member?.displayName || msg.author.globalName || msg.author.username)).slice(0, 80),
+      username: (msg.type === 7 ? 'CenaDrop' : eBot ? 'Equipe A Sala' : (msg.member?.displayName || msg.author.globalName || msg.author.username)).slice(0, 80),
       avatarURL: eBot || msg.type === 7 ? client.user.displayAvatarURL() : (msg.member?.displayAvatarURL() || msg.author.displayAvatarURL()),
       content: content || undefined, embeds, files, allowedMentions: { parse: [] },
     };
@@ -134,7 +134,7 @@ module.exports = function espelho(client) {
       const quem = original && !original.author.bot ? original.author.id : null;
       await destino.send({
         content: quem ? `<@${quem}>` : undefined,
-        embeds: txt ? [{ author: { name: 'Equipe CenaDrop', icon_url: client.user.displayAvatarURL() }, description: txt.slice(0, 4000), color: 0x7C3AED }] : [],
+        embeds: txt ? [{ author: { name: 'Equipe A Sala', icon_url: client.user.displayAvatarURL() }, description: txt.slice(0, 4000), color: 0x7C3AED }] : [],
         files,
         ...(original ? { reply: { messageReference: original.id, failIfNotExists: false } } : {}),
         allowedMentions: { users: quem ? [quem] : [], repliedUser: !!quem },

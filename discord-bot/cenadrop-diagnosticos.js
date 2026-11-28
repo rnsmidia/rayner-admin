@@ -140,7 +140,7 @@ module.exports = function diagnosticos(client, { db, logStaff, suporte }) {
         const user = await client.users.fetch(lic.discord_id);
         await user.send({
           embeds: [{
-            author: { name: 'Equipe CenaDrop', icon_url: client.user.displayAvatarURL() },
+            author: { name: 'Equipe A Sala', icon_url: client.user.displayAvatarURL() },
             title: `Sobre o seu diagnóstico ${d.codigo}`,
             description: texto.slice(0, 4000), color: COR,
             footer: { text: 'Precisa continuar a conversa? Abra um post no #suporte citando o código.' },

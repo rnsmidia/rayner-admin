@@ -25,7 +25,8 @@ const APP_ID       = '1555368816140361778';
 const GUILD_ID     = '1555365917578240130';
 const STAFF_GUILD  = '1555367221541208105';
 const ROLE_CLIENTE = '1555372672534454282';
-const ROLE_COMUNIDADE = '1557134048491606147'; // vê #geral e #dicas; quem escolhe "só suporte" fica sem
+const ROLE_COMUNIDADE = '1557134048491606147';
+const ROLE_NARRATIVA = '1576118645355061348';   // A SALA (28/11/26): quem também é cliente do Narrativa não perde a Comunidade // vê #geral e #dicas; quem escolhe "só suporte" fica sem
 const CH = {
   geral:    '1555365918278684775',
   suporte:  '1555372720517283931',
@@ -145,7 +146,7 @@ async function ativar(inter) {
   await logStaff(`✅ Ativou · **${user.username}** \`${user.id}\` · ${lic.name || '—'} · ${mascararEmail(lic.email || '')} · ${lic.source || ''}`);
   return inter.editReply({
     content:
-      `✅ **Acesso liberado${primeiro ? `, ${primeiro}` : ''}!** Bem-vindo à comunidade CenaDrop.\n\n` +
+      `✅ **Acesso liberado${primeiro ? `, ${primeiro}` : ''}!** Bem-vindo à A SALA.\n\n` +
       `💬 Apresente-se em <#${CH.geral}>\n` +
       `🛟 Dúvida ou problema? Abra um post em <#${CH.suporte}>\n` +
       `✨ Mostre suas melhores cenas na <#${CH.vitrine}>\n\n` +
@@ -244,7 +245,7 @@ async function conferirAcessos() {
 
       if (temCargo && !ativo.get(m.id)) {
         const motivo = ativo.has(m.id) ? 'chave desativada' : 'sem chave ligada';
-        await m.roles.remove([ROLE_CLIENTE, ROLE_COMUNIDADE].filter((r) => m.roles.cache.has(r)), `Conferência: ${motivo}`);
+        await m.roles.remove([ROLE_CLIENTE, ...(m.roles.cache.has(ROLE_NARRATIVA) ? [] : [ROLE_COMUNIDADE])].filter((r) => m.roles.cache.has(r)), `Conferência: ${motivo}`);
         removidos++;
         await logStaff(`🚫 Perdeu o acesso · **${m.user.username}** \`${m.id}\` · ${motivo}`);
         if (motivo === 'chave desativada') {
@@ -301,7 +302,7 @@ async function conferirVersao() {
       embeds: [{
         title: `🚀 Nova versão ${v} disponível`,
         description: `${det.resumo ? `**${det.resumo}** · ` : ''}lançada em ${data}\n\n${novidades ? `**O que mudou:**\n${novidades}\n\n` : ''}Baixe pelo botão abaixo e troque a pasta da extensão (passo a passo no manual).`,
-        color: COR, footer: { text: 'Equipe CenaDrop' },
+        color: COR, footer: { text: 'Equipe A Sala' },
       }],
       components: botoes,
     });
@@ -322,7 +323,7 @@ async function publicarAviso(texto) {
   const m = await canal.send({
     content: `<@&${ROLE_CLIENTE}>`,
     allowedMentions: { roles: [ROLE_CLIENTE] },
-    embeds: [{ title: '📢 Aviso', description: texto.slice(0, 4000), color: COR, footer: { text: 'Equipe CenaDrop' }, timestamp: new Date().toISOString() }],
+    embeds: [{ title: '📢 Aviso', description: texto.slice(0, 4000), color: COR, footer: { text: 'Equipe A Sala' }, timestamp: new Date().toISOString() }],
   });
   return m.url;
 }
@@ -357,7 +358,7 @@ async function mandarDM(alvo, texto, quem) {
   }
   if (!membro) throw new Error(`não achei "${limpo}" no servidor CenaDrop (a pessoa precisa estar lá dentro)`);
   await membro.send({
-    embeds: [{ author: { name: 'Equipe CenaDrop', icon_url: client.user.displayAvatarURL() }, description: texto.slice(0, 4000), color: COR,
+    embeds: [{ author: { name: 'Equipe A Sala', icon_url: client.user.displayAvatarURL() }, description: texto.slice(0, 4000), color: COR,
       footer: { text: 'Precisa de ajuda? Abra um post no #suporte do servidor CenaDrop.' } }],
     components: [new ActionRowBuilder().addComponents(
       new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel('Abrir o #suporte').setEmoji('🛟').setURL(`https://discord.com/channels/${GUILD_ID}/${CH.suporte}`))],
@@ -394,7 +395,7 @@ async function preferencia(inter) {
 
 // ── !geral / !responder no Staff: a equipe fala no servidor sem aparecer ──
 const GERAL = '1555365918278684775';
-const embedEquipe = (texto) => ({ author: { name: 'Equipe CenaDrop', icon_url: client.user.displayAvatarURL() }, description: texto.slice(0, 4000), color: COR });
+const embedEquipe = (texto) => ({ author: { name: 'Equipe A Sala', icon_url: client.user.displayAvatarURL() }, description: texto.slice(0, 4000), color: COR });
 
 async function falarComoEquipe(msg) {
   const txt = msg.content.trim();
@@ -447,13 +448,13 @@ async function painelStaff(inter) {
       new TextInputBuilder().setCustomId(cid).setLabel(rotulo).setStyle(estilo).setPlaceholder(exemplo).setRequired(true).setMaxLength(max))));
   if (inter.isButton()) {
     if (inter.customId === 'staff:aviso') return inter.showModal(caixaLonga('staff:m-aviso', 'Publicar aviso no #avisos', [['texto', 'Aviso (vai com @Cliente CenaDrop)', TextInputStyle.Paragraph, 'O Google Flow está instável agora; se der erro, espere 1 hora e tente de novo.', 4000]]));
-    if (inter.customId === 'staff:geral') return inter.showModal(caixaLonga('staff:m-geral', 'Postar no #geral', [['texto', 'Mensagem (sai como Equipe CenaDrop)', TextInputStyle.Paragraph, 'Bom dia, pessoal! Qual cena vocês geraram hoje?', 4000]]));
+    if (inter.customId === 'staff:geral') return inter.showModal(caixaLonga('staff:m-geral', 'Postar no #geral', [['texto', 'Mensagem (sai como Equipe A Sala)', TextInputStyle.Paragraph, 'Bom dia, pessoal! Qual cena vocês geraram hoje?', 4000]]));
     if (inter.customId === 'staff:dm') return inter.showModal(caixaLonga('staff:m-dm', 'Mensagem direta pro aluno', [
       ['quem', 'Nome de usuário ou id do aluno', TextInputStyle.Short, 'Ex.: ademicio (como aparece no #ativacoes)', 100],
-      ['texto', 'Mensagem (sai como Equipe CenaDrop)', TextInputStyle.Paragraph, 'Oi! Vimos que…', 4000]]));
+      ['texto', 'Mensagem (sai como Equipe A Sala)', TextInputStyle.Paragraph, 'Oi! Vimos que…', 4000]]));
     if (inter.customId === 'staff:responder') return inter.showModal(caixaLonga('staff:m-responder', 'Responder um aluno', [
       ['link', 'Link da mensagem do aluno', TextInputStyle.Short, 'Botão direito na mensagem → Copiar link da mensagem', 200],
-      ['texto', 'Sua resposta (sai como Equipe CenaDrop)', TextInputStyle.Paragraph, 'Que cena linda! Qual estilo você usou?', 4000]]));
+      ['texto', 'Sua resposta (sai como Equipe A Sala)', TextInputStyle.Paragraph, 'Que cena linda! Qual estilo você usou?', 4000]]));
     if (inter.customId === 'staff:conferir') {
       await inter.deferReply({ flags: MessageFlags.Ephemeral });
       const r = await conferirComAviso();

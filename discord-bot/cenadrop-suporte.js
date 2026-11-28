@@ -42,7 +42,11 @@ const PADRAO = {
     diag: '1557199153254105141',           // #diagnosticos do Staff
   },
   cor: 0x7C3AED,
-  equipe: 'Equipe CenaDrop',               // autor das respostas no post (o salvarCaso lê esse mesmo nome de volta)
+  equipe: 'Equipe A Sala',                 // autor das respostas no post (o salvarCaso lê esse nome de volta; aceita os antigos)
+  // A SALA (28/11/26): os 2 bots dividem o MESMO fórum #suporte. Cada um só atende post com a etiqueta da sua ferramenta.
+  // O "roteador" (CenaDrop) também fica com post sem etiqueta de ferramenta: deduz pelo código (D-/M-/N-) ou pergunta.
+  etiquetasProduto: ['One', 'Multi'],
+  roteador: true,
   padraoDiag: /\bD-[A-Z2-9]{4}\b/,
   diag: true,                              // false = sem diagnóstico ligado ao suporte
   pedirDiag: true,                         // mostra o "Falta só uma coisa: o código" depois do 🙋
@@ -123,6 +127,8 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
   const PADRAO_DIAG = FONTES.length === 1 ? FONTES[0].padrao : new RegExp(FONTES.map((f) => f.padrao.source).join('|'));
   const { suporte: SUPORTE, chamados: CHAMADOS, fila: PAINEL_FILA, faq: FAQ, diag: CANAL_DIAG } = cfg.canais;
   const TAG = cfg.produto === 'cenadrop' ? '[Suporte]' : `[Suporte ${cfg.produto}]`;
+  const PRODUTOS_TODOS = ['One', 'Multi', 'Narrativa'];
+  const EQUIPES = [cfg.equipe, 'Equipe CenaDrop', 'Equipe Narrativa', 'Equipe A Sala'];   // nomes antigos: posts de antes d'A SALA
   let KB_NORM = prepararBase(cfg.kbArquivo || []);
   const procurar = (titulo, corpo, assunto) => procurarEm(KB_NORM, titulo, corpo, assunto);
   const ehTecnico = (assuntoTag, texto) => !cfg.assuntosNaoTecnicos.includes(assuntoTag) && !(cfg.outroProduto && cfg.outroProduto.test(texto));
@@ -195,7 +201,7 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
         if (inicial && m.id === inicial.id) continue;
         if (m.author.id === client.user.id) {
           for (const e of m.embeds) {
-            if (e.author?.name === cfg.equipe && e.description) conversa.push({ quem: 'equipe', texto: e.description, quando: m.createdAt.toISOString() });
+            if (EQUIPES.includes(e.author?.name) && e.description) conversa.push({ quem: 'equipe', texto: e.description, quando: m.createdAt.toISOString() });
             const id = e.title && idPorPergunta(e.title);
             if (id) respostasBot.add(id);
           }
@@ -217,7 +223,7 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
         thread_id: thread.id, staff_thread_id: staffId, canal: 'discord', produto: cfg.produto, ferramenta: ferramentaDe(codigos), sugestoes_ia: sugestoes,
         aberto_em: thread.createdAt?.toISOString(), resolvido_em: new Date().toISOString(), resolvido_por: resolvidoPor,
         cliente_discord_id: dono, cliente_nome: owner?.username || null,
-        assunto: thread.appliedTags.map((id) => nomeTag(thread.parent, id)).find((n) => n && !STATUS.includes(n)) || null,
+        assunto: thread.appliedTags.map((id) => nomeTag(thread.parent, id)).find((n) => n && !NAO_ASSUNTO.includes(n)) || null,
         titulo: thread.name, problema: inicial?.content || null, conversa,
         resposta_equipe: conversa.filter((c) => c.quem === 'equipe').map((c) => c.texto).join('\n\n') || null,
         respostas_bot: [...respostasBot], diag_codigos: codigos, diag_resumo: diagResumo,
@@ -248,6 +254,11 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
   const tagsDe = (forum) => Object.fromEntries(forum.availableTags.map((t) => [t.name, t.id]));
   const nomeTag = (forum, id) => forum.availableTags.find((t) => t.id === id)?.name;
   const STATUS = ['Na fila', 'Em atendimento', 'Resolvido', 'Bot respondeu'];
+  const NAO_ASSUNTO = [...STATUS, ...PRODUTOS_TODOS];
+  const tagsProduto = (th) => th.appliedTags.map((id) => nomeTag(th.parent, id)).filter((n) => PRODUTOS_TODOS.includes(n));
+  // este post é deste bot? (com etiqueta de ferramenta: só a minha · sem etiqueta: só o roteador)
+  const ehMeu = (th) => { const t = tagsProduto(th); return t.length ? t.some((n) => cfg.etiquetasProduto.includes(n)) : !!cfg.roteador; };
+  const produtoDoCodigo = (codigo) => (cfg.produto === 'narrativa' ? 'Narrativa' : /^M-/.test(codigo || '') ? 'Multi' : 'One');
 
   async function marcarStatus(thread, status) {
     try {
@@ -303,6 +314,72 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
         inicial = await thread.fetchStarterMessage().catch(() => null);
       }
       if (inicial?.author?.bot) return;
+      if (!tagsProduto(thread).length) {
+        if (!cfg.roteador) return;
+        // sem etiqueta de ferramenta: deduz pelo código; senão pergunta (o bot da outra ferramenta pega no threadUpdate)
+        const texto = `${thread.name} ${inicial?.content || ''}`;
+        const deduzido = /\bN-[A-Z2-9]{4}\b/.test(texto) ? 'Narrativa' : /\bM-[A-Z2-9]{4}\b/.test(texto) ? 'Multi' : /\bD-[A-Z2-9]{4}\b/.test(texto) ? 'One' : null;
+        if (deduzido) { await aplicarProduto(thread, deduzido); return; }   // o threadUpdate chama o novoPost do bot certo
+        await perguntarProduto(thread);
+        return;
+      }
+      if (!ehMeu(thread)) return;
+      await novoPost(thread, inicial);
+    } catch (err) {
+      console.error(`${TAG} threadCreate:`, err);
+    }
+  });
+
+  // etiqueta de ferramenta chegou depois (o aluno escolheu nos botões ou o roteador deduziu) → o bot dono atende
+  client.on('threadUpdate', async (antes, depois) => {
+    try {
+      if (depois.parentId !== SUPORTE) return;
+      const minhaAntes = tagsProduto(antes).some((n) => cfg.etiquetasProduto.includes(n));
+      const minhaAgora = tagsProduto(depois).some((n) => cfg.etiquetasProduto.includes(n));
+      if (minhaAntes || !minhaAgora || chamados.has(depois.id)) return;
+      const msgs = await depois.messages.fetch({ limit: 30 });
+      if (msgs.some((m) => m.author.id === client.user.id && !m.content.startsWith(PERGUNTA))) return;   // já atendi
+      const inicial = await depois.fetchStarterMessage().catch(() => null);
+      if (!inicial || inicial.author.bot) return;
+      await novoPost(depois, inicial);
+    } catch (err) {
+      console.error(`${TAG} threadUpdate:`, err.message);
+    }
+  });
+
+  const PERGUNTA = '🧭';
+  async function aplicarProduto(thread, nome) {
+    const id = tagsDe(thread.parent)[nome];
+    if (!id) return;
+    const atuais = thread.appliedTags.filter((t) => !PRODUTOS_TODOS.includes(nomeTag(thread.parent, t)));
+    await thread.setAppliedTags([id, ...atuais].slice(0, 5));
+  }
+  async function perguntarProduto(thread) {
+    await thread.send({
+      content: `${PERGUNTA} <@${thread.ownerId}>, de qual ferramenta é a sua dúvida? Assim o seu post vai direto pra equipe certa.`,
+      components: [new ActionRowBuilder().addComponents(
+        new ButtonBuilder().setCustomId('prod:One').setStyle(ButtonStyle.Secondary).setLabel('CenaDrop One (extensão)').setEmoji('🧩'),
+        new ButtonBuilder().setCustomId('prod:Multi').setStyle(ButtonStyle.Secondary).setLabel('CenaDrop Multi (programa)').setEmoji('🖥️'),
+        new ButtonBuilder().setCustomId('prod:Narrativa').setStyle(ButtonStyle.Secondary).setLabel('Narrativa IA').setEmoji('📝'),
+      )],
+      allowedMentions: { users: [thread.ownerId] },
+    });
+  }
+  client.on('interactionCreate', async (inter) => {
+    if (!inter.isButton() || !inter.customId.startsWith('prod:')) return;
+    try {
+      const thread = inter.channel;
+      if (inter.user.id !== await donoDe(thread)) {
+        return inter.reply({ content: 'Só quem abriu este post escolhe a ferramenta. 🙂', flags: MessageFlags.Ephemeral });
+      }
+      const nome = inter.customId.slice(5);
+      await inter.update({ content: `${PERGUNTA} Ferramenta: **${nome === 'One' ? 'CenaDrop One' : nome === 'Multi' ? 'CenaDrop Multi' : 'Narrativa IA'}** ✅`, components: [] });
+      await aplicarProduto(thread, nome);   // o threadUpdate do bot dono faz o resto
+    } catch (err) { console.error(`${TAG} escolher ferramenta:`, err.message); }
+  });
+
+  async function novoPost(thread, inicial) {
+    try {
       const dono = await client.users.fetch(thread.ownerId);
       // já veio com o código do diagnóstico → é técnico, a base não resolve: direto pra fila
       if (cfg.diag && PADRAO_DIAG.test(`${thread.name} ${inicial?.content || ''}`)) {
@@ -310,7 +387,7 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
         await logStaff(`📝 Post novo no #suporte com código → direto pra fila · "${thread.name}"`);
         return;
       }
-      const assunto = thread.appliedTags.map((id) => nomeTag(thread.parent, id)).find(Boolean);
+      const assunto = thread.appliedTags.map((id) => nomeTag(thread.parent, id)).find((n) => n && !NAO_ASSUNTO.includes(n));
       const achados = procurar(thread.name, inicial?.content || '', assunto);
       const embeds = achados.length
         ? achados.map((e) => ({
@@ -332,9 +409,9 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
       await abrirChamado(thread, dono, { modo: 'bot', botResumo });
       await logStaff(`📝 Post novo no #suporte · ${assunto || 'sem assunto'} · "${thread.name}" · ${achados.length ? `respondido com: ${achados.map((e) => e.id).join(', ')}` : 'sem resposta pronta'}`);
     } catch (err) {
-      console.error(`${TAG} threadCreate:`, err);
+      console.error(`${TAG} novo post:`, err);
     }
-  });
+  }
 
   // ── 2. botões ─────────────────────────────────────────────────────────────
   client.on('interactionCreate', async (inter) => {
@@ -466,7 +543,7 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
     const ehBot = modo === 'bot';
     const card = ehBot ? null : await thread.send({ embeds: [cartao('fila', naFila().length + 1)] });
     // diagnóstico só faz sentido em problema técnico — dúvida de licença/plano não precisa
-    const assuntoTag = thread.appliedTags.map((id) => nomeTag(thread.parent, id)).find((n) => n && !STATUS.includes(n));
+    const assuntoTag = thread.appliedTags.map((id) => nomeTag(thread.parent, id)).find((n) => n && !NAO_ASSUNTO.includes(n));
     // o D-XXXX é da extensão CenaDrop: Elo IA e Narrativa não têm esse diagnóstico
     const inicialTxt = (await thread.fetchStarterMessage().catch(() => null))?.content || '';
     const tecnico = ehTecnico(assuntoTag, `${thread.name} ${inicialTxt}`);
@@ -482,7 +559,7 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
     const diag = await diagnostico(codigo);
     const inicial = await thread.fetchStarterMessage().catch(() => null);
     const descricao = codigoDado ? `🩺 Chamado aberto pelo bot a partir do diagnóstico ${codigoDado} (o aluno não abriu post).${diag?.mensagem ? `\n\n**Recado do aluno:** "${diag.mensagem}"` : ''}` : inicial?.content;
-    const assunto = thread.appliedTags.map((id) => nomeTag(thread.parent, id)).find((n) => n && !STATUS.includes(n));
+    const assunto = thread.appliedTags.map((id) => nomeTag(thread.parent, id)).find((n) => n && !NAO_ASSUNTO.includes(n));
     const anexos = inicial ? [...inicial.attachments.values()].map((a) => a.url) : [];
 
     const staffForum = await client.channels.fetch(CHAMADOS);
@@ -537,7 +614,7 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
     c.cardId = card.id;
     cartaoTexto.set(card.id, cartao('fila', posicao(cid)).title);
     // pede o código só se for técnico e ainda não veio
-    const assuntoTag = th.appliedTags.map((id) => nomeTag(th.parent, id)).find((n) => n && !STATUS.includes(n));
+    const assuntoTag = th.appliedTags.map((id) => nomeTag(th.parent, id)).find((n) => n && !NAO_ASSUNTO.includes(n));
     const inicialTxt = (await th.fetchStarterMessage().catch(() => null))?.content || '';
     const tecnico = ehTecnico(assuntoTag, `${th.name} ${inicialTxt}`);
     if (tecnico && cfg.diag && cfg.pedirDiag && !(codigosDe.get(cid)?.size) && !(await procurarCodigo(th))) await th.send({ embeds: [EMBED_DIAG] });
@@ -737,7 +814,7 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
         const tags = tagsDe(forum);
         const thread = await forum.threads.create({
           name: `🩺 Diagnóstico ${codigos.join(' · ')}`.slice(0, 95),
-          appliedTags: [cfg.tagDoDiag(dd[0] || {}, tags)].filter(Boolean),
+          appliedTags: [tags[produtoDoCodigo(codigos[0])], cfg.tagDoDiag(dd[0] || {}, tags)].filter(Boolean),
           message: {
             content: `<@${discordId}>, que bom te ver aqui! 🙂 O seu diagnóstico **${codigos.join(', ')}** estava com a equipe ` +
               (jaRespondido ? 'e já te respondemos por e-mail. Daqui pra frente a conversa segue **aqui**.' : 'e a resposta vai sair **aqui**, em ordem de chegada (o cartão abaixo mostra a sua posição).'),
@@ -869,7 +946,7 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
     const tag = cfg.tagDoDiag(d, tags);
     const thread = await forum.threads.create({
       name: `🩺 Diagnóstico ${d.codigo}`,
-      appliedTags: [tag].filter(Boolean),
+      appliedTags: [tags[produtoDoCodigo(d.codigo)], tag].filter(Boolean),
       message: {
         content: `<@${discordId}>, recebemos o seu diagnóstico **${d.codigo}** e abrimos este chamado pra você. 🙂\n` +
           'A equipe responde **aqui**, em ordem de chegada (o cartão abaixo mostra a sua posição). Se quiser, conte mais detalhes aqui embaixo.',
@@ -901,6 +978,7 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
       if (msg.channel.parentId === SUPORTE) {
         const c = chamados.get(msg.channel.id);
         if (!c) {
+          if (!ehMeu(msg.channel)) return;   // A SALA: post da outra ferramenta é do outro bot
           // post já resolvido e o dono voltou a escrever → oferece a fila de novo (uma vez)
           const resolvido = msg.channel.appliedTags.some((id) => nomeTag(msg.channel.parent, id) === 'Resolvido');
           if (resolvido && msg.author.id === await donoDe(msg.channel)) {
@@ -971,7 +1049,8 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
       const forum = await client.channels.fetch(SUPORTE);
       const ativos = await forum.threads.fetchActive();
       for (const th of ativos.threads.values()) {
-        if (th.parentId !== SUPORTE || chamados.has(th.id)) continue;
+        if (th.parentId !== SUPORTE || chamados.has(th.id) || !ehMeu(th)) continue;   // A SALA: só os posts da minha ferramenta
+        if (!tagsProduto(th).length && th.createdTimestamp > Date.parse('2026-11-28T06:00:00Z')) continue;   // esperando o aluno escolher a ferramenta
         if (th.appliedTags.some((id) => nomeTag(forum, id) === 'Resolvido')) continue;
         const dono = await client.users.fetch(await donoDe(th)).catch(() => null);
         if (!dono) continue;

@@ -27,7 +27,7 @@ module.exports = function rascunhos(client, { logStaff }) {
     const [, tipo, canalId, msgId] = alvo;
     const canal = await client.channels.fetch(canalId);
     if (canal.guildId !== GUILD_ID) throw new Error('destino fora do servidor CenaDrop');
-    const embed = { author: { name: 'Equipe CenaDrop', icon_url: client.user.displayAvatarURL() }, description: texto.slice(0, 4000), color: COR };
+    const embed = { author: { name: 'Equipe A Sala', icon_url: client.user.displayAvatarURL() }, description: texto.slice(0, 4000), color: COR };
     let enviada;
     if (tipo === 'reply') {
       const original = await canal.messages.fetch(msgId);

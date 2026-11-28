@@ -1,5 +1,9 @@
 /**
- * Narrativa Bot — comunidade/suporte do Narrativa IA (servidor separado, 22/10/26)
+ * Narrativa Bot — comunidade/suporte do Narrativa IA
+ * 28/11/26 (Fase 2 d'A SALA): mora no servidor ÚNICO "A SALA" (o ex-CenaDrop), ao lado do CenaDrop Bot. Cuida só do que é
+ * do Narrativa: cargo Narrativa, o /ativar-narrativa e o 🔑 do Narrativa no #ativar-acesso, o #conheça-o-narrativa e os
+ * posts do #suporte com a etiqueta "Narrativa". O cargo Comunidade é COMUM: só sai se a pessoa não for cliente de mais nada.
+ * (antes: servidor separado, 22/10/26)
  * Espelha o CenaDrop Bot, com uma diferença central: o Narrativa não tem chave — o aluno entra com
  * e-mail e senha. Então a prova de identidade acontece DENTRO do app: Perfil › "Ligar ao Discord" gera
  * um código de uso único (NV-XXXX, 15 min, tabela narrativa_discord_codigos) e aqui o /ativar troca o
@@ -25,22 +29,24 @@ const {
 const { createClient } = require('@supabase/supabase-js');
 
 const APP_ID      = '1562532541683077203';
-const GUILD_ID    = '1562531582462394459';
+const GUILD_ID    = '1555365917578240130';   // A SALA (era 1562531582462394459, o servidor só do Narrativa)
 const STAFF_GUILD = '1555367221541208105';
-const ROLE_CLIENTE    = '1562683754038829086';
-const ROLE_COMUNIDADE = '1562683758862270514';
+const ROLE_CLIENTE    = '1576118645355061348';   // cargo "Narrativa" n'A SALA
+const ROLE_COMUNIDADE = '1557134048491606147';   // "Comunidade" — COMUM às ferramentas
+const ROLE_OUTROS_CLIENTES = ['1555372672534454282'];   // "CenaDrop": quem tem não perde a Comunidade quando sai do Narrativa
 const CH = {
-  boasVindas: '1562683766718333060',
-  avisos:     '1562683768723214507',
-  conheca:    '1562683773735407686',
-  ativar:     '1562683775878561833',
-  geral:      '1562683779623948319',
-  dicas:      '1562683781712715850',
-  aulas:      '1562683792383025162',
-  suporte:    '1562683796900290617',
-  faq:        '1562683799593164800',
+  avisos:     '1555372692742340718',
+  conheca:    '1576118691895054396',
+  ativar:     '1555372696383262730',
+  geral:      '1555365918278684775',
+  dicas:      '1555372711763513364',
+  aulas:      '1560389544917082123',
+  suporte:    '1555372720517283931',
+  faq:        '1557072936119308338',
   ativacoes:  '1562683831763337246', // Staff
 };
+// Comunidade só sai se a pessoa não for cliente de outra ferramenta
+const cargosAoPerder = (m) => [ROLE_CLIENTE, ...(ROLE_OUTROS_CLIENTES.some((r) => m.roles.cache.has(r)) ? [] : [ROLE_COMUNIDADE])].filter((r) => m.roles.cache.has(r));
 const APP     = 'https://narrativaia.com.br/narrativa-ia';
 const PERFIL  = `${APP}/perfil`;
 const PLANOS  = 'https://narrativaia.com.br/planos';
@@ -81,8 +87,8 @@ const botoesPreferencia = () => linha(
 
 const comandos = [
   new SlashCommandBuilder()
-    .setName('ativar')
-    .setDescription('Libere a área de alunos com o código gerado no seu Perfil do Narrativa')
+    .setName('ativar-narrativa')   // n'A SALA o /ativar é do CenaDrop (chave)
+    .setDescription('Libere o Narrativa n\'A SALA com o código gerado no seu Perfil do Narrativa')
     .addStringOption((o) => o.setName('codigo').setDescription('O código do Perfil (ex.: NV-7K2P)').setRequired(true)),
 ].map((c) => c.toJSON());
 
@@ -143,9 +149,9 @@ async function ativar(inter) {
   await logStaff(`✅ Ativou · **${user.username}** \`${user.id}\` · ${conta.name || '—'} · ${mascararEmail(conta.email)} · ${conta.origin || ''}`);
   return inter.editReply({
     content:
-      `✅ **Acesso liberado${primeiro ? `, ${primeiro}` : ''}!** Bem-vindo à comunidade do Narrativa.\n\n` +
+      `✅ **Acesso ao Narrativa liberado${primeiro ? `, ${primeiro}` : ''}!** Bem-vindo à A SALA.\n\n` +
       `💬 Apresente-se em <#${CH.geral}>\n` +
-      `🛟 Dúvida ou problema? Abra um post em <#${CH.suporte}>\n` +
+      `🛟 Dúvida ou problema? Abra um post em <#${CH.suporte}> com a etiqueta **Narrativa**\n` +
       `🎓 Aulas e lives em <#${CH.aulas}>\n\n` +
       '-# Prefere só o essencial (suporte e avisos), sem a conversa da comunidade? Use o botão abaixo — dá pra voltar quando quiser.',
     components: botoesPreferencia(),
@@ -200,12 +206,12 @@ async function conferirAcessos() {
       const temCargo = m.roles.cache.has(ROLE_CLIENTE);
       if (temCargo && !ativo.get(m.id)) {
         const motivo = ativo.has(m.id) ? 'conta sem acesso ativo' : 'Discord não ligado a nenhuma conta';
-        await m.roles.remove([ROLE_CLIENTE, ROLE_COMUNIDADE].filter((r) => m.roles.cache.has(r)), `Conferência: ${motivo}`);
+        await m.roles.remove(cargosAoPerder(m), `Conferência: ${motivo}`);
         removidos++;
         await logStaff(`🚫 Perdeu o acesso · **${m.user.username}** \`${m.id}\` · ${motivo}`);
         if (ativo.has(m.id)) {
           await m.send({
-            content: '👋 Seu acesso à área de alunos do **Narrativa IA** foi encerrado porque a sua conta está sem acesso ativo (assinatura vencida, cancelada ou reembolsada).\nVocê continua no servidor e pode voltar quando quiser.',
+            content: '👋 Seu acesso ao **Narrativa IA** n\'A SALA foi encerrado porque a sua conta está sem acesso ativo (assinatura vencida, cancelada ou reembolsada).\nVocê continua no servidor e pode voltar quando quiser.',
             components: linha(btnLink('Ver planos', '🛒', PLANOS)),
           }).catch(() => {});
         }
@@ -232,18 +238,6 @@ async function conferirComAviso() {
 
 // ── mensagens fixas dos canais de entrada (posta uma vez; se já existe, edita) ──
 const FIXAS = {
-  [CH.boasVindas]: {
-    embeds: [{
-      title: '👋 Bem-vindo à comunidade do Narrativa IA',
-      description:
-        'Aqui é o lugar dos alunos do **Narrativa IA**: do nicho ao vídeo pronto, com roteiro, Studio e Elo IA.\n\n' +
-        `**1.** Já é aluno? Libere sua área no <#${CH.ativar}> — leva 1 minuto.\n` +
-        '**2.** Depois de ativar, abrem pra você o **#suporte** (o bot responde na hora e, se não resolver, a equipe assume), ' +
-        'as **#perguntas-frequentes**, as **aulas** e a **comunidade**.\n\n' +
-        `Novidades da ferramenta saem no <#${CH.avisos}>.`,
-      color: COR, footer: { text: 'Equipe Narrativa' },
-    }],
-  },
   [CH.conheca]: {
     embeds: [{
       title: '📖 O que é o Narrativa IA',
@@ -254,22 +248,22 @@ const FIXAS = {
         '📄 **Roteiro** — títulos, Fase 1 (narração) e Fase 2 (cenas)\n' +
         '🎬 **Studio** — voz, sincronização, thumbnail e o vídeo montado\n' +
         '⚡ **Elo IA** — o app que liga o Narrativa às IAs do seu computador',
-      color: COR, footer: { text: 'Equipe Narrativa' },
+      color: COR, footer: { text: 'Equipe A Sala' },
     }],
     components: linha(btnLink('Ver os planos', '🛒', PLANOS)),
   },
   [CH.ativar]: {
     embeds: [{
-      title: '🔑 Ative seu acesso',
+      title: '📝 Cliente do Narrativa IA? Ative aqui',
       description:
         '**1.** No Narrativa, abra o seu **Perfil** › *Comunidade e suporte no Discord*.\n' +
         '**2.** Clique em **Gerar código** — aparece um código tipo `NV-7K2P` (vale 15 minutos).\n' +
-        '**3.** Aqui, clique em **🔑 Ativar meu acesso** e cole o código.\n\n' +
+        '**3.** Aqui, clique em **🔑 Ativar o Narrativa** e cole o código.\n\n' +
         '-# Seu e-mail e sua senha nunca passam pelo Discord: o código é a prova de que a conta é sua.',
-      color: COR, footer: { text: 'Equipe Narrativa' },
+      color: COR, footer: { text: 'Equipe A Sala' },
     }],
     components: linha(
-      new ButtonBuilder().setCustomId('nv:ativar').setStyle(ButtonStyle.Primary).setLabel('Ativar meu acesso').setEmoji('🔑'),
+      new ButtonBuilder().setCustomId('nv:ativar').setStyle(ButtonStyle.Primary).setLabel('Ativar o Narrativa').setEmoji('🔑'),
       btnLink('Abrir meu Perfil', '👤', PERFIL),
     ),
   },
@@ -310,7 +304,7 @@ client.on('interactionCreate', async (inter) => {
     )).catch(() => {});
   }
   if (inter.isButton() && inter.customId.startsWith('nvpref:')) return preferencia(inter);
-  const ehAtivar = (inter.isModalSubmit() && inter.customId === 'nv:modal-ativar') || (inter.isChatInputCommand() && inter.commandName === 'ativar');
+  const ehAtivar = (inter.isModalSubmit() && inter.customId === 'nv:modal-ativar') || (inter.isChatInputCommand() && inter.commandName === 'ativar-narrativa');
   if (!ehAtivar) return;
   try {
     await inter.deferReply({ flags: MessageFlags.Ephemeral });   // resposta sempre privada
@@ -348,7 +342,7 @@ client.on('messageCreate', async (msg) => {
   if (msg.guildId === GUILD_ID && PADRAO_CODIGO.test(msg.content)) {
     await msg.delete().catch(() => {});
     await msg.channel.send({
-      content: `<@${msg.author.id}> apaguei sua mensagem pra ninguém usar o seu código. Use o botão **🔑 Ativar meu acesso** no <#${CH.ativar}> — só você vê a resposta.`,
+      content: `<@${msg.author.id}> apaguei sua mensagem pra ninguém usar o seu código. Use o botão **🔑 Ativar o Narrativa** no <#${CH.ativar}> — só você vê a resposta.`,
       allowedMentions: { users: [msg.author.id] },
     }).then((m) => setTimeout(() => m.delete().catch(() => {}), 20_000)).catch(() => {});
   }
@@ -370,7 +364,9 @@ if (process.env.NARRATIVA_SUPORTE === '1') {
       staffGuild: STAFF_GUILD,
       canais: { suporte: CH.suporte, faq: CH.faq, ...STAFF_SUP },
       cor: COR,
-      equipe: 'Equipe Narrativa',
+      equipe: 'Equipe A Sala',
+      etiquetasProduto: ['Narrativa'],   // n'A SALA: só os posts do #suporte com a etiqueta Narrativa
+      roteador: false,                   // post sem etiqueta é do CenaDrop Bot (deduz pelo código ou pergunta)
       padraoDiag: /\bN-[A-Z2-9]{4}\b/,
       kbArquivo: [],
       assuntosNaoTecnicos: ['Conta e acesso', 'Planos e outros'],
