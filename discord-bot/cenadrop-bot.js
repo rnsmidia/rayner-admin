@@ -101,6 +101,10 @@ const comandos = [
 async function ativar(inter) {
   const chave = normalizarChave(inter.isModalSubmit() ? inter.fields.getTextInputValue('chave') : inter.options.getString('chave'));
   const user = inter.user;
+  // A SALA (28/11/26): o aluno do Narrativa colou o código NV- no botão do CenaDrop → mostra o botão certo
+  if (/^NV-?[A-Z2-9]{4}$/i.test(chave || '')) {
+    return inter.editReply({ content: '📝 Esse é o código do **Narrativa IA**. Aqui no #ativar-acesso, use o botão **🔑 Ativar o Narrativa** (no bloco "Cliente do Narrativa IA? Ative aqui") e cole o código lá.' });
+  }
 
   const { data: lic, error } = await db()
     .from('licenses')
