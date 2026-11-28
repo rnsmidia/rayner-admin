@@ -4,154 +4,183 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<title>CenaDrop Flow — Nova versão disponível</title>
+<meta name="color-scheme" content="dark">
+<meta name="supported-color-schemes" content="dark">
+<title>CenaDrop One {{VERSAO}} — nova versão disponível</title>
 </head>
-<body style="margin:0;padding:0;background-color:#070710;font-family:Arial,Helvetica,sans-serif;">
+<body style="margin:0;padding:0;background-color:#070710;font-family:Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased;">
+
+<!-- Preheader: é o texto que aparece na PRÉVIA da caixa de entrada, ao lado do assunto.
+     Sem ele, o cliente de email puxa a primeira frase do corpo e a prévia fica truncada. -->
+<div style="display:none;font-size:1px;color:#070710;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">
+  Atualizar leva 2 minutos e a sua chave continua conectada. Veja o que mudou.
+  &#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;
+</div>
 
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#070710;">
 <tr><td align="center" style="padding:32px 16px;">
 
-  <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background-color:#0f0f1a;border-radius:20px;overflow:hidden;border:1px solid rgba(124,111,255,0.15);">
+  <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background-color:#0f0f1a;border-radius:20px;overflow:hidden;border:1px solid rgba(124,111,255,0.18);">
 
     <!-- Top bar -->
-    <tr><td><div style="height:4px;background:linear-gradient(90deg,#7c6fff,#4169FF,#7c6fff);"></div></td></tr>
+    <tr><td><div style="height:4px;background:linear-gradient(90deg,#7c6fff,#4169FF,#00d4aa);"></div></td></tr>
 
-    <!-- Header -->
-    <tr>
-      <td style="background:linear-gradient(160deg,#12122a 0%,#0a0a18 100%);padding:40px 40px 36px;text-align:center;">
-        <div style="font-size:28px;font-weight:800;color:#ffffff;letter-spacing:-0.5px;">
-          Cena<span style="color:#7c6fff;">Drop</span> <span style="color:#555580;font-weight:400;font-size:18px;">Flow</span>
-        </div>
-        <div style="margin-top:16px;background:rgba(124,111,255,0.1);border:1px solid rgba(124,111,255,0.3);border-radius:20px;padding:7px 20px;display:inline-block;font-size:12px;font-weight:700;color:#9b8cff;letter-spacing:2px;text-transform:uppercase;">
-          ⚡ Versão {{VERSAO}} — Atualização
-        </div>
-      </td>
-    </tr>
+    <!-- Header: marca + selo de versão -->
+    <tr><td align="center" style="padding:38px 32px 6px;">
+      <div style="font-size:23px;font-weight:bold;color:#ffffff;letter-spacing:-0.4px;">
+        <img src="https://www.cenadrop.com.br/cenadrop/marca/email-logo-one.png" width="300" height="22" alt="Cenadrop One" style="display:inline-block;border:0;width:300px;max-width:100%;height:auto;">
+      </div>
+      <div style="height:16px;line-height:16px;">&nbsp;</div>
+      <!-- selo de versão -->
+      <table cellpadding="0" cellspacing="0" border="0" align="center"><tr>
+        <td style="background:#00d4aa;border-radius:100px;padding:7px 20px;font-size:14px;font-weight:bold;color:#06121a;letter-spacing:0.4px;">
+          &#9889; versão {{VERSAO}} disponível
+        </td>
+      </tr></table>
+    </td></tr>
 
-    <!-- Greeting -->
-    <tr>
-      <td style="padding:40px 40px 0;">
-        <p style="font-size:24px;font-weight:700;color:#eeeef8;margin:0 0 14px;">
-          Olá, {{PRIMEIRO_NOME}}! 🚀
-        </p>
-        <p style="font-size:17px;color:#8080a0;line-height:1.8;margin:0;">
-          A versão <strong style="color:#b8a5ff;">{{VERSAO}} do CenaDrop Flow</strong> chegou com melhorias importantes.<br>
-          Veja o que mudou e como atualizar:
-        </p>
-      </td>
-    </tr>
+    <!-- Título -->
+    <tr><td align="center" style="padding:26px 40px 0;">
+      <div style="font-size:27px;font-weight:bold;color:#ffffff;line-height:1.28;letter-spacing:-0.5px;">
+        Tem versão nova esperando por você
+      </div>
+    </td></tr>
 
-    <!-- What's new -->
-    <tr>
-      <td style="padding:28px 40px 0;">
-        <div style="font-size:13px;color:#555577;text-transform:uppercase;letter-spacing:2px;font-weight:700;margin-bottom:16px;">O que há de novo</div>
-        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#08081a;border:1px solid rgba(124,111,255,0.2);border-radius:14px;overflow:hidden;">
-          <tr><td style="padding:24px 24px 20px;">
-            <div style="font-size:16px;color:#c8c8e0;line-height:1.9;">{{NOVIDADES}}</div>
-          </td></tr>
-        </table>
-      </td>
-    </tr>
+    <!-- Saudação -->
+    <tr><td style="padding:22px 40px 0;">
+      <div style="font-size:16px;color:#b9b5d4;line-height:1.75;">
+        Oi, <strong style="color:#ffffff;">{{PRIMEIRO_NOME}}</strong>. Saiu a <strong style="color:#ffffff;">{{VERSAO}}</strong> do CenaDrop One,
+        e ela chega com melhorias que encurtam o seu caminho até o vídeo pronto.
+      </div>
+    </td></tr>
 
-    <!-- How to update -->
-    <tr>
-      <td style="padding:28px 40px 0;">
-        <div style="font-size:13px;color:#555577;text-transform:uppercase;letter-spacing:2px;font-weight:700;margin-bottom:20px;">Como atualizar — 4 passos simples</div>
+    <!-- O que mudou -->
+    <tr><td style="padding:30px 40px 0;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#141426;border-radius:14px;border:1px solid rgba(124,111,255,0.18);">
+        <tr><td style="padding:24px 26px;">
+          <div style="font-size:12px;font-weight:bold;color:#a78bfa;letter-spacing:1.6px;text-transform:uppercase;">O que mudou</div>
+          <div style="height:14px;line-height:14px;">&nbsp;</div>
+          <div style="font-size:15.5px;color:#c8c4e0;line-height:1.85;">{{NOVIDADES}}</div>
+        </td></tr>
+      </table>
+    </td></tr>
 
-        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:14px;">
-          <tr>
-            <td width="48" valign="top">
-              <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,rgba(124,111,255,0.25),rgba(65,105,255,0.15));border:1px solid rgba(124,111,255,0.35);text-align:center;line-height:38px;font-size:15px;font-weight:800;color:#9b8cff;">1</div>
-            </td>
-            <td valign="middle">
-              <p style="margin:0;font-size:17px;color:#d8d8f0;font-weight:700;">Remova a versão antiga</p>
-              <p style="margin:5px 0 0;font-size:15px;color:#8080a0;line-height:1.7;">No Chrome, vá em <strong style="color:#c0c0e0;">Extensões</strong>, localize o CenaDrop e clique em <strong style="color:#c0c0e0;">Remover</strong>.</p>
-            </td>
-          </tr>
-        </table>
+    <!-- Como atualizar -->
+    <tr><td style="padding:30px 40px 0;">
+      <div style="font-size:12px;font-weight:bold;color:#8d89a8;letter-spacing:1.6px;text-transform:uppercase;">Como atualizar &middot; leva 2 minutos</div>
+      <div style="height:16px;line-height:16px;">&nbsp;</div>
 
-        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:14px;">
-          <tr>
-            <td width="48" valign="top">
-              <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,rgba(124,111,255,0.25),rgba(65,105,255,0.15));border:1px solid rgba(124,111,255,0.35);text-align:center;line-height:38px;font-size:15px;font-weight:800;color:#9b8cff;">2</div>
-            </td>
-            <td valign="middle">
-              <p style="margin:0;font-size:17px;color:#d8d8f0;font-weight:700;">Baixe a nova versão</p>
-              <p style="margin:5px 0 0;font-size:15px;color:#8080a0;line-height:1.7;">Clique no botão abaixo para baixar o arquivo da versão {{VERSAO}}.</p>
-            </td>
-          </tr>
-        </table>
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td width="34" valign="top" style="padding-bottom:14px;">
+            <div style="width:26px;height:26px;background:rgba(124,111,255,0.16);border:1px solid rgba(124,111,255,0.36);border-radius:8px;color:#a78bfa;font-size:13px;font-weight:bold;text-align:center;line-height:26px;">1</div>
+          </td>
+          <td valign="top" style="padding-bottom:14px;font-size:15px;color:#b9b5d4;line-height:1.7;">
+            Baixe o arquivo novo pelo botão abaixo.
+          </td>
+        </tr>
+        <tr>
+          <td width="34" valign="top" style="padding-bottom:14px;">
+            <div style="width:26px;height:26px;background:rgba(124,111,255,0.16);border:1px solid rgba(124,111,255,0.36);border-radius:8px;color:#a78bfa;font-size:13px;font-weight:bold;text-align:center;line-height:26px;">2</div>
+          </td>
+          <td valign="top" style="padding-bottom:14px;font-size:15px;color:#b9b5d4;line-height:1.7;">
+            <strong style="color:#ffffff;">Veja onde a pasta está:</strong> em <span style="color:#e8e5f8;font-family:Consolas,Monaco,monospace;font-size:14px;">chrome://extensions</span>, clique em Detalhes no card do CenaDrop. Aparece o caminho da pasta. Anote o lugar e o nome.
+          </td>
+        </tr>
+        <tr>
+          <td width="34" valign="top" style="padding-bottom:14px;">
+            <div style="width:26px;height:26px;background:rgba(124,111,255,0.16);border:1px solid rgba(124,111,255,0.36);border-radius:8px;color:#a78bfa;font-size:13px;font-weight:bold;text-align:center;line-height:26px;">3</div>
+          </td>
+          <td valign="top" style="padding-bottom:14px;font-size:15px;color:#b9b5d4;line-height:1.7;">
+            <strong style="color:#ffffff;">Apague a pasta antiga inteira.</strong> Não copie a nova por cima (“Substituir” ou “Mesclar”): os arquivos das duas versões se misturam.
+          </td>
+        </tr>
+        <tr>
+          <td width="34" valign="top" style="padding-bottom:14px;">
+            <div style="width:26px;height:26px;background:rgba(124,111,255,0.16);border:1px solid rgba(124,111,255,0.36);border-radius:8px;color:#a78bfa;font-size:13px;font-weight:bold;text-align:center;line-height:26px;">4</div>
+          </td>
+          <td valign="top" style="padding-bottom:14px;font-size:15px;color:#b9b5d4;line-height:1.7;">
+            Descompacte a nova e coloque <strong style="color:#ffffff;">no mesmo lugar, com o mesmo nome</strong>. A pasta certa tem o manifest.json direto dentro dela.
+          </td>
+        </tr>
+        <tr>
+          <td width="34" valign="top" style="padding-bottom:14px;">
+            <div style="width:26px;height:26px;background:rgba(124,111,255,0.16);border:1px solid rgba(124,111,255,0.36);border-radius:8px;color:#a78bfa;font-size:13px;font-weight:bold;text-align:center;line-height:26px;">5</div>
+          </td>
+          <td valign="top" style="padding-bottom:14px;font-size:15px;color:#b9b5d4;line-height:1.7;">
+            Em <span style="color:#e8e5f8;font-family:Consolas,Monaco,monospace;font-size:14px;">chrome://extensions</span>, clique na setinha de recarregar do CenaDrop e confira se a versão mudou.
+          </td>
+        </tr>
+        <tr>
+          <td width="34" valign="top" style="">
+            <div style="width:26px;height:26px;background:rgba(124,111,255,0.16);border:1px solid rgba(124,111,255,0.36);border-radius:8px;color:#a78bfa;font-size:13px;font-weight:bold;text-align:center;line-height:26px;">6</div>
+          </td>
+          <td valign="top" style="font-size:15px;color:#b9b5d4;line-height:1.7;">
+            Dê F5 na aba do Flow ou do Vids.
+          </td>
+        </tr>
+      </table>
+    </td></tr>
 
-        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:14px;">
-          <tr>
-            <td width="48" valign="top">
-              <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,rgba(124,111,255,0.25),rgba(65,105,255,0.15));border:1px solid rgba(124,111,255,0.35);text-align:center;line-height:38px;font-size:15px;font-weight:800;color:#9b8cff;">3</div>
-            </td>
-            <td valign="middle">
-              <p style="margin:0;font-size:17px;color:#d8d8f0;font-weight:700;">Instale a nova versão</p>
-              <p style="margin:5px 0 0;font-size:15px;color:#8080a0;line-height:1.7;">Em <strong style="color:#c0c0e0;">Extensões</strong>, clique em <strong style="color:#c0c0e0;">Carregar sem compactação</strong> e selecione a pasta baixada.</p>
-            </td>
-          </tr>
-        </table>
-
-        <table width="100%" cellpadding="0" cellspacing="0" border="0">
-          <tr>
-            <td width="48" valign="top">
-              <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,rgba(124,111,255,0.25),rgba(65,105,255,0.15));border:1px solid rgba(124,111,255,0.35);text-align:center;line-height:38px;font-size:15px;font-weight:800;color:#9b8cff;">4</div>
-            </td>
-            <td valign="middle">
-              <p style="margin:0;font-size:17px;color:#d8d8f0;font-weight:700;">Ative com a mesma chave</p>
-              <p style="margin:5px 0 0;font-size:15px;color:#8080a0;line-height:1.7;">Sua chave de acesso <strong style="color:#c0c0e0;">continua a mesma</strong>. Só cole ela novamente e pronto!</p>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-
-    <!-- Key note -->
-    <tr>
-      <td style="padding:24px 40px 0;">
-        <div style="background:rgba(124,111,255,0.07);border:1px solid rgba(124,111,255,0.2);border-radius:12px;padding:18px 22px;">
-          <p style="margin:0;font-size:16px;color:#8888b0;line-height:1.8;">
-            🔑 <strong style="color:#b0a8e0;">Sua chave não muda.</strong> Não é preciso comprar novamente. Se precisar, selecione "Trocar dispositivo" e use a mesma chave que você já tem.
-          </p>
-        </div>
-      </td>
-    </tr>
+    <!-- A dúvida que todo mundo tem -->
+    <tr><td style="padding:26px 40px 0;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:rgba(0,212,170,0.07);border-radius:12px;border-left:3px solid #00d4aa;">
+        <tr><td style="padding:16px 20px;font-size:14.5px;color:#a9d8cc;line-height:1.7;">
+          <strong style="color:#00f5c4;">A sua chave continua conectada.</strong> Ela fica guardada no Chrome, não na pasta: atualizando desse jeito, nada se perde. Personagens, roteiro e configurações continuam exatamente onde estavam.
+        </td></tr>
+      </table>
+    </td></tr>
 
     <!-- CTA -->
-    <tr>
-      <td style="padding:32px 40px 0;text-align:center;">
-        <a href="{{LINK_DOWNLOAD}}" style="display:inline-block;background:linear-gradient(135deg,#7c6fff 0%,#4169FF 100%);color:#ffffff;font-size:18px;font-weight:800;padding:18px 52px;border-radius:14px;text-decoration:none;box-shadow:0 8px 28px rgba(124,111,255,0.4);">
-          ⬇&nbsp;&nbsp;Baixar Versão {{VERSAO}}
-        </a>
-      </td>
-    </tr>
+    <tr><td align="center" style="padding:34px 40px 0;">
+      <table cellpadding="0" cellspacing="0" border="0" align="center"><tr>
+        <td align="center" style="background:linear-gradient(135deg,#7c6fff,#4169FF);border-radius:12px;">
+          <a href="{{LINK_DOWNLOAD}}" target="_blank" style="display:inline-block;padding:17px 46px;font-size:16.5px;font-weight:bold;color:#ffffff;text-decoration:none;letter-spacing:0.2px;">
+            Baixar a versão {{VERSAO}}
+          </a>
+        </td>
+      </tr></table>
+      <div style="height:12px;line-height:12px;">&nbsp;</div>
+      <div style="font-size:13px;color:#6f6b88;">Se o botão não abrir, copie: {{LINK_DOWNLOAD}}</div>
+    </td></tr>
 
+    <!-- Tutoriais -->
+    <tr><td style="padding:32px 40px 0;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#141426;border-radius:14px;border:1px solid rgba(255,255,255,0.07);">
+        <tr><td style="padding:22px 26px;">
+          <div style="font-size:16px;font-weight:bold;color:#ffffff;line-height:1.5;">Os tutoriais foram todos regravados</div>
+          <div style="height:8px;line-height:8px;">&nbsp;</div>
+          <div style="font-size:14.5px;color:#9a96b8;line-height:1.75;">
+            São 10 vídeos, do zero até o vídeo montado, gravados já com esta versão. Estão na sua área de membros &mdash; e também no YouTube, se preferir assistir por lá.
+          </div>
+          <div style="height:14px;line-height:14px;">&nbsp;</div>
+          <a href="https://www.youtube.com/playlist?list=PLcGnzq_yUExE" target="_blank" style="font-size:14.5px;font-weight:bold;color:#a78bfa;text-decoration:none;">Ver a playlist completa &rarr;</a>
+        </td></tr>
+      </table>
+    </td></tr>
 
     <!-- Divider -->
-    <tr><td style="padding:0 40px;"><div style="height:1px;background:linear-gradient(90deg,transparent,rgba(124,111,255,0.2),transparent);"></div></td></tr>
+    <tr><td style="padding:34px 40px 0;">
+      <div style="height:1px;background:rgba(255,255,255,0.08);line-height:1px;">&nbsp;</div>
+    </td></tr>
 
     <!-- Footer -->
-    <tr>
-      <td style="padding:24px 40px 28px;text-align:center;">
-        <div style="font-size:17px;font-weight:800;color:#ffffff;">
-          Cena<span style="color:#7c6fff;">Drop</span> Flow
-        </div>
-        <p style="font-size:13px;color:#444460;margin:8px 0 4px;">
-          <a href="https://cenadrop.com.br" style="color:#555577;text-decoration:none;">cenadrop.com.br</a>
-        </p>
-        <p style="font-size:12px;color:#2a2a40;margin:0;">
-          Você recebeu este email porque tem uma licença ativa do CenaDrop Flow.
-        </p>
-      </td>
-    </tr>
+    <tr><td align="center" style="padding:26px 40px 36px;">
+      <div style="font-size:13.5px;color:#6f6b88;line-height:1.8;">
+        Dúvida no passo a passo? O manual está sempre atualizado em<br>
+        <a href="https://cenadrop.com.br/manual" target="_blank" style="color:#a78bfa;text-decoration:none;">cenadrop.com.br/manual</a>
+      </div>
+      <div style="height:18px;line-height:18px;">&nbsp;</div>
+      <div style="font-size:12px;color:#4a4762;">CenaDrop One &middot; automação para o Google Flow e o Google Vids</div>
+    </td></tr>
 
     <!-- Bottom bar -->
-    <tr><td><div style="height:4px;background:linear-gradient(90deg,#7c6fff,#4169FF,#7c6fff);"></div></td></tr>
+    <tr><td><div style="height:4px;background:linear-gradient(90deg,#00d4aa,#4169FF,#7c6fff);"></div></td></tr>
 
   </table>
+
 </td></tr>
 </table>
+
 </body>
 </html>
