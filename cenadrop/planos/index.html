@@ -1,0 +1,977 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CenaDrop — Seu roteiro vira cenas em lote</title>
+<meta name="description" content="CenaDrop: gere as cenas do seu vídeo em lote no Google Flow (Veo 3) e no Google Vids, com o mesmo personagem e tudo baixado na ordem. Na mesma assinatura: a extensão para Chrome e o CenaDrop Multi, o programa para Windows e Mac que divide o lote entre várias contas, no Flow e no Vids. Anual em 12x de R$21,10 ou R$204 à vista, com 7 dias de garantia.">
+<meta property="og:title" content="CenaDrop — Seu roteiro vira cenas em lote">
+<meta property="og:description" content="Extensão + CenaDrop Multi na mesma assinatura: vídeos e imagens do seu roteiro em lote no Google Flow e no Google Vids, com uma ou várias contas. Anual em 12x de R$21,10, 7 dias de garantia.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.cenadrop.com.br/planos">
+<meta property="og:image" content="https://www.cenadrop.com.br/cenadrop/marca/compartilhar-1200x630.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/cenadrop/marca/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/cenadrop/marca/favicon.ico" sizes="48x48">
+<link rel="apple-touch-icon" href="/cenadrop/marca/apple-touch-icon-180.png">
+<meta name="theme-color" content="#0A0814">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@800&display=swap" rel="stylesheet">
+<style>
+/* ═══════════ TOKENS (troque estes e a página vira outro produto) ═══════════ */
+:root{
+  --bg:#07070f; --bg-2:#0c0b18; --bg-3:#121124;
+  --surface:rgba(255,255,255,.035); --surface-2:rgba(255,255,255,.06);
+  --line:rgba(255,255,255,.08); --line-2:rgba(255,255,255,.14);
+  --flow:#8b5cf6; --flow-2:#b39dff; --vids:#f59e0b; --vids-2:#fde68a; --vids-3:#fbbf24;
+  --ok:#4ade80; --text:#f4f3ff; --muted:#aaa7c6; --dim:#6f6c8e;
+  --f-display:"Bricolage Grotesque",system-ui,sans-serif;
+  --f-text:"Instrument Sans",system-ui,-apple-system,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,monospace;
+  --f-logo:"Syne","Arial Black",system-ui,sans-serif; /* marca nova 28/11/26: "Cenadrop" no logo desenhado */
+  --r:16px; --r-lg:24px; --wrap:1240px; --nav-h:66px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--nav-h) + 12px);-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--text);font-family:var(--f-text);font-size:17px;line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+img,video{display:block;max-width:100%}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+b,strong{color:#fff;font-weight:700}
+::selection{background:rgba(139,92,246,.45)}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 16px}
+
+/* fundo em 3 camadas */
+.bg{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.bg__glow{position:absolute;inset:-20%;background:
+  radial-gradient(36% 32% at 16% 6%,rgba(139,92,246,.34),transparent 62%),
+  radial-gradient(26% 26% at 86% 14%,rgba(245,158,11,.14),transparent 60%);
+  animation:drift 24s ease-in-out infinite alternate}
+@keyframes drift{to{transform:translate3d(3%,4%,0) scale(1.06)}}
+.bg__grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:64px 64px;-webkit-mask-image:radial-gradient(60% 50% at 50% 0%,#000 15%,transparent 100%);mask-image:radial-gradient(60% 50% at 50% 0%,#000 15%,transparent 100%)}
+.bg__noise{position:absolute;inset:0;opacity:.3;mix-blend-mode:overlay;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.35 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+
+/* nav */
+.nav{position:sticky;top:0;z-index:50;height:var(--nav-h);background:rgba(7,7,15,.72);backdrop-filter:blur(16px) saturate(1.4);-webkit-backdrop-filter:blur(16px) saturate(1.4);border-bottom:1px solid var(--line)}
+.nav .wrap{height:100%;display:flex;align-items:center;gap:22px}
+.nav__brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-family:var(--f-logo);font-weight:800;font-size:19px;letter-spacing:-.01em;color:#EFEDF8}
+.nav__brand img{width:30px;height:30px;display:block}
+.nav__links{display:flex;gap:22px;margin-left:auto;font-size:15px;color:var(--muted)}
+.nav__links a{text-decoration:none;transition:color .2s}
+.nav__links a:hover{color:#fff}
+@media (max-width:860px){.nav__links{display:none}.nav .btn{margin-left:auto}}
+
+/* botões */
+.btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:15px 24px;border-radius:14px;font-weight:700;font-size:16.5px;text-decoration:none;white-space:nowrap;transition:box-shadow .25s,background .25s,border-color .25s;will-change:transform}
+.btn--pri{background:linear-gradient(135deg,#7c3aed,var(--flow) 55%,#a78bfa);color:#fff;box-shadow:0 14px 40px -12px rgba(139,92,246,.9),inset 0 1px 0 rgba(255,255,255,.22)}
+.btn--pri:hover{box-shadow:0 18px 50px -12px rgba(139,92,246,1),inset 0 1px 0 rgba(255,255,255,.22)}
+.btn--sec{border:1px solid var(--line-2);background:var(--surface)}
+.btn--sec:hover{background:var(--surface-2);border-color:rgba(255,255,255,.26)}
+.btn--sm{padding:10px 16px;font-size:14.5px;border-radius:11px}
+.btn small{font-weight:500;opacity:.8}
+
+/* tipografia de seção */
+.kicker{display:inline-flex;align-items:center;gap:8px;font-family:var(--f-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.kicker i{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok)}
+.h2{font-family:var(--f-display);font-weight:300;font-size:clamp(32px,4.4vw,56px);line-height:1.04;letter-spacing:-.045em;margin:14px 0 16px}
+.h2 strong{font-weight:800}
+.lead{color:var(--muted);font-size:18.5px;max-width:640px}
+.lead b{color:var(--text)}
+.sec{padding:110px 0 0}
+.g-flow{background:linear-gradient(120deg,var(--flow-2),var(--flow));-webkit-background-clip:text;background-clip:text;color:transparent}
+.g-vids{background:linear-gradient(120deg,var(--vids-2),var(--vids));-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* ═══════════ HERO ═══════════ */
+.hero{padding:70px 0 20px;overflow-x:clip}
+.hero .wrap{display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);gap:44px;align-items:center}
+.hero h1{font-family:var(--f-display);font-weight:300;font-size:clamp(40px,5.6vw,76px);line-height:1;letter-spacing:-.05em;margin:18px 0 22px}
+.hero h1 strong{font-weight:800}
+.hero__sub{font-size:19.5px;color:var(--muted);max-width:540px}
+.hero__sub b{color:var(--text)}
+.hero__cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.selos{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:26px;font-size:14.5px;color:var(--muted)}
+.selos span::before{content:"✓ ";color:var(--ok);font-weight:800}
+.palco-col{position:relative;min-width:0}
+.palco-col::before{content:"";position:absolute;inset:6% 4% -2%;background:radial-gradient(50% 50% at 50% 50%,rgba(245,158,11,.18),rgba(139,92,246,.14) 45%,transparent 72%);filter:blur(24px);z-index:-1}
+.palco-cap{margin-top:14px;text-align:center;font-size:13.5px;color:var(--dim)}
+.palco-cap b{color:var(--muted)}
+/* tratamento B: topo centrado, demo presa na rolagem logo abaixo */
+html[data-t=b] .hero .wrap{grid-template-columns:minmax(0,1fr);text-align:center;justify-items:center}
+html[data-t=b] .hero .palco-col{display:none}
+html[data-t=b] .hero__sub{margin:0 auto}
+html[data-t=b] .hero__cta,html[data-t=b] .selos{justify-content:center}
+html[data-t=b] .hero h1{max-width:980px}
+@media (max-width:980px){.hero .wrap{grid-template-columns:minmax(0,1fr)}.hero{padding-top:40px}}
+
+/* ═══════════ PALCO (tamanho FIXO, escalado) ═══════════ */
+.palco-wrap{position:relative;width:100%}
+.palco-scaler{width:880px;height:540px;transform-origin:top left;will-change:transform}
+.palco{position:relative;width:880px;height:540px;border-radius:18px;background:#0a0914;border:1px solid rgba(255,255,255,.1);overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;font-size:13px;line-height:1.4;color:#e8e8f4;box-shadow:0 50px 100px -40px rgba(0,0,0,.95),0 0 0 1px rgba(0,0,0,.4);user-select:none}
+.pc-bar{height:38px;display:flex;align-items:center;gap:6px;padding:0 12px;background:#0f0e1b;border-bottom:1px solid rgba(255,255,255,.07)}
+.pc-bar > i{width:10px;height:10px;border-radius:50%}
+.pc-bar > i:nth-child(1){background:#ff5f57}.pc-bar > i:nth-child(2){background:#febc2e}.pc-bar > i:nth-child(3){background:#28c840}
+.pc-tab{display:flex;align-items:center;gap:7px;height:28px;margin-top:10px;padding:0 14px;border-radius:9px 9px 0 0;font-size:11.5px;color:#8c8aad}
+.pc-tab b{width:11px;height:11px;border-radius:3px;background:#6d5cf0}
+.pc-tab.v b{background:#f59e0b}
+.pc-tab.on{background:#0a0914;color:#e8e8f4}
+.pc-url{flex:1;margin-left:10px;height:24px;border-radius:7px;background:rgba(255,255,255,.05);display:flex;align-items:center;padding:0 12px;font-family:var(--f-mono);font-size:11px;color:#9a98b8}
+.pc-main{position:absolute;left:0;right:0;top:38px;bottom:42px;display:grid;grid-template-columns:minmax(0,1fr) 300px}
+/* lado do Google Vids (o site do Google, claro) */
+.gv{position:relative;background:#f6f5f1;color:#1d1d1f;padding:14px 16px;overflow:hidden}
+.gv__h{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px;margin-bottom:10px}
+.gv__h b{width:14px;height:14px;border-radius:4px;background:#f59e0b}
+.gv__h small{margin-left:auto;font-weight:500;color:#77756f;font-size:11px}
+.gv__g{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.gv__box{position:absolute;left:16px;right:16px;bottom:34px;border-radius:14px;background:#fff;border:1px solid #e2e0d8;box-shadow:0 6px 20px -10px rgba(0,0,0,.25);padding:10px 12px}
+.gv__ing{display:flex;align-items:center;gap:8px;font-size:10.5px;color:#77756f;margin-bottom:6px}
+.gv__ing .ft{position:relative;width:26px;height:26px;border-radius:7px;border:1.5px dashed #cfcdc5}
+.gv__ing .ft img{position:absolute;inset:-1.5px;width:26px;height:26px;border-radius:7px;object-fit:cover;opacity:0}
+.gv__txt{min-height:36px;padding-right:36px;font-size:12px;line-height:1.45;color:#1d1d1f}
+.gv__txt span{display:inline;clip-path:inset(0 100% 0 0)}
+.gv__txt b{color:#b45309}
+.gv__send{position:absolute;right:10px;bottom:9px;width:28px;height:28px;border-radius:50%;background:#1d1d1f;color:#fff;display:grid;place-items:center;font-size:13px}
+.slot{position:relative;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:#e6e4dd}
+.slot .shim{position:absolute;inset:0;background:linear-gradient(100deg,#e6e4dd 30%,#f1efe9 50%,#e6e4dd 70%);background-size:200% 100%;animation:shim 1.3s linear infinite;opacity:0}
+@keyframes shim{to{background-position:-200% 0}}
+.slot .st{position:absolute;left:8px;bottom:7px;font-size:10px;font-weight:700;color:#5b5953;opacity:0}
+.slot video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0}
+.slot .n{position:absolute;left:7px;top:6px;z-index:2;font-family:var(--f-mono);font-size:10px;font-weight:600;padding:1px 6px;border-radius:5px;background:rgba(255,255,255,.88);color:#1d1d1f}
+.slot .ok{position:absolute;right:7px;top:6px;z-index:2;width:18px;height:18px;border-radius:50%;background:#16a34a;color:#fff;font-size:10px;display:grid;place-items:center;opacity:0;transform:scale(.4)}
+.slot.vazio{display:grid;place-items:center;border:1.5px dashed #cfcdc5;background:none;color:#aaa79e;font-size:20px}
+.gv__f{position:absolute;left:16px;bottom:10px;font-size:11px;color:#77756f}
+.gv__f b{color:#1d1d1f}
+/* o painel do CenaDrop */
+.cd{position:relative;background:radial-gradient(120% 40% at 50% 0%,rgba(245,158,11,.10),transparent 60%),#0c0b17;border-left:1px solid rgba(255,255,255,.07);padding:11px 13px;display:flex;flex-direction:column;gap:7px;min-height:0}
+.cd__h{display:flex;align-items:center;gap:9px}
+.cd__h img{width:26px;height:26px;display:block}
+.cd__h b{font-family:var(--f-logo);font-size:14px;font-weight:800;color:#EFEDF8;letter-spacing:-.01em}
+.cd__h b{white-space:nowrap}
+@media (max-width:600px){.cd__h{gap:6px}.cd__h img{width:20px;height:20px}.cd__h b{font-size:10.5px}}
+.cd__h b em{font-style:normal;color:#fbbf24}
+.cd__h span{margin-left:auto;font-family:var(--f-mono);font-size:10px;padding:2px 7px;border-radius:6px;border:1px solid rgba(251,191,36,.35);background:rgba(251,191,36,.08)}
+.cd__conn{display:none;align-items:center;gap:7px;padding:5px 9px;border-radius:8px;border:1px solid rgba(74,222,128,.25);background:rgba(74,222,128,.06);font-size:11px;color:#a7f3d0}
+.cd__conn i{width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 8px #4ade80}
+.card{border-radius:11px;border:1px solid rgba(251,191,36,.18);background:linear-gradient(180deg,rgba(251,191,36,.06),rgba(255,255,255,.01));padding:8px 9px}
+.card__t{display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:800;color:#fff}
+.card__t small{font-weight:500;color:#77759a}
+.card__t .tag{margin-left:auto;font-family:var(--f-mono);font-size:9.5px;padding:1px 6px;border-radius:5px;background:rgba(251,191,36,.15);color:#fde68a}
+.eln{display:flex;align-items:center;gap:9px;margin-top:6px;height:50px;padding:0 8px;border-radius:8px;background:rgba(255,255,255,.04);border:1px dashed rgba(251,191,36,.3);font-size:11px;color:#77759a;position:relative}
+.eln .cheio{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;gap:4px;padding:0 6px;border-radius:8px;background:#15131f;border:1px solid rgba(251,191,36,.35)}
+.av{display:flex;flex-direction:column;align-items:center;gap:1px;font-size:8.5px;font-weight:700;color:#e8e8f4;opacity:0;transform:scale(.6)}
+.av img{width:33px;height:33px;border-radius:8px;object-fit:cover;border:1.5px solid rgba(251,191,36,.6)}
+.arq{display:flex;align-items:center;gap:8px;margin-top:7px;height:30px;padding:0 9px;border-radius:8px;border:1.5px dashed rgba(251,191,36,.3);font-size:11px;color:#a4a2c0;position:relative}
+.arq .fn{font-family:var(--f-mono);color:#fff;display:inline-block;clip-path:inset(0 100% 0 0)}
+.arq .qt{margin-left:auto;font-family:var(--f-mono);font-size:10px;color:#4ade80;opacity:0}
+.fila{position:relative;height:122px;overflow:hidden;margin-top:6px}
+.fila__trilho{display:flex;flex-direction:column;gap:3px}
+.qr{position:relative;display:flex;align-items:center;gap:7px;height:22px;padding:0 7px;border-radius:7px;background:rgba(255,255,255,.03);font-size:10.5px;color:#b9b7d4;overflow:hidden;opacity:0;transform:translateY(6px)}
+.qr .qn{font-family:var(--f-mono);font-size:9.5px;color:#77759a}
+.qr .qt{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qr .qt b{color:#9a98b8;font-weight:700}
+.qr .qs{position:relative;width:62px;height:14px;font-size:9.5px;font-weight:700;flex:none}
+.qr .qs em{position:absolute;right:0;top:0;font-style:normal;opacity:0;white-space:nowrap}
+.qr .qs .a{color:#fbbf24}.qr .qs .b{color:#4ade80}
+.qr .pb{position:absolute;left:0;bottom:0;height:2px;width:100%;background:#fbbf24;transform:scaleX(0);transform-origin:left}
+.cont{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:auto}
+.cont div{padding:5px 9px;border-radius:8px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.06);font-size:9.5px;color:#8c8aad;font-family:var(--f-mono);text-transform:uppercase;letter-spacing:.05em}
+.cont b{display:block;font-size:16px;color:#fff;letter-spacing:0}
+.cont b em{font-style:normal;font-size:10px;color:#6d6b8a}
+.go{position:relative;flex:none;height:36px;border-radius:10px;background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#1a1200;font-weight:900;font-size:13.5px;overflow:hidden}
+.go em{position:absolute;inset:0;display:grid;place-items:center;font-style:normal}
+.go .g2,.go .g3{opacity:0}
+.go .g3{color:#052e16}
+/* prateleira de downloads */
+.dl{position:absolute;left:0;right:0;bottom:0;height:42px;display:flex;align-items:center;gap:7px;padding:0 12px;white-space:nowrap;background:#0f0e1b;border-top:1px solid rgba(255,255,255,.07);font-size:11px;color:#77759a;overflow:hidden}
+.dl > span{flex:none;margin-right:4px;font-weight:700}
+.dl > .dl__vp{flex:1;min-width:0;overflow:hidden;margin:0;font-weight:400;-webkit-mask-image:linear-gradient(90deg,transparent,#000 14px);mask-image:linear-gradient(90deg,transparent,#000 14px);padding-left:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;flex:none;height:26px;padding:0 9px;border-radius:7px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);font-family:var(--f-mono);font-size:10.5px;color:#e8e8f4;opacity:0;transform:translateY(10px)}
+.chip i{font-style:normal;color:#4ade80}
+/* cursor */
+.cur{position:absolute;left:0;top:0;width:22px;height:22px;margin:-3px 0 0 -4px;z-index:9;opacity:0;filter:drop-shadow(0 3px 6px rgba(0,0,0,.6));pointer-events:none}
+.rip{position:absolute;left:0;top:0;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;border:2px solid #fff;z-index:8;opacity:0;pointer-events:none}
+/* compacto (celular): mesma janela, mais estreita → escala maior, texto legível */
+.palco-scaler.compacto,.palco-scaler.compacto .palco{width:620px}
+.palco-scaler.compacto .pc-main{grid-template-columns:minmax(0,1fr) 250px}
+.palco-scaler.compacto .gv{padding:10px}
+.palco-scaler.compacto .gv__g{gap:7px;grid-template-columns:repeat(3,1fr)}
+.palco-scaler.compacto .gv__box{display:none}
+.palco-scaler.compacto .gv__h small,.palco-scaler.compacto .pc-tab:not(.on),.palco-scaler.compacto .cd__conn{display:none}
+
+/* ═══════════ TRATAMENTO B: a demo presa na rolagem ═══════════ */
+.preso{display:none;padding-top:var(--nav-h)}
+html[data-t=b] .preso{display:block}
+.preso__in{min-height:calc(100vh - var(--nav-h));display:grid;grid-template-columns:300px minmax(0,1fr);gap:40px;align-items:center;max-width:var(--wrap);margin:0 auto;padding:20px 16px}
+.trilho{list-style:none;display:grid;gap:6px}
+.trilho li{display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px;padding:12px 14px;border-radius:14px;border:1px solid transparent;color:var(--dim);transition:color .35s,background .35s,border-color .35s}
+.trilho li .n{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-family:var(--f-mono);font-weight:600;border:1px solid var(--line-2);transition:background .35s,border-color .35s,color .35s}
+.trilho li b{display:block;color:inherit;font-size:17px}
+.trilho li small{font-size:14px;line-height:1.45}
+.trilho li.on{color:var(--text);background:var(--surface);border-color:var(--line)}
+.trilho li.on .n{background:linear-gradient(135deg,var(--vids),var(--vids-3));border-color:transparent;color:var(--vids-ink,#1a1200)}
+.trilho li.on small{color:var(--muted)}
+.trilho li.feito .n{border-color:rgba(74,222,128,.5);color:var(--ok)}
+.preso__dica{margin-top:14px;font-family:var(--f-mono);font-size:12px;color:var(--dim);text-align:center}
+@media (max-width:900px){
+  .preso__in{grid-template-columns:minmax(0,1fr);gap:16px;align-content:center}
+  .trilho{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+  .trilho li{grid-template-columns:minmax(0,1fr);justify-items:center;text-align:center;padding:8px 4px}
+  .trilho li small{display:none}
+  .trilho li b{font-size:12px}
+}
+
+/* ═══════════ SEÇÕES ═══════════ */
+.dores{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:36px}
+.dor{padding:24px;border-radius:var(--r-lg);border:1px solid var(--line);background:linear-gradient(180deg,var(--surface-2),var(--surface))}
+.dor .ic{font-size:26px}
+.dor h3{font-size:19px;margin:12px 0 6px;letter-spacing:-.01em}
+.dor p{color:var(--muted);font-size:15.5px}
+@media (max-width:860px){.dores{grid-template-columns:minmax(0,1fr)}}
+
+.passos3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:36px;counter-reset:p}
+.p3{position:relative;padding:26px 24px;border-radius:var(--r-lg);border:1px solid var(--line);background:var(--surface)}
+.p3::before{counter-increment:p;content:counter(p);font-family:var(--f-display);font-weight:800;font-size:64px;line-height:1;letter-spacing:-.05em;background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,.02));-webkit-background-clip:text;background-clip:text;color:transparent}
+.p3 h3{font-size:20px;margin:10px 0 6px}
+.p3 p{color:var(--muted);font-size:15.5px}
+.p3 code{font-family:var(--f-mono);font-size:13px;background:rgba(255,255,255,.07);border-radius:6px;padding:1px 6px}
+html[data-t=b] #como-a{display:none}
+@media (max-width:860px){.passos3{grid-template-columns:minmax(0,1fr)}}
+
+.duas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:36px}
+.plat{position:relative;padding:28px;border-radius:var(--r-lg);border:1px solid;overflow:hidden}
+.plat--f{border-color:rgba(139,92,246,.4);background:linear-gradient(180deg,rgba(139,92,246,.14),rgba(139,92,246,.02))}
+.plat--v{border-color:rgba(245,158,11,.4);background:linear-gradient(180deg,rgba(245,158,11,.13),rgba(245,158,11,.02))}
+.plat h3{font-family:var(--f-display);font-weight:800;font-size:28px;letter-spacing:-.03em}
+.plat p{color:var(--muted);margin:6px 0 14px}
+.plat ul{list-style:none;display:grid;gap:7px;font-size:15.5px}
+.plat li::before{content:"✓ ";color:var(--ok);font-weight:800}
+.plat li.no{color:var(--dim)}
+.plat li.no::before{content:"— ";color:var(--dim)}
+.segue{margin-top:16px;padding:16px 20px;border-radius:var(--r);border:1px dashed var(--line-2);color:var(--muted);font-size:15.5px}
+@media (max-width:860px){.duas{grid-template-columns:minmax(0,1fr)}}
+
+/* prova */
+.elenco{display:flex;flex-wrap:wrap;align-items:center;gap:14px 18px;margin-top:26px}
+.elenco__t{width:100%;font-family:var(--f-mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.elenco figure{display:flex;align-items:center;gap:10px}
+.elenco img{width:52px;height:52px;border-radius:14px;object-fit:cover;border:1.5px solid rgba(245,158,11,.5)}
+.elenco figcaption{font-weight:700}
+.prova{display:grid;grid-template-columns:minmax(0,1fr);gap:22px;margin-top:30px}
+.tela{position:relative;border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--line-2);background:#000;aspect-ratio:16/9;box-shadow:0 40px 90px -40px rgba(0,0,0,.9)}
+.tela video{width:100%;height:100%;object-fit:cover}
+.tela__play{position:absolute;inset:0;display:grid;place-items:center;background:linear-gradient(0deg,rgba(0,0,0,.55),rgba(0,0,0,.05) 60%);transition:opacity .3s}
+.tela__play span{display:inline-flex;align-items:center;gap:10px;padding:14px 22px;border-radius:99px;background:rgba(255,255,255,.95);color:#111;font-weight:800;font-size:16px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.tela.tocando .tela__play{opacity:0;pointer-events:none}
+.tela__leg{position:absolute;left:16px;bottom:14px;right:16px;font-size:13.5px;color:rgba(255,255,255,.85);pointer-events:none;transition:opacity .3s}
+.tela.tocando .tela__leg{opacity:0}
+.cenas{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.cn{display:flex;flex-direction:column;gap:9px;padding:8px 8px 12px;border-radius:14px;border:1px solid var(--line);background:var(--surface);cursor:pointer;text-align:left;transition:border-color .25s,background .25s}
+.cn:hover,.cn.on{border-color:rgba(245,158,11,.45);background:rgba(245,158,11,.06)}
+.cn img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:9px}
+.cn small{display:block;font-family:var(--f-mono);font-size:11px;color:var(--dim)}
+.cn small b{color:var(--vids-3);font-weight:600}
+.cn span{display:block;font-size:14.5px;line-height:1.4}
+.cn span.sem{color:var(--dim);font-style:italic}
+.prova__rod{margin-top:14px;font-size:13.5px;color:var(--dim)}
+.nums{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:44px}
+.num{padding:22px;border-radius:var(--r-lg);border:1px solid var(--line);background:var(--surface)}
+.num b{display:block;font-family:var(--f-display);font-weight:800;font-size:clamp(40px,5vw,60px);line-height:1;letter-spacing:-.05em}
+.num > span{color:var(--muted);font-size:15.5px}
+.nums__nota{margin-top:10px;font-size:13.5px;color:var(--dim)}
+@media (max-width:900px){.cenas{grid-template-columns:repeat(2,minmax(0,1fr))}.nums{grid-template-columns:minmax(0,1fr)}}
+
+/* planos */
+.planos{display:grid;grid-template-columns:1fr 1.08fr 1fr;gap:16px;margin-top:40px;align-items:stretch;perspective:1200px}
+.pl{position:relative;display:flex;flex-direction:column;padding:28px 24px 24px;border-radius:var(--r-lg);border:1px solid var(--line-2);background:linear-gradient(180deg,var(--surface-2),var(--surface))}
+.pl--top{border:1.5px solid rgba(167,139,250,.7);background:linear-gradient(180deg,rgba(139,92,246,.2),rgba(139,92,246,.04));box-shadow:0 30px 80px -30px rgba(139,92,246,.75);transform-style:preserve-3d}
+.pl__tag{position:absolute;top:-13px;left:50%;transform:translateX(-50%);font-family:var(--f-mono);font-size:11px;font-weight:600;letter-spacing:.1em;padding:5px 12px;border-radius:99px;background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;white-space:nowrap}
+.pl h3{font-family:var(--f-mono);font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--flow-2);font-weight:600}
+.pl__preco{display:flex;align-items:baseline;gap:4px;margin:14px 0 6px}
+.pl__preco small{font-size:18px;color:var(--muted);font-weight:600}
+.pl__preco b{font-family:var(--f-display);font-weight:800;font-size:58px;line-height:1;letter-spacing:-.05em}
+.pl__preco span{color:var(--muted)}
+.pl p{color:var(--muted);font-size:15px;min-height:48px}
+.pl p b{color:var(--text)}
+.pl__eco{display:inline-block;margin-top:12px;font-size:13.5px;font-weight:700;color:#86efac;padding:5px 10px;border-radius:8px;border:1px solid rgba(74,222,128,.3);background:rgba(74,222,128,.07)}
+.pl .btn{margin-top:auto;width:100%}
+.pl .esp{flex:1;min-height:22px}
+.planos__rod{margin-top:16px;text-align:center;font-size:14px;color:var(--dim)}
+@media (max-width:900px){.planos{grid-template-columns:minmax(0,1fr);max-width:460px;margin-left:auto;margin-right:auto}.pl--top{order:-1}}
+
+.inclui{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:36px}
+.inc{padding:20px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface)}
+.inc .ic{font-size:22px}
+.inc h4{font-size:16.5px;margin:10px 0 4px}
+.inc p{font-size:14.5px;color:var(--muted);line-height:1.5}
+@media (max-width:1000px){.inclui{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.inclui{grid-template-columns:minmax(0,1fr)}}
+
+.aviso{display:grid;grid-template-columns:40px minmax(0,1fr);gap:16px;margin-top:22px;padding:22px 24px;border-radius:var(--r-lg);border:1px solid rgba(251,191,36,.3);background:rgba(251,191,36,.06)}
+.aviso .ic{font-size:26px}
+.aviso p{color:var(--muted)}
+.aviso b{color:#fde68a}
+.garantia{display:grid;grid-template-columns:72px minmax(0,1fr);gap:20px;align-items:center;margin-top:16px;padding:26px 28px;border-radius:var(--r-lg);border:1px solid rgba(74,222,128,.3);background:linear-gradient(135deg,rgba(74,222,128,.09),rgba(74,222,128,.02))}
+.garantia .sel{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:30px;color:#052e16;background:linear-gradient(135deg,#86efac,#22c55e);box-shadow:0 0 40px -6px rgba(74,222,128,.7)}
+.garantia h3{font-family:var(--f-display);font-weight:800;font-size:24px;letter-spacing:-.02em}
+.garantia p{color:var(--muted)}
+
+.faq{max-width:820px;margin:36px auto 0}
+.faq details{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);margin-bottom:10px;overflow:hidden}
+.faq summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:18px 20px;font-weight:700;font-size:17px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";margin-left:auto;font-family:var(--f-mono);font-size:20px;color:var(--dim);transition:transform .25s}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq .r{padding:0 20px 18px;color:var(--muted)}
+.faq .r a{color:var(--flow-2)}
+
+.final{margin:120px 0 0;padding:64px 24px;border-radius:32px;text-align:center;border:1px solid var(--line-2);background:radial-gradient(60% 80% at 50% 0%,rgba(139,92,246,.28),transparent 70%),var(--bg-2)}
+.final .h2{max-width:820px;margin-left:auto;margin-right:auto}
+.final .lead{margin:0 auto 28px}
+.rod{padding:48px 16px 56px;text-align:center;color:var(--dim);font-size:14.5px}
+.rod nav{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 22px;margin-bottom:14px}
+.rod a{text-decoration:none;color:var(--muted)}
+.rod a:hover{color:#fff}
+
+/* comparação de tratamentos (só no rascunho local) */
+/* ═══════════ CENADROP MULTI ═══════════ */
+.selo-novo{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-mono);font-size:11px;font-weight:600;letter-spacing:.12em;padding:4px 10px;border-radius:99px;background:linear-gradient(135deg,#22c55e,#4ade80);color:#052e16;vertical-align:middle}
+.kicker .selo-novo{font-size:10px;padding:2px 8px;letter-spacing:.1em}
+.nav__links a.nv{color:#86efac}
+.multi{position:relative;margin-top:36px;padding:40px 36px;border-radius:32px;border:1px solid rgba(74,222,128,.28);background:radial-gradient(60% 70% at 85% 0%,rgba(74,222,128,.12),transparent 70%),radial-gradient(50% 60% at 0% 100%,rgba(139,92,246,.16),transparent 70%),var(--bg-2);overflow:hidden}
+.multi__top{display:grid;grid-template-columns:minmax(0,1fr);gap:28px}
+.multi__top .lead{max-width:760px}
+.multi__msg{display:inline-block}
+.multi__top .h2{margin-top:12px}
+.multi__msg{margin-top:20px;padding:14px 18px;border-radius:var(--r);border:1px solid var(--line-2);background:rgba(0,0,0,.25);font-size:16px}
+.multi__msg b{color:#86efac}
+.multi__print{border-radius:16px;border:1px solid var(--line-2);overflow:hidden;box-shadow:0 30px 70px -30px rgba(0,0,0,.9)}
+.multi__print img{display:block;width:100%;height:auto}
+.multi__cap{margin-top:10px;font-size:13px;color:var(--dim);text-align:center}
+.comp{margin-top:40px;border-radius:var(--r-lg);border:1px solid var(--line);overflow:hidden;background:var(--surface)}
+.comp table{width:100%;border-collapse:collapse;font-size:15.5px}
+.comp th,.comp td{padding:13px 16px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+.comp tr:last-child td{border-bottom:0}
+.comp thead th{font-family:var(--f-display);font-weight:800;font-size:18px;letter-spacing:-.02em;background:rgba(255,255,255,.03)}
+.comp thead th.e{color:var(--flow-2)}
+.comp thead th.m{color:#86efac}
+.comp td:first-child{color:var(--dim);font-family:var(--f-mono);font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;width:24%}
+.comp td{color:var(--muted)}
+.comp td b{color:var(--text)}
+@media (max-width:700px){
+  .comp thead{display:none}
+  .comp tr{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--line)}
+  .comp tr:last-child{border-bottom:0}
+  .comp td{border:0;padding:8px 14px 12px}
+  .comp td:first-child{grid-column:1/-1;width:auto;padding:12px 14px 0}
+  .comp td.e::before,.comp td.m::before{display:block;font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px}
+  .comp td.e::before{content:"One · extensão";color:var(--flow-2)}
+  .comp td.m::before{content:"Multi";color:#86efac}
+}
+.recs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:34px}
+.rec{padding:18px 20px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface)}
+.rec .ic{font-size:21px}
+.rec h4{font-size:16.5px;margin:8px 0 4px;letter-spacing:-.01em}
+.rec p{font-size:14.5px;color:var(--muted);line-height:1.5}
+.multi .passos3{margin-top:34px}
+.multi .p3{background:rgba(0,0,0,.2)}
+.provam{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:34px}
+.provam .num{background:rgba(0,0,0,.22)}
+.provam .num b{font-size:clamp(34px,4vw,48px)}
+.provam .num small{display:block;margin-top:8px;font-family:var(--f-mono);font-size:11.5px;color:var(--dim);letter-spacing:.04em}
+.reqs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:22px}
+.reqs ul{list-style:none;display:grid;gap:9px;padding:20px 22px;border-radius:var(--r-lg);border:1px solid var(--line);background:var(--surface);font-size:15px;color:var(--muted)}
+.reqs ul li{display:grid;grid-template-columns:24px minmax(0,1fr);gap:6px}
+.reqs h4{font-family:var(--f-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);font-weight:500;margin-bottom:4px}
+.multi .aviso{margin-top:0}
+@media (max-width:980px){.recs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:760px){.multi__print{overflow-x:auto;-webkit-overflow-scrolling:touch}.multi__print img{width:760px;max-width:none}.multi{padding:28px 18px;border-radius:24px}.recs,.provam,.reqs{grid-template-columns:minmax(0,1fr)}}
+/* "na assinatura vêm os dois" (planos) */
+.osdois{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:36px}
+.od{position:relative;display:grid;grid-template-columns:48px minmax(0,1fr);gap:14px;align-items:start;padding:22px 24px;border-radius:var(--r-lg);border:1px solid}
+.od .ic{font-size:30px;line-height:1}
+.od h4{font-family:var(--f-display);font-weight:800;font-size:21px;letter-spacing:-.02em;display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.od p{color:var(--muted);font-size:15px;margin-top:4px}
+.od--e{border-color:rgba(139,92,246,.4);background:linear-gradient(180deg,rgba(139,92,246,.12),rgba(139,92,246,.02))}
+.od--m{border-color:rgba(74,222,128,.35);background:linear-gradient(180deg,rgba(74,222,128,.10),rgba(74,222,128,.02))}
+.osdois__t{grid-column:1/-1;text-align:center;font-size:15.5px;color:var(--muted)}
+.osdois__t b{color:var(--text)}
+@media (max-width:760px){.osdois{grid-template-columns:minmax(0,1fr)}}
+
+.trat{position:fixed;left:16px;bottom:16px;z-index:80;display:none;gap:4px;padding:5px;border-radius:12px;background:rgba(12,11,24,.92);border:1px solid var(--line-2);font-family:var(--f-mono);font-size:12px}
+.trat.on{display:flex}
+.trat a{padding:7px 11px;border-radius:8px;text-decoration:none;color:var(--muted)}
+.trat a.on{background:var(--flow);color:#fff}
+
+[data-reveal]{opacity:0;transform:translateY(18px)}
+.no-js [data-reveal]{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.bg__glow{animation:none}html{scroll-behavior:auto}}
+</style>
+<script>document.documentElement.dataset.t = /[?&]t=b\b/.test(location.search) ? "b" : "a";</script>
+</head>
+<body class="no-js">
+<div class="bg" aria-hidden="true"><div class="bg__glow"></div><div class="bg__grid"></div><div class="bg__noise"></div></div>
+
+<nav class="nav"><div class="wrap">
+  <a class="nav__brand" href="#topo" aria-label="Cenadrop"><img src="/cenadrop/marca/simbolo.svg" alt="">Cenadrop</a>
+  <div class="nav__links"><a href="#como">Como funciona</a><a href="#flow-vids">Flow × Vids</a><a class="nv" href="#multi">Multi · novo</a><a href="#prova">Funcionando</a><a href="#duvidas">Dúvidas</a></div>
+  <a class="btn btn--pri btn--sm" href="#planos">Ver planos</a>
+</div></nav>
+
+<!-- ═══════════ HERO ═══════════ -->
+<header class="hero" id="topo"><div class="wrap">
+  <div>
+    <span class="kicker" data-reveal><i></i>CenaDrop One · <span class="cd-ver">v11.0.1</span> &nbsp;+&nbsp; <a href="#multi" style="text-decoration:none"><span class="selo-novo">NOVO</span> CenaDrop Multi</a></span>
+    <h1 data-reveal>Seu roteiro vira cenas em lote, <strong>enquanto você faz <span class="g-flow">outra</span> <span class="g-vids">coisa.</span></strong></h1>
+    <p class="hero__sub" data-reveal>O CenaDrop envia cada cena para o <b>Google Flow</b> e o <b>Google Vids</b>, coloca o personagem certo em cada uma e <b>baixa tudo na ordem</b>. Você carrega o arquivo e aperta Iniciar.</p>
+    <div class="hero__cta" data-reveal>
+      <a class="btn btn--pri" data-magnetico href="#planos">Ver os planos <small>· anual em 12x de R$21,10</small></a>
+      <a class="btn btn--sec" href="#prova">Ver um lote real</a>
+    </div>
+    <div class="selos" data-reveal><span>CenaDrop One + CenaDrop Multi na mesma assinatura</span><span>7 dias de garantia</span><span>Windows e Mac</span><span>Atualizações incluídas</span></div>
+  </div>
+  <div class="palco-col" data-reveal>
+    <div class="palco-wrap" id="palcoHero"></div>
+    <p class="palco-cap">Reprise de um <b>lote real</b>: as 8 cenas do curta de exemplo, com 5 personagens.</p>
+  </div>
+</div></header>
+
+<!-- ═══════════ TRATAMENTO B: demo presa na rolagem ═══════════ -->
+<section class="preso" id="preso" aria-label="Como funciona, passo a passo">
+  <div class="preso__in">
+    <ol class="trilho" id="trilho">
+      <li data-e="csv"><span class="n">1</span><div><b>Carregue o CSV</b><small>O arquivo com as cenas do seu roteiro.</small></div></li>
+      <li data-e="personagem"><span class="n">2</span><div><b>Escolha o personagem</b><small>Uma foto. Ele entra nas cenas com o nome dele.</small></div></li>
+      <li data-e="gerar"><span class="n">3</span><div><b>Aperte Iniciar</b><small>Até 5 cenas gerando ao mesmo tempo no Vids.</small></div></li>
+      <li data-e="baixar"><span class="n">4</span><div><b>Baixa sozinho</b><small>Cada cena cai na pasta, já numerada.</small></div></li>
+      <li data-e="pronto"><span class="n">5</span><div><b>Pronto pra montar</b><small>001, 002, 003… na ordem do roteiro.</small></div></li>
+    </ol>
+    <div><div class="palco-wrap" id="palcoPreso"></div><p class="preso__dica">role devagar — a demo anda com você</p></div>
+  </div>
+</section>
+
+<!-- ═══════════ DOR ═══════════ -->
+<section class="sec"><div class="wrap">
+  <span class="kicker" data-reveal>O problema</span>
+  <h2 class="h2" data-reveal>Fazer vídeo com IA deveria ser rápido. <strong>Cena por cena, não é.</strong></h2>
+  <div class="dores">
+    <div class="dor" data-reveal><span class="ic">⏱️</span><h3>Horas colando prompt</h3><p>Um vídeo de 60 cenas é colar, esperar gerar, colar a próxima. Sessenta vezes, olhando pra tela.</p></div>
+    <div class="dor" data-reveal><span class="ic">📂</span><h3>Baixar e renomear um por um</h3><p>Cada clipe sai com nome aleatório. Depois você ainda tem que descobrir qual é a cena 37.</p></div>
+    <div class="dor" data-reveal><span class="ic">🎭</span><h3>O personagem muda de cara</h3><p>Na cena 12 ele é outra pessoa. Manter o mesmo rosto à mão é um trabalho à parte.</p></div>
+  </div>
+</div></section>
+
+<!-- ═══════════ COMO FUNCIONA ═══════════ -->
+<section class="sec" id="como"><div class="wrap">
+  <span class="kicker" data-reveal>Como funciona</span>
+  <h2 class="h2" data-reveal>Três passos. <strong>O resto é com ele.</strong></h2>
+  <div class="passos3" id="como-a">
+    <div class="p3" data-reveal><h3>Carregue o arquivo de cenas</h3><p>O CSV do seu roteiro — vindo do Narrativa IA, da sua IA ou da aba <b>✦ Roteiro</b> da própria extensão.</p></div>
+    <div class="p3" data-reveal><h3>Aperte Iniciar</h3><p>Ele escreve cada prompt, coloca o personagem quando a cena começa com o nome (<code>Vera,</code>) e manda gerar.</p></div>
+    <div class="p3" data-reveal><h3>Os vídeos chegam numerados</h3><p><code>001_Flow_Video.mp4</code>, <code>002</code>, <code>003</code>… na ordem do roteiro, prontos pro seu editor.</p></div>
+  </div>
+</div></section>
+
+<!-- ═══════════ FLOW × VIDS ═══════════ -->
+<section class="sec" id="flow-vids"><div class="wrap">
+  <span class="kicker" data-reveal>Duas ferramentas do Google, um painel</span>
+  <h2 class="h2" data-reveal>Gere no <strong class="g-flow">Flow</strong> ou no <strong class="g-vids">Vids</strong>.</h2>
+  <p class="lead" data-reveal>O mesmo arquivo serve nos dois. Você usa o que a sua conta Google tiver.</p>
+  <div class="duas">
+    <div class="plat plat--f" data-reveal><h3>Google Flow</h3><p>O Veo 3, cena por cena, sem você tocar no teclado.</p>
+      <ul><li>Vídeo e imagem em lote</li><li>Personagem capturado do próprio Flow</li><li>Base Fixa: a mesma voz no vídeo inteiro</li><li>Várias cenas ao mesmo tempo (5 = área segura)</li></ul></div>
+    <div class="plat plat--v" data-reveal><h3>Google Vids</h3><p>Rápido, com o personagem pela foto.</p>
+      <ul><li>Até 5 cenas gerando ao mesmo tempo</li><li>Personagem por foto — cadastre uma vez</li><li>Cota do seu plano Google à vista no painel</li><li class="no">Imagem sem personagem</li></ul></div>
+  </div>
+  <p class="segue" data-reveal>🔀 O painel segue a aba aberta: no Flow ele fica roxo, no Vids fica âmbar. Você não precisa escolher toda vez.</p>
+</div></section>
+
+<!-- ═══════════ CENADROP MULTI ═══════════ -->
+<section class="sec" id="multi"><div class="wrap">
+  <div class="multi">
+    <div class="multi__top">
+      <div>
+        <span class="kicker" data-reveal><span class="selo-novo">NOVO</span> CenaDrop Multi · Windows e Mac</span>
+        <h2 class="h2" data-reveal>Tem mais de uma conta Google? <strong>Use todas no mesmo lote.</strong></h2>
+        <p class="lead" data-reveal>O <b>CenaDrop Multi</b> é o CenaDrop como programa de computador. Ele usa <b>até 10 contas Google no mesmo lote</b>, no <b>Flow</b> ou no <b>Vids</b>: o roteiro é dividido entre elas, cada uma gera as suas cenas e tudo chega numerado numa pasta só.</p>
+        <p class="multi__msg" data-reveal>🎁 <b>Na assinatura vêm os dois.</b> Comece pela extensão; quando quiser mais volume, abra o Multi e ligue as suas outras contas.</p>
+      </div>
+      <div data-reveal>
+        <div class="multi__print"><img src="/cenadrop/planos/midia/multi-andamento.jpg" alt="Painel do CenaDrop Multi: lote de 11 cenas terminado em 3 minutos e 57 segundos, dividido entre 3 contas" loading="lazy" width="1605" height="300"></div>
+        <p class="multi__cap">Print real do Multi: 11 cenas, 3 contas, 3 min 57 s (15/11/2026).</p>
+      </div>
+    </div>
+
+    <div class="comp" data-reveal>
+      <table>
+        <thead><tr><th></th><th class="e">CenaDrop One</th><th class="m">CenaDrop Multi <span class="selo-novo">NOVO</span></th></tr></thead>
+        <tbody>
+          <tr><td>O que é</td><td class="e">Extensão do Google Chrome</td><td class="m">Programa instalado (Windows e Mac)</td></tr>
+          <tr><td>Contas Google</td><td class="e">1, a que está aberta no Chrome</td><td class="m"><b>Até 10 contas no mesmo lote</b></td></tr>
+          <tr><td>Onde gera</td><td class="e">Google Flow <b>e</b> Google Vids</td><td class="m">Google Flow <b>e</b> Google Vids, em abas separadas</td></tr>
+          <tr><td>Vídeo e imagem</td><td class="e">Sim</td><td class="m">No Flow, os dois <b>no mesmo arquivo</b>. No Vids, vídeo</td></tr>
+          <tr><td>Personagem</td><td class="e">Sim (Flow e Vids)</td><td class="m">Sim: no Flow, cria o personagem em cada conta a partir da foto. No Vids, vai pela foto</td></tr>
+          <tr><td>Cenas ao mesmo tempo</td><td class="e">No Flow, de 1 a 10 (5 = área segura). No Vids, até 5</td><td class="m">De 1 a 5 <b>por conta</b>, com as contas se revezando</td></tr>
+          <tr><td>Arquivo de cenas</td><td class="e">CSV do Narrativa, da sua IA ou da aba Roteiro</td><td class="m"><b>O mesmo CSV</b></td></tr>
+          <tr><td>Para quem</td><td class="e">Todo mundo: o jeito mais simples e seguro</td><td class="m">Quem tem várias contas e quer volume</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="recs">
+      <div class="rec" data-reveal><span class="ic">👥</span><h4>Até 10 contas no mesmo programa</h4><p>Você entra em cada conta Google uma vez, e o programa lembra.</p></div>
+      <div class="rec" data-reveal><span class="ic">⚡</span><h4>As contas trabalham juntas</h4><p>O lote é dividido entre elas, com até 5 cenas por conta (você escolhe). A partir de 4 contas elas se revezam: metade gera enquanto as outras descansam.</p></div>
+      <div class="rec" data-reveal><span class="ic">🎬</span><h4>Vídeo e imagem no mesmo lote</h4><p>Na aba Flow, uma coluna no CSV diz se a cena é vídeo ou imagem, e o programa troca de modo sozinho.</p></div>
+      <div class="rec" data-reveal><span class="ic">🎭</span><h4>Personagem em todas as contas</h4><p>Cadastre uma vez (foto, nome, voz) e o programa cria ele no Flow de cada conta. Na aba Vids bastam a foto e o nome.</p></div>
+      <div class="rec" data-reveal><span class="ic">🗂️</span><h4>Um projeto por canal</h4><p>Trocou de projeto no topo, todas as contas trocam juntas, com os personagens daquele canal.</p></div>
+      <div class="rec" data-reveal><span class="ic">🎁</span><h4>Aproveita o que cada conta tem</h4><p>Na aba Flow, cada conta tem um papel que você pode mudar: vídeo primeiro, imagem primeiro ou só imagem. A que tem o vídeo gratuito do Flow ("Lower Priority") usa ele nos vídeos.</p></div>
+      <div class="rec" data-reveal><span class="ic">📂</span><h4>Tudo numerado numa pasta só</h4><p><code style="font-family:var(--f-mono);font-size:13px">001_Flow_Video.mp4</code>, <code style="font-family:var(--f-mono);font-size:13px">002_Flow_Imagem.jpg</code>… na ordem do roteiro, venha de qual conta vier.</p></div>
+      <div class="rec" data-reveal><span class="ic">🔁</span><h4>Falhou? Tenta de novo sozinho</h4><p>A cena que falha volta pro fim do lote, de preferência em outra conta. Recusa por política fica marcada pra você corrigir.</p></div>
+      <div class="rec" data-reveal><span class="ic">🛡️</span><h4>Uma conta parou, as outras seguem</h4><p>Se o Google segura uma conta, o programa tira ela do lote e as outras continuam.</p></div>
+      <div class="rec" data-reveal><span class="ic">🧠</span><h4>Lembra o que já foi feito</h4><p>Abriu o mesmo CSV de novo? Ele já marca só o que falta.</p></div>
+      <div class="rec" data-reveal><span class="ic">🔄</span><h4>Atualiza sozinho</h4><p>Avisa quando sai versão nova e instala com um clique.</p></div>
+      <div class="rec" data-reveal><span class="ic">🩺</span><h4>Diagnóstico em um clique</h4><p>Um botão manda o registro pro suporte e devolve um código pra você colar no Discord.</p></div>
+    </div>
+
+    <div class="passos3">
+      <div class="p3" data-reveal><h3>Instale e entre nas suas contas</h3><p>Uma vez só, em cada conta Google que você quiser usar.</p></div>
+      <div class="p3" data-reveal><h3>Abra o CSV do roteiro</h3><p>O mesmo arquivo da extensão: Narrativa IA, a sua IA ou a aba <b>✦ Roteiro</b>.</p></div>
+      <div class="p3" data-reveal><h3>Aperte Iniciar</h3><p>O lote se divide entre as contas e as cenas chegam numeradas na pasta.</p></div>
+    </div>
+
+    <div class="provam">
+      <div class="num" data-reveal><b>14 min</b><span>102 imagens de um vídeo, com 3 contas: 102 de 102 baixadas</span><small>LOTE REAL · 14/11/2026</small></div>
+      <div class="num" data-reveal><b>3 min 57 s</b><span>11 cenas de um Short, vídeo e imagem, com 3 contas: 11 de 11</span><small>LOTE REAL · 15/11/2026</small></div>
+      <div class="num" data-reveal><b>4 min 57 s</b><span>12 cenas, 6 vídeos e 6 imagens, com 3 contas: cada arquivo na cena certa</span><small>TESTE · 12/11/2026</small></div>
+    </div>
+    <p class="nums__nota" data-reveal>O tempo de cada geração é do Google e varia com a fila, com o plano de cada conta e com quantas contas você usa.</p>
+
+    <div class="reqs">
+      <ul data-reveal>
+        <li><h4 style="grid-column:1/-1">O que você precisa</h4></li>
+        <li><span>💻</span><span>Computador <b>Windows</b> (64 bits) ou <b>Mac</b> (Apple ou Intel). Não funciona no celular.</span></li>
+        <li><span>🧠</span><span>Cada conta aberta usa cerca de <b>1 GB de memória</b>. Com 8 GB, use 2 ou 3 contas com folga.</span></li>
+        <li><span>🔑</span><span>Contas Google com acesso ao <b>Flow</b> ou ao <b>Vids</b>. Créditos e limites são os do plano de cada conta.</span></li>
+        <li><span>🇧🇷</span><span>A conta Google <b>em português (Brasil)</b>, em todas as contas.</span></li>
+        <li><span>📶</span><span>Internet estável e o computador ligado durante o lote (o programa não deixa ele dormir).</span></li>
+      </ul>
+      <div class="aviso" data-reveal style="grid-template-columns:32px minmax(0,1fr)"><span class="ic">🤝</span><p><b>Sobre usar várias contas.</b> Quem gera os vídeos é o Google, em cada uma das suas contas, com os créditos e limites delas. Gerar muito em pouco tempo pode fazer o Google pausar uma conta por algumas horas. O CenaDrop Multi percebe isso, tira aquela conta do lote e segue com as outras. Recomendamos usar contas separadas da sua conta pessoal. Se você quer o caminho mais tranquilo, use a extensão com uma conta só. Ela está incluída na mesma assinatura.</p></div>
+    </div>
+  </div>
+</div></section>
+
+<!-- ═══════════ PROVA ═══════════ -->
+<section class="sec" id="prova"><div class="wrap">
+  <span class="kicker" data-reveal><i></i>Lote real · não é mockup</span>
+  <h2 class="h2" data-reveal>Isto saiu do CenaDrop. <strong>Dá o play com som.</strong></h2>
+  <p class="lead" data-reveal>Um curta de 1 minuto com <b>5 personagens</b>. O CenaDrop gerou as 8 cenas em lote, cada uma com a foto do personagem certo e a fala em português, sincronizada. Depois foi só montar.</p>
+  <div class="elenco" data-reveal id="elenco"><span class="elenco__t">O elenco · 5 fotos, o mesmo rosto em todas as cenas</span></div>
+  <div class="prova">
+    <div data-reveal>
+      <div class="tela" id="tela">
+        <video id="telaVideo" playsinline preload="none"></video>
+        <button class="tela__play" id="telaPlay" aria-label="Assistir com som"><span>▶ Assistir com som</span></button>
+        <div class="tela__leg" id="telaLeg"></div>
+      </div>
+      <p class="prova__rod" id="provaRod"></p>
+    </div>
+    <div class="cenas" id="cenas" data-reveal></div>
+  </div>
+  <div class="nums">
+    <div class="num" data-reveal><b><span data-conta="93">93</span></b><span>cenas num lote real no Vids</span></div>
+    <div class="num" data-reveal><b><span data-conta="21">21</span> min</b><span>do Iniciar à última cena baixada</span></div>
+    <div class="num" data-reveal><b><span data-conta="0">0</span></b><span>cliques pra baixar e renomear</span></div>
+  </div>
+  <p class="nums__nota" data-reveal>Lote de 28/09/2026, 4 cenas ao mesmo tempo. O tempo de cada geração é do Google e varia com a fila e com o seu plano.</p>
+</div></section>
+
+<!-- ═══════════ PLANOS ═══════════ -->
+<section class="sec" id="planos"><div class="wrap">
+  <div style="text-align:center">
+    <span class="kicker" data-reveal>Planos</span>
+    <h2 class="h2" data-reveal>Escolha o plano. <strong>Tudo incluído em todos.</strong></h2>
+  </div>
+  <div class="planos">
+    <div class="pl" data-reveal>
+      <h3>Mensal</h3>
+      <div class="pl__preco"><small>R$</small><b>37</b><span>/mês</span></div>
+      <p>Cobrado todo mês. Cancele quando quiser.</p>
+      <div class="esp"></div>
+      <a class="btn btn--sec" data-plan="mensal" href="https://pay.hotmart.com/R107828804T?off=b05v1myz">Assinar mensal</a>
+    </div>
+    <div class="pl pl--top" data-reveal data-inclina>
+      <span class="pl__tag">MELHOR PREÇO</span>
+      <h3>Anual</h3>
+      <div class="pl__preco"><small>12x R$</small><b>21,10</b></div>
+      <p>ou <b>R$204 à vista</b> por ano — sai a R$17 por mês.</p>
+      <span class="pl__eco">Até R$240 de economia por ano</span>
+      <div class="esp"></div>
+      <a class="btn btn--pri" data-magnetico data-plan="anual" href="https://pay.hotmart.com/R107828804T?off=q1820l9p">Quero o anual →</a>
+    </div>
+    <div class="pl" data-reveal>
+      <h3>Trimestral</h3>
+      <div class="pl__preco"><small>3x R$</small><b>28,91</b></div>
+      <p>ou <b>R$81 à vista</b> a cada 3 meses — sai a R$27 por mês.</p>
+      <span class="pl__eco">Até R$120 de economia por ano</span>
+      <div class="esp"></div>
+      <a class="btn btn--sec" data-plan="trimestral" href="https://pay.hotmart.com/R107828804T?off=e84ix4kb">Assinar trimestral</a>
+    </div>
+  </div>
+  <p class="planos__rod">Pagamento seguro pela Hotmart · cartão, PIX ou boleto. No cartão parcelado a Hotmart cobra acréscimo: anual em 12x de R$21,10 (total R$253,20) · trimestral em 3x de R$28,91 (total R$86,73). Economia calculada à vista, contra 12 meses do mensal (R$444).</p>
+
+  <div class="osdois">
+    <p class="osdois__t" data-reveal>Em <b>qualquer plano</b> você leva <b>os dois CenaDrops</b>, com a <b>mesma chave de ativação</b>.</p>
+    <div class="od od--e" data-reveal><span class="ic">🧩</span><div><h4>CenaDrop One</h4><p>No Google Chrome, com a sua conta. Gera no Google Flow e no Google Vids. O jeito mais simples de começar.</p></div></div>
+    <div class="od od--m" data-reveal><span class="ic">🖥️</span><div><h4>CenaDrop Multi <span class="selo-novo">NOVO</span></h4><p>O programa para Windows e Mac que divide o lote entre até 10 contas Google, no Flow ou no Vids. <a href="#multi" style="color:#86efac">Ver como funciona</a></p></div></div>
+  </div>
+
+  <div class="inclui">
+    <div class="inc" data-reveal><span class="ic">🎬</span><h4>Vídeo em lote no Google Flow</h4><p>Cena por cena no Veo 3, sem colar prompt nem clicar em gerar.</p></div>
+    <div class="inc" data-reveal><span class="ic">⚡</span><h4>Vídeo em lote no Google Vids</h4><p>Até 5 cenas gerando ao mesmo tempo.</p></div>
+    <div class="inc" data-reveal><span class="ic">🎭</span><h4>Personagem consistente</h4><p>Cadastre o rosto uma vez e ele entra nas cenas certas.</p></div>
+    <div class="inc" data-reveal><span class="ic">🍌</span><h4>Imagens em lote</h4><p>As imagens do roteiro em lote, no mesmo fluxo.</p></div>
+    <div class="inc" data-reveal><span class="ic">🎨</span><h4>11 estilos, 33 variações</h4><p>Cinematográfico, anime, realismo, desenho educativo e mais.</p></div>
+    <div class="inc" data-reveal><span class="ic">✦</span><h4>Gerador de meta-prompts</h4><p>Do roteiro aos prompts visuais de cada cena.</p></div>
+    <div class="inc" data-reveal><span class="ic">▶️</span><h4>Curso passo a passo</h4><p>Da instalação ao vídeo pronto, em aulas curtas.</p></div>
+    <div class="inc" data-reveal><span class="ic">🔄</span><h4>Atualizações incluídas</h4><p>Todas as versões novas enquanto a assinatura estiver ativa.</p></div>
+  </div>
+
+  <div class="aviso" data-reveal><span class="ic">🔑</span><p><b>Importante:</b> quem gera os vídeos é o Google, na sua própria conta. Você precisa de uma conta Google com acesso ao Flow ou ao Vids, e os créditos e limites de geração são os do seu plano Google. O CenaDrop organiza e acelera a produção.</p></div>
+  <div class="garantia" data-reveal><span class="sel">7</span><div><h3>7 dias de garantia</h3><p>Instalou, testou e não serviu para você? Peça o reembolso em até 7 dias pela Hotmart e recebe 100% de volta.</p></div></div>
+</div></section>
+
+<!-- ═══════════ DÚVIDAS ═══════════ -->
+<section class="sec" id="duvidas"><div class="wrap">
+  <div style="text-align:center">
+    <span class="kicker" data-reveal>Dúvidas</span>
+    <h2 class="h2" data-reveal>Antes de assinar</h2>
+  </div>
+  <div class="faq">
+    <details data-reveal><summary>Como recebo o acesso?</summary><div class="r">A chave de ativação chega no seu e-mail logo depois da compra, junto com o link para baixar a extensão. Confira também a caixa de spam.</div></details>
+    <details data-reveal><summary>Recebo os dois CenaDrops?</summary><div class="r">Sim. A mesma assinatura e a mesma chave de ativação valem para a extensão e para o CenaDrop Multi, em qualquer plano.</div></details>
+    <details data-reveal><summary>Qual devo usar, a extensão ou o Multi?</summary><div class="r">Se você tem uma conta Google, a extensão. Se tem várias contas e quer gerar mais rápido, o Multi. Dá para usar os dois.</div></details>
+    <details data-reveal><summary>Como recebo o Multi?</summary><div class="r">Você baixa em <a href="/download#multi">cenadrop.com.br/download</a> (Windows ou Mac) e ativa com a mesma chave da extensão, que chega no e-mail da compra. Na primeira vez, o programa pede para ativar essa chave no <a href="https://discord.gg/SGEVxaurAw">Discord do CenaDrop</a>, onde ficam o suporte e os avisos. É uma vez só.</div></details>
+    <details data-reveal><summary>O Multi funciona no Google Vids?</summary><div class="r">Sim. No topo do programa você escolhe a aba <b>Flow</b> ou <b>Vids</b>, e o lote inteiro sai por ela. No Vids ele gera os vídeos, com o personagem pela foto e a cota de vídeo de cada conta. As imagens saem pela aba Flow.</div></details>
+    <details data-reveal><summary>Preciso pagar várias contas Google para usar o Multi?</summary><div class="r">Não necessariamente. Cada conta usa os próprios créditos, e o Multi aproveita o que cada uma tem: uma conta com o vídeo gratuito do Flow faz os vídeos com ele, e as outras podem fazer as imagens. Os limites de cada conta são definidos pelo Google.</div></details>
+    <details data-reveal><summary>Posso usar minha conta pessoal no Multi?</summary><div class="r">Pode, mas recomendamos contas separadas da sua conta principal. O Google pode limitar ou pausar por algum tempo uma conta que gera muito em pouco tempo. Quando isso acontece, o programa tira aquela conta do lote e as outras seguem.</div></details>
+    <details data-reveal><summary>Ao instalar o Multi apareceu um aviso de segurança. É normal?</summary><div class="r">Sim. Na primeira vez, o Mac e o Windows avisam sobre programas baixados da internet. O passo a passo para abrir leva menos de um minuto.</div></details>
+    <details data-reveal><summary>Deu problema no Multi. Como peço ajuda?</summary><div class="r">No programa, clique em <b>Diagnóstico</b> → <b>Mandar</b>. Você recebe um código (ex.: M-ABCD); abra um chamado no #suporte do <a href="https://discord.gg/SGEVxaurAw" target="_blank" rel="noopener">Discord do CenaDrop</a> e cole o código.</div></details>
+    <details data-reveal><summary>Funciona no celular?</summary><div class="r">Não. A extensão roda no Google Chrome do computador e o Multi é um programa para Windows e Mac.</div></details>
+    <details data-reveal><summary>Vou pagar alguma coisa para o Google?</summary><div class="r">Depende da sua conta Google. O CenaDrop usa os créditos que a sua conta já tem no Flow ou no Vids. Na aula sobre o Vids eu mostro quanto dá para gerar em cada plano: <a href="https://www.youtube.com/playlist?list=PLcGnzq_yUExE" target="_blank" rel="noopener">ver o curso</a>.</div></details>
+    <details data-reveal><summary>Posso cancelar?</summary><div class="r">Sim. A assinatura é gerenciada pela Hotmart e você cancela por lá quando quiser, sem multa.</div></details>
+    <details data-reveal><summary>Troquei de computador. Perco o acesso?</summary><div class="r">Não. Você desvincula a chave no computador antigo e ativa no novo, sem custo e sem limite de trocas.</div></details>
+    <details data-reveal><summary>Quero ver tudo funcionando antes</summary><div class="r">O curso completo está aberto no YouTube: <a href="https://www.youtube.com/playlist?list=PLcGnzq_yUExE" target="_blank" rel="noopener">assistir o curso</a>. E o <a href="/manual">manual</a> mostra cada passo do painel.</div></details>
+  </div>
+
+  <div class="final" data-reveal>
+    <h2 class="h2">Carregue o roteiro. <strong>Aperte Iniciar. Vá fazer outra coisa.</strong></h2>
+    <p class="lead">CenaDrop One + CenaDrop Multi na mesma assinatura. Anual em 12x de R$21,10 ou R$204 à vista. 7 dias de garantia.</p>
+    <a class="btn btn--pri" data-magnetico href="#planos">Escolher meu plano</a>
+  </div>
+</div></section>
+
+<footer class="rod">
+  <nav><a href="/manual">Manual</a><a href="/download">Download</a><a href="https://www.youtube.com/playlist?list=PLcGnzq_yUExE" target="_blank" rel="noopener">Curso no YouTube</a><a href="https://discord.gg/SGEVxaurAw" target="_blank" rel="noopener">Comunidade no Discord</a></nav>
+  <p>CenaDrop One · extensão para Google Chrome · <span class="cd-ver">v11.0.1</span> · CenaDrop Multi para Windows e Mac</p>
+</footer>
+
+<div class="trat" id="trat"><a href="?t=a" data-t="a">A · vitrine</a><a href="?t=b" data-t="b">B · rolagem</a></div>
+
+<!-- ═══════════ PALCO: a janela do produto ═══════════ -->
+<template id="tplPalco">
+<div class="palco-scaler"><div class="palco">
+  <div class="pc-bar"><i></i><i></i><i></i>
+    <span class="pc-tab"><b></b>Google Flow</span><span class="pc-tab v on"><b></b>Google Vids</span>
+    <span class="pc-url">docs.google.com/videos/d/…/edit</span>
+  </div>
+  <div class="pc-main">
+    <div class="gv">
+      <div class="gv__h"><b></b>Clipes de vídeo gerados com IA <small>Vídeo com IA · 720p</small></div>
+      <div class="gv__g" data-slots></div>
+      <div class="gv__box"><div class="gv__ing">Ingredientes <span class="ft"><img data-foto2 alt=""></span><span data-ingnome></span></div>
+        <div class="gv__txt"><span data-prompt></span></div><span class="gv__send">↑</span></div>
+      <div class="gv__f"><b>Veo · 720p</b> · as cenas chegam sozinhas na pasta de Downloads</div>
+    </div>
+    <div class="cd">
+      <div class="cd__h"><img src="/cenadrop/marca/simbolo.svg" alt=""><b>Cenadrop <em>One</em></b><span class="cd-ver">v11.0.1</span></div>
+      <div class="cd__conn"><i></i>Conectado: <b>Google Vids</b></div>
+      <div class="card"><div class="card__t">🎬 Elenco do Google Vids <span class="tag" data-qtdel></span></div>
+        <div class="eln">nenhuma foto escolhida<div class="cheio" data-elenco></div></div></div>
+      <div class="card"><div class="card__t">Arquivo de cenas <span class="tag" data-qtd></span></div>
+        <div class="arq">📋 <span class="fn" data-arq></span><span class="qt" data-sel></span></div>
+        <div class="fila"><div class="fila__trilho" data-fila></div></div></div>
+      <div class="cont"><div>gerando agora<b><span data-noar>0</span><em> / 4</em></b></div><div>baixadas<b><span data-bx>0</span><em data-tot></em></b></div></div>
+      <div class="go"><em class="g1">▶ Iniciar lote</em><em class="g2">● Gerando…</em><em class="g3" data-fim></em></div>
+    </div>
+  </div>
+  <div class="dl"><span>⬇ Downloads</span><span class="dl__vp"><span data-chips style="display:flex;gap:7px;margin:0"></span></span></div>
+  <svg class="cur" viewBox="0 0 24 24"><path d="M4 2l15 11-6.5 1.2L9.8 21z" fill="#fff" stroke="#111" stroke-width="1.4" stroke-linejoin="round"/></svg>
+  <span class="rip"></span>
+</div></div>
+</template>
+
+<script id="demo" type="application/json">{"geradoEm": "2026-10-05", "lote": {"ferramenta": "Google Vids", "data": "2026-10-05", "csv": "curta-exemplo.csv"}, "personagens": [{"nome": "Vera", "foto": "/cenadrop/planos/midia/elenco-vera.jpg"}, {"nome": "Teo", "foto": "/cenadrop/planos/midia/elenco-teo.jpg"}, {"nome": "Duda", "foto": "/cenadrop/planos/midia/elenco-duda.jpg"}, {"nome": "Rubens", "foto": "/cenadrop/planos/midia/elenco-rubens.jpg"}, {"nome": "Silas", "foto": "/cenadrop/planos/midia/elenco-silas.jpg"}], "cenas": [{"n": "001", "nome": "Silas", "prompt": "seated in the leather armchair facing the camera as if on a video call, speaks slowly and…", "falante": "Silas", "fala": "Vera, seu pai e eu estamos conversando aqui em cima. Você tem até o amanhecer pra trazer o que é meu. Sem atraso.", "inicio": 0.0, "dur": 8.04, "video": "/cenadrop/planos/midia/cena001.mp4", "poster": "/cenadrop/planos/midia/cena001.jpg"}, {"n": "002", "nome": null, "prompt": "the phone screen in Vera's hand goes dark; she squeezes it, her jaw tightens, a tear runs down…", "falante": null, "fala": null, "inicio": 8.04, "dur": 8.0, "video": "/cenadrop/planos/midia/cena002.mp4", "poster": "/cenadrop/planos/midia/cena002.jpg"}, {"n": "003", "nome": "Teo", "prompt": "looks up from the laptop toward the front seat and speaks low and urgent; on 'Vera...' he…", "falante": "Teo", "fala": "Consegui as câmeras. Ele está no último andar, com o Rubens. Vera... ele está esperando você, e eu não gosto disso.", "inicio": 16.04, "dur": 8.0, "video": "/cenadrop/planos/midia/cena003.mp4", "poster": "/cenadrop/planos/midia/cena003.jpg"}, {"n": "004", "nome": "Duda", "prompt": "keeps holding Vera's forearm and speaks with a brave half-smile while her eyes show fear; she…", "falante": "Duda", "fala": "Eu vou ficar aqui com o motor ligado. Dez minutos, Vera. Se você não descer... eu subo atrás de você, ouviu bem?", "inicio": 24.04, "dur": 8.0, "video": "/cenadrop/planos/midia/cena004.mp4", "poster": "/cenadrop/planos/midia/cena004.jpg"}, {"n": "005", "nome": "Vera", "prompt": "alone in the rising elevator, looks at the old photograph, her lips tremble, she closes her…", "falante": null, "fala": null, "inicio": 32.04, "dur": 8.0, "video": "/cenadrop/planos/midia/cena005.mp4", "poster": "/cenadrop/planos/midia/cena005.jpg"}, {"n": "006", "nome": "Silas", "prompt": "relaxed in the armchair, looks toward the open elevator and speaks with mock politeness,…", "falante": "Silas", "fala": "Pontual, igualzinho ao seu pai. Cadê o meu pen drive? Coloca em cima da mesa... devagar, Vera. Bem devagarinho.", "inicio": 40.04, "dur": 8.0, "video": "/cenadrop/planos/midia/cena006.mp4", "poster": "/cenadrop/planos/midia/cena006.jpg"}, {"n": "007", "nome": "Rubens", "prompt": "seated, looks at his daughter with tears in his eyes and speaks softly but firmly, his voice…", "falante": "Rubens", "fala": "Filha, olha pra mim. Não faz isso por mim. Eu vou ficar bem... você precisa ir embora agora. Vai, minha filha.", "inicio": 48.04, "dur": 8.04, "video": "/cenadrop/planos/midia/cena007.mp4", "poster": "/cenadrop/planos/midia/cena007.jpg"}, {"n": "008", "nome": "Vera", "prompt": "releases the flash drive on the glass table and looks up at Silas with a calm half-smile while…", "falante": "Vera", "fala": "Pode ficar com ele, Silas. Tá vazio. Enquanto você falava, o Teo publicou tudo sobre você. Vamos pra casa, pai.", "inicio": 56.08, "dur": 8.0, "video": "/cenadrop/planos/midia/cena008.mp4", "poster": "/cenadrop/planos/midia/cena008.jpg"}], "pronto": {"video": "/cenadrop/planos/midia/exemplo-pronto.mp4", "poster": "/cenadrop/planos/midia/exemplo-pronto.jpg", "dur": 64.02}}</script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script>
+(function(){
+"use strict";
+var $ = function(s,r){return (r||document).querySelector(s)};
+var $$ = function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+var DEMO = JSON.parse($("#demo").textContent);
+var reduz = matchMedia("(prefers-reduced-motion: reduce)").matches;
+var toque = matchMedia("(hover: none)").matches;
+
+/* ── origem do clique → checkout (aparece no relatório da Hotmart) ──
+   cenadrop.com.br/planos?src=yt011 → …&src=yt011 · sem ?src → src=planos */
+(function(){
+  var src = "planos";
+  try{ var q = new URLSearchParams(location.search).get("src"); if(q && /^[\w-]{1,40}$/.test(q)) src = q; }catch(e){}
+  $$("a[data-plan]").forEach(function(a){ a.href = a.href + (a.href.indexOf("?") > -1 ? "&" : "?") + "src=" + encodeURIComponent(src); });
+})();
+
+/* ── versão dinâmica (mesma fonte do download e do manual) ── */
+fetch("/cenadrop/version.json", {cache:"no-store"}).then(function(r){return r.json()}).then(function(v){
+  if(v && v.version) $$(".cd-ver").forEach(function(e){ e.textContent = "v" + v.version });
+}).catch(function(){});
+
+/* ── comparação de tratamentos: só no rascunho local ── */
+if(/^(localhost|127\.)/.test(location.hostname)){
+  var tr = $("#trat"); tr.classList.add("on");
+  $$("a", tr).forEach(function(a){ a.classList.toggle("on", a.dataset.t === document.documentElement.dataset.t) });
+}
+
+/* ═══════════ PROVA: o vídeo pronto + as 5 cenas do CSV ═══════════ */
+(function(){
+  var v = $("#telaVideo"), tela = $("#tela"), leg = $("#telaLeg");
+  v.poster = DEMO.pronto.poster;
+  leg.textContent = "1 min · " + DEMO.cenas.length + " cenas · " + DEMO.personagens.length + " personagens";
+  $("#provaRod").textContent = "Lote real gerado no " + DEMO.lote.ferramenta + " pelo CenaDrop. Embaixo, cada cena com o texto do CSV que entrou — clique pra pular até ela.";
+  var el = $("#elenco");
+  DEMO.personagens.forEach(function(p){ el.insertAdjacentHTML("beforeend", '<figure><img loading="lazy" src="' + p.foto + '" alt=""><figcaption>' + p.nome + '</figcaption></figure>') });
+  var inicio = DEMO.cenas.map(function(c){ return c.inicio });
+  var box = $("#cenas");
+  DEMO.cenas.forEach(function(c, i){
+    var b = document.createElement("button"); b.className = "cn";
+    b.innerHTML = '<img loading="lazy" src="' + c.poster + '" alt=""><div><small>cena ' + c.n + ' · ' + (c.nome ? '<b>' + c.nome + ',</b> ' : '') + c.prompt.replace(/</g,"&lt;") + '</small>' +
+      (c.fala ? '<span><b>' + c.falante + ':</b> “' + c.fala + '”</span>' : '<span class="sem">sem fala · só o som da cena</span>') + '</div>';
+    b.addEventListener("click", function(){ tocar(inicio[i]) });
+    box.appendChild(b);
+  });
+  function tocar(seg){
+    if(!v.src) v.src = DEMO.pronto.video;
+    v.controls = true; tela.classList.add("tocando");
+    var vai = function(){ try{ v.currentTime = seg || 0 }catch(e){} v.muted = false; v.play().catch(function(){}) };
+    if(v.readyState >= 1) vai(); else v.addEventListener("loadedmetadata", vai, {once:true});
+  }
+  $("#telaPlay").addEventListener("click", function(){ tocar(0) });
+  v.addEventListener("timeupdate", function(){
+    var k = 0; for(var i = 0; i < inicio.length; i++) if(v.currentTime >= inicio[i] - .05) k = i;
+    $$(".cn", box).forEach(function(b, i){ b.classList.toggle("on", i === k) });
+  });
+})();
+
+/* ═══════════ O PALCO: 1 timeline, só tweens (scrub-safe) ═══════════ */
+var ETAPAS = ["csv","personagem","gerar","baixar","pronto"];
+function criarPalco(){
+  var raiz = $("#tplPalco").content.firstElementChild.cloneNode(true);
+  var q = function(s){return raiz.querySelector(s)}, qa = function(s){return raiz.querySelectorAll(s)};
+  var C = DEMO.cenas, N = C.length;
+  /* monta com os dados reais */
+  var P = DEMO.personagens, fotoDe = {};
+  P.forEach(function(p){ fotoDe[p.nome] = p.foto;
+    q("[data-elenco]").insertAdjacentHTML("beforeend", '<span class="av"><img src="' + p.foto + '" alt="">' + p.nome + '</span>') });
+  q("[data-qtdel]").textContent = P.length + " fotos";
+  var c0 = C.filter(function(c){ return c.nome })[0];
+  q("[data-foto2]").src = fotoDe[c0.nome]; q("[data-ingnome]").textContent = c0.nome;
+  q("[data-prompt]").innerHTML = "<b>" + c0.nome + ",</b> " + c0.prompt;
+  q("[data-arq]").textContent = DEMO.lote.csv; q("[data-qtd]").textContent = N + " cenas";
+  q("[data-sel]").textContent = N + "/" + N + " ✓"; q("[data-tot]").textContent = " / " + N;
+  q("[data-fim]").textContent = "✓ " + N + " de " + N + " na pasta, na ordem";
+  C.forEach(function(c){
+    q("[data-slots]").insertAdjacentHTML("beforeend", '<div class="slot"><div class="shim"></div><span class="st">gerando…</span><video muted loop playsinline preload="none" data-src="' + c.video + '" poster="' + c.poster + '"></video><span class="n">' + c.n + '</span><span class="ok">✓</span></div>');
+    q("[data-fila]").insertAdjacentHTML("beforeend", '<div class="qr"><span class="qn">' + c.n + '</span><span class="qt">' + (c.nome ? '<b>' + c.nome + ',</b> ' : '') + c.prompt + '</span><span class="qs"><em class="a">gerando</em><em class="b">✓ baixada</em></span><i class="pb"></i></div>');
+    q("[data-chips]").insertAdjacentHTML("beforeend", '<span class="chip"><i>✓</i>' + c.n + '_Flow_Video.mp4</span>');
+  });
+
+  var tl = gsap.timeline({paused:true, defaults:{duration:.4, ease:"power2.out"}});
+  var cur = q(".cur"), rip = q(".rip"), dur = {};
+  function pos(el){
+    var r = el.getBoundingClientRect(), p = raiz.getBoundingClientRect(), s = (p.width / raiz.offsetWidth) || 1;
+    return {x:(r.left - p.left + r.width/2)/s, y:(r.top - p.top + r.height/2)/s};
+  }
+  function mira(el, at){
+    tl.to(cur, {x:function(){return pos(el).x}, y:function(){return pos(el).y}, opacity:1, duration:.6, ease:"power3.inOut"}, at);
+    tl.to(cur, {scale:.8, duration:.08, yoyo:true, repeat:1}, ">");
+    tl.fromTo(rip, {x:function(){return pos(el).x}, y:function(){return pos(el).y}, scale:.2, opacity:.8}, {scale:1.7, opacity:0, duration:.5, immediateRender:false}, "<");
+  }
+  function conta(el, de, ate, at, d){
+    var o = {n:de};
+    tl.to(o, {n:ate, duration:d, ease:"none", onUpdate:function(){ el.textContent = Math.round(o.n) }}, at);
+  }
+  function etapa(nome, fn){ var a = tl.duration(); tl.addLabel(nome); fn(); dur[nome] = [a, tl.duration()]; }
+  var slots = qa(".slot:not(.vazio)"), filas = qa(".qr"), chips = qa(".chip");
+
+  etapa("csv", function(){
+    mira(q(".arq"), "+=.3");
+    tl.fromTo(q(".fn"), {clipPath:"inset(0 100% 0 0)"}, {clipPath:"inset(0 0% 0 0)", duration:.7, ease:"steps(15)", immediateRender:false}, ">");
+    tl.to(q(".arq"), {borderStyle:"solid", borderColor:"rgba(251,191,36,.55)", duration:.2}, "<");
+    tl.to(q(".arq .qt"), {opacity:1}, ">");
+    tl.to(filas, {opacity:1, y:0, stagger:.12}, "<");
+    tl.to({}, {duration:.6});
+  });
+  etapa("personagem", function(){
+    mira(q(".eln"), ">");
+    tl.to(qa(".av"), {opacity:1, scale:1, stagger:.12, duration:.3, ease:"back.out(2)"}, ">");
+    tl.to(qa(".qr .qt b"), {color:"#fde68a", stagger:.06, duration:.25}, "<+.2");
+    tl.to(q(".gv__ing img"), {opacity:1, duration:.3}, "<");
+    tl.to({}, {duration:.7});
+  });
+  etapa("gerar", function(){
+    mira(q(".go"), ">");
+    tl.to(q(".g1"), {opacity:0, duration:.15}, ">"); tl.to(q(".g2"), {opacity:1, duration:.15}, "<");
+    tl.fromTo(q("[data-prompt]"), {clipPath:"inset(0 100% 0 0)"}, {clipPath:"inset(0 0% 0 0)", duration:.8, ease:"steps(40)", immediateRender:false}, "<");
+    tl.to(cur, {opacity:0, duration:.3}, "<+.2");
+    /* 4 no ar ao mesmo tempo (o padrão no Vids): as 4 primeiras saem juntas */
+    for(var i = 0; i < Math.min(4, N); i++) comeca(i, "gerar+=" + (1.15 + i*.12));
+    conta(q("[data-noar]"), 0, Math.min(4, N), "gerar+=1.15", .4);
+    tl.to({}, {duration:1.2});
+  });
+  function comeca(i, at){
+    tl.to(slots[i].querySelector(".shim"), {opacity:1, duration:.3}, at);
+    tl.to(slots[i].querySelector(".st"), {opacity:1, duration:.3}, at);
+    tl.to(filas[i].querySelector(".a"), {opacity:1, duration:.2}, at);
+    tl.to(filas[i].querySelector(".pb"), {scaleX:1, duration:2.2, ease:"none"}, at);
+  }
+  etapa("baixar", function(){
+    /* cada uma que fica pronta baixa na hora e libera a vaga pra próxima */
+    for(var i = 0; i < N; i++){
+      var at = "baixar+=" + (i*.62);
+      tl.to(slots[i].querySelector("video"), {opacity:1, duration:.5}, at);
+      tl.to(slots[i].querySelectorAll(".shim, .st"), {opacity:0, duration:.3}, at);
+      tl.fromTo(slots[i].querySelector(".ok"), {opacity:0, scale:.4}, {opacity:1, scale:1, duration:.35, ease:"back.out(3)", immediateRender:false}, at);
+      tl.to(filas[i].querySelector(".a"), {opacity:0, duration:.15}, at);
+      tl.to(filas[i].querySelector(".b"), {opacity:1, duration:.2}, at);
+      tl.to(filas[i].querySelector(".pb"), {opacity:0, duration:.2}, at);
+      tl.to(chips[i], {opacity:1, y:0, duration:.35, ease:"back.out(2)"}, at);
+      if(i + 4 < N) comeca(i + 4, at);
+      /* a fila e a prateleira andam pra mostrar as próximas */
+      if(i >= 2 && i + 3 < N) tl.to(q("[data-fila]"), {y:-(i - 1)*25, duration:.4, ease:"power2.inOut"}, at);
+      if(i >= 4) tl.to(q("[data-chips]"), {x:-(i - 3)*158, duration:.4, ease:"power2.inOut"}, at);
+    }
+    conta(q("[data-bx]"), 0, N, "baixar", (N-1)*.62 + .1);
+    conta(q("[data-noar]"), Math.min(4, N), 0, "baixar+=" + ((N-4)*.62), 4*.62);
+    tl.to({}, {duration:.4});
+  });
+  etapa("pronto", function(){
+    tl.to(q(".g2"), {opacity:0, duration:.2}, ">"); tl.to(q(".g3"), {opacity:1, duration:.2}, "<");
+    tl.to(q(".go"), {background:"linear-gradient(135deg,#16a34a,#4ade80)", duration:.4}, "<");
+    tl.to(chips, {borderColor:"rgba(74,222,128,.45)", stagger:.06, duration:.25}, "<");
+    tl.to({}, {duration:1.8});
+  });
+
+  /* os vídeos reais só carregam quando o palco aparece (4G) */
+  var carregou = false;
+  function carregar(){ if(carregou) return; carregou = true;
+    $$("video[data-src]", raiz).forEach(function(v){ v.src = v.dataset.src; v.play().catch(function(){}) });
+  }
+  return {raiz:raiz, timeline:tl, duracoes:dur, carregar:carregar};
+}
+
+/* palco de tamanho fixo, só o zoom muda (com modo compacto no celular) */
+function escalarParaCaber(scaler, alturaMax){
+  var wrap = scaler.parentElement, BW = 880, BH = 540;
+  var aplicar = function(){
+    var w = wrap.clientWidth; if(!w) return;
+    var compacto = w < 560; scaler.classList.toggle("compacto", compacto);
+    var base = compacto ? 620 : BW;
+    var s = Math.min(1, w / base);
+    if(alturaMax) s = Math.min(s, alturaMax() / BH);
+    scaler.style.transform = "scale(" + s + ")";
+    wrap.style.height = (BH * s) + "px";
+    scaler.style.marginLeft = Math.max(0, (w - base*s)/2) + "px";
+  };
+  aplicar(); new ResizeObserver(aplicar).observe(wrap); addEventListener("resize", aplicar);
+}
+
+/* ═══════════ MOVIMENTO COM INTENÇÃO ═══════════ */
+function revelar(){
+  if(reduz){ gsap.set("[data-reveal]", {opacity:1, y:0}); return; }
+  gsap.to(".hero [data-reveal]", {opacity:1, y:0, duration:.9, ease:"power3.out", stagger:.09, delay:.1});
+  $$("[data-reveal]").forEach(function(el){
+    if(el.closest(".hero")) return;
+    gsap.to(el, {opacity:1, y:0, duration:.8, ease:"power3.out", scrollTrigger:{trigger:el, start:"top 90%", once:true}});
+  });
+}
+function contadores(){
+  $$("[data-conta]").forEach(function(el){
+    var alvo = +el.dataset.conta, o = {v:0}; if(reduz || !alvo) return;
+    el.textContent = "0";
+    ScrollTrigger.create({trigger:el, start:"top 88%", once:true, onEnter:function(){
+      gsap.to(o, {v:alvo, duration:1.6, ease:"power2.out", onUpdate:function(){ el.textContent = Math.round(o.v) }});
+    }});
+  });
+}
+function inclinar(el){
+  if(toque || reduz) return;
+  var rx = gsap.quickTo(el, "rotationX", {duration:.5, ease:"power3"}), ry = gsap.quickTo(el, "rotationY", {duration:.5, ease:"power3"});
+  el.addEventListener("pointermove", function(e){ var r = el.getBoundingClientRect();
+    ry(((e.clientX - r.left)/r.width - .5) * 10); rx(-((e.clientY - r.top)/r.height - .5) * 8); });   /* ≤ 6° */
+  el.addEventListener("pointerleave", function(){ rx(0); ry(0) });
+}
+function magnetico(el){
+  if(toque || reduz) return;
+  var x = gsap.quickTo(el, "x", {duration:.4, ease:"power3"}), y = gsap.quickTo(el, "y", {duration:.4, ease:"power3"});
+  el.addEventListener("pointermove", function(e){ var r = el.getBoundingClientRect();
+    x((e.clientX - r.left - r.width/2) * .25); y((e.clientY - r.top - r.height/2) * .35); });
+  el.addEventListener("pointerleave", function(){ x(0); y(0) });
+}
+
+function iniciar(){
+  var modo = document.documentElement.dataset.t;
+  if(modo === "a"){
+    /* tratamento A — vitrine: a timeline toca sozinha, em loop */
+    var p = criarPalco(); $("#palcoHero").appendChild(p.raiz);
+    escalarParaCaber(p.raiz, function(){ return innerWidth > 980 ? innerHeight - 190 : 9999 });
+    var loop = gsap.timeline({repeat:-1, paused:true});
+    loop.add(p.timeline.tweenFromTo(0, p.timeline.duration(), {ease:"none"}))
+        .to(p.raiz, {opacity:0, duration:.45})
+        .add(p.timeline.tweenTo(0, {duration:.01}))
+        .to(p.raiz, {opacity:1, duration:.45});
+    if(reduz){ p.timeline.progress(1); p.carregar(); }
+    else ScrollTrigger.create({trigger:"#palcoHero", start:"top bottom", end:"bottom top",
+      onToggle:function(s){ if(s.isActive){ p.carregar(); loop.delay(1.1).play() } else loop.pause() }});
+  } else {
+    /* tratamento B — a MESMA timeline arrastada pela rolagem, seção presa */
+    var p2 = criarPalco(); $("#palcoPreso").appendChild(p2.raiz);
+    escalarParaCaber(p2.raiz, function(){ return innerHeight - 66 - (innerWidth > 900 ? 120 : 260) });
+    var itens = $$("#trilho li");
+    var marcar = function(t){
+      var k = 0; ETAPAS.forEach(function(e, i){ if(t >= p2.duracoes[e][0] - .01) k = i });
+      itens.forEach(function(li, i){ li.classList.toggle("on", i === k); li.classList.toggle("feito", i < k) });
+    };
+    marcar(0); p2.carregar();
+    p2.timeline.eventCallback("onUpdate", function(){ marcar(p2.timeline.time()) });
+    if(reduz) p2.timeline.progress(1);
+    else ScrollTrigger.create({trigger:"#preso", start:"top top", end:function(){ return "+=" + Math.round(p2.timeline.duration()*210) },
+      pin:true, scrub:.9, animation:p2.timeline, anticipatePin:1, invalidateOnRefresh:true});
+  }
+  contadores();
+  $$("[data-inclina]").forEach(inclinar);
+  $$("[data-magnetico]").forEach(magnetico);
+}
+
+/* sem GSAP (CDN fora): página estática e completa */
+if(!(window.gsap && window.ScrollTrigger)) return;
+document.body.classList.remove("no-js");
+gsap.registerPlugin(ScrollTrigger);
+revelar();
+/* o palco mede posições pro cursor: espera as fontes, no máximo 1,5 s */
+var pronto = false, go = function(){ if(pronto) return; pronto = true; iniciar(); ScrollTrigger.refresh(); };
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(go);
+setTimeout(go, 1500);
+})();
+</script>
+</body>
+</html>
