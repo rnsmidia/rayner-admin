@@ -41,6 +41,12 @@ const PADRAO = {
     faq: '1557072936119308338',
     diag: '1557199153254105141',           // #diagnosticos do Staff
   },
+  // A SALA Fase 3 (28/11/26): uma fila no Staff POR FERRAMENTA (o aprendizado e os TRIs não se misturam).
+  // A chave é a etiqueta do #suporte. Quem não passa `filas` (Narrativa) tem uma fila só, montada de `canais`.
+  filas: {
+    One:   { nome: 'CenaDrop One',   chamados: '1555372737915134092', fila: '1557072944176439318', diag: '1557199153254105141' },
+    Multi: { nome: 'CenaDrop Multi', chamados: '1576133388375429171', fila: '1576133390216995007', diag: '1576133392398033056' },
+  },
   cor: 0x7C3AED,
   equipe: 'Equipe A Sala',                 // autor das respostas no post (o salvarCaso lê esse nome de volta; aceita os antigos)
   // A SALA (28/11/26): os 2 bots dividem o MESMO fórum #suporte. Cada um só atende post com a etiqueta da sua ferramenta.
@@ -125,7 +131,12 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
   const maisNovoPrimeiro = (lista) => lista.sort((a, b) => String(b.criado || '').localeCompare(String(a.criado || '')));
   const GUILD_ID = cfg.guild, STAFF_GUILD = cfg.staffGuild, COR = cfg.cor;
   const PADRAO_DIAG = FONTES.length === 1 ? FONTES[0].padrao : new RegExp(FONTES.map((f) => f.padrao.source).join('|'));
-  const { suporte: SUPORTE, chamados: CHAMADOS, fila: PAINEL_FILA, faq: FAQ, diag: CANAL_DIAG } = cfg.canais;
+  const { suporte: SUPORTE, faq: FAQ } = cfg.canais;
+  const FILAS = cfgDado.filas || (cfgDado.canais?.chamados
+    ? { [cfg.etiquetasProduto[0]]: { nome: cfg.produto, chamados: cfg.canais.chamados, fila: cfg.canais.fila, diag: cfg.canais.diag } }
+    : PADRAO.filas);
+  const FILA_PADRAO = Object.keys(FILAS)[0];
+  const FORUNS_CHAMADOS = new Set(Object.values(FILAS).map((f) => f.chamados));
   const TAG = cfg.produto === 'cenadrop' ? '[Suporte]' : `[Suporte ${cfg.produto}]`;
   const PRODUTOS_TODOS = ['One', 'Multi', 'Narrativa'];
   const EQUIPES = [cfg.equipe, 'Equipe CenaDrop', 'Equipe Narrativa', 'Equipe A Sala'];   // nomes antigos: posts de antes d'A SALA
@@ -259,6 +270,9 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
   // este post é deste bot? (com etiqueta de ferramenta: só a minha · sem etiqueta: só o roteador)
   const ehMeu = (th) => { const t = tagsProduto(th); return t.length ? t.some((n) => cfg.etiquetasProduto.includes(n)) : !!cfg.roteador; };
   const produtoDoCodigo = (codigo) => (cfg.produto === 'narrativa' ? 'Narrativa' : /^M-/.test(codigo || '') ? 'Multi' : 'One');
+  // de qual fila do Staff é: pela etiqueta do post; sem etiqueta, pelo código (M- = Multi); senão a 1ª
+  const filaDoCodigo = (codigo) => { const p = codigo ? produtoDoCodigo(codigo) : null; return FILAS[p] ? p : FILA_PADRAO; };
+  const filaDoPost = (th, codigo = null) => tagsProduto(th).find((n) => FILAS[n]) || filaDoCodigo(codigo);
 
   async function marcarStatus(thread, status) {
     try {
@@ -454,8 +468,9 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
   });
 
   // ── fila ──────────────────────────────────────────────────────────────────
-  const naFila = () => [...chamados.entries()].filter(([, c]) => c.status === 'fila').sort((a, b) => a[1].criado - b[1].criado);
-  const posicao = (id) => { const i = naFila().findIndex(([k]) => k === id); return i < 0 ? null : i + 1; };
+  // cada ferramenta tem a SUA fila: a posição do aluno conta só os chamados da mesma ferramenta
+  const naFila = (fila) => [...chamados.entries()].filter(([, c]) => c.status === 'fila' && (c.fila || FILA_PADRAO) === fila).sort((a, b) => a[1].criado - b[1].criado);
+  const posicao = (id) => { const c = chamados.get(id); if (!c) return null; const i = naFila(c.fila || FILA_PADRAO).findIndex(([k]) => k === id); return i < 0 ? null : i + 1; };
 
   function cartao(status, pos) {
     if (status === 'fila') return { title: `🎫 Você é o nº ${pos} na fila`, description: 'A equipe responde **em ordem de chegada**. Este cartão se atualiza sozinho conforme a fila anda.', color: 0xEAB308 };
@@ -468,10 +483,9 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
     for (const [cid, c] of [...chamados.entries()]) {
       if (c.status === 'bot' && Date.now() - c.criado > PRAZO_BOT) await resolver(cid, 'prazo');
     }
-    const fila = naFila();
     for (const [cid, c] of chamados) {
       if (!c.cardId) continue;   // 🤖 bot respondeu: ainda sem cartão no post
-      const pos = c.status === 'fila' ? fila.findIndex(([k]) => k === cid) + 1 : null;
+      const pos = c.status === 'fila' ? posicao(cid) : null;
       const emb = cartao(c.status, pos);
       if (cartaoTexto.get(c.cardId) === emb.title) continue;
       try {
@@ -483,11 +497,17 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
         console.error(`${TAG} cartão:`, err.message);
       }
     }
-    // painel do Staff
+    // painel do Staff: um por ferramenta
+    for (const [nomeFila, f] of Object.entries(FILAS)) await painelDaFila(nomeFila, f);
+  }
+
+  async function painelDaFila(nomeFila, f) {
     try {
-      const canal = await client.channels.fetch(PAINEL_FILA);
-      const atend = [...chamados.entries()].filter(([, c]) => c.status === 'atendimento');
-      const doBot = [...chamados.entries()].filter(([, c]) => c.status === 'bot');
+      const canal = await client.channels.fetch(f.fila);
+      const daFila = [...chamados.entries()].filter(([, c]) => (c.fila || FILA_PADRAO) === nomeFila);
+      const fila = naFila(nomeFila);
+      const atend = daFila.filter(([, c]) => c.status === 'atendimento');
+      const doBot = daFila.filter(([, c]) => c.status === 'bot');
       const linhas = [
         `**🟡 Na fila (${fila.length})**`,
         ...(fila.length ? fila.map(([, c], i) => `${i + 1}. <#${c.staffId}> · ${c.email ? '📧 ' : ''}${c.cliente} · esperando há ${haQuanto(c.criado)}`) : ['— ninguém esperando 🎉']),
@@ -501,7 +521,7 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
         '',
         `-# Atualizado <t:${Math.floor(Date.now() / 1000)}:R> · responda dentro do chamado · \`//\` = nota interna · ✅ no topo do chamado (ou \`!resolvido\`) fecha`,
       ];
-      const embed = { title: '📋 Fila de atendimento', description: linhas.join('\n').slice(0, 4000), color: COR };
+      const embed = { title: Object.keys(FILAS).length > 1 ? `📋 Fila · ${f.nome}` : '📋 Fila de atendimento', description: linhas.join('\n').slice(0, 4000), color: COR };
       const ultimas = await canal.messages.fetch({ limit: 10 });
       const meu = ultimas.find((m) => m.author.id === client.user.id);
       if (meu) await meu.edit({ embeds: [embed] }); else await canal.send({ embeds: [embed] });
@@ -541,7 +561,8 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
 
   async function abrirChamado(thread, user, { codigoDado = null, modo = 'fila', botResumo = null } = {}) {
     const ehBot = modo === 'bot';
-    const card = ehBot ? null : await thread.send({ embeds: [cartao('fila', naFila().length + 1)] });
+    const filaNome = filaDoPost(thread, codigoDado || thread.name.match(PADRAO_DIAG)?.[0]);
+    const card = ehBot ? null : await thread.send({ embeds: [cartao('fila', naFila(filaNome).length + 1)] });
     // diagnóstico só faz sentido em problema técnico — dúvida de licença/plano não precisa
     const assuntoTag = thread.appliedTags.map((id) => nomeTag(thread.parent, id)).find((n) => n && !NAO_ASSUNTO.includes(n));
     // o D-XXXX é da extensão CenaDrop: Elo IA e Narrativa não têm esse diagnóstico
@@ -562,7 +583,7 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
     const assunto = thread.appliedTags.map((id) => nomeTag(thread.parent, id)).find((n) => n && !NAO_ASSUNTO.includes(n));
     const anexos = inicial ? [...inicial.attachments.values()].map((a) => a.url) : [];
 
-    const staffForum = await client.channels.fetch(CHAMADOS);
+    const staffForum = await client.channels.fetch(FILAS[filaNome].chamados);
     const staffTags = tagsDe(staffForum);
     const staff = await staffForum.threads.create({
       name: `${thread.name}`.slice(0, 95),
@@ -593,13 +614,13 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
     });
     const cliente = user.username;
     donos.set(thread.id, user.id);
-    chamados.set(thread.id, { staffId: staff.id, cardId: card ? card.id : null, status: ehBot ? 'bot' : 'fila', criado, titulo: thread.name, cliente });
+    chamados.set(thread.id, { staffId: staff.id, cardId: card ? card.id : null, status: ehBot ? 'bot' : 'fila', criado, titulo: thread.name, cliente, fila: filaNome });
     anotarCodigo(thread.id, codigo);
     doStaff.set(staff.id, thread.id);
     if (codigo && cfg.diag) await ligarCartaoDiag(codigo, staff.id);
     if (ehBot) { await atualizarFila(); return; }
     await marcarStatus(thread, 'Na fila');
-    await logStaff(`🎫 Novo chamado na fila · **${cliente}** · "${thread.name}" · <#${staff.id}>`);
+    await logStaff(`🎫 Novo chamado na fila ${FILAS[filaNome].nome} · **${cliente}** · "${thread.name}" · <#${staff.id}>`);
     await atualizarFila();
   }
 
@@ -718,14 +739,24 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
     }
   }
 
+  // cartão do diagnóstico no Staff: no #diagnosticos da ferramenta; os de antes da Fase 3 (28/11) ficaram todos no do One
+  async function cartaoDoDiag(codigo, msgId) {
+    const canais = [FILAS[filaDoCodigo(codigo)].diag, ...Object.values(FILAS).map((f) => f.diag)];
+    for (const id of [...new Set(canais)]) {
+      const canal = await client.channels.fetch(id).catch(() => null);
+      const msg = canal ? await canal.messages.fetch(msgId).catch(() => null) : null;
+      if (msg) return msg;
+    }
+    return null;
+  }
+
   // O cartão do #diagnosticos acompanha o chamado: respondido ali (verde) ou fechado sem resposta da equipe (cinza)
   async function atualizarCartoesDiag(linhas, situacao, cor, resposta = null) {
     if (!linhas?.length) return;
     try {
-      const canal = await client.channels.fetch(CANAL_DIAG);
       for (const d of linhas) {
         if (!d.staff_msg_id) continue;
-        const msg = await canal.messages.fetch(d.staff_msg_id).catch(() => null);
+        const msg = await cartaoDoDiag(d.codigo, d.staff_msg_id);
         if (!msg?.embeds?.[0]) continue;
         const e = msg.embeds[0].toJSON();
         const fields = (e.fields || []).filter((f) => !['A resposta vai por', 'Resposta'].includes(f.name));
@@ -742,12 +773,11 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
     try {
       const { data: d } = await db().from(fonteDe(codigo).tabela).select('id, codigo, staff_msg_id, status').eq('codigo', codigo).maybeSingle();
       if (!d?.staff_msg_id || ['respondido', 'encerrado'].includes(d.status)) return;
-      const canal = await client.channels.fetch(CANAL_DIAG);
-      const msg = await canal.messages.fetch(d.staff_msg_id).catch(() => null);
+      const msg = await cartaoDoDiag(codigo, d.staff_msg_id);
       if (!msg?.embeds?.[0]) return;
       const e = msg.embeds[0].toJSON();
       const fields = [...(e.fields || []).filter((f) => f.name !== 'A resposta vai por'), { name: 'A resposta vai por', value: `📌 responda no chamado <#${staffId}>` }];
-      await msg.edit({ embeds: [{ ...e, color: 0x3B82F6, title: `📌 ${d.codigo} · ${e.title.replace(/^\S+ /, '').split(' · ')[1] || 'aluno'} · no #chamados`, fields }],
+      await msg.edit({ embeds: [{ ...e, color: 0x3B82F6, title: `📌 ${d.codigo} · ${e.title.replace(/^\S+ /, '').split(' · ')[1] || 'aluno'} · no chamado`, fields }],
         components: [new ActionRowBuilder().addComponents(
           new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel('Abrir o chamado').setEmoji('📌').setURL(linkThread(STAFF_GUILD, staffId)),
         )] });
@@ -864,8 +894,9 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
     let email = dd.email, lic = null;
     if (dd.chave) ({ data: lic } = await db().from('licenses').select('key, email, name, active, status, source').eq('key', dd.chave).maybeSingle());
     email = email || lic?.email;
-    // mesmo aluno já tem chamado 📧 aberto → junta neste
-    const mesmo = [...chamados.entries()].find(([, c]) => c.email && email && c.email === email.toLowerCase());
+    // mesmo aluno já tem chamado 📧 aberto NA MESMA FERRAMENTA → junta neste (One e Multi não se misturam)
+    const filaNome = filaDoCodigo(dd.codigo);
+    const mesmo = [...chamados.entries()].find(([, c]) => c.email && email && c.email === email.toLowerCase() && (c.fila || FILA_PADRAO) === filaNome);
     if (mesmo) {
       const [cid, c] = mesmo;
       anotarCodigo(cid, dd.codigo);
@@ -878,7 +909,7 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
     const nome = dd.nome || lic?.name || 'aluno';
     const conta = cfg.contaDoDiag ? await cfg.contaDoDiag(dd, db)
       : { campo: 'Licença', texto: lic ? `${mascarar(lic.key)} · ${lic.source || '—'} · ${lic.active !== false && lic.status !== 'inactive' ? 'ativa ✅' : 'DESATIVADA ⛔'}` : 'chave não encontrada' };
-    const staffForum = await client.channels.fetch(CHAMADOS);
+    const staffForum = await client.channels.fetch(FILAS[filaNome].chamados);
     const staffTags = tagsDe(staffForum);
     const staff = await staffForum.threads.create({
       name: `📧 ${dd.codigo} · ${nome}`.slice(0, 95),
@@ -902,7 +933,7 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
         )],
       },
     });
-    chamados.set(cid, { staffId: staff.id, cardId: null, status: 'fila', criado: Date.now(), titulo: staff.name, cliente: nome, email: (email || '').toLowerCase() || null });
+    chamados.set(cid, { staffId: staff.id, cardId: null, status: 'fila', criado: Date.now(), titulo: staff.name, cliente: nome, email: (email || '').toLowerCase() || null, fila: filaNome });
     anotarCodigo(cid, dd.codigo);
     doStaff.set(staff.id, cid);
     await ligarCartaoDiag(dd.codigo, staff.id);
@@ -932,6 +963,7 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
     // o mesmo aluno já tem chamado aberto → o diagnóstico novo entra nele (não abre 2º post)
     for (const [cid, c] of chamados) {
       if (cid.startsWith('mail:') || donos.get(cid) !== discordId) continue;
+      if ((c.fila || FILA_PADRAO) !== filaDoCodigo(d.codigo)) continue;   // diagnóstico do Multi não entra no chamado do One (e vice-versa)
       anotarCodigo(cid, d.codigo);
       const st = await client.channels.fetch(c.staffId).catch(() => null);
       const { data: dd } = await db().from(fonteDe(d.codigo).tabela).select(fonteDe(d.codigo).campos).eq('codigo', d.codigo).maybeSingle();
@@ -964,7 +996,7 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
     if (msg.author.bot || !msg.channel.isThread?.()) return;
     try {
       // Staff → cliente
-      if (msg.channel.parentId === CHAMADOS) {
+      if (FORUNS_CHAMADOS.has(msg.channel.parentId)) {
         const cid = doStaff.get(msg.channel.id);
         if (!cid) return;
         const txt = msg.content.trim();
@@ -1015,7 +1047,14 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
 
   // ── reconstrói a fila a partir do Discord ao ligar ────────────────────────
   async function reconstruir() {
-    const forum = await client.channels.fetch(CHAMADOS);
+    for (const [nomeFila, f] of Object.entries(FILAS)) await reconstruirFila(nomeFila, f.chamados);
+    console.log(`${TAG} fila reconstruída: ${chamados.size} chamado(s) abertos`);
+    await puxarDoLimbo();
+    await atualizarFila();
+  }
+
+  async function reconstruirFila(nomeFila, forumId) {
+    const forum = await client.channels.fetch(forumId);
     const ativos = await forum.threads.fetchActive();
     const arquivados = await forum.threads.fetchArchived({ limit: 100 }).catch(() => ({ threads: new Map() }));
     const todos = [...ativos.threads.values(), ...arquivados.threads.values()];
@@ -1027,7 +1066,7 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
       const ref = ini?.embeds?.[0]?.footer?.text?.match(/^ref:(\d+|mail:[0-9a-f-]+):(\d+)$/);
       if (!ref) continue;
       const cliente = ini.embeds[0].fields?.find((f) => f.name === 'Cliente')?.value?.match(/\*\*(.+?)\*\*/)?.[1] || '?';
-      chamados.set(ref[1], { staffId: st.id, cardId: ref[2] === '0' ? null : ref[2], status, criado: st.createdTimestamp, titulo: st.name, cliente });
+      chamados.set(ref[1], { staffId: st.id, cardId: ref[2] === '0' ? null : ref[2], status, criado: st.createdTimestamp, titulo: st.name, cliente, fila: nomeFila });
       const idCliente = ini.embeds[0].fields?.find((f) => f.name === 'Cliente')?.value?.match(/`(\d+)`/)?.[1];
       if (idCliente) donos.set(ref[1], idCliente);
       if (ref[1].startsWith('mail:') && cfg.diag) {   // chamado 📧: guarda o e-mail pra juntar diagnósticos do mesmo aluno
@@ -1038,9 +1077,6 @@ module.exports = function suporte(client, { db, logStaff, cfg: cfgDado = {} }) {
       anotarCodigo(ref[1], ini.embeds[0].fields?.find((f) => f.name === 'Diagnóstico')?.value?.match(PADRAO_DIAG)?.[0]);
       doStaff.set(st.id, ref[1]);
     }
-    console.log(`${TAG} fila reconstruída: ${chamados.size} chamado(s) abertos`);
-    await puxarDoLimbo();
-    await atualizarFila();
   }
 
   // Post do #suporte sem chamado e não resolvido (o aluno nunca clicou 🙋) = ficou invisível pra equipe → vai pra fila

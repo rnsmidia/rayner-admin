@@ -18,16 +18,18 @@ const {
 } = require('discord.js');
 const { enviarEmailDiag } = require('./cenadrop-email');
 
-const CANAL = '1557199153254105141';           // #diagnosticos (Staff)
+// A SALA Fase 3 (28/11/26): cada ferramenta tem o seu #diagnosticos no Staff (One = D-XXXX · Multi = M-XXXX)
+const CANAL_ONE = '1557199153254105141';       // #diagnosticos-one
+const CANAL_MULTI = '1576133392398033056';     // #diagnosticos-multi
 const SUPORTE_URL = 'https://discord.com/channels/1555365917578240130/1555372720517283931';
 const CONVITE = 'https://discord.gg/SGEVxaurAw';
 const INTERVALO = 2 * 60 * 1000;
 const COR = 0x7C3AED;
 const FONTES = [
-  { tabela: 'cenadrop_diagnosticos', selo: null, soBotao: true, admin: 'Admin › CenaDrop › Diagnósticos',
+  { tabela: 'cenadrop_diagnosticos', canal: CANAL_ONE, fila: 'One', selo: null, soBotao: true, admin: 'Admin › CenaDrop › Diagnósticos',
     campos: 'id, codigo, criado, chave, email, nome, versao, plataforma, navegador, mensagem, resumo, n_linhas',
     ambiente: (d) => `v${d.versao || '?'} · ${d.plataforma || '?'} · ${resumoNavegador(d.navegador)} · ${d.n_linhas || 0} linhas de registro` },
-  { tabela: 'multi_diagnosticos', selo: '🖥️ CenaDrop Multi', soBotao: false, admin: 'Admin › CenaDrop › Diagnósticos Multi',
+  { tabela: 'multi_diagnosticos', canal: CANAL_MULTI, fila: 'Multi', selo: '🖥️ CenaDrop Multi', soBotao: false, admin: 'Admin › CenaDrop › Diagnósticos Multi',
     campos: 'id, codigo, criado, chave, email, nome, versao, plataforma, sistema, mensagem, resumo, n_linhas',
     ambiente: (d) => `programa v${d.versao || '?'} · ${d.plataforma || '?'} · ${/Windows/i.test(d.sistema || '') ? 'Windows' : /Darwin|Mac/i.test(d.sistema || '') ? 'Mac' : '?'} · ${d.n_linhas || 0} linhas de registro` },
 ];
@@ -65,13 +67,13 @@ module.exports = function diagnosticos(client, { db, logStaff, suporte }) {
     const { data: novos, error } = await q;
     if (error) throw error;
     if (!novos?.length) return;
-    const canal = await client.channels.fetch(CANAL);
+    const canal = await client.channels.fetch(fonte.canal);
     for (const d of novos) {
       const lic = await licencaDe(d.chave);
       const chamado = suporte.chamadoComCodigo(d.codigo);
       const destino = chamado ? '📌 tem chamado aberto no #suporte'
-        : lic?.discord_id ? '📌 vai virar chamado no #chamados (se o aluno não abrir post em 10 min, o bot abre por ele)'
-          : '📧 sem Discord → virou chamado 📧 no #chamados (a resposta sai por e-mail)';
+        : lic?.discord_id ? `📌 vai virar chamado no #chamados-${fonte.fila.toLowerCase()} (se o aluno não abrir post em 10 min, o bot abre por ele)`
+          : `📧 sem Discord → virou chamado 📧 no #chamados-${fonte.fila.toLowerCase()} (a resposta sai por e-mail)`;
       const m = await canal.send({
         embeds: [{
           title: `🩺 ${d.codigo} · ${d.nome || 'sem nome'}`,
@@ -93,7 +95,7 @@ module.exports = function diagnosticos(client, { db, logStaff, suporte }) {
       if (chamado) await suporte.ligarCartaoDiag(d.codigo, suporte.staffDe(chamado));
       else if (!lic?.discord_id) await suporte.abrirChamadoEmail(d).catch((e) => console.error('[Diagnósticos] chamado 📧:', e.message));
     }
-    await logStaff(`🩺 ${novos.length} diagnóstico(s) novo(s)${fonte.selo ? ` do ${fonte.selo}` : ''} no #diagnosticos`);
+    await logStaff(`🩺 ${novos.length} diagnóstico(s) novo(s)${fonte.selo ? ` do ${fonte.selo}` : ''} no #diagnosticos-${fonte.fila.toLowerCase()}`);
   }
 
   // Fila única: diagnóstico sem chamado há 15 min → o bot abre o chamado no #suporte
